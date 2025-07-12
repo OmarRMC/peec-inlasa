@@ -1,36 +1,226 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ sidebarOpen: false, sidebarCollapsed: false, openMenu: null }" x-cloak>
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://unpkg.com/alpinejs" defer></script>
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-            @include('layouts.navigation')
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
 
-            <!-- Page Heading -->
+        .sidebar-collapsed aside {
+            width: 0 !important;
+            overflow: hidden;
+        }
+
+        .sidebar-collapsed .sidebar-toggle-button {
+            display: block;
+        }
+
+        .sidebar-toggle-button {
+            display: none;
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 50;
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 9999px;
+            padding: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            aside {
+                position: fixed;
+                z-index: 40;
+                height: 100%;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .sidebar-open aside {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle-button {
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans antialiased text-gray-800"
+    :class="{ 'sidebar-open': sidebarOpen, 'sidebar-collapsed': sidebarCollapsed }">
+
+    <!-- Toggle button when sidebar is collapsed -->
+    {{-- <button class="sidebar-toggle-button md:hidden" @click="sidebarOpen = true" x-show="!sidebarOpen">
+        <i class="fas fa-bars"></i>
+    </button> --}}
+    {{-- <button class="sidebar-toggle-button hidden md:block" @click="sidebarCollapsed = false" x-show="sidebarCollapsed">
+        <i class="fas fa-bars"></i>
+    </button> --}}
+
+    <div class="flex h-screen transition-all duration-300 ease-in-out">
+        <!-- Sidebar -->
+        <aside class="bg-white border-r shadow-sm w-64 shrink-0 flex flex-col transition-all duration-300 ease-in-out">
+            <div class="flex items-center justify-between bg-indigo-600 text-white px-4 py-4">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-microscope text-lg"></i>
+                    <span class="font-semibold text-sm">SigPEEC</span>
+                </div>
+                <div class="flex gap-2">
+                    <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-white">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button @click="sidebarCollapsed = !sidebarCollapsed" class="hidden md:inline text-white">
+                        <i class="fas fa-bars" x-show="!sidebarCollapsed"></i>
+                        <i class="fas fa-eye" x-show="sidebarCollapsed"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-2 py-4 space-y-1 text-sm overflow-y-auto">
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                    <i class="fas fa-home w-5 text-indigo-500"></i>
+                    <span>Escritorio</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                    <i class="fas fa-file-signature w-5 text-indigo-500"></i>
+                    <span>Inscripciones</span>
+                </a>
+                <!-- Certificados -->
+                <div>
+                    <button @click="openMenu !== 1 ? openMenu = 1 : openMenu = null"
+                        class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                        <i class="fas fa-certificate w-5 text-indigo-500"></i>
+                        <span>Certificados</span>
+                        <i class="fas ml-auto" :class="openMenu === 1 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+                    <div x-show="openMenu === 1" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                        <a href="#"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Cert.
+                            Participación</a>
+                        <a href="#"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Cert.
+                            Desempeño</a>
+                    </div>
+                </div>
+                <!-- Recursos Lab -->
+                <div>
+                    <button @click="openMenu !== 2 ? openMenu = 2 : openMenu = null"
+                        class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                        <i class="fas fa-vials w-5 text-indigo-500"></i>
+                        <span>Recursos Lab.</span>
+                        <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+                    <div x-show="openMenu === 2" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                        <a href="#"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Contrato
+                            2025</a>
+                        <a href="#"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Convocatoria
+                            2025</a>
+                        <a href="#"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Resolución
+                            Adm. 2025</a>
+                        <a href="#"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Protocolos
+                            e Informes Finales</a>
+                        <a href="#"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Instrucciones para
+                            QUEJAS o APELACIONES</a>
+                        <a href="#"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Formulario
+                            para QUEJAS o APELACIONES</a>
+                    </div>
+                </div>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                    <i class="fas fa-upload w-5 text-indigo-500"></i>
+                    <span>Subir Documentos</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                    <i class="fas fa-database w-5 text-indigo-500"></i>
+                    <span>Datos Laboratorio</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 text-red-600 px-3 py-2 rounded hover:bg-red-50">
+                    <i class="fas fa-book w-5"></i>
+                    <span>Manual Usuario</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                    <i class="fas fa-info-circle w-5 text-indigo-500"></i>
+                    <span>Acerca de</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white border-b px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 md:hidden">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="text-gray-500 hidden md:block" @click="sidebarCollapsed = false"
+                        x-show="sidebarCollapsed">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="text-sm font-semibold text-indigo-600 flex items-center gap-2">
+                        <i class="fas fa-flask text-indigo-500"></i> CODIGO DISPONIBLE
+                    </h1>
+                </div>
+                <div class="relative">
+                    <button @click="document.getElementById('userMenu').classList.toggle('hidden')"
+                        class="flex items-center gap-2 text-sm text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-user-circle text-lg"></i>
+                        <span class="hidden sm:inline">{{ Auth::user()->nombre ?? 'Usuario' }}</span>
+                        <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                    </button>
+                    <div id="userMenu"
+                        class="absolute right-0 mt-2 bg-white border rounded shadow-md w-56 hidden z-50">
+                        <div class="px-4 py-3 border-b text-center text-sm">
+                            <div class="text-indigo-600 font-semibold">LABORATORIO REGISTRADO</div>
+                            <div>PEEC - INLASA</div>
+                            <div class="font-bold">{{ Auth::user()->codigo ?? 'BOL1146' }}</div>
+                        </div>
+                        <form method="POST" action="{{ route('logout') }}" class="text-sm">
+                            @csrf
+                            <button type="submit"
+                                class="w-full text-left px-4 py-2 hover:bg-indigo-50 flex items-center gap-2">
+                                <i class="fas fa-sign-out-alt text-gray-500"></i> Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
             @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <div class="bg-white shadow-sm">
+                    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
-                </header>
+                </div>
             @endisset
 
-            <!-- Page Content -->
-            <main>
+            <main class="flex-1 p-6 bg-gray-50 overflow-y-auto">
                 {{ $slot }}
             </main>
+
+            <footer class="bg-white text-center py-3 border-t text-sm text-gray-600">
+                © 2025 | <strong>INLASA</strong> Instituto Nacional de Laboratorios de Salud
+                <span class="float-right mr-4 text-gray-400">SigPEEC v1.5</span>
+            </footer>
         </div>
-    </body>
+    </div>
+</body>
+
 </html>

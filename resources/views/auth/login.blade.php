@@ -9,12 +9,12 @@
 
         <!-- Usuario -->
         <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-700">CÓDIGO / USUARIO</label>
+            <label for="username" class="block text-sm font-medium text-gray-700">CÓDIGO / USUARIO</label>
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                     <i class="fas fa-user"></i>
                 </span>
-                <input id="email" name="email" type="text" :value="old('email')" required autofocus
+                <input id="username" name="username" type="text" :value="old('username')" required autofocus
                     class="pl-10 w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-200"
                     placeholder="Ingrese su código o usuario" />
             </div>
