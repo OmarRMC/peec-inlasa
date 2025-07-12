@@ -1,47 +1,63 @@
 <x-guest-layout>
+    <h2 class="text-center text-lg font-semibold text-gray-800 mb-6">Por favor, ingrese sus credenciales de acceso</h2>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Usuario -->
+        <div class="mb-4">
+            <label for="email" class="block text-sm font-medium text-gray-700">CÓDIGO / USUARIO</label>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                    <i class="fas fa-user"></i>
+                </span>
+                <input id="email" name="email" type="text" :value="old('email')" required autofocus
+                    class="pl-10 w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-200"
+                    placeholder="Ingrese su código o usuario" />
+            </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-4">
+            <label for="password" class="block text-sm font-medium text-gray-700">CONTRASEÑA</label>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                    <i class="fas fa-lock"></i>
+                </span>
+                <input id="password" name="password" type="password" required
+                    class="pl-10 w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-200"
+                    placeholder="Ingrese su contraseña" />
+            </div>
+        </div>
+
+        <!-- Mostrar contraseña -->
+        <div class="flex items-center mb-4 text-sm text-gray-600">
+            <input type="checkbox" id="show_password" class="mr-2"
+                onclick="document.getElementById('password').type = this.checked ? 'text' : 'password'">
+            <label for="show_password">Mostrar Contraseña</label>
+        </div>
+
+        <!-- Enlace recuperar -->
+        <div class="flex justify-end text-sm mb-4">
+            <a href="{{ route('password.request') }}" class="text-blue-600 hover:underline">¿Olvidaste tu
+                contraseña?</a>
+        </div>
+
+        <!-- Botón -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+            <button type="submit"
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow">
+                INGRESAR
+            </button>
         </div>
     </form>
+
+    <!-- Pie institucional -->
+    <div class="text-xs text-center text-gray-500 mt-6">
+        © 2025 | Instituto Nacional de Laboratorios de Salud<br>
+        Programa de Evaluación Externa de la Calidad
+    </div>
 </x-guest-layout>
