@@ -8,7 +8,6 @@
                 <i class="fas fa-plus-circle"></i> Nuevo Permiso
             </a>
         </div>
-
         <!-- Tabla -->
         <div class="overflow-x-auto bg-white rounded-lg shadow">
             <table class="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
@@ -36,19 +35,23 @@
                                         class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-red-500 text-white">Inactivo</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-2 flex gap-2">
+
+                            <td class="px-4 py-2">
+                            <div class="flex space-x-1">
                                 <a href="{{ route('permiso.edit', $permiso->id) }}"
-                                    class="text-indigo-600 hover:text-indigo-800 transition">
+                                    class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded shadow-sm">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('permiso.destroy', $permiso->id) }}" method="POST"
-                                    onsubmit="return confirm('¿Estás seguro de eliminar este permiso?');">
+                                <form method="POST" action="{{ route('permiso.destroy', $permiso->id) }}"
+                                    class="delete-form inline" data-nombre="{{ $permiso->nombre_permiso }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800 transition">
+                                    <button type="submit"
+                                        class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>
+                            </div>
                             </td>
                         </tr>
                     @empty

@@ -21,6 +21,6 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cargos/data', [CargoController::class, 'getData'])->name('cargos.data');
     Route::resource('cargos', CargoController::class);
-    Route::resource('permisos', PermisoController::class);
+    Route::resource('permiso', PermisoController::class);
 });
 require __DIR__ . '/auth.php';

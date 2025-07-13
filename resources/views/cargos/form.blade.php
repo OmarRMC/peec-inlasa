@@ -5,10 +5,13 @@
             <h1 class="text-2xl font-semibold text-gray-800">
                 {{ isset($cargo) ? 'Editar Cargo' : 'Crear Cargo' }}
             </h1>
-            <a href="{{ route('cargos.index') }}"
+            {{-- <a href="{{ route('cargos.index') }}"
                 class="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition">
                 <i class="fas fa-arrow-left"></i> Volver
-            </a>
+            </a> --}}
+            <div>
+                <x-shared.btn-volver :url="route('cargos.index')" />
+            </div>
         </div>
 
         {{-- Mostrar errores generales --}}
@@ -84,7 +87,7 @@
 
                 <label for="status" class="text-sm text-gray-700">Activo</label>
             </div>
-            
+
             {{-- Botones --}}
             <div class="flex justify-end gap-3">
                 <a href="{{ route('cargos.index') }}"
