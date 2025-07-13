@@ -6,8 +6,12 @@ use App\Http\Controllers\Admin\PaqueteController;
 use App\Http\Controllers\Admin\ProgramaController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
+use App\Http\Controllers\DepartamentoController;
+use App\Http\Controllers\MunicipioController;
+use App\Http\Controllers\PaisController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProvinciaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -33,5 +37,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::resource('/area', AreaController::class)->except(['show']);
     Route::resource('/paquete', PaqueteController::class)->except(['show']);
     Route::resource('/ensayo_aptitud', EnsayoAptitudController::class)->except(['show']);
+
+    Route::resource('/pais', PaisController::class)->except(['show']);
+    Route::resource('/departamento', DepartamentoController::class)->except(['show']);
+    Route::resource('/provincia', ProvinciaController::class)->except(['show']);
+    Route::resource('/municipio', MunicipioController::class)->except(['show']);
 });
 require __DIR__ . '/auth.php';
