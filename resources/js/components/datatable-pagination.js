@@ -22,7 +22,7 @@ export function setupPagination(table, options = {}) {
         return `<button ${isDisabled ? 'disabled' : ''} data-page="${page}"
             class="px-3 py-1 rounded-md border text-sm transition
                 ${isDisabled ? 'bg-gray-100 text-gray-400 border-gray-200 opacity-50 cursor-not-allowed' : ''}
-                ${isCurrent ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'bg-white text-indigo-700 border-gray-300 hover:bg-indigo-50'}">
+                ${isCurrent ? 'bg-blue-600 text-white border-blue-600 shadow' : 'bg-white text-blue-700 border-gray-300 hover:bg-blue-50'}">
             ${label}
         </button>`;
     };

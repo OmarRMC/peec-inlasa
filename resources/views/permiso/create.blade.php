@@ -15,12 +15,11 @@
 
             {{-- Formulario --}}
             <form action="{{ route('permiso.store') }}" method="POST" class="space-y-4">
+                @csrf
                 @include('permiso.form')
-
-                {{-- Botón guardar --}}
                 <div class="flex justify-end">
                     <button type="submit"
-                        class="bg-indigo-600 text-white px-4 py-2 rounded-md shadow hover:bg-indigo-500 transition text-sm flex gap-2 items-center">
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-500 transition text-sm flex gap-2 items-center">
                         <i class="fas fa-save"></i> Guardar
                     </button>
                 </div>

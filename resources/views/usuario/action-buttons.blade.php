@@ -1,7 +1,11 @@
-@props(['editUrl', 'deleteUrl', 'nombre', 'id'])
+@props(['editUrl', 'deleteUrl', 'showUrl', 'nombre', 'id'])
 
 <div class="flex space-x-1">
-    <a href="{{ $editUrl }}" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"
+    <a href="{{ $showUrl }}" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-1 rounded shadow-sm"
+        data-tippy-content="Ver">
+        <i class="fas fa-eye"></i>
+    </a>
+    <a href="{{ $editUrl }}" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded shadow-sm"
         data-tippy-content="Editar">
         <i class="fas fa-edit"></i>
     </a>

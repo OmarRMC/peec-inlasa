@@ -3,12 +3,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Traits\General;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    use General;
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
@@ -23,11 +28,11 @@ class User extends Authenticatable
         'ap_paterno',
         'ap_materno',
         'ci',
-        'telefono',
-        'email',
-        'password',
-        'id_cargo',
+        'talefono',
         'status',
+        'id_cargo',
+        'email',
+        'password'
     ];
 
     /**
@@ -51,5 +56,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relación con el cargo (1:N)
+     */
+    public function cargo(): BelongsTo
+    {
+        return $this->belongsTo(Cargo::class, 'id_cargo');
+    }
+
+    /**
+     * Relación con permisos (N:M)
+     */
+    public function permisos(): BelongsToMany
+    {
+        return $this->belongsToMany(Permiso::class, 'usuario_permiso', 'id_usuario', 'id_permiso')->withTimestamps();
     }
 }

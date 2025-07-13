@@ -4,7 +4,7 @@
         <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
             <h1 class="text-xl font-bold text-gray-800">Lista de Permisos</h1>
             <a href="{{ route('permiso.create') }}"
-                class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 transition shadow-md text-sm">
+                class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition shadow-md text-sm">
                 <i class="fas fa-plus-circle"></i> Nuevo Permiso
             </a>
         </div>
@@ -37,21 +37,21 @@
                             </td>
 
                             <td class="px-4 py-2">
-                            <div class="flex space-x-1">
-                                <a href="{{ route('permiso.edit', $permiso->id) }}"
-                                    class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded shadow-sm">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form method="POST" action="{{ route('permiso.destroy', $permiso->id) }}"
-                                    class="delete-form inline" data-nombre="{{ $permiso->nombre_permiso }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </div>
+                                <div class="flex space-x-1">
+                                    <a href="{{ route('permiso.edit', $permiso->id) }}"
+                                        class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="{{ route('permiso.destroy', $permiso->id) }}"
+                                        class="delete-form inline" data-nombre="{{ $permiso->nombre_permiso }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty

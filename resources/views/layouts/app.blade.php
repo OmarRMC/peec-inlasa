@@ -37,7 +37,8 @@
             top: 1rem;
             left: 1rem;
             z-index: 50;
-            background-color: #4f46e5;
+            background-color: #0891b2;
+            /* cyan-600 */
             color: white;
             border-radius: 9999px;
             padding: 0.5rem;
@@ -186,12 +187,14 @@
                         <i class="fas ml-auto" :class="openMenu === 5 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                     </button>
                     <div x-show="openMenu === 5" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
-                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        <a href="{{ route('usuario.index') }}"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                                 class="fas fa-user"></i> Usuarios</a>
                         <a href="{{ route('cargos.index') }}"
                             class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                                 class="fas fa-user-tag"></i> Cargos</a>
-                        <a href="{{ route('permiso.index') }}" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        <a href="{{ route('permiso.index') }}"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                                 class="fas fa-key"></i> Permisos</a>
                     </div>
                 </div>

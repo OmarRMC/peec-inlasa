@@ -5,10 +5,6 @@
             <h1 class="text-2xl font-semibold text-gray-800">
                 {{ isset($cargo) ? 'Editar Cargo' : 'Crear Cargo' }}
             </h1>
-            {{-- <a href="{{ route('cargos.index') }}"
-                class="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition">
-                <i class="fas fa-arrow-left"></i> Volver
-            </a> --}}
             <div>
                 <x-shared.btn-volver :url="route('cargos.index')" />
             </div>
@@ -38,7 +34,7 @@
                 <label for="nombre_cargo" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Cargo</label>
                 <input type="text" name="nombre_cargo" id="nombre_cargo"
                     class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm 
-                    focus:border-indigo-400 focus:ring-1 focus:ring-indigo-300 focus:outline-none transition 
+                    focus:border-blue-400 focus:ring-1 focus:ring-blue-300 focus:outline-none transition 
                     @error('nombre_cargo') border-red-400 @enderror"
                     value="{{ old('nombre_cargo', $cargo->nombre_cargo ?? '') }}" placeholder="Nombre del Cargo">
 
@@ -52,7 +48,7 @@
                 <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                 <input type="text" name="descripcion" id="descripcion"
                     class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm 
-                    focus:border-indigo-400 focus:ring-1 focus:ring-indigo-300 focus:outline-none transition 
+                    focus:border-blue-400 focus:ring-1 focus:ring-blue-300 focus:outline-none transition 
                     @error('descripcion') border-red-400 @enderror"
                     value="{{ old('descripcion', $cargo->descripcion ?? '') }}" placeholder="Descripción del cargo">
 
@@ -66,7 +62,7 @@
                 <label for="obs" class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
                 <textarea name="obs" id="obs" rows="3"
                     class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm 
-                    focus:border-indigo-400 focus:ring-1 focus:ring-indigo-300 focus:outline-none transition 
+                    focus:border-blue-400 focus:ring-1 focus:ring-blue-300 focus:outline-none transition 
                     @error('obs') border-red-400 @enderror"
                     placeholder="Observaciones adicionales">{{ old('obs', $cargo->obs ?? '') }}</textarea>
 
@@ -81,7 +77,7 @@
                 <input type="hidden" name="status" value="0">
 
                 <input type="checkbox" name="status" id="status" value="1"
-                    class="text-indigo-600 focus:ring-indigo-300 focus:ring-1 rounded 
+                    class="text-blue-600 focus:ring-blue-300 focus:ring-1 rounded 
                     @error('status') border-red-400 @enderror"
                     {{ old('status', $cargo->status ?? true) ? 'checked' : '' }}>
 
@@ -96,7 +92,7 @@
                 </a>
 
                 <button type="submit"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-500 transition">
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-500 transition">
                     <i class="fas fa-save"></i> {{ isset($cargo) ? 'Actualizar' : 'Crear' }}
                 </button>
             </div>

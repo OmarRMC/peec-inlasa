@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
@@ -22,5 +23,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cargos/data', [CargoController::class, 'getData'])->name('cargos.data');
     Route::resource('cargos', CargoController::class);
     Route::resource('permiso', PermisoController::class);
+    Route::get('/usuario/ajax/data', [UserController::class, 'getData'])->name('usuario.data');
+    Route::resource('usuario', UserController::class);
 });
 require __DIR__ . '/auth.php';
