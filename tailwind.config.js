@@ -16,6 +16,26 @@ export default {
             },
         },
     },
+    safelist: [
+        'bg-red-100',
+        'hover:bg-red-200',
+        'text-red-700',
+        'bg-indigo-100',
+        'hover:bg-indigo-200',
+        'text-indigo-700',
+        'bg-green-500',
+        'bg-red-500',
+        'text-white',
+        'rounded',
+        'shadow-sm',
+        'px-2',
+        'py-1',
+        'ml-1',
+        'inline-block',
+        'text-xs',
+        'font-semibold',
+    ],
+
 
     plugins: [forms],
 };

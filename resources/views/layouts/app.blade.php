@@ -9,7 +9,14 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://unpkg.com/alpinejs" defer></script>
+    <!-- ToastifyJS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+    <!-- TippyJS -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
     <style>
         [x-cloak] {
             display: none !important;
@@ -60,13 +67,15 @@
 <body class="bg-gray-100 font-sans antialiased text-gray-800"
     :class="{ 'sidebar-open': sidebarOpen, 'sidebar-collapsed': sidebarCollapsed }">
 
-    <!-- Toggle button when sidebar is collapsed -->
-    {{-- <button class="sidebar-toggle-button md:hidden" @click="sidebarOpen = true" x-show="!sidebarOpen">
+    <x-alerts.sweetalert />
+
+    <!-- Sidebar Toggle Buttons -->
+    <button class="sidebar-toggle-button md:hidden" @click="sidebarOpen = true" x-show="!sidebarOpen">
         <i class="fas fa-bars"></i>
-    </button> --}}
-    {{-- <button class="sidebar-toggle-button hidden md:block" @click="sidebarCollapsed = false" x-show="sidebarCollapsed">
+    </button>
+    <button class="sidebar-toggle-button hidden md:block" @click="sidebarCollapsed = false" x-show="sidebarCollapsed">
         <i class="fas fa-bars"></i>
-    </button> --}}
+    </button>
 
     <div class="flex h-screen transition-all duration-300 ease-in-out">
         <!-- Sidebar -->
@@ -93,68 +102,110 @@
                     <i class="fas fa-home w-5 text-indigo-500"></i>
                     <span>Escritorio</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
-                    <i class="fas fa-file-signature w-5 text-indigo-500"></i>
-                    <span>Inscripciones</span>
-                </a>
-                <!-- Certificados -->
+
+                <!-- Gestión de Inscripciones -->
                 <div>
                     <button @click="openMenu !== 1 ? openMenu = 1 : openMenu = null"
                         class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
-                        <i class="fas fa-certificate w-5 text-indigo-500"></i>
-                        <span>Certificados</span>
+                        <i class="fas fa-file-signature w-5 text-indigo-500"></i>
+                        <span>Inscripciones</span>
                         <i class="fas ml-auto" :class="openMenu === 1 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                     </button>
                     <div x-show="openMenu === 1" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
-                        <a href="#"
-                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Cert.
-                            Participación</a>
-                        <a href="#"
-                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Cert.
-                            Desempeño</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-list"></i> Ver Inscripciones</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-edit"></i> Formularios</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-file-alt"></i> Documentos</a>
                     </div>
                 </div>
-                <!-- Recursos Lab -->
+
+                <!-- Certificados -->
                 <div>
                     <button @click="openMenu !== 2 ? openMenu = 2 : openMenu = null"
                         class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
-                        <i class="fas fa-vials w-5 text-indigo-500"></i>
-                        <span>Recursos Lab.</span>
+                        <i class="fas fa-certificate w-5 text-indigo-500"></i>
+                        <span>Certificados</span>
                         <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                     </button>
                     <div x-show="openMenu === 2" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
-                        <a href="#"
-                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Contrato
-                            2025</a>
-                        <a href="#"
-                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Convocatoria
-                            2025</a>
-                        <a href="#"
-                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Resolución
-                            Adm. 2025</a>
-                        <a href="#"
-                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Protocolos
-                            e Informes Finales</a>
-                        <a href="#"
-                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Instrucciones para
-                            QUEJAS o APELACIONES</a>
-                        <a href="#"
-                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">Formulario
-                            para QUEJAS o APELACIONES</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-certificate"></i> Participación</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-medal"></i> Desempeño</a>
                     </div>
                 </div>
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
-                    <i class="fas fa-upload w-5 text-indigo-500"></i>
-                    <span>Subir Documentos</span>
-                </a>
+
+                <!-- Recursos Laboratorio -->
+                <div>
+                    <button @click="openMenu !== 3 ? openMenu = 3 : openMenu = null"
+                        class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                        <i class="fas fa-vials w-5 text-indigo-500"></i>
+                        <span>Recursos Lab.</span>
+                        <i class="fas ml-auto" :class="openMenu === 3 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+                    <div x-show="openMenu === 3" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-file-contract"></i> Contrato 2025</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-bullhorn"></i> Convocatoria</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-gavel"></i> Resolución</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-file-alt"></i> Protocolos</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-exclamation-triangle"></i> Quejas</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-clipboard"></i> Formularios de Queja</a>
+                    </div>
+                </div>
+
+                <!-- Paquetes y Parámetros -->
+                <div>
+                    <button @click="openMenu !== 4 ? openMenu = 4 : openMenu = null"
+                        class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                        <i class="fas fa-boxes w-5 text-indigo-500"></i>
+                        <span>Paquetes</span>
+                        <i class="fas ml-auto" :class="openMenu === 4 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+                    <div x-show="openMenu === 4" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-box"></i> Listar Paquetes</a>
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-sliders-h"></i> Parámetros</a>
+                    </div>
+                </div>
+
+                <!-- Usuarios y Roles -->
+                <div>
+                    <button @click="openMenu !== 5 ? openMenu = 5 : openMenu = null"
+                        class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                        <i class="fas fa-users w-5 text-indigo-500"></i>
+                        <span>Usuarios</span>
+                        <i class="fas ml-auto" :class="openMenu === 5 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+                    <div x-show="openMenu === 5" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-user"></i> Usuarios</a>
+                        <a href="{{ route('cargos.index') }}"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-user-tag"></i> Cargos</a>
+                        <a href="{{ route('permisos.index') }}" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                                class="fas fa-key"></i> Permisos</a>
+                    </div>
+                </div>
+
                 <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
                     <i class="fas fa-database w-5 text-indigo-500"></i>
                     <span>Datos Laboratorio</span>
                 </a>
+
                 <a href="#" class="flex items-center gap-3 text-red-600 px-3 py-2 rounded hover:bg-red-50">
                     <i class="fas fa-book w-5"></i>
                     <span>Manual Usuario</span>
                 </a>
+
                 <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
                     <i class="fas fa-info-circle w-5 text-indigo-500"></i>
                     <span>Acerca de</span>
@@ -169,15 +220,11 @@
                     <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 md:hidden">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <button class="text-gray-500 hidden md:block" @click="sidebarCollapsed = false"
-                        x-show="sidebarCollapsed">
-                        <i class="fas fa-bars"></i>
-                    </button>
                     <h1 class="text-sm font-semibold text-indigo-600 flex items-center gap-2">
                         <i class="fas fa-flask text-indigo-500"></i> CODIGO DISPONIBLE
                     </h1>
                 </div>
-                <div class="relative">
+                <div class="relative}">
                     <button @click="document.getElementById('userMenu').classList.toggle('hidden')"
                         class="flex items-center gap-2 text-sm text-gray-700 hover:text-indigo-600">
                         <i class="fas fa-user-circle text-lg"></i>
@@ -221,6 +268,7 @@
             </footer>
         </div>
     </div>
+    @stack('scripts')
 </body>
 
 </html>

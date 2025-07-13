@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CargoController;
+use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,5 +18,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-require __DIR__.'/auth.php';
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/cargos/data', [CargoController::class, 'getData'])->name('cargos.data');
+    Route::resource('cargos', CargoController::class);
+    Route::resource('permisos', PermisoController::class);
+});
+require __DIR__ . '/auth.php';
