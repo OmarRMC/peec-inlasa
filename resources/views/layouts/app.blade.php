@@ -162,20 +162,42 @@
                     </div>
                 </div>
 
-                <!-- Paquetes y Parámetros -->
+                <!--  Programas , Area , Paquetes y Ensayo Aptutud -->
                 <div>
                     <button @click="openMenu !== 4 ? openMenu = 4 : openMenu = null"
                         class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
                         <i class="fas fa-boxes w-5 text-indigo-500"></i>
-                        <span>Paquetes</span>
+                        <span>Programas</span>
                         <i class="fas ml-auto" :class="openMenu === 4 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                     </button>
                     <div x-show="openMenu === 4" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
-                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                                class="fas fa-box"></i> Listar Paquetes</a>
-                        <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                                class="fas fa-sliders-h"></i> Parámetros</a>
+
+                        <a href="{{ route('programa.index') }}"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                            <i class="fas fa-clipboard-list"></i> <!-- icono para “Programas” -->
+                            Programas
+                        </a>
+
+                        <a href="{{ route('area.index') }}"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                            <i class="fas fa-layer-group"></i> <!-- icono para “Area” -->
+                            Área
+                        </a>
+
+                        <a href="{{ route('paquete.index') }}"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                            <i class="fas fa-box-open"></i> <!-- icono para “Paquetes” -->
+                            Paquetes
+                        </a>
+
+                        <a href="{{ route('ensayo_aptitud.index') }}"
+                            class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                            <i class="fas fa-vials"></i> <!-- icono para “Ensayo de Aptitud” -->
+                            Ensayo de Aptitud
+                        </a>
+
                     </div>
+
                 </div>
 
                 <!-- Usuarios y Roles -->

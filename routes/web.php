@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\EnsayoAptitudController;
+use App\Http\Controllers\Admin\PaqueteController;
+use App\Http\Controllers\Admin\ProgramaController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PermisoController;
@@ -21,9 +25,13 @@ Route::middleware('auth')->group(function () {
 });
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cargos/data', [CargoController::class, 'getData'])->name('cargos.data');
-    Route::resource('cargos', CargoController::class);
-    Route::resource('permiso', PermisoController::class);
+    Route::resource('cargos', CargoController::class)->except(['show']);
+    Route::resource('permiso', PermisoController::class)->except(['show']);
     Route::get('/usuario/ajax/data', [UserController::class, 'getData'])->name('usuario.data');
-    Route::resource('usuario', UserController::class);
+    Route::resource('/usuario', UserController::class);
+    Route::resource('/programa', ProgramaController::class)->except(['show']);
+    Route::resource('/area', AreaController::class)->except(['show']);
+    Route::resource('/paquete', PaqueteController::class)->except(['show']);
+    Route::resource('/ensayo_aptitud', EnsayoAptitudController::class)->except(['show']);
 });
 require __DIR__ . '/auth.php';

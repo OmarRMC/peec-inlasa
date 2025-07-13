@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.delete-form').forEach(form => {
         form.addEventListener('submit', function (e) {
             e.preventDefault();
-            const nombre = this.querySelector('.delete-button')?.dataset?.nombre || 'este registro';
+            const nombre = this.querySelector('.delete-button')?.dataset?.nombre || this.getAttribute('data-nombre') || 'este registro';
 
             Swal.fire({
                 title: `¿Eliminar "${nombre}"?`,
