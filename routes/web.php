@@ -1,17 +1,17 @@
 <?php
 
 use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\DepartamentoController;
 use App\Http\Controllers\Admin\EnsayoAptitudController;
+use App\Http\Controllers\Admin\MunicipioController;
+use App\Http\Controllers\Admin\PaisController;
 use App\Http\Controllers\Admin\PaqueteController;
 use App\Http\Controllers\Admin\ProgramaController;
+use App\Http\Controllers\Admin\ProvinciaController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
-use App\Http\Controllers\DepartamentoController;
-use App\Http\Controllers\MunicipioController;
-use App\Http\Controllers\PaisController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProvinciaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,9 +38,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::resource('/paquete', PaqueteController::class)->except(['show']);
     Route::resource('/ensayo_aptitud', EnsayoAptitudController::class)->except(['show']);
 
-    Route::resource('/pais', PaisController::class)->except(['show']);
+    Route::resource('/pais', PaisController::class)->parameters(['pais' => 'pais'])->except(['show']);
     Route::resource('/departamento', DepartamentoController::class)->except(['show']);
-    Route::resource('/provincia', ProvinciaController::class)->except(['show']);
-    Route::resource('/municipio', MunicipioController::class)->except(['show']);
+    Route::resource('/provincia', ProvinciaController::class)->parameters(['provincia' => 'provincia'])->except(['show']);
+    Route::resource('/municipio', MunicipioController::class)->parameters(['municipio' => 'municipio'])->except(['show']);
 });
 require __DIR__ . '/auth.php';

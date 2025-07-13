@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\General;
 use Illuminate\Database\Eloquent\Model;
 
 class Pais extends Model
