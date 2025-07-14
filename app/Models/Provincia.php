@@ -18,4 +18,13 @@ class Provincia extends Model
     {
         return $this->hasMany(Municipio::class, 'id_prov');
     }
+
+    public function laboratorios()
+    {
+        return $this->hasMany(Laboratorio::class, 'id_prov');
+    }
+    public function scopeActive($query)
+    {
+        return $query->where('status_prov', true);
+    }
 }

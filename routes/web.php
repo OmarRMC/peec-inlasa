@@ -1,13 +1,18 @@
 <?php
 
 use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\DepartamentoController;
 use App\Http\Controllers\Admin\EnsayoAptitudController;
+use App\Http\Controllers\Admin\InscripcionLaboratorioController;
+use App\Http\Controllers\Admin\LaboratorioController;
 use App\Http\Controllers\Admin\MunicipioController;
+use App\Http\Controllers\Admin\NivelLaboratorioController;
 use App\Http\Controllers\Admin\PaisController;
 use App\Http\Controllers\Admin\PaqueteController;
 use App\Http\Controllers\Admin\ProgramaController;
 use App\Http\Controllers\Admin\ProvinciaController;
+use App\Http\Controllers\Admin\TipoLaboratorioController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PermisoController;
@@ -15,7 +20,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard');
 });
 
 Route::get('/dashboard', function () {
@@ -42,5 +47,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::resource('/departamento', DepartamentoController::class)->except(['show']);
     Route::resource('/provincia', ProvinciaController::class)->parameters(['provincia' => 'provincia'])->except(['show']);
     Route::resource('/municipio', MunicipioController::class)->parameters(['municipio' => 'municipio'])->except(['show']);
+
+    Route::resource('nivel_laboratorio', NivelLaboratorioController::class);
+    Route::resource('tipo_laboratorio', TipoLaboratorioController::class);
+    Route::resource('categoria_laboratorio', CategoriaLaboratorioController::class);
+    Route::resource('inscripcion_laboratorio', InscripcionLaboratorioController::class);
+    Route::resource('laboratorio', LaboratorioController::class);
 });
 require __DIR__ . '/auth.php';

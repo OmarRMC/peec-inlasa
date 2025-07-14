@@ -13,4 +13,13 @@ class Municipio extends Model
     {
         return $this->belongsTo(Provincia::class, 'id_prov');
     }
+    public function laboratorios()
+    {
+        return $this->hasMany(Laboratorio::class, 'id_municipio');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status_municipio', true);
+    }
 }

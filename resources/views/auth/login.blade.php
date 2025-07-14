@@ -49,7 +49,7 @@
         <!-- Botón -->
         <div>
             <button type="submit"
-                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow">
+                class="btn-primary w-full justify-center font-semibold py-2 px-4 rounded shadow">
                 INGRESAR
             </button>
         </div>

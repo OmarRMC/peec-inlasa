@@ -14,4 +14,13 @@ class Pais extends Model
     {
         return $this->hasMany(Departamento::class, 'id_pais');
     }
+    public function laboratorios()
+    {
+        return $this->hasMany(Laboratorio::class, 'id_pais');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status_pais', true);
+    }
 }

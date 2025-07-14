@@ -18,4 +18,12 @@ class Departamento extends Model
     {
         return $this->hasMany(Provincia::class, 'id_dep');
     }
+    public function laboratorios()
+    {
+        return $this->hasMany(Laboratorio::class, 'id_dep');
+    }
+    public function scopeActive($query)
+    {
+        return $query->where('status_dep', true);
+    }
 }

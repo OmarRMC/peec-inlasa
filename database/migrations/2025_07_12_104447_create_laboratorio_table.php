@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('sigla_lab', 20)->nullable();
             $table->unsignedBigInteger('id_nivel');
             $table->unsignedBigInteger('id_tipo');
+            $table->unsignedBigInteger('id_categoria');
             $table->string('respo_lab', 50);
             $table->string('ci_respo_lab', 12)->nullable();
             $table->string('repreleg_lab', 50);
@@ -41,8 +42,12 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by');
             $table->timestamps();
             $table->foreign('id_tipo')->references('id')->on('tipo_laboratorio');
+            $table->foreign('id_categoria')->references('id')->on('categoria');
             $table->foreign('id_nivel')->references('id')->on('nivel_laboratorio');
             $table->foreign('id_municipio')->references('id')->on('municipio');
+            $table->foreign('id_pais')->references('id')->on('pais');
+            $table->foreign('id_dep')->references('id')->on('departamento');
+            $table->foreign('id_prov')->references('id')->on('provincia');
             $table->foreign('id_usuario')->references('id')->on('users');
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');

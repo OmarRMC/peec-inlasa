@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('categoria', function (Blueprint $table) {
             $table->id();
-            $table->string('descripcion_categoria', 25);
-            $table->boolean('status_categoria')->default(true);
+            $table->string('descripcion', 25);
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

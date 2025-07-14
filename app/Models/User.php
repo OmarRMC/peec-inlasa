@@ -73,4 +73,19 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Permiso::class, 'usuario_permiso', 'id_usuario', 'id_permiso')->withTimestamps();
     }
+
+    public function laboratorios()
+    {
+        return $this->hasMany(Laboratorio::class, 'id_usuario');
+    }
+
+    public function laboratoriosCreados()
+    {
+        return $this->hasMany(Laboratorio::class, 'created_by');
+    }
+
+    public function laboratoriosActualizados()
+    {
+        return $this->hasMany(Laboratorio::class, 'updated_by');
+    }
 }
