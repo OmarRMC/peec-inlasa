@@ -104,10 +104,12 @@
     display: inline-block;
     background-color: var(--color-status-active);
     color: var(--color-white);
-    padding: 0.25rem 0.5rem;
+    /* padding: 0.25rem 0.5rem; */
+    padding: 2px 1px;
     font-size: 0.75rem;
     font-weight: 600;
-    border-radius: 9999px;
+    /* border-radius: 9999px; */
+    background-origin: 4px;
     user-select: none;
 }
 
