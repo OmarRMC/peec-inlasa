@@ -23,7 +23,12 @@ class LaboratorioController extends Controller
     public function index()
     {
         $laboratorios = Laboratorio::with('usuario')->latest()->paginate(10);
-        return view('laboratorio.index', compact('laboratorios'));
+        // Cargar países para el filtro
+        $paises = Pais::active()->get();
+        $tipos = TipoLaboratorio::active()->get();
+        $categorias = CategoriaLaboratorio::active()->get();
+        $niveles = NivelLaboratorio::active()->get();
+        return view('laboratorio.index', compact('laboratorios', 'paises', 'tipos', 'categorias', 'niveles'));
     }
 
     public function create()
@@ -136,7 +141,16 @@ class LaboratorioController extends Controller
      */
     public function show(string $id)
     {
-        $laboratorio = Laboratorio::with('usuario')->findOrFail($id);
+        $laboratorio = Laboratorio::with([
+            'usuario',
+            'pais',
+            'departamento',
+            'provincia',
+            'municipio',
+            'tipo',
+            'categoria',
+            'nivel'
+        ])->findOrFail($id);
 
         return view('laboratorio.show', compact('laboratorio'));
     }
@@ -192,6 +206,7 @@ class LaboratorioController extends Controller
             'mail2_lab' => 'nullable|email',
             'telefono' => 'nullable|string|max:50',
             'password' => 'nullable|string|min:8|confirmed',
+            'status' => 'nullable|boolean',
         ], $this->messages());
 
         // Actualizar usuario
@@ -201,6 +216,7 @@ class LaboratorioController extends Controller
             'telefono' => $request->telefono,
             'ci' => $request->ci_respo_lab ?: '00000000',
             'password' => $request->filled('password') ? $request->password : $user->password,
+            'status' => $request->status ?? $user->status,
         ]);
 
         // Actualizar laboratorio
@@ -228,6 +244,7 @@ class LaboratorioController extends Controller
             'wapp2_lab' => $request->wapp2_lab,
             'mail_lab' => $request->mail_lab,
             'mail2_lab' => $request->mail2_lab,
+            'status' => $request->status ?? $user->status,
             'updated_by' => Auth::id(),
         ]);
 
@@ -298,20 +315,37 @@ class LaboratorioController extends Controller
 
     public function getData(Request $request)
     {
-        $query = Laboratorio::query()->with('pais');
+        // $query = Laboratorio::query()->with(['pais', 'usuario']);
+        $query = Laboratorio::query()->with(['pais', 'usuario', 'departamento', 'provincia', 'municipio', 'tipo', 'categoria', 'nivel']);
 
         // Aplicar filtros
-        foreach (['pais', 'dep', 'prov', 'mun'] as $f) {
+        foreach (['pais', 'dep', 'prov', 'mun', 'tipo', 'categoria', 'nivel'] as $f) {
             if ($val = $request->get($f)) {
                 $query->where("id_{$f}", $val);
             }
         }
 
+
         return datatables()
             ->of($query)
             ->addColumn('pais_nombre', fn($lab) => $lab->pais->nombre_pais)
+            ->addColumn('departamento_nombre', fn($lab) => $lab->departamento->nombre_dep ?? '-')
+            ->addColumn('provincia_nombre', fn($lab) => $lab->provincia->nombre_prov ?? '-')
+            ->addColumn('municipio_nombre', fn($lab) => $lab->municipio->nombre_municipio ?? '-')
+            ->addColumn('codigo', fn($lab) => $lab->usuario->username)
+            ->addColumn('tipo_nombre', fn($lab) => $lab->tipo->nombre_tipo ?? '-')
+            ->addColumn('categoria_nombre', fn($lab) => $lab->categoria->nombre_categoria ?? '-')
+            ->addColumn('nivel_nombre', fn($lab) => $lab->nivel->nombre ?? '-')
             ->addColumn('status_label', fn($lab) => $lab->status ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>')
-            ->addColumn('actions', fn($lab) => view('laboratorio.partials.actions', compact('lab'))->render())
+            ->addColumn('actions', function ($lab) {
+                return view('laboratorio.action-buttons', [
+                    'showUrl' => route('laboratorio.show', $lab->id),
+                    'editUrl' => route('laboratorio.edit', $lab->id),
+                    'deleteUrl' => route('laboratorio.destroy', $lab->id),
+                    'nombre' => $lab->nombre_lab,
+                    'id' => $lab->id,
+                ])->render();
+            })
             ->rawColumns(['status_label', 'actions'])
             ->toJson();
     }

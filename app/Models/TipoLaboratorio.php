@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\General;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TipoLaboratorio extends Model
 {
-    use HasFactory;
+    use HasFactory, General;
 
     protected $table = 'tipo_laboratorio';
 

@@ -365,7 +365,8 @@
             <div>
                 <label for="password" class="label  {{ !$edit ? 'required-label' : '' }}">Contraseña</label>
                 <div class="relative">
-                    <input type="password" name="password" id="password" required
+                    <input type="password" name="password" id="password"
+                        @unless ($edit) required @endunless
                         class="input-standard pr-10 w-full @error('password') border-red-500 @enderror"
                         placeholder="Mínimo 8 caracteres">
                     <span onclick="togglePassword('password')"
@@ -384,9 +385,10 @@
                     Contraseña</label>
                 <div class="relative">
                     <input type="password" name="password_confirmation" id="password_confirmation"
-                        {{ !$edit ? 'required' : '' }}
+                        @unless ($edit) required @endunless
                         class="input-standard pr-10 w-full @error('password_confirmation') border-red-500 @enderror"
                         placeholder="Repetir contraseña">
+
                     <span onclick="togglePassword('password_confirmation')"
                         class="absolute right-3 top-2.5 cursor-pointer text-gray-500">
                         <i id="icon-password_confirmation" class="fas fa-eye"></i>
@@ -399,6 +401,31 @@
 
         </div>
     </fieldset>
+
+    @if ($edit)
+        {{-- Estado --}}
+        <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
+            <legend class="flex items-center gap-2 text-lg font-semibold mb-2">
+                <i class="fas fa-toggle-on text-primary"></i> Estado del Laboratorio
+            </legend>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="status" class="label">Estado</label>
+                    <select name="status" id="status"
+                        class="input-standard max-w-md w-full @error('status') border-red-500 @enderror" required>
+                        <option value="1" {{ old('status', $laboratorio->status ?? '') == 1 ? 'selected' : '' }}>
+                            Activo</option>
+                        <option value="0"
+                            {{ old('status', $laboratorio->status ?? '') === 0 ? 'selected' : '' }}>Inactivo</option>
+                    </select>
+                    @error('status')
+                        {{-- <p class="text-red-500 text-sm mt-1">{{ $message }}</p> --}}
+                    @enderror
+                </div>
+            </div>
+        </fieldset>
+    @endif
 
 
     {{-- JavaScript para cargar selects dinámicos --}}
