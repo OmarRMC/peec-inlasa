@@ -72,7 +72,7 @@
             <table id="labs-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="px-4 py-2 text-left">ID</th>
+                        <th class="px-4 py-2 text-left">Fecha/Hora</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
                         <th class="px-4 py-2 text-left">Código</th>
                         <th class="px-4 py-2 text-left">Responsable</th>
@@ -110,8 +110,8 @@
                         }
                     },
                     columns: [{
-                            data: 'id',
-                            name: 'id'
+                            data: 'created_at',
+                            name: 'created_at',
                         },
                         {
                             data: 'nombre_lab',

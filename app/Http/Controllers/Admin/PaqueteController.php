@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Paquete;
 use App\Models\Area;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PaqueteController extends Controller
 {
@@ -74,5 +76,41 @@ class PaqueteController extends Controller
     {
         $paquete->delete();
         return redirect()->route('paquete.index')->with('success', 'Paquete eliminado correctamente.');
+    }
+
+    public function porPrograma(Request $request)
+    {
+        $programaId = $request->query('programa_id');
+
+        if (!$programaId) {
+            return response()->json([]);
+        }
+
+        // Obtener el laboratorio actual (puedes ajustar esta lógica si es por auth o por otro medio)
+        $laboratorio = Auth::user()->laboratorio;
+
+        if (!$laboratorio || !$laboratorio->id_tipo) {
+            return response()->json([]);
+        }
+
+        // Verificar si el programa está asociado al tipo de laboratorio
+        $tipoCompatible = DB::table('tipo_laboratorio_programa')
+            ->where('id_programa', $programaId)
+            ->where('id_tipo', $laboratorio->id_tipo)
+            ->exists();
+
+        if (!$tipoCompatible) {
+            return response()->json([]);
+        }
+
+        // Obtener áreas del programa → paquetes del área
+        $paquetes = Paquete::whereHas('area.programa', function ($query) use ($programaId) {
+            $query->where('programa.id', $programaId);
+        })
+            ->where('status', true)
+            ->select('id', 'descripcion', 'costo_paquete')
+            ->get();
+
+        return response()->json($paquetes);
     }
 }

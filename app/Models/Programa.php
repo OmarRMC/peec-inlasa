@@ -22,4 +22,9 @@ class Programa extends Model
     {
         return $this->hasMany(Area::class, 'id_programa');
     }
+
+    public function tipos()
+    {
+        return $this->belongsToMany(TipoLaboratorio::class, 'tipo_laboratorio_programa', 'id_programa', 'id_tipo');
+    }
 }

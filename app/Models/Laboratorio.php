@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -91,5 +92,11 @@ class Laboratorio extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
-    
+
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)
+            ->timezone('America/La_Paz')
+            ->format('d/m/Y H:i');
+    }
 }

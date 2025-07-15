@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\DepartamentoController;
 use App\Http\Controllers\Admin\EnsayoAptitudController;
+use App\Http\Controllers\Admin\InscripcionPaqueteController;
 use App\Http\Controllers\Admin\LaboratorioController;
 use App\Http\Controllers\Admin\MunicipioController;
 use App\Http\Controllers\Admin\NivelLaboratorioController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Inscripcion;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -53,5 +55,16 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::resource('laboratorio', LaboratorioController::class);
     Route::get('laboratorio/ajax/data', [LaboratorioController::class, 'getData'])->name('laboratorio.ajax.data');
     Route::resource('laboratorio', LaboratorioController::class);
+
+    Route::prefix('inscripciones')->group(function () {
+        Route::get('create/{lab}', [InscripcionPaqueteController::class, 'create'])
+            ->name('inscripcion.create');
+        Route::get('paquetes', [InscripcionPaqueteController::class, 'paquetesPorPrograma']);
+        Route::post('store', [InscripcionPaqueteController::class, 'store'])
+            ->name('inscripcion.store');
+    });
+
+    Route::get('/paquetes-programa', [PaqueteController::class, 'porPrograma'])->name('paquetes.programa');
+    Route::post('/inscripcion-paquetes', [Inscripcion::class, 'store'])->name('inscripcion-paquetes.store');
 });
 require __DIR__ . '/auth.php';

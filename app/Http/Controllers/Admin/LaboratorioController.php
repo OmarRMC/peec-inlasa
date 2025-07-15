@@ -342,8 +342,10 @@ class LaboratorioController extends Controller
                     'showUrl' => route('laboratorio.show', $lab->id),
                     'editUrl' => route('laboratorio.edit', $lab->id),
                     'deleteUrl' => route('laboratorio.destroy', $lab->id),
+                    'inscribirUrl' => route('inscripcion.create', $lab->id),
                     'nombre' => $lab->nombre_lab,
                     'id' => $lab->id,
+                    'activo' => $lab->status, // ← Aquí pasamos si está activo o no
                 ])->render();
             })
             ->rawColumns(['status_label', 'actions'])
