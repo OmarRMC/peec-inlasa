@@ -186,7 +186,7 @@
                             <i class="fas fa-tags"></i> Categoría
                         </a>
 
-                        <a href="{{ route('inscripcion_laboratorio.index') }}"
+                        <a href="{{ route('laboratorio.index') }}"
                             class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
                             <i class="fas fa-file-signature"></i> Inscripciones
                         </a>

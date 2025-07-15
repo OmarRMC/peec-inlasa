@@ -107,7 +107,11 @@ class UserController extends Controller
 
     public function destroy(User $usuario)
     {
+
         $usuario->delete();
+        // if ($user && $user->laboratorios()->count() <= 1) {
+        //     $user->delete();
+        // }
         return response()->json([
             'success' => true,
             'message' => 'Usuario eliminado correctamente.'

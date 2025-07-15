@@ -93,4 +93,16 @@ class DepartamentoController extends Controller
             'status_dep.boolean' => 'El estado debe ser válido (activo o inactivo).',
         ];
     }
+
+    /**
+     * Método para obtener datos de departamentos por país
+     */
+    public function getDataAjax(Pais $pais)
+    {
+        $departamentos = $pais->departamentos()->active()->get();
+        // $departamentos = Departamento::active()->where('id_pais', $pais->id)
+        //     ->select('id', 'nombre_dep', 'sigla_dep', 'status_dep')
+        //     ->get();
+        return response()->json($departamentos);
+    }
 }

@@ -71,4 +71,10 @@ class ProvinciaController extends Controller
             'status_prov.required' => 'Debe seleccionar un estado.',
         ];
     }
+
+    public function getDataAjax(Departamento $departamento)
+    {
+        $provincias = Provincia::where('id_dep', $departamento->id)->get();
+        return response()->json($provincias);
+    }
 }

@@ -71,4 +71,10 @@ class MunicipioController extends Controller
             'status_municipio.required' => 'Debe seleccionar un estado.',
         ];
     }
+
+    public function getDataAjax(Provincia $provincia)
+    {
+        $municipios = Municipio::where('id_prov', $provincia->id)->get();
+        return response()->json($municipios);
+    }
 }

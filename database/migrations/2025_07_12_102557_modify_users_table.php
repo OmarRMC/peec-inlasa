@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('ap_paterno', 50);
             $table->string('ap_materno', 50)->nullable();
             $table->string('ci', 15);
-            $table->string('talefono', 20)->nullable(); // Se asume que 'talefono' es un error de tipeo de 'telefono'
+            $table->string('telefono', 20)->nullable(); // Se asume que 'talefono' es un error de tipeo de 'telefono'
             $table->boolean('status');
             $table->foreign('id_cargo')->references('id')->on('cargo');
         });

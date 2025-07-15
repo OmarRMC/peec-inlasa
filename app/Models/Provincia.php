@@ -27,4 +27,10 @@ class Provincia extends Model
     {
         return $query->where('status_prov', true);
     }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('status_prov', false);
+    }
+    
 }

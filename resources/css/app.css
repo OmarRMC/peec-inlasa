@@ -187,6 +187,12 @@
     font-size: 0.875rem;
 }
 
+.required-label::after {
+    content: ' (*)';
+    color: red;
+    font-weight: bold;
+}
+
 /* Inputs y selects que usan clase input-standard */
 /* Ya los tienes */
 

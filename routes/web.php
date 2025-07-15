@@ -4,7 +4,6 @@ use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\DepartamentoController;
 use App\Http\Controllers\Admin\EnsayoAptitudController;
-use App\Http\Controllers\Admin\InscripcionLaboratorioController;
 use App\Http\Controllers\Admin\LaboratorioController;
 use App\Http\Controllers\Admin\MunicipioController;
 use App\Http\Controllers\Admin\NivelLaboratorioController;
@@ -51,7 +50,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::resource('nivel_laboratorio', NivelLaboratorioController::class);
     Route::resource('tipo_laboratorio', TipoLaboratorioController::class);
     Route::resource('categoria_laboratorio', CategoriaLaboratorioController::class);
-    Route::resource('inscripcion_laboratorio', InscripcionLaboratorioController::class);
+    Route::resource('laboratorio', LaboratorioController::class);
+    Route::get('laboratorio/ajax/data', [LaboratorioController::class, 'getData'])->name('laboratorio.ajax.data');
     Route::resource('laboratorio', LaboratorioController::class);
 });
 require __DIR__ . '/auth.php';
