@@ -20,10 +20,11 @@ export function showToast({ icon = 'success', title = '', timer = 3000 }) {
  * Muestra una alerta de confirmación con botones personalizados.
  * Devuelve una Promise que resuelve si se confirma.
  */
-export function confirmDialog({ title, text = '', confirmText = 'Sí, continuar', cancelText = 'Cancelar' }) {
+export function confirmDialog({ title, text = '', confirmText = 'Sí, continuar', cancelText = 'Cancelar', html = '', icon = 'warning' }) {
     return Swal.fire({
         title,
         text,
+        html,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#e3342f',
@@ -85,5 +86,27 @@ export function confirmDelete({ csrfToken, table }) {
                 }
             });
         });
+    });
+}
+
+
+export function confirmAsyncHandle({ handle, html, title, text , icon = 'warning' }) {
+    confirmDialog({
+        html: html || '',
+        title: title || 'Confirmar acción',
+        icon: icon,
+        title: title || 'Confirmar acción',
+        text: text || 'Esta acción no se puede deshacer.',
+        confirmText: 'Confirmar',
+        cancelText: 'Cancelar'
+
+    }).then(async result => {
+        if (result.isConfirmed) {
+            try {
+                await handle();
+            } catch (error) {
+                showError()
+            }
+        }
     });
 }

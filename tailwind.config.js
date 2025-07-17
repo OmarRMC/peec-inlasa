@@ -34,6 +34,7 @@ export default {
         'inline-block',
         'text-xs',
         'font-semibold',
+        'bg-yellow-100'
     ],
 
 

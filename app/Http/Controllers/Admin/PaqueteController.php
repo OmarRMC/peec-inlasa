@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Paquete;
 use App\Models\Area;
+use App\Models\Programa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class PaqueteController extends Controller
 {
@@ -86,31 +88,75 @@ class PaqueteController extends Controller
             return response()->json([]);
         }
 
-        // Obtener el laboratorio actual (puedes ajustar esta lógica si es por auth o por otro medio)
-        $laboratorio = Auth::user()->laboratorio;
-
-        if (!$laboratorio || !$laboratorio->id_tipo) {
+        $programa = Programa::find($programaId);
+        if (!$programa) {
             return response()->json([]);
         }
 
-        // Verificar si el programa está asociado al tipo de laboratorio
-        $tipoCompatible = DB::table('tipo_laboratorio_programa')
-            ->where('id_programa', $programaId)
-            ->where('id_tipo', $laboratorio->id_tipo)
-            ->exists();
+        $programa->load(['areas.paquetes']);
+        $data = [];
 
-        if (!$tipoCompatible) {
-            return response()->json([]);
+        foreach ($programa->areas as $area) {
+            foreach ($area->paquetes as $paquete) {
+                $data[] = [
+                    'paquete_id' => $paquete->id,
+                    'costo' => $paquete->costo_paquete,
+                    'nombre_paquete' => $paquete->descripcion,
+                    'area_id' => $area->id,
+                    'nombre_area' => $area->descripcion
+                ];
+            }
         }
 
-        // Obtener áreas del programa → paquetes del área
-        $paquetes = Paquete::whereHas('area.programa', function ($query) use ($programaId) {
-            $query->where('programa.id', $programaId);
-        })
-            ->where('status', true)
-            ->select('id', 'descripcion', 'costo_paquete')
-            ->get();
+        return response()->json($data);
+    }
 
-        return response()->json($paquetes);
+    public function getPaquetesPorPrograma(Request $request)
+    {
+        $programaId = $request->query('programa_id');
+
+        if (!$programaId) {
+            return datatables()->of(collect())->toJson();
+        }
+
+        $programa = Programa::with(['areas.paquetes'])->find($programaId);
+
+        if (!$programa) {
+            return datatables()->of(collect())->toJson();
+        }
+
+        $paquetes = collect();
+
+        foreach ($programa->areas as $area) {
+            foreach ($area->paquetes as $paquete) {
+                $paquetes->push([
+                    'id' => $paquete->id,
+                    'nombre_paquete' => $paquete->descripcion,
+                    'costo' => $paquete->costo_paquete,
+                    'nombre_area' => $area->descripcion,
+                    'status' => $paquete->status ?? 1,
+                ]);
+            }
+        }
+
+        return DataTables::of($paquetes)
+            ->addColumn('acciones', function ($row) {
+                return '
+                <div class="flex space-x-1 justify-center">
+                    <button 
+                        class="agregar-paquete bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm"
+                        data-id="' . $row['id'] . '" 
+                        data-paquete="' . e($row['nombre_paquete']) . '" 
+                        data-costo="' . $row['costo'] . '" 
+                            data-area-id="' . e($row['nombre_area']) . '" 
+                        data-area="' . e($row['nombre_area']) . '"
+                        data-tippy-content="Agregar paquete"
+                    >
+                    <i class="fas fa-plus-circle"></i>
+                    </button>
+                </div>';
+            })
+            ->rawColumns(['acciones'])
+            ->toJson();
     }
 }

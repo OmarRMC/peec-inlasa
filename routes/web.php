@@ -17,14 +17,9 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
-use App\Models\Inscripcion;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('dashboard');
-});
-
-Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -56,15 +51,13 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('laboratorio/ajax/data', [LaboratorioController::class, 'getData'])->name('laboratorio.ajax.data');
     Route::resource('laboratorio', LaboratorioController::class);
 
-    Route::prefix('inscripciones')->group(function () {
-        Route::get('create/{lab}', [InscripcionPaqueteController::class, 'create'])
+    Route::prefix('inscripcion')->group(function () {
+        Route::get('/', [InscripcionPaqueteController::class, 'index'])->name('inscripcion.index');
+        Route::get('/create/{lab}', [InscripcionPaqueteController::class, 'create'])
             ->name('inscripcion.create');
-        Route::get('paquetes', [InscripcionPaqueteController::class, 'paquetesPorPrograma']);
-        Route::post('store', [InscripcionPaqueteController::class, 'store'])
-            ->name('inscripcion.store');
+        Route::post('/paquetes', [InscripcionPaqueteController::class, 'store'])->name('inscripcion-paquetes.store');
     });
 
-    Route::get('/paquetes-programa', [PaqueteController::class, 'porPrograma'])->name('paquetes.programa');
-    Route::post('/inscripcion-paquetes', [Inscripcion::class, 'store'])->name('inscripcion-paquetes.store');
+    Route::get('/paquetes/programa', [PaqueteController::class, 'getPaquetesPorPrograma'])->name('paquetes.programa');
 });
 require __DIR__ . '/auth.php';

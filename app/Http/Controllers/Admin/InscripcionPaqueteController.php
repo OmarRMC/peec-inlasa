@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Laboratorio;
 use App\Models\Paquete;
 use App\Models\Programa;
-use App\Models\TipoLaboratorioPrograma;
-use App\Models\InscripcionPaquete;
 use App\Models\DetalleInscripcion;
+use App\Models\EnsayoAptitud;
 use App\Models\Inscripcion;
+use App\Models\InscripcionEA;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class InscripcionPaqueteController extends Controller
 {
@@ -20,6 +21,8 @@ class InscripcionPaqueteController extends Controller
     {
         $laboratorio = Laboratorio::findOrFail($labId);
         $programas = $laboratorio->tipo->programas()->get();
+
+        $programas  = Programa::active()->get();
 
         // $programas = Programa::whereHas('tipos', fn($q) => $q->where('id_tipo', $tipoLab))
         //     ->where('status', true)
@@ -45,10 +48,9 @@ class InscripcionPaqueteController extends Controller
             'paquetes.*.id' => 'required|exists:paquete,id',
             'paquetes.*.costo' => 'required|integer|min:0',
             'obs_inscripcion' => 'nullable|string|max:255',
-            'gestion' => 'required|string|max:10',
         ]);
-
-        DB::transaction(function () use ($request) {
+        try {
+            DB::beginTransaction();
             $total = collect($request->paquetes)->sum('costo');
             $ins = Inscripcion::create([
                 'id_lab' => $request->id_lab,
@@ -68,14 +70,38 @@ class InscripcionPaqueteController extends Controller
                 DetalleInscripcion::create([
                     'id_inscripcion' => $ins->id,
                     'id_paquete' => $p['id'],
-                    'descripcion_paquete' => Paquete::find($p['id'])->descripcion,
+                    'descripcion_paquete' => $p['descripcion'],
                     'costo_paquete' => $p['costo'],
                 ]);
+                $idsEA = EnsayoAptitud::where('id_paquete', $p['id'])
+                    ->active()
+                    ->pluck('descripcion', 'id');
+                foreach ($idsEA as $id => $descripcion) {
+                    InscripcionEA::create([
+                        'id_inscripcion' => $ins->id,
+                        'id_ea' => $id,
+                        'descripcion_ea' => $descripcion,
+                    ]);
+                }
             }
-        });
 
-        return redirect()->route('laboratorio.show', $request->id_lab)
-            ->with('success', 'Inscripción creada exitosamente.');
+            DB::commit();
+            session()->flash('success', 'Inscripción creada exitosamente.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Inscripción creada exitosamente.',
+                'inscripcion_id' => $ins->id,
+                'redirect_url' => route('laboratorio.index')
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Error al iniciar transacción: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error en la inscripción, Intente de nuevo.',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
     }
 
     // public function store(Request $request)
