@@ -79,9 +79,9 @@ class Inscripcion extends Model
         return $this->hasMany(DocumentoInscripcion::class, 'id_inscripcion');
     }
 
-    public function vigencias()
+    public function vigencia()
     {
-        return $this->hasMany(VigenciaInscripcion::class, 'id_inscripcion');
+        return $this->hasOne(VigenciaInscripcion::class, 'id_inscripcion');
     }
 
     public function ensayos()
@@ -131,5 +131,21 @@ class Inscripcion extends Model
         //     ? "<span class='text-green-600 font-semibold'>" . self::STATUS_CUENTA[$this->status_cuenta] - "</span>"
         //     : '<span class="text-red-600 font-semibold">Inactiva</span>';
         return "<span class='text-green-600 font-semibold'>" . self::STATUS_CUENTA[$this->status_cuenta] - "</span>";
+    }
+
+    public function getEstadoInscripcionTextoAttribute()
+    {
+        return self::STATUS_INSCRIPCION[$this->status_inscripcion] ?? 'Desconocido';
+    }
+
+    public function getEstadoPagoTextoAttribute()
+    {
+        return self::STATUS_CUENTA[$this->status_cuenta] ?? 'Desconocid1o';
+    }
+
+    public function getSaldoAttribute()
+    {
+        $pagos = $this->pagos->where('status', true)->sum('monto_pagado');
+        return $this->costo_total - $pagos;
     }
 }

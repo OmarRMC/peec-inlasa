@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\InscripcionPaqueteController;
 use App\Http\Controllers\Admin\LaboratorioController;
 use App\Http\Controllers\Admin\MunicipioController;
 use App\Http\Controllers\Admin\NivelLaboratorioController;
+use App\Http\Controllers\Admin\PagoController;
 use App\Http\Controllers\Admin\PaisController;
 use App\Http\Controllers\Admin\PaqueteController;
 use App\Http\Controllers\Admin\ProgramaController;
@@ -61,6 +62,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::post('/paquetes', [InscripcionPaqueteController::class, 'store'])->name('inscripcion-paquetes.store');
     });
 
+    Route::post('/pago', [PagoController::class, 'store'])->name('pago.store');
+    Route::delete('/pago/{pago}', [PagoController::class, 'destroy'])->name('pago.destroy');
     Route::get('/paquetes/programa', [PaqueteController::class, 'getPaquetesPorPrograma'])->name('paquetes.programa');
 });
 require __DIR__ . '/auth.php';

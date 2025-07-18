@@ -81,7 +81,7 @@
                             </span>
                             <input type="search" id="custom-search"
                                 class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                placeholder="Buscar laboratorio...">
+                                placeholder="Buscar inscripciones...">
                         </div>
                         <button id="btn-search"
                             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-sm">

@@ -173,12 +173,20 @@ class InscripcionPaqueteController extends Controller
 
     public function show($id)
     {
+        // $inscripcion = Inscripcion::with([
+        //     'laboratorio.pais',
+        //     'laboratorio.tipo',
+        //     'laboratorio.categoria',
+        //     'laboratorio.nivel',
+        //     'detalleInscripciones'
+        // ])->findOrFail($id);
+
         $inscripcion = Inscripcion::with([
-            'laboratorio.pais',
-            'laboratorio.tipo',
-            'laboratorio.categoria',
-            'laboratorio.nivel',
-            'detalleInscripciones'
+            'laboratorio',
+            'detalleInscripciones',
+            'pagos',
+            'documentos',
+            'vigencia'
         ])->findOrFail($id);
 
         return view('inscripcion_paquete.show', compact('inscripcion'));
