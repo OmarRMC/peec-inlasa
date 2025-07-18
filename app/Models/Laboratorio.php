@@ -99,4 +99,5 @@ class Laboratorio extends Model
             ->timezone('America/La_Paz')
             ->format('d/m/Y H:i');
     }
+
 }

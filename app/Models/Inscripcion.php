@@ -2,11 +2,33 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Inscripcion extends Model
 {
     protected $table = 'inscripcion';
+
+    const STATUS_EN_REVISION = 1;
+
+    const STATUS_APROBADO = 2;
+
+    const STATUS_VENCIDO = 3;
+
+
+    const STATUS_PAGADO = 1;
+
+    const STATUS_DEUDOR = 2;
+    const STATUS_INSCRIPCION = [
+        self::STATUS_EN_REVISION => 'En revision',
+        self::STATUS_APROBADO => 'Aprobado',
+        self::STATUS_VENCIDO => 'Vencido',
+    ];
+
+    const STATUS_CUENTA = [
+        self::STATUS_PAGADO => 'Pagado',
+        self::STATUS_DEUDOR => 'Deudor',
+    ];
 
     protected $fillable = [
         'id_lab',
@@ -65,5 +87,49 @@ class Inscripcion extends Model
     public function ensayos()
     {
         return $this->hasMany(InscripcionEA::class, 'id_inscripcion');
+    }
+
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)
+            ->timezone('America/La_Paz')
+            ->format('d/m/Y H:i');
+    }
+
+    public function getFechaInscripcionAttribute($value)
+    {
+        return Carbon::parse($value)
+            ->timezone('America/La_Paz')
+            ->format('d/m/Y H:i');
+    }
+
+    public function getStatusInscripcion()
+    {
+        switch ($this->status_inscripcion) {
+            case self::STATUS_EN_REVISION:
+                return "<span class='inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full shadow-sm'>
+                        " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
+                    </span>";
+            case self::STATUS_APROBADO:
+                return "<span class='inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full shadow-sm'>
+                        " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
+                    </span>";
+            case self::STATUS_VENCIDO:
+                return "<span class='inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full shadow-sm'>
+                        " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
+                    </span>";
+            default:
+                return "<span class='inline-flex items-center px-2 py-1 bg-gray-100 text-gray-800 text-xs font-semibold rounded-full shadow-sm'>
+                        ...
+                    </span>";
+        }
+    }
+
+    public function getStatusCuenta()
+    {
+        // return $this->status_cuenta
+        //     ? "<span class='text-green-600 font-semibold'>" . self::STATUS_CUENTA[$this->status_cuenta] - "</span>"
+        //     : '<span class="text-red-600 font-semibold">Inactiva</span>';
+        return "<span class='text-green-600 font-semibold'>" . self::STATUS_CUENTA[$this->status_cuenta] - "</span>";
     }
 }

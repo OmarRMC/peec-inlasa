@@ -52,7 +52,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::resource('laboratorio', LaboratorioController::class);
 
     Route::prefix('inscripcion')->group(function () {
-        Route::get('/', [InscripcionPaqueteController::class, 'index'])->name('inscripcion.index');
+        Route::get('/', [InscripcionPaqueteController::class, 'index'])->name('inscripcion_paquete.index');
+        Route::get('/{lab}', [InscripcionPaqueteController::class, 'show'])
+            ->name('inscripcion_paquete.show');
+        Route::get('ajax/data', [InscripcionPaqueteController::class, 'getInscripcionesData'])->name('inscripcion_paquete.ajax.data');
         Route::get('/create/{lab}', [InscripcionPaqueteController::class, 'create'])
             ->name('inscripcion.create');
         Route::post('/paquetes', [InscripcionPaqueteController::class, 'store'])->name('inscripcion-paquetes.store');

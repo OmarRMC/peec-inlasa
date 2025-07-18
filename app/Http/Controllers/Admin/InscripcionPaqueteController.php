@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CategoriaLaboratorio;
 use App\Models\Laboratorio;
 use App\Models\Paquete;
 use App\Models\Programa;
@@ -10,6 +11,9 @@ use App\Models\DetalleInscripcion;
 use App\Models\EnsayoAptitud;
 use App\Models\Inscripcion;
 use App\Models\InscripcionEA;
+use App\Models\NivelLaboratorio;
+use App\Models\Pais;
+use App\Models\TipoLaboratorio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +21,68 @@ use Illuminate\Support\Facades\Log;
 
 class InscripcionPaqueteController extends Controller
 {
+    public function index()
+    {
+        return view('inscripcion_paquete.index', [
+            'paises' => Pais::active()->get(),
+            'niveles' => NivelLaboratorio::all(),
+            'tipos' => TipoLaboratorio::all(),
+            'departamentos' => [],
+            'provincias' => [],
+            'municipios' => [],
+            'categorias' => CategoriaLaboratorio::all(),
+            'gestiones' => ['2025', '2024', '2023'],
+        ]);
+    }
+    public function getInscripcionesData(Request $request)
+    {
+        $query = Inscripcion::with([
+            'laboratorio.pais',
+            'laboratorio.tipo',
+            'laboratorio.categoria',
+            'laboratorio.nivel',
+            'detalleInscripciones'
+        ]);
+
+        foreach (['pais', 'tipo', 'categoria', 'nivel', 'dep', 'prov', 'mun'] as $filtro) {
+            if ($valor = $request->get($filtro)) {
+                $query->whereHas('laboratorio', function ($q) use ($filtro, $valor) {
+                    $q->where("id_{$filtro}", $valor);
+                });
+            }
+        }
+        if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
+            $query->whereBetween('fecha_inscripcion', [
+                $request->fecha_inicio,
+                $request->fecha_fin
+            ]);
+        }
+
+        if ($request->filled('gestion')) {
+            $query->where('gestion', $request->gestion);
+        }
+        return datatables()
+            ->of($query)
+            ->addColumn('nombre_lab', fn($i) => $i->laboratorio->nombre_lab ?? '-')
+            ->addColumn('codigo_lab', fn($i) => $i->laboratorio->cod_lab ?? '-')
+            ->addColumn('pais', fn($i) => $i->laboratorio->pais->nombre_pais ?? '-')
+            ->addColumn('tipo', fn($i) => $i->laboratorio->tipo->descripcion ?? '-')
+            ->addColumn('categoria', fn($i) => $i->laboratorio->categoria->descripcion ?? '-')
+            ->addColumn('nivel', fn($i) => $i->laboratorio->nivel->descripcion_nivel ?? '-')
+            ->addColumn('fecha', fn($i) => $i->fecha_inscripcion)
+            ->addColumn('gestion', fn($i) => $i->gestion)
+            ->addColumn('paquetes', fn($i) => $i->detalleInscripciones->pluck('descripcion_paquete')->implode(', '))
+            ->addColumn('costo', fn($i) => number_format($i->costo_total, 2) . ' Bs.')
+            ->addColumn('estado', fn($i) => $i->getStatusInscripcion())
+            ->addColumn('acciones', function ($i) {
+                return view('inscripcion_paquete.action-buttons', [
+                    'showUrl' => route('inscripcion_paquete.show', $i->id),
+                ])->render();
+            })
+            ->rawColumns(['estado', 'acciones'])
+            ->toJson();
+    }
+
     public function create($labId)
     {
         $laboratorio = Laboratorio::findOrFail($labId);
@@ -91,7 +157,7 @@ class InscripcionPaqueteController extends Controller
                 'success' => true,
                 'message' => 'Inscripción creada exitosamente.',
                 'inscripcion_id' => $ins->id,
-                'redirect_url' => route('laboratorio.index')
+                'redirect_url' => route('inscripcion_paquete.index')
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -102,6 +168,20 @@ class InscripcionPaqueteController extends Controller
                 'error' => $e->getMessage(),
             ], 422);
         }
+    }
+
+
+    public function show($id)
+    {
+        $inscripcion = Inscripcion::with([
+            'laboratorio.pais',
+            'laboratorio.tipo',
+            'laboratorio.categoria',
+            'laboratorio.nivel',
+            'detalleInscripciones'
+        ])->findOrFail($id);
+
+        return view('inscripcion_paquete.show', compact('inscripcion'));
     }
 
     // public function store(Request $request)
