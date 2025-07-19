@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cargo;
 use App\Models\Permiso;
 use App\Models\User;
+use App\Notifications\VerificarCorreoUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
@@ -57,6 +58,7 @@ class UserController extends Controller
             'status'     => $request->status,
         ]);
 
+        $usuario->notify(new VerificarCorreoUser($usuario));
         $usuario->permisos()->sync($request->input('permisos', []));
         return redirect()->route('usuario.index')->with('success', 'Usuario creado correctamente.');
     }
@@ -161,7 +163,7 @@ class UserController extends Controller
     {
         $query = User::with(['cargo', 'permisos'])
             ->whereDoesntHave('laboratorio')
-            ->select(['id','created_at', 'username', 'nombre', 'ap_paterno', 'ap_materno', 'id_cargo', 'status']);
+            ->select(['id', 'created_at', 'username', 'nombre', 'ap_paterno', 'ap_materno', 'id_cargo', 'status']);
 
         // $query = User::with('cargo')
         //     ->select(['id', 'username', 'nombre', 'ap_paterno', 'ap_materno', 'id_cargo', 'status']);
@@ -172,7 +174,7 @@ class UserController extends Controller
             ->addColumn(
                 'status_label',
                 fn($u) =>
-                $u->status 
+                $u->status
                     ? '<span class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-500 text-white">Activo</span>'
                     : '<span class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-red-500 text-white">Inactivo</span>'
             )

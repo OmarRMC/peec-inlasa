@@ -4,14 +4,16 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Notifications\VerificarCorreoPersonalizado;
 use App\Traits\General;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use General;
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -92,5 +94,15 @@ class User extends Authenticatable
     public function getCreatedAtAttribute($value)
     {
         return formatDate($value);
+    }
+
+    // public function sendEmailVerificationNotification()
+    // {
+    //     $this->notify(new VerificarCorreoPersonalizado($this, null));
+    // }
+
+    public function isLaboratorio()
+    {
+        return $this->laboratorio !== null;
     }
 }

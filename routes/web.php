@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {

@@ -11,6 +11,7 @@ use App\Models\NivelLaboratorio;
 use App\Models\Pais;
 use App\Models\TipoLaboratorio;
 use App\Models\User;
+use App\Notifications\VerificarCorreoLab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -125,13 +126,7 @@ class LaboratorioController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        // Envío de correo de verificación (habilitar si tienes Mail configurado)
-        // $url_verificacion = URL::temporarySignedRoute(
-        //     'verification.verify',
-        //     now()->addMinutes(60),
-        //     ['id' => $user->id, 'hash' => sha1($user->email)]
-        // );
-        // Mail::to($user->email)->send(new VerificacionCorreoLaboratorio($user, $lab, $url_verificacion));
+        $user->notify(new VerificarCorreoLab($user, $lab));
 
         return redirect()->route('laboratorio.index')->with('success', 'Laboratorio registrado correctamente. Se envió un correo de verificación.');
     }

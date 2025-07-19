@@ -1,16 +1,18 @@
 <x-guest-layout>
-    <div class="">
+    <div class="w-full max-w-md bg-white bg-opacity-95 rounded-md shadow-lg px-6 py-8 card-lon">
         <h2 class="text-center text-lg font-semibold text-gray-800 mb-6">Por favor, ingrese sus credenciales de acceso
         </h2>
 
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
-        @if ($errors->has('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                <strong class="font-bold">Error:</strong>
-                <span class="block sm:inline">{{ $errors->first('error') }}</span>
-            </div>
-        @endif
+     @if ($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+        <strong class="font-bold"></strong>
+        <span class="block sm:inline">
+            Estas credenciales no coinciden con nuestros registros.
+        </span>
+        </div>
+    @endif
         <form method="POST" action="{{ route('login') }}">
             @csrf
 

@@ -9,7 +9,7 @@
                 <i class="fas fa-plus-circle"></i> Nuevo Laboratorio
             </a>
         </div>
-
+        
         <!-- Filtros y Buscador -->
         <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
             <div class="flex space-x-2 text-sm">
@@ -72,13 +72,13 @@
             <table id="labs-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
                 <thead class="bg-gray-100">
                     <tr>
+                        <th class="px-4 py-2 text-left">Acciones</th>
                         <th class="px-4 py-2 text-left">Fecha/Hora</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
                         <th class="px-4 py-2 text-left">Código</th>
                         <th class="px-4 py-2 text-left">Responsable</th>
                         <th class="px-4 py-2 text-left">País</th>
                         <th class="px-4 py-2 text-left">Estado</th>
-                        <th class="px-4 py-2 text-left">Acciones</th>
                     </tr>
                 </thead>
             </table>
@@ -109,7 +109,16 @@
                             d.nivel = $('#filter-nivel').val();
                         }
                     },
+                    order: [
+                        [1, 'desc']
+                    ],
                     columns: [{
+                            data: 'actions',
+                            name: 'actions',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
                             data: 'created_at',
                             name: 'created_at',
                         },
@@ -133,12 +142,6 @@
                             data: 'status_label',
                             name: 'status',
                         },
-                        {
-                            data: 'actions',
-                            name: 'actions',
-                            orderable: false,
-                            searchable: false
-                        }
                     ],
                     language: {
                         url: "/translation/es.json"
