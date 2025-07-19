@@ -14,6 +14,8 @@ use App\Models\InscripcionEA;
 use App\Models\NivelLaboratorio;
 use App\Models\Pais;
 use App\Models\TipoLaboratorio;
+use App\Models\VigenciaInscripcion;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -118,19 +120,32 @@ class InscripcionPaqueteController extends Controller
         try {
             DB::beginTransaction();
             $total = collect($request->paquetes)->sum('costo');
+            $now  = now();
             $ins = Inscripcion::create([
                 'id_lab' => $request->id_lab,
                 'id_formulario' => $request->id_formulario,
                 'cant_paq' => count($request->paquetes),
                 'costo_total' => $total,
                 'obs_inscripcion' => $request->obs_inscripcion,
-                'fecha_inscripcion' => now(),
+                'fecha_inscripcion' => $now,
                 'status_cuenta' => false,
                 'status_inscripcion' => true,
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
-                'gestion' => $request->gestion,
+                'gestion' => configuracion('gestion') ?? $request->gestion,
+                'status_cuenta' => Inscripcion::STATUS_DEUDOR,
             ]);
+
+            $vigenciaInscripcion = new VigenciaInscripcion();
+
+            $vigenciaInscripcion->status = true;
+            $vigenciaInscripcion->id_inscripcion = $ins->id;
+            $vigenciaInscripcion->fecha_inicio = $now;
+            $vigenciaInscripcion->fecha_fin = configuracion('fecha.fin.vigencia');
+            $vigenciaInscripcion->created_by = Auth::user()->id;
+            $vigenciaInscripcion->updated_by = Auth::user()->id;
+            $vigenciaInscripcion->save();
+
 
             foreach ($request->paquetes as $p) {
                 DetalleInscripcion::create([
@@ -152,15 +167,16 @@ class InscripcionPaqueteController extends Controller
             }
 
             DB::commit();
-            session()->flash('success', 'Inscripción creada exitosamente.');
+            session()->flash('success', 'Inscripción registrado exitosamente.');
             return response()->json([
                 'success' => true,
-                'message' => 'Inscripción creada exitosamente.',
+                'message' => 'Inscripción registrado exitosamente.',
                 'inscripcion_id' => $ins->id,
                 'redirect_url' => route('inscripcion_paquete.index')
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
+            session()->flash('error', 'Error en la Inscripción, Intente nuevamente.');
             Log::error('Error al iniciar transacción: ' . $e->getMessage());
             return response()->json([
                 'success' => false,

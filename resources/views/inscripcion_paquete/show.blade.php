@@ -95,7 +95,13 @@
 
             <!-- Documentos -->
             <section class="p-6">
-                <h2 class="text-lg font-semibold text-blue-700 mb-4">📁 Documentos</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-blue-700 mb-4">📁 Documentos</h2>
+                    <button
+                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                        Aprobar
+                    </button>
+                </div>
                 @forelse ($inscripcion->documentos as $doc)
                     <div
                         class="border rounded px-4 py-2 mb-2 text-sm text-gray-700 bg-gray-50 flex justify-between items-center">

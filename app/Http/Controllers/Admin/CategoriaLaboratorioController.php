@@ -30,7 +30,7 @@ class CategoriaLaboratorioController extends Controller
 
         CategoriaLaboratorio::create($request->all());
 
-        return redirect()->route('categoria_laboratorio.index')->with('success', 'Categoría creada exitosamente.');
+        return redirect()->route('categoria_laboratorio.index')->with('success', 'Categoría registrado exitosamente.');
     }
 
     public function edit(CategoriaLaboratorio $categoria_laboratorio)

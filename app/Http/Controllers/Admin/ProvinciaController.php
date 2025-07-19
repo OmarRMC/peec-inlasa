@@ -31,7 +31,7 @@ class ProvinciaController extends Controller
         ], $this->messages());
 
         Provincia::create($request->all());
-        return redirect()->route('provincia.index')->with('success', 'Provincia creada correctamente.');
+        return redirect()->route('provincia.index')->with('success', 'Provincia registrado correctamente.');
     }
 
     public function edit(Provincia $provincia)

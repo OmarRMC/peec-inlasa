@@ -2,13 +2,21 @@
     <div class="max-w-4xl mx-auto px-4 py-6">
         <div class="bg-white border border-gray-200 shadow rounded-2xl p-6 space-y-6">
             <h1 class="text-xl font-bold text-primary mb-4">⚙️ Configuración del Sistema</h1>
-
+            @if ($errors->any())
+                <div class="bg-red-100 text-red-800 border border-red-200 p-4 mb-6 rounded-xl">
+                    <ul class="list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <!-- Bloques de configuración -->
             @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'], ['id' => 'gestion', 'title' => 'Gestión Actual'], ['id' => 'notificacion', 'title' => 'Notificaciones']] as $i => $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <!-- Botón encabezado -->
                     <button type="button"
-                        class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold text-indigo-800 transition duration-300"
+                        class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold  transition duration-300"
                         onclick="toggleCollapse('{{ $item['id'] }}')">
                         <span>{{ $item['title'] }}</span>
                         <svg id="icon-{{ $item['id'] }}" class="w-5 h-5 transform transition-transform duration-300"
@@ -131,14 +139,14 @@
                                             <div>
                                                 <label for="notificacion_key" class="block text-sm font-medium">Key</label>
                                                 <input type="text" name="notificacion_key" id="notificacion_key"
-                                                    value="{{ old('notificacion_key', configuracion('notificacion_key') ?? '') }}"
+                                                    value="{{ old('notificacion_key', configuracion('notificacion.key') ?? '') }}"
                                                     class="mt-1 input-standard" required>
                                             </div>
                                             <div>
                                                 <label for="notificacion_titulo"
                                                     class="block text-sm font-medium">Título</label>
                                                 <input type="text" name="notificacion_titulo" id="notificacion_titulo"
-                                                    value="{{ old('notificacion_titulo', configuracion('notificacion_titulo') ?? '') }}"
+                                                    value="{{ old('notificacion_titulo', configuracion('notificacion.titulo') ?? '') }}"
                                                     class="mt-1 input-standard" required>
                                             </div>
                                         </div>
@@ -147,13 +155,13 @@
                                                 class="block text-sm font-medium">Descripción</label>
                                             <input type="text" name="notificacion_descripcion"
                                                 id="notificacion_descripcion"
-                                                value="{{ old('notificacion_descripcion', configuracion('notificacion_descripcion') ?? '') }}"
+                                                value="{{ old('notificacion_descripcion', configuracion('notificacion.descripcion') ?? '') }}"
                                                 class="mt-1 input-standard" required>
                                         </div>
                                         <div>
                                             <label for="notificacion_mensaje" class="block text-sm font-medium">Mensaje (HTML
                                                 permitido)</label>
-                                            <textarea name="notificacion_mensaje" id="notificacion_mensaje" rows="4" class="input-standard" required>{{ old('notificacion_mensaje', configuracion('notificacion_mensaje') ?? '') }}</textarea>
+                                            <textarea name="notificacion_mensaje" id="notificacion_mensaje" rows="4" class="input-standard" required>{{ old('notificacion_mensaje', configuracion('notificacion.mensaje') ?? '') }}</textarea>
                                         </div>
                                         <div class="text-right mt-4">
                                             <button type="submit" class="btn-primary"><i

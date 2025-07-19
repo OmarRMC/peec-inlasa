@@ -13,6 +13,14 @@
     {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script> --}}
 
+    {{-- 
+       SwitAleart2 
+    --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- TippyJS -->
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
@@ -101,7 +109,7 @@
 
             <!-- Navigation -->
             <nav class="flex-1 px-2 py-4 space-y-1 text-sm overflow-y-auto">
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
                     <i class="fas fa-home w-5 text-indigo-500"></i>
                     <span>Escritorio</span>
                 </a>
@@ -197,7 +205,7 @@
                         </a>
                         <a href="{{ route('laboratorio.index') }}"
                             class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
-                            <i class="fas fa-flask"></i> Laboratorios Inscritos
+                            <i class="fas fa-flask"></i> Laboratorios registrados
                         </a>
 
                         <a href="{{ route('inscripcion_paquete.index') }}"

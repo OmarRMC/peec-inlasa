@@ -48,7 +48,7 @@ class AreaController extends Controller
 
         Area::create($request->all());
 
-        return redirect()->route('area.index')->with('success', 'Área creada correctamente.');
+        return redirect()->route('area.index')->with('success', 'Área registrado correctamente.');
     }
 
     public function edit(Area $area)

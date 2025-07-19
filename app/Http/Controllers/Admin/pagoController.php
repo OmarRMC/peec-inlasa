@@ -107,15 +107,14 @@ class PagoController extends Controller
         try {
             // Anular el pago en lugar de eliminarlo
             $pago->status = false;
+            $pago->updated_by = Auth::user()->id;
             $pago->save();
 
             // Actualizar el estado de cuenta de la inscripción asociada
             $inscripcion = $pago->inscripcion;
 
             $saldo = $inscripcion->saldo;
-            $total = $inscripcion->costo_total;
-
-            $inscripcion->status_cuenta = ($total - $saldo <= 0) ? 1 : 2;
+            $inscripcion->status_cuenta = ($saldo <= 0) ? 1 : 2;
             $inscripcion->save();
 
             return redirect()->back()->with('success', 'Pago anulado correctamente.');
