@@ -93,11 +93,17 @@ class Laboratorio extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
+
+    public function inscripciones()
+    {
+        return $this->hasMany(Inscripcion::class, 'id_lab');
+    }
+
+
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)
             ->timezone('America/La_Paz')
             ->format('d/m/Y H:i');
     }
-
 }

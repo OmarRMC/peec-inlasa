@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cargo;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -10,6 +11,7 @@ class CargoController extends Controller
 {
     public function index()
     {
+        Gate::authorize('cargo-write');
         $cargos = Cargo::all();
         return view('cargos.index', compact('cargos'));
     }

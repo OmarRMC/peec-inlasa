@@ -28,7 +28,6 @@
                         placeholder="Ingrese su código o usuario" />
                 </div>
             </div>
-
             <!-- Contraseña -->
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium text-gray-700">CONTRASEÑA</label>

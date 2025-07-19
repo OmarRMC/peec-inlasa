@@ -3,7 +3,7 @@
         <!-- Encabezado -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Detalles de la Inscripción</h1>
-            <x-shared.btn-volver :url="route('inscripcion_paquete.index')" />
+            <x-shared.btn-volver :url=" $backTo ?? route('inscripcion_paquete.index')" />
         </div>
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden divide-y divide-gray-200">

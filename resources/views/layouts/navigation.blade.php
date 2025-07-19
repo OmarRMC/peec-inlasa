@@ -1,33 +1,250 @@
-<aside class="w-64 bg-white border-r shadow-sm hidden md:block">
-    <div class="px-6 py-4 border-b bg-green-600 text-white font-bold text-lg">
-        <i class="fas fa-microscope mr-2"></i>Sig<span class="font-semibold">PEEC | INLASA</span>
+@php use App\Models\Permiso; @endphp
+<!-- Navigation -->
+<nav class="flex-1 px-2 py-4 space-y-1 text-sm overflow-y-auto">
+    <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+        <i class="fas fa-home w-5 text-indigo-500"></i>
+        <span>Escritorio</span>
+    </a>
+
+    <!-- Gestión de Inscripciones -->
+    @if (Gate::any([Permiso::ADMIN]))
+        <div>
+            <button @click="openMenu !== 1 ? openMenu = 1 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-file-signature w-5 text-indigo-500"></i>
+                <span>Inscripciones</span>
+                <i class="fas ml-auto" :class="openMenu === 1 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 1" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-list"></i> Ver Inscripciones</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-edit"></i> Formularios</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-file-alt"></i> Documentos</a>
+            </div>
+        </div>
+    @endif
+
+  @if (Gate::any([Permiso::LABORATORIO]))
+    <div>
+        <button @click="openMenu !== 2 ? openMenu = 2 : openMenu = null"
+            class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+            <i class="fas fa-vials w-5 text-indigo-500"></i>
+            <span>Laboratorio</span>
+            <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </button>
+        <div x-show="openMenu === 2" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+            <a href="{{ route('lab.profile') }}"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                <i class="fas fa-id-card-alt w-4 mr-1 text-indigo-500"></i> Perfil de laboratorio
+            </a>
+            <a href="{{ route('lab.profile.edit') }}"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                <i class="fas fa-user-edit w-4 mr-1 text-indigo-500"></i> Actualizar tu información
+            </a>
+            <a href="{{ route('lab.ins.index') }}"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Listado de inscripciones
+            </a>
+        </div>
     </div>
-    <nav class="px-4 py-6 space-y-2 text-sm">
-        <a href="#" class="flex items-center gap-3 text-gray-700 hover:bg-green-100 px-3 py-2 rounded">
-            <i class="fas fa-home"></i> Escritorio
+@endif
+
+
+    <!-- Certificados -->
+    @if (Gate::any([Permiso::ADMIN]))
+        <div>
+            <button @click="openMenu !== 2 ? openMenu = 2 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-certificate w-5 text-indigo-500"></i>
+                <span>Certificados</span>
+                <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 2" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-certificate"></i> Participación</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-medal"></i> Desempeño</a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN]))
+        <div>
+            <a href="{{ route('configuracion.index') }}"
+                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                <i class="fas fa-cogs w-5 text-indigo-500"></i>
+                <span>Configuración</span>
+            </a>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN]))
+        <!-- Recursos Laboratorio -->
+        <div>
+            <button @click="openMenu !== 3 ? openMenu = 3 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-vials w-5 text-indigo-500"></i>
+                <span>Recursos Lab.</span>
+                <i class="fas ml-auto" :class="openMenu === 3 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 3" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-file-contract"></i> Contrato 2025</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-bullhorn"></i> Convocatoria</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-gavel"></i> Resolución</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-file-alt"></i> Protocolos</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-exclamation-triangle"></i> Quejas</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-clipboard"></i> Formularios de Queja</a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN]))
+        <div>
+            <button @click="openMenu !== 7 ? openMenu = 7 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-flask w-5 text-indigo-500"></i>
+                <span>Gestión de Laboratorio</span>
+                <i class="fas ml-auto" :class="openMenu === 7 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 7" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+
+                <a href="{{ route('nivel_laboratorio.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-layer-group"></i> Nivel de Laboratorio
+                </a>
+
+                <a href="{{ route('tipo_laboratorio.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-vial"></i> Tipo de Laboratorio
+                </a>
+
+                <a href="{{ route('categoria_laboratorio.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-tags"></i> Categoría
+                </a>
+                <a href="{{ route('laboratorio.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-flask"></i> Laboratorios registrados
+                </a>
+
+                <a href="{{ route('inscripcion_paquete.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-file-signature"></i> Inscripciones a paquetes
+                </a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN]))
+        <!--  Programas , Area , Paquetes y Ensayo Aptutud -->
+        <div>
+            <button @click="openMenu !== 4 ? openMenu = 4 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-boxes w-5 text-indigo-500"></i>
+                <span>Programas</span>
+                <i class="fas ml-auto" :class="openMenu === 4 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 4" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+
+                <a href="{{ route('programa.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-clipboard-list"></i> <!-- icono para “Programas” -->
+                    Programas
+                </a>
+
+                <a href="{{ route('area.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-layer-group"></i> <!-- icono para “Area” -->
+                    Área
+                </a>
+
+                <a href="{{ route('paquete.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-box-open"></i> <!-- icono para “Paquetes” -->
+                    Paquetes
+                </a>
+
+                <a href="{{ route('ensayo_aptitud.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-vials"></i> <!-- icono para “Ensayo de Aptitud” -->
+                    Ensayo de Aptitud
+                </a>
+
+            </div>
+
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN]))
+        <!-- Ubicación Geográfica -->
+        <div>
+            <button @click="openMenu !== 6 ? openMenu = 6 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-globe-americas w-5 text-indigo-500"></i>
+                <span>Ubicación</span>
+                <i class="fas ml-auto" :class="openMenu === 6 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 6" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="{{ route('pais.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-flag"></i> País
+                </a>
+                <a href="{{ route('departamento.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-map"></i> Departamento
+                </a>
+                <a href="{{ route('provincia.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-map-marked-alt"></i> Provincia
+                </a>
+                <a href="{{ route('municipio.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-city"></i> Municipio
+                </a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN]))
+        <!-- Usuarios y Roles -->
+        <div>
+            <button @click="openMenu !== 5 ? openMenu = 5 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-users w-5 text-indigo-500"></i>
+                <span>Usuarios</span>
+                <i class="fas ml-auto" :class="openMenu === 5 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 5" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="{{ route('usuario.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-user"></i>
+                    Usuarios</a>
+                <a href="{{ route('cargos.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-user-tag"></i> Cargos</a>
+                <a href="{{ route('permiso.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-key"></i>
+                    Permisos</a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN]))
+        {{-- <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                    <i class="fas fa-database w-5 text-indigo-500"></i>
+                    <span>Datos Laboratorio</span>
+                </a> --}}
+
+        <a href="#" class="flex items-center gap-3 text-red-600 px-3 py-2 rounded hover:bg-red-50">
+            <i class="fas fa-book w-5"></i>
+            <span>Manual Usuario</span>
         </a>
-        <a href="#" class="flex items-center gap-3 text-gray-700 hover:bg-green-100 px-3 py-2 rounded">
-            <i class="fas fa-file-signature"></i> Inscripciones
+
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+            <i class="fas fa-info-circle w-5 text-indigo-500"></i>
+            <span>Acerca de</span>
         </a>
-        <a href="#" class="flex items-center gap-3 text-gray-700 hover:bg-green-100 px-3 py-2 rounded">
-            <i class="fas fa-certificate"></i> Certificados
-        </a>
-        <a href="#" class="flex items-center gap-3 text-gray-700 hover:bg-green-100 px-3 py-2 rounded">
-            <i class="fas fa-vials"></i> Recursos Lab.
-        </a>
-        <a href="#" class="flex items-center gap-3 text-gray-700 hover:bg-green-100 px-3 py-2 rounded">
-            <i class="fas fa-upload"></i> Subir Documentos
-        </a>
-        <a href="#" class="flex items-center gap-3 text-gray-700 hover:bg-green-100 px-3 py-2 rounded">
-            <i class="fas fa-database"></i> Datos Laboratorio
-        </a>
-        <a href="#" class="flex items-center gap-3 text-red-600 hover:bg-red-100 px-3 py-2 rounded">
-            <i class="fas fa-book"></i> Manual Usuario <span
-                class="text-xs bg-red-600 text-white px-1 rounded">PDF</span>
-        </a>
-        <a href="#" class="flex items-center gap-3 text-gray-700 hover:bg-green-100 px-3 py-2 rounded">
-            <i class="fas fa-info-circle"></i> Acerca de SigPEEC <span
-                class="text-xs bg-yellow-500 text-white px-1 rounded">IT</span>
-        </a>
-    </nav>
-</aside>
+    @endif
+</nav>

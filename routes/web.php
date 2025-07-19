@@ -20,6 +20,7 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
+use App\Http\Controllers\Lab\LabController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -70,5 +71,14 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
 
     Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
     Route::put('/configuracion/update/{seccion}', [ConfiguracionController::class, 'update'])->name('configuracion.update');
+});
+
+Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () {
+    Route::get('/profile', [LabController::class, 'profile'])->name('lab.profile');
+    Route::get('/editar-profile', [LabController::class, 'editarProfile'])->name('lab.profile.edit');
+    Route::get('/', [LabController::class, 'index'])->name('lab.ins.index');
+    Route::get('/inscripciones/ajax/data', [LabController::class, 'getInscripcionData'])->name('lab_inscripcion.ajax.data');
+    Route::get('/inscripciones/new', [LabController::class, 'labInscripcion'])->name('lab.inscripcion.create');
+    Route::get('/inscripcion/{id}', [LabController::class, 'labShowInscripcion'])->name('lab.inscripcion.show');
 });
 require __DIR__ . '/auth.php';

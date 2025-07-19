@@ -105,4 +105,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->laboratorio !== null;
     }
+
+    public function tienePermiso($nombre)
+    {
+        return $this->permisos->contains('nombre_permiso', $nombre);
+    }
 }

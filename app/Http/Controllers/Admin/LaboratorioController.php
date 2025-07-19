@@ -243,7 +243,14 @@ class LaboratorioController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        return redirect()->route('laboratorio.index')->with('success', 'Laboratorio actualizado correctamente.');
+        $user = Auth::user(); 
+
+        if($user->isLaboratorio()) {
+            return redirect()->route('lab.profile')->with('success', 'Tu informacion ha sido actualizado correctamente.');
+        }else {
+            return redirect()->route('laboratorio.index')->with('success', 'Laboratorio actualizado correctamente.');
+        }
+        
     }
 
     /**

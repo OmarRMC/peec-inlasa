@@ -214,7 +214,11 @@
                         return res.json();
                     }).then(res => {
                         if (res.success) {
-                            window.location.href = res.redirect_url;
+                            @if (isset($redirectTo))
+                                window.location.href = "{{ $redirectTo }}";
+                            @else
+                                window.location.href = res.redirect_url;
+                            @endif
                         } else {
                             alert(res.message || 'Error al registrar inscripción.');
                         }
@@ -235,11 +239,11 @@
                                 <div class="max-h-64 overflow-y-auto pr-2">
                                     <ul class="divide-y divide-gray-200">
                                         ${seleccionados.map(pkt => `
-                                                                <li class="py-0 flex justify-between">
-                                                                    <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
-                                                                    <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
-                                                                </li>
-                                                            `).join('')}
+                                                                    <li class="py-0 flex justify-between">
+                                                                        <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
+                                                                        <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
+                                                                    </li>
+                                                                `).join('')}
                                     </ul>
                                 </div>
                                 <!-- Total fijo -->
