@@ -43,16 +43,18 @@
 
         .sidebar-toggle-button {
             display: none;
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
+            /* position: absolute; */
+            top: 0.8rem;
+            left: 1.05rem;
             z-index: 50;
-            background-color: #0891b2;
+            /* background-color: #0891b2; */
+            background: white;
             /* cyan-600 */
-            color: white;
-            border-radius: 9999px;
-            padding: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            /* color: white; */
+            /* color: black; */
+            border-radius: 5px;
+            padding: 0.25rem 0.3rem;
+            /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); */
         }
 
         @media (max-width: 768px) {
@@ -81,12 +83,15 @@
     <x-alerts.sweetalert />
 
     <!-- Sidebar Toggle Buttons -->
-    <button class="sidebar-toggle-button md:hidden" @click="sidebarOpen = true" x-show="!sidebarOpen">
-        <i class="fas fa-bars"></i>
-    </button>
-    <button class="sidebar-toggle-button hidden md:block" @click="sidebarCollapsed = false" x-show="sidebarCollapsed">
-        <i class="fas fa-bars"></i>
-    </button>
+    <div class="relative">
+        {{-- <button class="sidebar-toggle-button md:hidden" @click="sidebarOpen = true" x-show="!sidebarOpen">
+            <i class="fas fa-bars"></i>
+        </button> --}}
+        {{-- <button class="sidebar-toggle-button hidden md:block" @click="sidebarCollapsed = false"
+            x-show="sidebarCollapsed">
+            <i class="fas fa-bars"></i>
+        </button> --}}
+    </div>
 
     <div class="flex h-screen transition-all duration-300 ease-in-out">
         <!-- Sidebar -->
@@ -102,7 +107,7 @@
                     </button>
                     <button @click="sidebarCollapsed = !sidebarCollapsed" class="hidden md:inline text-white">
                         <i class="fas fa-bars" x-show="!sidebarCollapsed"></i>
-                        <i class="fas fa-eye" x-show="sidebarCollapsed"></i>
+                        {{-- <i class="fas fa-eye" x-show="sidebarCollapsed"></i> --}}
                     </button>
                 </div>
             </div>
@@ -301,10 +306,10 @@
                     </div>
                 </div>
 
-                <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                {{-- <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
                     <i class="fas fa-database w-5 text-indigo-500"></i>
                     <span>Datos Laboratorio</span>
-                </a>
+                </a> --}}
 
                 <a href="#" class="flex items-center gap-3 text-red-600 px-3 py-2 rounded hover:bg-red-50">
                     <i class="fas fa-book w-5"></i>
@@ -323,6 +328,14 @@
             <header class="bg-white border-b px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
                 <div class="flex items-center gap-3">
                     <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 md:hidden">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    {{-- <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 hidden">
+                        <i class="fas fa-bars"></i>
+                    </button> --}}
+                    <button class="sidebar-toggle-button hidden md:block text-gray-500" @click="sidebarCollapsed = false"
+                        x-show="sidebarCollapsed">
                         <i class="fas fa-bars"></i>
                     </button>
                     <h1 class="text-sm font-semibold text-indigo-600 flex items-center gap-2">

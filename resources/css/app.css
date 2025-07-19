@@ -222,3 +222,7 @@
 .accent-primary {
     accent-color: var(--color-primary);
 }
+
+.card-login{
+    box-shadow: 1px 1px 8px rgba(14, 13, 13, 0.685);
+}

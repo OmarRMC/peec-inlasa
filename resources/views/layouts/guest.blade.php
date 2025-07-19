@@ -22,7 +22,7 @@
 <body class="font-sans text-gray-900 antialiased">
     <div class="min-h-screen flex items-center justify-center bg-cover bg-center"
         style="background-image: url('/img/fondo.jpg');">
-        <div class="w-full max-w-md bg-white bg-opacity-95 rounded-md shadow-lg px-6 py-8">
+        <div class="w-full max-w-md bg-white bg-opacity-95 rounded-md shadow-lg px-6 py-8 card-login">
             {{ $slot }}
         </div>
     </div>
