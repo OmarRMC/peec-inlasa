@@ -6,7 +6,7 @@ use App\Traits\General;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Cargo extends Model
+class Cargo extends BaseModel
 {
     use General;
     protected $table = 'cargo';

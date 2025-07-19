@@ -74,9 +74,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Permiso::class, 'usuario_permiso', 'id_usuario', 'id_permiso')->withTimestamps();
     }
 
-    public function laboratorios()
+    public function laboratorio()
     {
-        return $this->hasMany(Laboratorio::class, 'id_usuario');
+        return $this->hasOne(Laboratorio::class, 'id_usuario');
     }
 
     public function laboratoriosCreados()
@@ -87,5 +87,10 @@ class User extends Authenticatable
     public function laboratoriosActualizados()
     {
         return $this->hasMany(Laboratorio::class, 'updated_by');
+    }
+
+    public function getCreatedAtAttribute($value)
+    {
+        return formatDate($value);
     }
 }

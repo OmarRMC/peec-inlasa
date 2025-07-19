@@ -14,7 +14,9 @@ class UserController extends Controller
 {
     public function index()
     {
-        $usuarios = User::with(['cargo', 'permisos'])->get();
+        $usuarios = User::with(['cargo', 'permisos'])
+            ->whereDoesntHave('laboratorio')
+            ->get();
         return view('usuario.index', compact('usuarios'));
     }
 
@@ -157,8 +159,12 @@ class UserController extends Controller
 
     public function getData()
     {
-        $query = User::with('cargo')
-            ->select(['id', 'username', 'nombre', 'ap_paterno', 'ap_materno', 'id_cargo', 'status']);
+        $query = User::with(['cargo', 'permisos'])
+            ->whereDoesntHave('laboratorio')
+            ->select(['id','created_at', 'username', 'nombre', 'ap_paterno', 'ap_materno', 'id_cargo', 'status']);
+
+        // $query = User::with('cargo')
+        //     ->select(['id', 'username', 'nombre', 'ap_paterno', 'ap_materno', 'id_cargo', 'status']);
 
         return DataTables::of($query)
             ->addColumn('nombre_completo', fn($u) => "{$u->nombre} {$u->ap_paterno} {$u->ap_materno}")
@@ -166,7 +172,7 @@ class UserController extends Controller
             ->addColumn(
                 'status_label',
                 fn($u) =>
-                $u->status
+                $u->status 
                     ? '<span class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-500 text-white">Activo</span>'
                     : '<span class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-red-500 text-white">Inactivo</span>'
             )

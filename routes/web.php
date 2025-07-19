@@ -23,14 +23,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'usuario.activo'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function () {
     Route::get('/cargos/data', [CargoController::class, 'getData'])->name('cargos.data');
     Route::resource('cargos', CargoController::class)->except(['show']);
     Route::resource('permiso', PermisoController::class)->except(['show']);

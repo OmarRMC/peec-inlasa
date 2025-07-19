@@ -98,9 +98,7 @@ class Inscripcion extends Model
 
     public function getFechaInscripcionAttribute($value)
     {
-        return Carbon::parse($value)
-            ->timezone('America/La_Paz')
-            ->format('d/m/Y H:i');
+        return formatDate($value);
     }
 
     public function getStatusInscripcion()

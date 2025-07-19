@@ -43,7 +43,7 @@
             <table id="usuarios-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="px-4 py-2 text-left">ID</th>
+                        <th class="px-4 py-2 text-left">Fecha hora</th>
                         <th class="px-4 py-2 text-left">Usuario</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
                         <th class="px-4 py-2 text-left">Cargo</th>
@@ -71,8 +71,8 @@
                     lengthChange: false,
                     dom: 'rt',
                     columns: [{
-                            data: 'id',
-                            name: 'id'
+                            data: 'created_at',
+                            name: 'created_at'
                         },
                         {
                             data: 'username',

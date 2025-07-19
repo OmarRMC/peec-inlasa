@@ -3,7 +3,12 @@
 
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
-
+    @if ($errors->has('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            <strong class="font-bold">Error:</strong>
+            <span class="block sm:inline">{{ $errors->first('error') }}</span>
+        </div>
+    @endif
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
@@ -48,8 +53,7 @@
 
         <!-- Botón -->
         <div>
-            <button type="submit"
-                class="btn-primary w-full justify-center font-semibold py-2 px-4 rounded shadow">
+            <button type="submit" class="btn-primary w-full justify-center font-semibold py-2 px-4 rounded shadow">
                 INGRESAR
             </button>
         </div>
