@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
+use App\Http\Controllers\Admin\ConfiguracionController;
 use App\Http\Controllers\Admin\DepartamentoController;
 use App\Http\Controllers\Admin\EnsayoAptitudController;
 use App\Http\Controllers\Admin\InscripcionPaqueteController;
@@ -65,5 +66,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/pago', [PagoController::class, 'store'])->name('pago.store');
     Route::delete('/pago/{pago}', [PagoController::class, 'destroy'])->name('pago.destroy');
     Route::get('/paquetes/programa', [PaqueteController::class, 'getPaquetesPorPrograma'])->name('paquetes.programa');
+
+    Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+    Route::put('/configuracion/update/{seccion}', [ConfiguracionController::class, 'update'])->name('configuracion.update');
 });
 require __DIR__ . '/auth.php';

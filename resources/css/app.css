@@ -86,9 +86,9 @@
 
 /* Texto */
 .text-primary {
-    /* color: var(--color-text-primary); */
+    color: var(--color-text-primary);
     /* color:#1f2937 */
-    @apply text-gray-800
+    /* @apply text-gray-800 */
 }
 
 .text-secondary {

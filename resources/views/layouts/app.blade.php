@@ -10,13 +10,15 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://unpkg.com/alpinejs" defer></script>
     <!-- ToastifyJS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script> --}}
 
     <!-- TippyJS -->
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         [x-cloak] {
             display: none !important;
@@ -136,6 +138,14 @@
                         <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                                 class="fas fa-medal"></i> Desempeño</a>
                     </div>
+                </div>
+
+                <div>
+                    <a href="{{ route('configuracion.index') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                        <i class="fas fa-cogs w-5 text-indigo-500"></i>
+                        <span>Configuración</span>
+                    </a>
                 </div>
 
                 <!-- Recursos Laboratorio -->
@@ -323,7 +333,7 @@
                         <div class="px-4 py-3 border-b text-center text-sm">
                             <div class="text-indigo-600 font-semibold">LABORATORIO REGISTRADO</div>
                             <div>PEEC - INLASA</div>
-                            <div class="font-bold">{{ Auth::user()->codigo ?? 'BOL1146' }}</div>
+                            <div class="font-bold">{{ Auth::user()->username ?? 'BOL1146' }}</div>
                         </div>
                         <form method="POST" action="{{ route('logout') }}" class="text-sm">
                             @csrf
