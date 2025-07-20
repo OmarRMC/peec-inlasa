@@ -21,6 +21,7 @@ use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use App\Http\Controllers\Lab\LabController;
+use App\Http\Controllers\NotificacionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -80,6 +81,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/inscripciones/ajax/data', [LabController::class, 'getInscripcionData'])->name('lab_inscripcion.ajax.data');
     Route::get('/inscripciones/new', [LabController::class, 'labInscripcion'])->name('lab.inscripcion.create');
     Route::get('/inscripcion/{id}', [LabController::class, 'labShowInscripcion'])->name('lab.inscripcion.show');
+    Route::get('/notificacion/verify', [NotificacionController::class, 'getNotificacion']);
+    Route::post('/notificacion/read', [NotificacionController::class, 'marcarLeido']);
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {

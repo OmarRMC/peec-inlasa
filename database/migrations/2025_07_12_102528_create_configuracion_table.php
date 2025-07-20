@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('configuracion', function (Blueprint $table) {
             $table->string('key', 150)->primary();
-            $table->string('valor', 150);
+            $table->mediumText('valor');
             $table->timestamps();
         });
     }

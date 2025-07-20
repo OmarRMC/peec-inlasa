@@ -31,8 +31,9 @@ class ConfiguracionController extends Controller
                     'fecha_fin_inscripcion.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
                 ]);
 
-                configuracion('fecha_inicio_inscripcion', $request->fecha_inicio_inscripcion);
-                configuracion('fecha_fin_inscripcion', $request->fecha_fin_inscripcion);
+
+                configuracion(Configuracion::FECHA_INICIO_INSCRIPCION, $request->fecha_inicio_inscripcion);
+                configuracion(Configuracion::FECHA_FIN_INSCRIPCION, $request->fecha_fin_inscripcion);
                 break;
 
             case 'periodo-pago':
@@ -47,8 +48,9 @@ class ConfiguracionController extends Controller
                     'fecha_fin_pago.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
                 ]);
 
-                configuracion('fecha_inicio_pago', $request->fecha_inicio_pago);
-                configuracion('fecha_fin_pago', $request->fecha_fin_pago);
+
+                configuracion(Configuracion::FECHA_INICIO_PAGO, $request->fecha_inicio_pago);
+                configuracion(Configuracion::FECHA_FIN_PAGO, $request->fecha_fin_pago);
                 break;
 
             case 'periodo-vigencia':
@@ -63,8 +65,8 @@ class ConfiguracionController extends Controller
                     'fecha_fin_vigencia.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
                 ]);
 
-                configuracion('fecha.inicio.vigencia', $request->fecha_inicio_vigencia);
-                configuracion('fecha.fin.vigencia', $request->fecha_fin_vigencia);
+                configuracion(Configuracion::FECHA_INICIO_VIGENCIA, $request->fecha_inicio_vigencia);
+                configuracion(Configuracion::FECHA_FIN_VIGENCIA, $request->fecha_fin_vigencia);
                 break;
 
             case 'gestion':
@@ -75,7 +77,7 @@ class ConfiguracionController extends Controller
                     'gestion_actual.digits' => 'La gestión debe contener exactamente 4 dígitos.',
                 ]);
 
-                configuracion('gestion_actual', $request->gestion_actual);
+                configuracion(Configuracion::GESTION_ACTUAL, $request->gestion_actual);
                 break;
 
             case 'notificacion':
@@ -84,6 +86,8 @@ class ConfiguracionController extends Controller
                     'notificacion_titulo' => 'required|string|max:100',
                     'notificacion_descripcion' => 'nullable|string|max:255',
                     'notificacion_mensaje' => 'nullable|string',
+                    'notificacion_fecha_inicio' => 'required|date',
+                    'notificacion_fecha_fin' => 'required|date|after_or_equal:notificacion_fecha_inicio',
                 ], [
                     'notificacion_key.required' => 'El campo "key" es obligatorio.',
                     'notificacion_key.string' => 'El campo "key" debe ser una cadena de texto.',
@@ -93,12 +97,17 @@ class ConfiguracionController extends Controller
                     'notificacion_descripcion.string' => 'La descripción debe ser una cadena de texto.',
                     'notificacion_descripcion.max' => 'La descripción no debe exceder los 255 caracteres.',
                     'notificacion_mensaje.string' => 'El mensaje debe ser una cadena de texto.',
+                    'notificacion_fecha_fin.required' => 'La fecha de fin es obligatoria.',
+                    'notificacion_fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
                 ]);
 
-                configuracion('notificacion.key', $request->notificacion_key);
-                configuracion('notificacion.titulo', $request->notificacion_titulo);
-                configuracion('notificacion.descripcion', $request->notificacion_descripcion);
-                configuracion('notificacion.mensaje', $request->notificacion_mensaje);
+
+                configuracion(Configuracion::NOTIFICACION_KEY, $request->notificacion_key);
+                configuracion(Configuracion::NOTIFICACION_TITULO, $request->notificacion_titulo);
+                configuracion(Configuracion::NOTIFICACION_DESCRIPCION, $request->notificacion_descripcion);
+                configuracion(Configuracion::NOTIFICACION_MENSAJE, $request->notificacion_mensaje);
+                configuracion(Configuracion::NOTIFICACION_FECHA_INICIO, $request->notificacion_fecha_inicio);
+                configuracion(Configuracion::NOTIFICACION_FECHA_FIN, $request->notificacion_fecha_fin);
                 break;
 
             default:

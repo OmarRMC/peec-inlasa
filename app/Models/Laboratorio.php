@@ -106,4 +106,17 @@ class Laboratorio extends Model
             ->timezone('America/La_Paz')
             ->format('d/m/Y H:i');
     }
+
+
+    public function tieneNotificacionPendiente()
+    {
+        $fechaInicio = Configuracion::where('key', Configuracion::NOTIFICACION_FECHA_INICIO)->value('valor');
+        $fechaFin = Configuracion::where('key', Configuracion::NOTIFICACION_FECHA_FIN)->value('valor');
+        $clave = Configuracion::where('key', Configuracion::NOTIFICACION_KEY)->value('valor');
+        $hoy = Carbon::now()->toDateString();
+
+        return $this->notificacion_key !== $clave &&
+            $fechaInicio <= $hoy &&
+            $fechaFin >= $hoy;
+    }
 }

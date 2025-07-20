@@ -104,7 +104,7 @@
             </div>
         </div>
     @endif
-    @if (Gate::any([Permiso::ADMIN]))
+    @if (Gate::any([Permiso::ADMIN, Permiso::CONFIGURACION]))
         <div>
             <a href="{{ route('configuracion.index') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">

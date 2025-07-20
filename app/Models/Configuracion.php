@@ -18,4 +18,23 @@ class Configuracion extends Model
         'key',
         'valor',
     ];
+
+    // Claves centralizadas como constantes
+    public const FECHA_INICIO_INSCRIPCION = 'fecha_inicio_inscripcion';
+    public const FECHA_FIN_INSCRIPCION = 'fecha_fin_inscripcion';
+
+    public const FECHA_INICIO_PAGO = 'fecha_inicio_pago';
+    public const FECHA_FIN_PAGO = 'fecha_fin_pago';
+
+    public const FECHA_INICIO_VIGENCIA = 'fecha.inicio.vigencia';
+    public const FECHA_FIN_VIGENCIA = 'fecha.fin.vigencia';
+
+    public const GESTION_ACTUAL = 'gestion_actual';
+
+    public const NOTIFICACION_KEY = 'notificacion.key';
+    public const NOTIFICACION_TITULO = 'notificacion.titulo';
+    public const NOTIFICACION_DESCRIPCION = 'notificacion.descripcion';
+    public const NOTIFICACION_MENSAJE = 'notificacion.mensaje';
+    public const NOTIFICACION_FECHA_INICIO = 'notificacion.fecha_inicio';
+    public const NOTIFICACION_FECHA_FIN = 'notificacion.fecha_fin';
 }

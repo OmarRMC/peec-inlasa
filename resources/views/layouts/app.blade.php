@@ -1,4 +1,3 @@
-@php use App\Models\Permiso; @endphp
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ sidebarOpen: false, sidebarCollapsed: false, openMenu: null }" x-cloak>
@@ -175,11 +174,12 @@
 
             <footer class="bg-white text-center py-3 border-t text-sm text-gray-600">
                 © 2025 | <strong>INLASA</strong> Instituto Nacional de Laboratorios de Salud
-                <span class="float-right mr-4 text-gray-400">SigPEEC v1.5</span>
+                <span class="float-right mr-4 text-gray-400">SigPEEC v2</span>
             </footer>
         </div>
     </div>
     @stack('scripts')
+    <x-shared.notificacion-lab/>
 </body>
 
 </html>

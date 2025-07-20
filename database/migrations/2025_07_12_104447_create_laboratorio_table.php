@@ -37,6 +37,8 @@ return new class extends Migration
             $table->integer('wapp2_lab')->nullable();
             $table->string('mail_lab', 50);
             $table->string('mail2_lab', 50)->nullable();
+            $table->string('notificacion_key', 100)->nullable();
+            $table->timestamp('notificacion_read_at')->nullable();
             $table->boolean('status');
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('updated_by');
