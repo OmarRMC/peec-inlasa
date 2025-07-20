@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Notifications\CustomResetPassword;
 use App\Notifications\VerificarCorreoPersonalizado;
 use App\Traits\General;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -119,5 +120,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function tienePermiso($clave)
     {
         return $this->permisos->contains('clave', $clave);
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPassword($token));
     }
 }
