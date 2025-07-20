@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('cod_lab', 20);
             $table->string('antcod_peec', 10)->nullable();
             $table->string('numsedes_lab', 15)->nullable();
-            $table->bigInteger('nit_lab');
+            $table->bigInteger('nit_lab')->nullable();
             $table->string('nombre_lab', 100);
             $table->string('sigla_lab', 20)->nullable();
             $table->unsignedBigInteger('id_nivel');

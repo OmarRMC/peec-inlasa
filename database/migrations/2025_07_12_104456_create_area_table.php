@@ -16,7 +16,7 @@ return new class extends Migration
               $table->unsignedBigInteger('id_programa');
             $table->string('descripcion', 50);
             $table->boolean('status');
-            $table->integer('max_paquetes_inscribir');
+            $table->integer('max_paquetes_inscribir')->default(0);
             $table->foreign('id_programa')->references('id')->on('programa');
             $table->timestamps();
         });

@@ -81,4 +81,9 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/inscripciones/new', [LabController::class, 'labInscripcion'])->name('lab.inscripcion.create');
     Route::get('/inscripcion/{id}', [LabController::class, 'labShowInscripcion'])->name('lab.inscripcion.show');
 });
+
+Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
+    Route::get('/ea/{id}/labs', [LabController::class, 'profile'])->name('ea.lab.inscritos');
+});
+
 require __DIR__ . '/auth.php';
