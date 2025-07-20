@@ -99,13 +99,13 @@
 
             <!-- Teléfono -->
             <div>
-                <label for="talefono" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
                     <i class="fas fa-phone text-gray-400"></i> Teléfono
                 </label>
-                <input type="text" name="talefono" id="talefono"
-                    value="{{ old('talefono', $usuario->talefono ?? '') }}"
-                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 @error('talefono') border-red-500 @enderror">
-                @error('talefono')
+                <input type="text" name="telefono" id="telefono"
+                    value="{{ old('telefono', $usuario->telefono ?? '') }}"
+                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 @error('telefono') border-red-500 @enderror">
+                @error('telefono')
                     <p class="mt-1 text-xs text-red-600 flex items-center gap-1">
                         <i class="fas fa-exclamation-circle"></i> {{ $message }}
                     </p>

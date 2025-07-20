@@ -1,9 +1,12 @@
+@php
+    use App\Models\Permiso;
+@endphp
 <x-app-layout>
     <div class="px-4 py-6 max-w-6xl mx-auto">
         <!-- Encabezado -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Detalles de la Inscripción</h1>
-            <x-shared.btn-volver :url=" $backTo ?? route('inscripcion_paquete.index')" />
+            <x-shared.btn-volver :url="$backTo ?? route('inscripcion_paquete.index')" />
         </div>
 
         <div class="bg-white shadow-md rounded-lg overflow-hidden divide-y divide-gray-200">
@@ -47,10 +50,12 @@
             <section class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-blue-700">💳 Pagos</h2>
-                    <button onclick="document.getElementById('modalPago').showModal()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
-                        Registrar Pago
-                    </button>
+                    @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                        <button onclick="document.getElementById('modalPago').showModal()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                            Registrar Pago
+                        </button>
+                    @endif
                 </div>
 
                 @forelse ($inscripcion->pagos as $pago)
@@ -59,20 +64,26 @@
 
                         <div class="absolute top-2 right-2">
                             @if ($pago->status)
-                                <form method="POST" onsubmit="return confirm('¿Estás seguro de anular este pago?')"
-                                    action="{{ route('pago.destroy', [$pago->id]) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="text-red-600 hover:text-red-800 text-xs underline">Anular</button>
-                                </form>
+                                @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                                    <form method="POST" onsubmit="return confirm('¿Estás seguro de anular este pago?')"
+                                        action="{{ route('pago.destroy', [$pago->id]) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="text-red-600 hover:text-red-800 text-xs underline">
+                                            Anular
+                                        </button>
+                                    </form>
+                                @endif
                             @else
                                 <p>Anulado</p>
                             @endif
-                            <div class="text-gray-500 mt-2 text-xs space-y-1">
-                                <div>Registrado por: {{ $pago->creador->username ?? 'Desconocido' }}</div>
-                                <div>Actualizado por: {{ $pago->editor->username ?? '---' }}</div>
-                            </div>
+                            @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                                <div class="text-gray-500 mt-2 text-xs space-y-1">
+                                    <div>Registrado por: {{ $pago->creador->username ?? 'Desconocido' }}</div>
+                                    <div>Actualizado por: {{ $pago->editor->username ?? '---' }}</div>
+                                </div>
+                            @endif
                         </div>
 
                         <div><strong>Fecha:</strong> {{ $pago->fecha_pago }}</div>
@@ -97,11 +108,13 @@
             <section class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-blue-700 mb-4">📁 Documentos</h2>
-                    <button
-                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
-                        Aprobar
-                    </button>
+                    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                        <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                            Aprobar
+                        </button>
+                    @endif
                 </div>
+
                 @forelse ($inscripcion->documentos as $doc)
                     <div
                         class="border rounded px-4 py-2 mb-2 text-sm text-gray-700 bg-gray-50 flex justify-between items-center">

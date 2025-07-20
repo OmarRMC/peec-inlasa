@@ -34,5 +34,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::define(Permiso::RESPONSABLE, function (User $user) {
             return $user->isResponsableEA();
         });
+
+        Gate::define(Permiso::GESTION_PAGOS, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_PAGOS);;
+        });
+
+        Gate::define(Permiso::GESTION_INSCRIPCIONES, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_INSCRIPCIONES);
+        });
     }
 }

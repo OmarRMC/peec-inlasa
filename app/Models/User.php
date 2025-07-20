@@ -30,7 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'ap_paterno',
         'ap_materno',
         'ci',
-        'talefono',
+        'telefono',
         'status',
         'id_cargo',
         'email',

@@ -39,7 +39,7 @@ return new class extends Migration
                 'ap_paterno',
                 'ap_materno',
                 'ci',
-                'talefono',
+                'telefono',
                 'correo',
                 'password',
                 'status_usuario'

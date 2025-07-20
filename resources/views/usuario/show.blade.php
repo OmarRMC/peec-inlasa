@@ -17,7 +17,7 @@
                     <div><strong>Apellido Paterno:</strong> {{ $usuario->ap_paterno }}</div>
                     <div><strong>Apellido Materno:</strong> {{ $usuario->ap_materno }}</div>
                     <div><strong>CI:</strong> {{ $usuario->ci }}</div>
-                    <div><strong>Teléfono:</strong> {{ $usuario->talefono }}</div>
+                    <div><strong>Teléfono:</strong> {{ $usuario->telefono }}</div>
                     <div class="md:col-span-2"><strong>Email:</strong> {{ $usuario->email }}</div>
                 </div>
             </section>
