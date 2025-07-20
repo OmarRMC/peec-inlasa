@@ -144,7 +144,13 @@
                     <div id="userMenu"
                         class="absolute right-0 mt-2 bg-white border rounded shadow-md w-56 hidden z-50">
                         <div class="px-4 py-3 border-b text-center text-sm">
-                            <div class="text-indigo-600 font-semibold">LABORATORIO REGISTRADO</div>
+                            <div class="text-indigo-600 font-semibold">
+                                @if (Auth::user()->isLaboratorio())
+                                    LABORATORIO REGISTRADO
+                                @else 
+                                    USUARIO REGISTRADO
+                                @endif
+                            </div>
                             <div>PEEC - INLASA</div>
                             <div class="font-bold">{{ Auth::user()->username ?? 'BOL1146' }}</div>
                         </div>

@@ -1,4 +1,7 @@
-@php use App\Models\Permiso; @endphp
+@php 
+use App\Models\Permiso; 
+use App\Models\Configuracion;
+@endphp
 <!-- Navigation -->
 <nav class="flex-1 px-2 py-4 space-y-1 text-sm overflow-y-auto">
     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
@@ -39,10 +42,12 @@
                     class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                     <i class="fas fa-id-card-alt w-4 mr-1 text-indigo-500"></i> Perfil de laboratorio
                 </a>
+                @if (Configuracion::esPeriodoInscripcion())
                 <a href="{{ route('lab.profile.edit') }}"
                     class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                     <i class="fas fa-user-edit w-4 mr-1 text-indigo-500"></i> Actualizar tu información
                 </a>
+                @endif
                 <a href="{{ route('lab.ins.index') }}"
                     class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                     <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Listado de inscripciones

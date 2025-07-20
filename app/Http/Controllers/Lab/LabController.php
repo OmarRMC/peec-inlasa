@@ -141,7 +141,15 @@ class LabController extends Controller
      */
     public function create()
     {
-        //
+        return view('lab_tem.create', [
+            'paises' => Pais::active()->get(),
+            'niveles' => NivelLaboratorio::all(),
+            'tipos' => TipoLaboratorio::all(),
+            'departamentos' => [],
+            'provincias' => [],
+            'municipios' => [],
+            'categorias' => CategoriaLaboratorio::all(),
+        ]);
     }
 
     /**
@@ -183,4 +191,6 @@ class LabController extends Controller
     {
         //
     }
+
+    public function registrar() {}
 }

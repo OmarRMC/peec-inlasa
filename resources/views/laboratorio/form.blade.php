@@ -11,13 +11,13 @@
     @endif
 
     {{-- Datos Básicos --}}
-    <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
+    <fieldset class="form-fieldset border p-4 mb-8 rounded-md max-w-3xl mx-auto">
         {{-- <fieldset class="border p-6 mb-8 rounded-md max-w-5xl mx-auto shadow-sm"> --}}
         <legend class="flex items-center gap-2 text-lg font-semibold mb-2 text-gray-700">
             <i class="fas fa-flask text-primary"></i> Datos Básicos
         </legend>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="container-inputs grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
             {{-- Num. Registro Sedes --}}
             <div>

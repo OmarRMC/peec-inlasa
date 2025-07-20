@@ -1,18 +1,24 @@
+@php
+    use App\Models\Configuracion;
+@endphp
 <x-guest-layout>
     <div class="w-full max-w-md bg-white bg-opacity-95 rounded-md shadow-lg px-6 py-8 card-lon">
-        <h2 class="text-center text-lg font-semibold text-gray-800 mb-6">Por favor, ingrese sus credenciales de acceso
+        <h2 class="text-center text-lg font-semibold text-gray-800 mb-6">
+            Por favor, ingrese sus credenciales de acceso
         </h2>
 
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
-     @if ($errors->any())
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-        <strong class="font-bold"></strong>
-        <span class="block sm:inline">
-            Estas credenciales no coinciden con nuestros registros.
-        </span>
-        </div>
-    @endif
+
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                <strong class="font-bold"></strong>
+                <span class="block sm:inline">
+                    Estas credenciales no coinciden con nuestros registros.
+                </span>
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('login') }}">
             @csrf
 
@@ -24,10 +30,11 @@
                         <i class="fas fa-user"></i>
                     </span>
                     <input id="username" name="username" type="text" :value="old('username')" required autofocus
-                        class="pl-10 w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-200 "
+                        class="pl-10 w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-200"
                         placeholder="Ingrese su código o usuario" />
                 </div>
             </div>
+
             <!-- Contraseña -->
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium text-gray-700">CONTRASEÑA</label>
@@ -54,12 +61,22 @@
                     contraseña?</a>
             </div>
 
-            <!-- Botón -->
-            <div>
+            <!-- Botón ingresar -->
+            <div class="mb-4">
                 <button type="submit" class="btn-primary w-full justify-center font-semibold py-2 px-4 rounded shadow">
                     INGRESAR
                 </button>
             </div>
+
+            @if (Configuracion::esPeriodoInscripcion())
+                <!-- Enlace a registro -->
+                <div class="text-center text-sm">
+                    ¿No tienes una cuenta?
+                    <a href="{{ route('form.registro.tem.lab') }}" class="text-blue-600 hover:underline font-semibold">
+                        Regístrate aquí
+                    </a>
+                </div>
+            @endif
         </form>
 
         <!-- Pie institucional -->

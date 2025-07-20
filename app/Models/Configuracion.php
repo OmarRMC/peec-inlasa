@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Configuracion extends Model
@@ -37,4 +38,13 @@ class Configuracion extends Model
     public const NOTIFICACION_MENSAJE = 'notificacion.mensaje';
     public const NOTIFICACION_FECHA_INICIO = 'notificacion.fecha_inicio';
     public const NOTIFICACION_FECHA_FIN = 'notificacion.fecha_fin';
+
+
+    public static function esPeriodoInscripcion()
+    {
+        $fechaInicio = Configuracion::where('key', Configuracion::FECHA_INICIO_INSCRIPCION)->value('valor');
+        $fechaFin = Configuracion::where('key', Configuracion::FECHA_FIN_INSCRIPCION)->value('valor');
+        $hoy = Carbon::now()->toDateString();
+        return $fechaInicio <= $hoy && $hoy <= $fechaFin;
+    }
 }
