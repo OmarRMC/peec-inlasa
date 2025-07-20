@@ -2,6 +2,11 @@
 @if (isset($method) && $method === 'PUT')
     @method('PUT')
 @endif
+@php
+    $ensayosSeleccionados = $ensayosSeleccionados ?? []; // array de IDs
+    $ensayoMap = $ensayoA->pluck('descripcion', 'id')->toArray(); // [id => descripcion]
+@endphp
+
 
 @php
     $permisosAsignados = old('permisos');
@@ -184,6 +189,52 @@
                         Inactivo</option>
                 </select>
             </div>
+            <div class="">
+                <input type="hidden" name="is_responsable" value="0">
+                <input type="checkbox" name="is_responsable" id="is_responsable" value="1"
+                    class="text-blue-600 focus:ring-blue-300 focus:ring-1 rounded 
+                    @error('is_responsable') border-red-400 @enderror">
+                <label for="is_responsable" class="text-sm text-gray-700">
+                    @if (empty($ensayosSeleccionados))
+                        Responsable
+                    @else 
+                        Agregar REA
+                    @endif
+                </label>
+            </div>
+
+            <div class="hidden" id="ensayoSelect">
+                <label for="ensayo_ap" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                    <i class="fas fa-clipboard-list text-gray-400"></i> Ensayo de aptitud
+                </label>
+                <select id="ensayo_ap"
+                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Selecciona ensayo de aptitud</option>
+                    @foreach ($ensayoA as $ensayo)
+                        <option value="{{ $ensayo->id }}">{{ $ensayo->descripcion }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                @if (!empty($ensayosSeleccionados))
+                    <span>
+                        Responsable de los EA: 
+                    </span>
+                @endif
+                <div id="ensayoChipsContainer" class="flex flex-wrap gap-2 mt-3">
+                    @foreach ($ensayosSeleccionados as $id)
+                        <div class="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm gap-2 ensayo-chip"
+                            data-id="{{ $id }}">
+                            <span>
+                                {{ $ensayoMap[$id] ?? 'Sin descripción' }}</span>
+                            <input type="hidden" name="ensayos_ap[]" value="{{ $id }}">
+                            <button type="button"
+                                class="text-blue-600 hover:text-red-500 font-bold eliminar-chip">&times;</button>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -205,4 +256,66 @@
             @endforeach
         </div>
     </section>
+    <script>
+        const isResponsableCheckbox = document.getElementById('is_responsable');
+        const ensayoSelectWrapper = document.getElementById('ensayoSelect');
+        const ensayoSelect = document.getElementById('ensayo_ap');
+        const chipsContainer = document.getElementById('ensayoChipsContainer');
+
+        let selectedEnsayos = [...chipsContainer.querySelectorAll('input[name="ensayos_ap[]"]')].map(input => input.value);
+
+        if (isResponsableCheckbox.checked) {
+            ensayoSelectWrapper.classList.remove('hidden');
+            ensayoSelectWrapper.classList.add('block');
+        }
+
+        isResponsableCheckbox.addEventListener('change', () => {
+            if (isResponsableCheckbox.checked) {
+                ensayoSelectWrapper.classList.remove('hidden');
+                ensayoSelectWrapper.classList.add('block');
+            } else {
+                ensayoSelectWrapper.classList.add('hidden');
+                ensayoSelectWrapper.classList.remove('block');
+                selectedEnsayos = [];
+                chipsContainer.innerHTML = '';
+            }
+        });
+
+        ensayoSelect.addEventListener('change', () => {
+            const ensayoId = ensayoSelect.value;
+            const ensayoText = ensayoSelect.options[ensayoSelect.selectedIndex].text;
+
+            if (!ensayoId || selectedEnsayos.includes(ensayoId)) return;
+
+            selectedEnsayos.push(ensayoId);
+
+            const chip = document.createElement('div');
+            chip.className =
+                'flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm gap-2 ensayo-chip';
+            chip.setAttribute('data-id', ensayoId);
+            chip.innerHTML = `
+            <span>${ensayoText}</span>
+            <input type="hidden" name="ensayos_ap[]" value="${ensayoId}">
+            <button type="button" class="text-blue-600 hover:text-red-500 font-bold eliminar-chip">&times;</button>
+        `;
+
+            chip.querySelector('.eliminar-chip').addEventListener('click', () => {
+                chip.remove();
+                selectedEnsayos = selectedEnsayos.filter(id => id !== ensayoId);
+            });
+
+            chipsContainer.appendChild(chip);
+            ensayoSelect.value = '';
+        });
+
+        document.querySelectorAll('.eliminar-chip').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const chip = this.closest('.ensayo-chip');
+                const ensayoId = chip.dataset.id;
+                chip.remove();
+                selectedEnsayos = selectedEnsayos.filter(id => id !== ensayoId);
+            });
+        });
+    </script>
+
 </div>

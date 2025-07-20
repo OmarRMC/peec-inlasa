@@ -99,6 +99,9 @@
                             searchable: false
                         }
                     ],
+                    order: [
+                        [0, 'desc']
+                    ],
                     language: {
                         url: "/translation/es.json"
                     },

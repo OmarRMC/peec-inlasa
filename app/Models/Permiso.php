@@ -90,6 +90,8 @@ class Permiso extends Model
     public const VER_MANUAL_USUARIO = 'ver.manual.usuario';
     public const VER_ACERCA_DE = 'ver.acerca.de';
     public const LABORATORIO = 'laboratorio';
+    public const RESPONSABLE = 'responsable';
+
     protected $table = 'permiso';
     protected $primaryKey = 'id';
 

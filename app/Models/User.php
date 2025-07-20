@@ -106,6 +106,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->laboratorio !== null;
     }
 
+    public function isResponsableEA()
+    {
+        return $this->responsablesEA()->exists();
+    }
+
+    public function responsablesEA()
+    {
+        return $this->belongsToMany(EnsayoAptitud::class, 'responsable', 'id_usuario', 'id_ea');
+        // ->withPivot('descripcion');
+    }
     public function tienePermiso($nombre)
     {
         return $this->permisos->contains('nombre_permiso', $nombre);

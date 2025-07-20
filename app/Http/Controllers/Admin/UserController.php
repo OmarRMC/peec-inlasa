@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cargo;
+use App\Models\EnsayoAptitud;
 use App\Models\Permiso;
 use App\Models\User;
 use App\Notifications\VerificarCorreoUser;
@@ -25,11 +26,13 @@ class UserController extends Controller
     {
         $cargos = Cargo::active()->get();
         $permisos = Permiso::active()->get();
-        return view('usuario.create', compact('cargos', 'permisos'));
+        $ensayoA = EnsayoAptitud::active()->orderBy('descripcion')->get();
+        return view('usuario.create', compact('cargos', 'permisos', 'ensayoA'));
     }
 
     public function store(Request $request)
     {
+
         $request->validate([
             'username'     => 'required|string|max:50|unique:users,username',
             'nombre'       => 'required|string|max:50',
@@ -43,6 +46,8 @@ class UserController extends Controller
             'status'       => 'required|boolean',
             'permisos'     => 'array',
             'permisos.*'   => 'exists:permiso,id',
+            'ensayos_ap'   => 'nullable|array',
+            'ensayos_ap.*' => 'exists:ensayo_aptitud,id',
         ], $this->messages());
 
         $usuario = User::create([
@@ -60,11 +65,29 @@ class UserController extends Controller
 
         $usuario->notify(new VerificarCorreoUser($usuario));
         $usuario->permisos()->sync($request->input('permisos', []));
+
+        $ensayoIDs = $request->input('ensayos_ap', []);
+
+        // $ensayosData = [];
+        // $ensayos = EnsayoAptitud::whereIn('id', $ensayoIDs)->get();
+
+        // foreach ($ensayos as $ensayo) {
+        //     $ensayosData[$ensayo->id] = ['descripcion' => $ensayo->descripcion];
+        // }
+
+        $usuario->responsablesEA()->attach($ensayoIDs);
+
         return redirect()->route('usuario.index')->with('success', 'Usuario creado correctamente.');
     }
 
     public function show(User $usuario)
     {
+        $usuario->load([
+            'cargo',
+            'permisos',
+            'responsablesEA'
+        ]);
+
         return view('usuario.show', compact('usuario'));
     }
 
@@ -72,7 +95,10 @@ class UserController extends Controller
     {
         $cargos = Cargo::active()->get();
         $permisos = Permiso::active()->get();
-        return view('usuario.edit', compact('usuario', 'cargos', 'permisos'));
+        $ensayoA = EnsayoAptitud::active()->get();
+
+        $ensayosSeleccionados = old('ensayos_ap', $usuario->responsablesEA()->pluck('ensayo_aptitud.id')->toArray());
+        return view('usuario.edit', compact('usuario', 'cargos', 'permisos', 'ensayoA', 'ensayosSeleccionados'));
     }
 
     public function update(Request $request, User $usuario)
@@ -88,6 +114,8 @@ class UserController extends Controller
             'password'     => 'nullable|string|min:8|confirmed',
             'id_cargo'     => 'nullable|exists:cargo,id',
             'status'       => 'required|boolean',
+            'ensayos_ap'   => 'nullable|array',
+            'ensayos_ap.*' => 'exists:ensayo_aptitud,id',
         ], $this->messages());
 
         $usuario->update([
@@ -105,7 +133,16 @@ class UserController extends Controller
         if (!empty($validated['password'])) {
             $usuario->update(['password' => Hash::make($validated['password'])]);
         }
+        $ensayoIDs = $request->input('ensayos_ap', []);
 
+        // $ensayosData = [];
+        // $ensayos = EnsayoAptitud::whereIn('id', $ensayoIDs)->get();
+
+        // foreach ($ensayos as $ensayo) {
+        //     $ensayosData[$ensayo->id] = ['descripcion' => $ensayo->descripcion];
+        // }
+
+        $usuario->responsablesEA()->sync($ensayoIDs);
         return redirect()->route('usuario.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
