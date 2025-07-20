@@ -3,7 +3,7 @@
         <!-- Título -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Detalles del Laboratorio</h1>
-            @if ($backTo != false)
+            @if (!isset($backTo) || $backTo != false)
                 <x-shared.btn-volver :url="route('laboratorio.index')" />
             @endif
         </div>

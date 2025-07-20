@@ -24,6 +24,11 @@ class VerificacionCorreoLaboratorioController extends Controller
         $user->markEmailAsVerified();
         $user->status = true;
         $user->save();
+        if($user->laboratorio){
+            $lab= $user->laboratorio; 
+            $lab->status = true; 
+            $lab->save();
+        }
 
         event(new Verified($user));
         Auth::login($user);

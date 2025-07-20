@@ -116,8 +116,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(EnsayoAptitud::class, 'responsable', 'id_usuario', 'id_ea');
         // ->withPivot('descripcion');
     }
-    public function tienePermiso($nombre)
+    public function tienePermiso($clave)
     {
-        return $this->permisos->contains('nombre_permiso', $nombre);
+        return $this->permisos->contains('clave', $clave);
     }
 }

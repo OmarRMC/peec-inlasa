@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define(Permiso::ADMIN, function (User $user) {
-            return true;
+            return $user->tienePermiso(Permiso::ADMIN);
         });
 
         Gate::define(Permiso::RESPONSABLE, function (User $user) {

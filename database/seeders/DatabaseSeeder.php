@@ -23,6 +23,10 @@ class DatabaseSeeder extends Seeder
             PermisoSeed::class,
             CargoSeeder::class,
             UserSeeder::class,
+            GeoSeeder::class,
+            TipoLaboratorioSeeder::class,
+            NivelLaboratorioSeeder::class,
+            CategoriaLaboratorioSeeder::class,
         ]);
     }
 }

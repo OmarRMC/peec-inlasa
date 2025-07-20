@@ -1,3 +1,5 @@
+@php use App\Models\Permiso; @endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ sidebarOpen: false, sidebarCollapsed: false, openMenu: null }" x-cloak>
 

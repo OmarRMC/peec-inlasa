@@ -1,4 +1,5 @@
-    @csrf
+@php use App\Models\Permiso; @endphp
+@csrf
     @php
         $edit = false;
     @endphp
@@ -46,7 +47,7 @@
                 <label for="cod_lab" class="label">Código Laboratorio</label>
                 <input type="text" name="cod_lab" id="cod_lab" maxlength="20"
                     value="{{ old('cod_lab', $laboratorio->cod_lab ?? '') }}"
-                    class="input-standard w-full @error('cod_lab') border-red-500 @enderror" required>
+                    class="input-standard w-full @error('cod_lab') border-red-500 @enderror">
                 @error('cod_lab')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -404,27 +405,31 @@
 
     @if ($edit)
         {{-- Estado --}}
-        <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
-            <legend class="flex items-center gap-2 text-lg font-semibold mb-2">
-                <i class="fas fa-toggle-on text-primary"></i> Estado del Laboratorio
-            </legend>
+        @if (Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN]))
+            <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
+                <legend class="flex items-center gap-2 text-lg font-semibold mb-2">
+                    <i class="fas fa-toggle-on text-primary"></i> Estado del Laboratorio
+                </legend>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="status" class="label">Estado</label>
-                    <select name="status" id="status"
-                        class="input-standard max-w-md w-full @error('status') border-red-500 @enderror" required>
-                        <option value="1" {{ old('status', $laboratorio->status ?? '') == 1 ? 'selected' : '' }}>
-                            Activo</option>
-                        <option value="0"
-                            {{ old('status', $laboratorio->status ?? '') === 0 ? 'selected' : '' }}>Inactivo</option>
-                    </select>
-                    @error('status')
-                        {{-- <p class="text-red-500 text-sm mt-1">{{ $message }}</p> --}}
-                    @enderror
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="status" class="label">Estado</label>
+                        <select name="status" id="status"
+                            class="input-standard max-w-md w-full @error('status') border-red-500 @enderror" required>
+                            <option value="1"
+                                {{ old('status', $laboratorio->status ?? '') == 1 ? 'selected' : '' }}>
+                                Activo</option>
+                            <option value="0"
+                                {{ old('status', $laboratorio->status ?? '') === 0 ? 'selected' : '' }}>Inactivo
+                            </option>
+                        </select>
+                        @error('status')
+                            {{-- <p class="text-red-500 text-sm mt-1">{{ $message }}</p> --}}
+                        @enderror
+                    </div>
                 </div>
-            </div>
-        </fieldset>
+            </fieldset>
+        @endif
     @endif
 
 

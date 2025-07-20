@@ -2,7 +2,7 @@
     <div class="px-4 py-6 max-w-6xl mx-auto">
         <div class="bg-white shadow-md rounded-xl p-6 space-y-5 border border-gray-200">
 
-            @if ($backTo != false)
+            @if ( !isset($backTo) || $backTo != false)
                 <x-shared.btn-volver :url="route('laboratorio.index')" />
             @endif
 
