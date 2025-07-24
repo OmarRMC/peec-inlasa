@@ -16,11 +16,12 @@ return new class extends Migration
             $table->string('cod_lab', 20);
             $table->string('antcod_peec', 10)->nullable();
             $table->string('numsedes_lab', 15)->nullable();
-            $table->bigInteger('nit_lab');
+            $table->bigInteger('nit_lab')->nullable();
             $table->string('nombre_lab', 100);
             $table->string('sigla_lab', 20)->nullable();
             $table->unsignedBigInteger('id_nivel');
             $table->unsignedBigInteger('id_tipo');
+            $table->unsignedBigInteger('id_categoria');
             $table->string('respo_lab', 50);
             $table->string('ci_respo_lab', 12)->nullable();
             $table->string('repreleg_lab', 50);
@@ -33,10 +34,12 @@ return new class extends Migration
             $table->string('direccion_lab', 150);
             $table->integer('wapp_lab');
             $table->integer('wapp2_lab')->nullable();
+            $table->string('telefono', 50)->nullable();
             $table->string('mail_lab', 50);
             $table->string('mail2_lab', 50)->nullable();
             $table->string('password', 255);
             $table->timestamps();
+            $table->softDeletes(); 
         });
     }
 

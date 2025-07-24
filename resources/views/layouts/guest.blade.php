@@ -12,6 +12,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -20,6 +23,7 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
+    <x-alerts.sweetalert />
     <div class="min-h-screen flex items-center justify-center bg-cover bg-center"
         style="background-image: url('/img/fondo.jpg');">
         <div>

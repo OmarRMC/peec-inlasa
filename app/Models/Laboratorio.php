@@ -40,6 +40,7 @@ class Laboratorio extends Model
         'status',
         'created_by',
         'updated_by',
+        'email_verified_at'
     ];
 
     // Relaciones

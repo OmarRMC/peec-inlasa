@@ -3,16 +3,27 @@
 namespace App\Http\Controllers\Lab;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EnvioCodigoLab;
+use App\Mail\LaboratorioVerificacionDatos;
 use App\Models\CategoriaLaboratorio;
+use App\Models\Departamento;
 use App\Models\Inscripcion;
+use App\Models\Laboratorio;
+use App\Models\LaboratorioTem;
+use App\Models\Municipio;
 use App\Models\NivelLaboratorio;
 use App\Models\Pais;
 use App\Models\Permiso;
 use App\Models\Programa;
+use App\Models\Provincia;
 use App\Models\TipoLaboratorio;
+use App\Models\User;
+use App\Notifications\VerificarCorreoLab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 
 class LabController extends Controller
 {
@@ -192,5 +203,198 @@ class LabController extends Controller
         //
     }
 
-    public function registrar() {}
+    public function registrar(Request $request)
+    {
+        $request->validate([
+            'cod_lab' => 'required|string|max:20|unique:laboratorio,cod_lab',
+            'antcod_peec' => 'nullable|string|max:10',
+            'numsedes_lab' => 'nul  lable|string|max:15',
+            'nombre_lab' => 'required|string|max:100',
+            'sigla_lab' => 'nullable|string|max:20|unique:laboratorio,sigla_lab',
+            'nit_lab' => 'nullable|numeric|unique:laboratorio,nit_lab',
+            'id_nivel' => 'required|exists:nivel_laboratorio,id',
+            'id_tipo' => 'required|exists:tipo_laboratorio,id',
+            'id_categoria' => 'required|exists:categoria,id',
+            'respo_lab' => 'required|string|max:50',
+            'ci_respo_lab' => 'nullable|string|max:12',
+            'repreleg_lab' => 'required|string|max:50',
+            'ci_repreleg_lab' => 'nullable|string|max:12',
+            'id_pais' => 'required|exists:pais,id',
+            'id_dep' => 'required|exists:departamento,id',
+            'id_prov' => 'required|exists:provincia,id',
+            'id_municipio' => 'required|exists:municipio,id',
+            'zona_lab' => 'required|string|max:50',
+            'direccion_lab' => 'required|string|max:150',
+            'wapp_lab' => 'required|numeric',
+            'wapp2_lab' => 'nullable|numeric',
+            'mail_lab' => 'required|email|unique:users,email',
+            'mail2_lab' => 'nullable|email',
+            'telefono' => 'nullable|string|max:50',
+            'password' => 'required|string|min:8|confirmed',
+        ], $this->messages());
+
+        $laboratorio = LaboratorioTem::create([
+            'cod_lab' => $request->cod_lab,
+            'antcod_peec' => $request->antcod_peec,
+            'numsedes_lab' => $request->numsedes_lab,
+            'nit_lab' => $request->nit_lab,
+            'nombre_lab' => $request->nombre_lab,
+            'sigla_lab' => $request->sigla_lab,
+            'id_nivel' => $request->id_nivel,
+            'id_tipo' => $request->id_tipo,
+            'id_categoria' => $request->id_categoria,
+            'respo_lab' => $request->respo_lab,
+            'ci_respo_lab' => $request->ci_respo_lab,
+            'repreleg_lab' => $request->repreleg_lab,
+            'ci_repreleg_lab' => $request->ci_repreleg_lab,
+            'id_pais' => $request->id_pais,
+            'id_dep' => $request->id_dep,
+            'id_prov' => $request->id_prov,
+            'id_municipio' => $request->id_municipio,
+            'zona_lab' => $request->zona_lab,
+            'direccion_lab' => $request->direccion_lab,
+            'wapp_lab' => $request->wapp_lab,
+            'wapp2_lab' => $request->wapp2_lab,
+            'mail_lab' => $request->mail_lab,
+            'mail2_lab' => $request->mail2_lab,
+            'telefono' => $request->telefono,
+            'password' => $request->password,
+        ]);
+
+        $pais = Pais::find($request->id_pais)?->nombre ?? 'Desconocido';
+        $departamento = Departamento::find($request->id_dep)?->nombre_dep ?? 'Desconocido';
+        $provincia = Provincia::find($request->id_prov)?->nombre_prov ?? 'Desconocido';
+        $municipio = Municipio::find($request->id_municipio)?->nombre_municipio ?? 'Desconocido';
+        $categoria = CategoriaLaboratorio::find($request->id_categoria)?->descripcion ?? 'Desconocido';
+        $tipo = TipoLaboratorio::find($request->id_tipo)?->descripcion ?? 'Desconocido';
+        $nivel = NivelLaboratorio::find($request->id_nivel)?->descripcion_nivel ?? 'Desconocido';
+
+        Mail::to($laboratorio->mail_lab)->send(
+            new LaboratorioVerificacionDatos(
+                $laboratorio,
+                $pais,
+                $departamento,
+                $provincia,
+                $municipio,
+                $categoria,
+                $tipo,
+                $nivel
+            )
+        );
+        return redirect('login')->with('success', 'Laboratorio registrado exitosamente, Se envió un correo de verificación para validar sus datos.');
+    }
+
+
+    private function messages()
+    {
+        return [
+            'cod_lab.required' => 'El código del laboratorio es obligatorio.',
+            'cod_lab.unique' => 'El código del laboratorio ya está en uso.',
+            'antcod_peec.max' => 'El código PEEC no debe exceder 10 caracteres.',
+            'numsedes_lab.max' => 'El número de sedes no debe exceder 15 caracteres.',
+            'nombre_lab.required' => 'El nombre del laboratorio es obligatorio.',
+            'sigla_lab.unique' => 'La sigla del laboratorio ya está en uso.',
+            'nit_lab.required' => 'El NIT del laboratorio es obligatorio.',
+            'nit_lab.unique' => 'El NIT del laboratorio ya está en uso.',
+            'id_nivel.required' => 'Debe seleccionar un nivel de laboratorio.',
+            'id_nivel.exists' => 'El nivel seleccionado no es válido.',
+            'id_tipo.required' => 'Debe seleccionar un tipo de laboratorio.',
+            'id_tipo.exists' => 'El tipo seleccionado no es válido.',
+            'id_categoria.required' => 'Debe seleccionar una categoría.',
+            'id_categoria.exists' => 'La categoría seleccionada no es válida.',
+            'respo_lab.required' => 'El nombre del responsable es obligatorio.',
+            'ci_respo_lab.max' => 'El CI del responsable no debe exceder 12 caracteres.',
+            'repreleg_lab.required' => 'El nombre del representante legal es obligatorio.',
+            'ci_repreleg_lab.max' => 'El CI del representante legal no debe exceder 12 caracteres.',
+            'id_pais.required' => 'Debe seleccionar un país.',
+            'id_pais.exists' => 'El país seleccionado no es válido.',
+            'id_dep.required' => 'Debe seleccionar un departamento.',
+            'id_dep.exists' => 'El departamento seleccionado no es válido.',
+            'id_prov.required' => 'Debe seleccionar una provincia.',
+            'id_prov.exists' => 'La provincia seleccionada no es válida.',
+            'id_municipio.required' => 'Debe seleccionar un municipio.',
+            'id_municipio.exists' => 'El municipio seleccionado no es válido.',
+            'zona_lab.required' => 'La zona es obligatoria.',
+            'direccion_lab.required' => 'La dirección es obligatoria.',
+            'wapp_lab.required' => 'El número de WhatsApp principal es obligatorio.',
+            'wapp_lab.numeric' => 'El número de WhatsApp principal debe ser numérico.',
+            'wapp2_lab.numeric' => 'El número de WhatsApp secundario debe ser numérico.',
+            'mail_lab.required' => 'El correo electrónico principal es obligatorio.',
+            'mail_lab.email' => 'El correo electrónico principal debe ser válido.',
+            'mail_lab.unique' => 'El correo electrónico ya está registrado.',
+            'mail2_lab.email' => 'El correo electrónico secundario debe ser válido.',
+            'telefono.max' => 'El teléfono no debe exceder 50 caracteres.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+        ];
+    }
+
+    public function confirmarDatos($id)
+    {
+        $labTem = LaboratorioTem::findOrFail($id);
+
+        $pais = Pais::find($labTem->id_pais);
+        $sigla = strtoupper($pais->sigla_pais); // Ej: BOL
+
+        // Generar username incremental
+        $count = User::where('username', 'LIKE', "$sigla-%")->count() + 1;
+        $username = $sigla . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        try {
+            DB::beginTransaction();
+
+            // Crear usuario
+            $user = User::create([
+                'nombre' => $labTem->nombre_lab,
+                'username' => $username,
+                'email' => $labTem->mail_lab,
+                'password' => $labTem->password,
+                'status' => false,
+                'ap_paterno' => 'Laboratorio_ap_paterno', // Asignar un apellido por defecto
+                'ci' => $labTem->ci_respo_lab ?: '00000000',
+                'telefono' => $labTem->telefono,
+                'email_verified_at' => now(),
+                'status' => true
+            ]);
+
+            // Crear laboratorio
+            $lab = Laboratorio::create([
+                'id_usuario' => $user->id,
+                'cod_lab' => $labTem->cod_lab,
+                'antcod_peec' => $labTem->antcod_peec,
+                'numsedes_lab' => $labTem->numsedes_lab,
+                'nit_lab' => $labTem->nit_lab,
+                'nombre_lab' => $labTem->nombre_lab,
+                'sigla_lab' => $labTem->sigla_lab,
+                'id_nivel' => $labTem->id_nivel,
+                'id_tipo' => $labTem->id_tipo,
+                'id_categoria' => $labTem->id_categoria,
+                'respo_lab' => $labTem->respo_lab,
+                'ci_respo_lab' => $labTem->ci_respo_lab,
+                'repreleg_lab' => $labTem->repreleg_lab,
+                'ci_repreleg_lab' => $labTem->ci_repreleg_lab,
+                'id_pais' => $labTem->id_pais,
+                'id_dep' => $labTem->id_dep,
+                'id_prov' => $labTem->id_prov,
+                'id_municipio' => $labTem->id_municipio,
+                'zona_lab' => $labTem->zona_lab,
+                'direccion_lab' => $labTem->direccion_lab,
+                'wapp_lab' => $labTem->wapp_lab,
+                'wapp2_lab' => $labTem->wapp2_lab,
+                'mail_lab' => $labTem->mail_lab,
+                'mail2_lab' => $labTem->mail2_lab,
+                'status' => true,
+                'created_by' => $user->id,
+                'updated_by' =>     $user->id,
+            ]);
+            Mail::to($user->email)->send(new EnvioCodigoLab($user, $lab));
+            DB::commit();
+            $labTem->delete();
+            return redirect('login')->with('success', 'El laboratorio fue confirmado y registrado correctamente. Se ha enviado el código asignado al correo electrónico principal proporcionado.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            \Log::error('Error al iniciar transacción: ' . $e->getMessage());
+            return redirect('login')->with('error', 'Ocurrió un error al registrar la información. Por favor, inténtelo nuevamente.');
+        }
+    }
 }
