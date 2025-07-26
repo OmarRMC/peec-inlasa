@@ -1,5 +1,6 @@
 @php
     $paquete ??= new \App\Models\Paquete();
+    $tiposLaboratoriosSelecionados = $tiposLaboratoriosSelecionados ?? [];
 @endphp
 
 
@@ -58,6 +59,35 @@
     @enderror
 </div>
 
+
+<!-- Tipos de laboratorio -->
+<div class="mt-4">
+    <label for="tipo_laboratorio_ids" class="block text-sm font-semibold text-gray-700 mb-1">Tipos de
+        Laboratorio</label>
+    <select id="tipo_lab_app"
+        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+        <option value="">Selecciona los tipos de laboratorio</option>
+        @foreach ($tiposLaboratorios as $tipo)
+            <option value="{{ $tipo->id }}">{{ $tipo->descripcion }}</option>
+        @endforeach
+    </select>
+
+    @error('tipo_laboratorio_ids')
+        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+    @enderror
+    <div id="ensayoChipsContainer" class="flex flex-wrap gap-2 mt-3">
+        @foreach ($tiposLaboratoriosSelecionados as $tiposLab)
+            <div class="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm gap-2 ensayo-chip"
+                data-id="{{ $tiposLab->id }}">
+                <span>
+                    {{ $tiposLab->descripcion ?? 'Sin descripción' }}</span>
+                <input type="hidden" name="tipo_laboratorio_ids[]" value="{{ $tiposLab->id }}">
+                <button type="button" class="text-blue-600 hover:text-red-500 font-bold eliminar-chip">&times;</button>
+            </div>
+        @endforeach
+    </div>
+</div>
+
 <!-- Estado -->
 <div>
     <label for="status" class="block text-sm font-semibold text-gray-700 mb-1">Estado</label>
@@ -71,3 +101,51 @@
         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
     @enderror
 </div>
+
+<script>
+    const isResponsableCheckbox = document.getElementById('is_responsable');
+    const ensayoSelectWrapper = document.getElementById('ensayoSelect');
+    const ensayoSelect = document.getElementById('tipo_lab_app');
+    const chipsContainer = document.getElementById('ensayoChipsContainer');
+
+    let selectedEnsayos = [...chipsContainer.querySelectorAll('input[name="tipo_laboratorio_ids[]"]')].map(input =>
+        input.value);
+
+    ensayoSelect.addEventListener('change', () => {
+
+        const ensayoId = ensayoSelect.value;
+        console.log(ensayoId);
+        const ensayoText = ensayoSelect.options[ensayoSelect.selectedIndex].text;
+
+        if (!ensayoId || selectedEnsayos.includes(ensayoId)) return;
+
+        selectedEnsayos.push(ensayoId);
+
+        const chip = document.createElement('div');
+        chip.className =
+            'flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm gap-2 ensayo-chip';
+        chip.setAttribute('data-id', ensayoId);
+        chip.innerHTML = `
+            <span>${ensayoText}</span>
+            <input type="hidden" name="tipo_laboratorio_ids[]" value="${ensayoId}">
+            <button type="button" class="text-blue-600 hover:text-red-500 font-bold eliminar-chip">&times;</button>
+        `;
+
+        chip.querySelector('.eliminar-chip').addEventListener('click', () => {
+            chip.remove();
+            selectedEnsayos = selectedEnsayos.filter(id => id !== ensayoId);
+        });
+
+        chipsContainer.appendChild(chip);
+        ensayoSelect.value = '';
+    });
+
+    document.querySelectorAll('.eliminar-chip').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const chip = this.closest('.ensayo-chip');
+            const ensayoId = chip.dataset.id;
+            chip.remove();
+            selectedEnsayos = selectedEnsayos.filter(id => id !== ensayoId);
+        });
+    });
+</script>

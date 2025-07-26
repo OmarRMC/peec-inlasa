@@ -24,4 +24,10 @@ class TipoLaboratorio extends Model
     {
         return $this->belongsToMany(Programa::class, 'tipo_laboratorio_programa', 'id_tipo', 'id_programa');
     }
+
+    public function paquetes()
+    {
+        return $this->belongsToMany(Paquete::class, 'paquete_tipo_laboratorio', 'tipo_laboratorio_id', 'paquete_id')
+            ->withTimestamps();
+    }
 }

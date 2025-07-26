@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Paquete;
 use App\Models\Area;
 use App\Models\Programa;
+use App\Models\TipoLaboratorio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,14 +31,16 @@ class PaqueteController extends Controller
 
     public function index()
     {
-        $paquetes = Paquete::with('area')->paginate(10);
+        $paquetes = Paquete::with('area')->orderByDesc('created_at')
+            ->paginate(10);
         return view('paquete.index', compact('paquetes'));
     }
 
     public function create()
     {
         $areas = Area::active()->get();
-        return view('paquete.create', compact('areas'));
+        $tiposLaboratorios = TipoLaboratorio::active()->get();
+        return view('paquete.create', compact('areas', 'tiposLaboratorios'));
     }
 
     public function store(Request $request)
@@ -53,18 +56,22 @@ class PaqueteController extends Controller
                 'regex:/^\d+(\.\d{1,2})?$/'
             ],
             'max_participantes' => 'required|integer|min:0',
+            'tipo_laboratorio_ids' => 'array',
+            'tipo_laboratorio_ids.*' => 'exists:tipo_laboratorio,id',
             'status' => 'required|boolean',
         ], $this->messages());
 
-        Paquete::create($request->all());
-
+        $paquete = Paquete::create($request->all());
+        $paquete->tiposLaboratorios()->sync($request['tipo_laboratorio_ids'] ?? []);
         return redirect()->route('paquete.index')->with('success', 'Paquete creado correctamente.');
     }
 
     public function edit(Paquete $paquete)
     {
         $areas = Area::active()->get();
-        return view('paquete.edit', compact('paquete', 'areas'));
+        $tiposLaboratorios = TipoLaboratorio::active()->get();
+        $tiposLaboratoriosSelecionados  = $paquete->tiposLaboratorios()->get();
+        return view('paquete.edit', compact('paquete', 'areas', 'tiposLaboratorios', 'tiposLaboratoriosSelecionados'));
     }
 
     public function update(Request $request, Paquete $paquete)
@@ -73,10 +80,13 @@ class PaqueteController extends Controller
             'id_area' => 'required|exists:area,id',
             'descripcion' => 'required|string|max:100|unique:paquete,descripcion,' . $paquete->id,
             'costo_paquete' => 'required|integer',
+            'tipo_laboratorio_ids' => 'array',
+            'tipo_laboratorio_ids.*' => 'exists:tipo_laboratorio,id',
             'status' => 'required|boolean',
         ], $this->messages());
 
         $paquete->update($request->all());
+        $paquete->tiposLaboratorios()->sync($request['tipo_laboratorio_ids'] ?? []);
 
         return redirect()->route('paquete.index')->with('success', 'Paquete actualizado correctamente.');
     }

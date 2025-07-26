@@ -31,4 +31,10 @@ class Paquete extends Model
     {
         return $this->hasMany(EnsayoAptitud::class, 'id_paquete');
     }
+
+    public function tiposLaboratorios()
+    {
+        return $this->belongsToMany(TipoLaboratorio::class, 'paquete_tipo_laboratorio', 'paquete_id', 'tipo_laboratorio_id')
+            ->withTimestamps();
+    }
 }

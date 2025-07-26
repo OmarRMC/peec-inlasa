@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('tipo_laboratorio', function (Blueprint $table) {
             $table->id();
-            // $table->unsignedBigInteger('id_categoria');
             $table->string('descripcion', 25);
             $table->boolean('status')->default(true);
-            // $table->foreign('id_categoria')->references('id')->on('categoria');
             $table->timestamps();
         });
     }
