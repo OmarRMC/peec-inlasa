@@ -9,6 +9,7 @@ use App\Models\Departamento;
 use App\Models\Laboratorio;
 use App\Models\NivelLaboratorio;
 use App\Models\Pais;
+use App\Models\Permiso;
 use App\Models\TipoLaboratorio;
 use App\Models\User;
 use App\Notifications\VerificarCorreoLab;
@@ -20,6 +21,10 @@ use Illuminate\Support\Facades\URL;
 
 class LaboratorioController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('canany:' . Permiso::GESTION_LABORATORIO . ',' . Permiso::ADMIN);
+    }
 
     public function index()
     {
@@ -34,6 +39,7 @@ class LaboratorioController extends Controller
 
     public function create()
     {
+
         return view('laboratorio.create', [
             'paises' => Pais::active()->get(),
             'niveles' => NivelLaboratorio::all(),
@@ -48,7 +54,7 @@ class LaboratorioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'cod_lab' => 'required|string|max:20|unique:laboratorio,cod_lab',
+            'cod_lab' => 'nullable|string|max:20|unique:laboratorio,cod_lab',
             'antcod_peec' => 'nullable|string|max:10',
             'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
@@ -58,9 +64,9 @@ class LaboratorioController extends Controller
             'id_tipo' => 'required|exists:tipo_laboratorio,id',
             'id_categoria' => 'required|exists:categoria,id',
             'respo_lab' => 'required|string|max:50',
-            'ci_respo_lab' => 'nullable|string|max:12',
+            'ci_respo_lab' => 'required|string|max:25',
             'repreleg_lab' => 'required|string|max:50',
-            'ci_repreleg_lab' => 'nullable|string|max:12',
+            'ci_repreleg_lab' => 'required|string|max:25',
             'id_pais' => 'required|exists:pais,id',
             'id_dep' => 'required|exists:departamento,id',
             'id_prov' => 'required|exists:provincia,id',
@@ -80,8 +86,8 @@ class LaboratorioController extends Controller
         $sigla = strtoupper($pais->sigla_pais); // Ej: BOL
 
         // Generar username incremental
-        $count = User::where('username', 'LIKE', "$sigla-%")->count() + 1;
-        $username = $sigla . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        $count = User::where('username', 'LIKE', "$sigla%")->count() + 1;
+        $username = $sigla . str_pad($count, 4, '0', STR_PAD_LEFT);
 
         // Crear usuario
         $user = User::create([
@@ -98,7 +104,7 @@ class LaboratorioController extends Controller
         // Crear laboratorio
         $lab = Laboratorio::create([
             'id_usuario' => $user->id,
-            'cod_lab' => $request->cod_lab,
+            'cod_lab' => $username,
             'antcod_peec' => $request->antcod_peec,
             'numsedes_lab' => $request->numsedes_lab,
             'nit_lab' => $request->nit_lab,
@@ -176,7 +182,7 @@ class LaboratorioController extends Controller
         $user = $laboratorio->usuario;
 
         $request->validate([
-            'cod_lab' => 'required|string|max:20|unique:laboratorio,cod_lab,' . $laboratorio->id,
+            'cod_lab' => 'nullable|string|max:20|unique:laboratorio,cod_lab,' . $laboratorio->id,
             'antcod_peec' => 'nullable|string|max:10',
             'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
@@ -243,14 +249,13 @@ class LaboratorioController extends Controller
             'updated_by' => Auth::id(),
         ]);
 
-        $user = Auth::user(); 
+        $user = Auth::user();
 
-        if($user->isLaboratorio()) {
+        if ($user->isLaboratorio()) {
             return redirect()->route('lab.profile')->with('success', 'Tu informacion ha sido actualizado correctamente.');
-        }else {
+        } else {
             return redirect()->route('laboratorio.index')->with('success', 'Laboratorio actualizado correctamente.');
         }
-        
     }
 
     /**

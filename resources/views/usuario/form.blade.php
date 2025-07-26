@@ -131,8 +131,14 @@
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
                     <i class="fas fa-key text-gray-400"></i> Contraseña
                 </label>
-                <input type="password" name="password" id="password"
-                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 @error('password') border-red-500 @enderror">
+                <div class="relative">
+                    <input type="password" name="password" id="password"
+                        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 pr-10 @error('password') border-red-500 @enderror">
+                    <button type="button" onclick="togglePassword('password', this)"
+                        class="absolute inset-y-0 right-2 text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
                 @error('password')
                     <p class="mt-1 text-xs text-red-600 flex items-center gap-1">
                         <i class="fas fa-exclamation-circle"></i> {{ $message }}
@@ -146,8 +152,14 @@
                     class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
                     <i class="fas fa-key text-gray-400"></i> Confirmar Contraseña
                 </label>
-                <input type="password" name="password_confirmation" id="password_confirmation"
-                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                <div class="relative">
+                    <input type="password" name="password_confirmation" id="password_confirmation"
+                        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 pr-10">
+                    <button type="button" onclick="togglePassword('password_confirmation', this)"
+                        class="absolute inset-y-0 right-2 text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </section>
@@ -197,7 +209,7 @@
                 <label for="is_responsable" class="text-sm text-gray-700">
                     @if (empty($ensayosSeleccionados))
                         Responsable
-                    @else 
+                    @else
                         Agregar REA
                     @endif
                 </label>
@@ -218,7 +230,7 @@
             <div>
                 @if (!empty($ensayosSeleccionados))
                     <span>
-                        Responsable de los EA: 
+                        Responsable de los EA:
                     </span>
                 @endif
                 <div id="ensayoChipsContainer" class="flex flex-wrap gap-2 mt-3">
@@ -316,6 +328,21 @@
                 selectedEnsayos = selectedEnsayos.filter(id => id !== ensayoId);
             });
         });
+
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
     </script>
 
 </div>

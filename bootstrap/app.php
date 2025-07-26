@@ -13,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'usuario.activo' => \App\Http\Middleware\VerificarUsuarioActivo::class
+            'usuario.activo' => \App\Http\Middleware\VerificarUsuarioActivo::class,
+            'canany' => \App\Http\Middleware\CanAnyPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

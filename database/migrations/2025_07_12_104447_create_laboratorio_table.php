@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('laboratorio', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_usuario');
-            $table->string('cod_lab', 20);
+            $table->string('cod_lab', 20)->nullable();
             $table->string('antcod_peec', 10)->nullable();
             $table->string('numsedes_lab', 15)->nullable();
             $table->bigInteger('nit_lab')->nullable();

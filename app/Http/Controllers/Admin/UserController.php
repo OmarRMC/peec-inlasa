@@ -14,6 +14,10 @@ use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:' . Permiso::ADMIN)->only(['index', 'create', 'update', 'destroy']);
+    }
     public function index()
     {
         $usuarios = User::with(['cargo', 'permisos'])
