@@ -35,7 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'status',
         'id_cargo',
         'email',
-        'password', 
+        'password',
         'email_verified_at'
     ];
 
@@ -97,6 +97,16 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return formatDate($value);
     }
+
+
+    public function getEmailVerifiedAtAttribute($value)
+    {
+        if(!$value){
+            return null; 
+        }
+        return formatDate($value);
+    }
+
 
     // public function sendEmailVerificationNotification()
     // {

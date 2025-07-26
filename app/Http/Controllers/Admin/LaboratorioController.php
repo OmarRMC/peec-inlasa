@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Notifications\VerificarCorreoLab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
@@ -90,51 +91,59 @@ class LaboratorioController extends Controller
         $username = $sigla . str_pad($count, 4, '0', STR_PAD_LEFT);
 
         // Crear usuario
-        $user = User::create([
-            'nombre' => $request->nombre_lab,
-            'username' => $username,
-            'email' => $request->mail_lab,
-            'password' => $request->password,
-            'status' => false,
-            'ap_paterno' => 'Laboratorio_ap_paterno', // Asignar un apellido por defecto
-            'ci' => $request->ci_respo_lab ?: '00000000',
-            'telefono' => $request->telefono,
-        ]);
+        try {
+            DB::beginTransaction();
+            $user = User::create([
+                'nombre' => $request->nombre_lab,
+                'username' => $username,
+                'email' => $request->mail_lab,
+                'password' => $request->password,
+                'status' => false,
+                'ap_paterno' => 'Laboratorio_ap_paterno', // Asignar un apellido por defecto
+                'ci' => $request->ci_respo_lab ?: '00000000',
+                'telefono' => $request->telefono,
+            ]);
 
-        // Crear laboratorio
-        $lab = Laboratorio::create([
-            'id_usuario' => $user->id,
-            'cod_lab' => $username,
-            'antcod_peec' => $request->antcod_peec,
-            'numsedes_lab' => $request->numsedes_lab,
-            'nit_lab' => $request->nit_lab,
-            'nombre_lab' => $request->nombre_lab,
-            'sigla_lab' => $request->sigla_lab,
-            'id_nivel' => $request->id_nivel,
-            'id_tipo' => $request->id_tipo,
-            'id_categoria' => $request->id_categoria,
-            'respo_lab' => $request->respo_lab,
-            'ci_respo_lab' => $request->ci_respo_lab,
-            'repreleg_lab' => $request->repreleg_lab,
-            'ci_repreleg_lab' => $request->ci_repreleg_lab,
-            'id_pais' => $request->id_pais,
-            'id_dep' => $request->id_dep,
-            'id_prov' => $request->id_prov,
-            'id_municipio' => $request->id_municipio,
-            'zona_lab' => $request->zona_lab,
-            'direccion_lab' => $request->direccion_lab,
-            'wapp_lab' => $request->wapp_lab,
-            'wapp2_lab' => $request->wapp2_lab,
-            'mail_lab' => $request->mail_lab,
-            'mail2_lab' => $request->mail2_lab,
-            'status' => false,
-            'created_by' => Auth::id(),
-            'updated_by' => Auth::id(),
-        ]);
+            // Crear laboratorio
+            $lab = Laboratorio::create([
+                'id_usuario' => $user->id,
+                'cod_lab' => $username,
+                'antcod_peec' => $request->antcod_peec,
+                'numsedes_lab' => $request->numsedes_lab,
+                'nit_lab' => $request->nit_lab,
+                'nombre_lab' => $request->nombre_lab,
+                'sigla_lab' => $request->sigla_lab,
+                'id_nivel' => $request->id_nivel,
+                'id_tipo' => $request->id_tipo,
+                'id_categoria' => $request->id_categoria,
+                'respo_lab' => $request->respo_lab,
+                'ci_respo_lab' => $request->ci_respo_lab,
+                'repreleg_lab' => $request->repreleg_lab,
+                'ci_repreleg_lab' => $request->ci_repreleg_lab,
+                'id_pais' => $request->id_pais,
+                'id_dep' => $request->id_dep,
+                'id_prov' => $request->id_prov,
+                'id_municipio' => $request->id_municipio,
+                'zona_lab' => $request->zona_lab,
+                'direccion_lab' => $request->direccion_lab,
+                'wapp_lab' => $request->wapp_lab,
+                'wapp2_lab' => $request->wapp2_lab,
+                'mail_lab' => $request->mail_lab,
+                'mail2_lab' => $request->mail2_lab,
+                'status' => false,
+                'created_by' => Auth::id(),
+                'updated_by' => Auth::id(),
+            ]);
 
-        $user->notify(new VerificarCorreoLab($user, $lab));
-
-        return redirect()->route('laboratorio.index')->with('success', 'Laboratorio registrado correctamente. Se envió un correo de verificación.');
+            $user->notify(new VerificarCorreoLab($user, $lab));
+            DB::commit();
+            return redirect()->route('laboratorio.index')->with('success', 'Laboratorio registrado correctamente. Se envió un correo de verificación.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Lo sentimos, no se pudo registrar el laboratorio. Inténtelo de nuevo en unos momentos.');
+        }
     }
 
     /**
@@ -209,17 +218,20 @@ class LaboratorioController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'status' => 'nullable|boolean',
         ], $this->messages());
+        $user->nombre = $request->nombre_lab;
+        $user->username = $request->username ?? $user->username;
+        $user->email = $request->mail_lab;
+        $user->telefono = $request->telefono;
+        $user->ci = $request->ci_respo_lab ?: '00000000';
 
-        // Actualizar usuario
-        $user->update([
-            'nombre' => $request->nombre_lab,
-            'email' => $request->mail_lab,
-            'telefono' => $request->telefono,
-            'ci' => $request->ci_respo_lab ?: '00000000',
-            'password' => $request->filled('password') ? $request->password : $user->password,
-            'status' => $request->status ?? $user->status,
-        ]);
+        if ($request->password) {
+            $user->password = $request->password;
+        }
 
+        if ($request->email_verified_at && !$user->email_verified_at) {
+            $user->email_verified_at = now();
+        }
+        $user->save();
         // Actualizar laboratorio
         $laboratorio->update([
             'cod_lab' => $request->cod_lab,
@@ -322,10 +334,8 @@ class LaboratorioController extends Controller
 
     public function getData(Request $request)
     {
-        // $query = Laboratorio::query()->with(['pais', 'usuario']);
         $query = Laboratorio::query()->with(['pais', 'usuario', 'departamento', 'provincia', 'municipio', 'tipo', 'categoria', 'nivel']);
 
-        // Aplicar filtros
         foreach (['pais', 'dep', 'prov', 'mun', 'tipo', 'categoria', 'nivel'] as $f) {
             if ($val = $request->get($f)) {
                 $query->where("id_{$f}", $val);
@@ -343,6 +353,7 @@ class LaboratorioController extends Controller
             ->addColumn('tipo_nombre', fn($lab) => $lab->tipo->nombre_tipo ?? '-')
             ->addColumn('categoria_nombre', fn($lab) => $lab->categoria->nombre_categoria ?? '-')
             ->addColumn('nivel_nombre', fn($lab) => $lab->nivel->nombre ?? '-')
+            ->addColumn('email', fn($lab) => $lab->usuario->email ?? '-')
             ->addColumn('status_label', fn($lab) => $lab->status ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>')
             ->addColumn('actions', function ($lab) {
                 return view('laboratorio.action-buttons', [

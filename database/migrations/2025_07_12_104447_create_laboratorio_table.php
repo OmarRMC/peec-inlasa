@@ -32,9 +32,9 @@ return new class extends Migration
             $table->unsignedBigInteger('id_prov');
             $table->unsignedBigInteger('id_municipio');
             $table->string('zona_lab', 50);
-            $table->string('direccion_lab', 150);
-            $table->integer('wapp_lab');
-            $table->integer('wapp2_lab')->nullable();
+            $table->string('direccion_lab', 250);
+            $table->string('wapp_lab', 50);
+            $table->string('wapp2_lab',50)->nullable();
             $table->string('mail_lab', 50);
             $table->string('mail2_lab', 50)->nullable();
             $table->string('notificacion_key', 100)->nullable();

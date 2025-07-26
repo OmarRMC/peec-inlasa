@@ -33,6 +33,18 @@
                                 class="inline-block bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">Inactivo</span>
                         @endif
                     </div>
+                    <div><strong>Correo Verificado:</strong>
+                        @if ($laboratorio->usuario?->email_verified_at)
+                            <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                                Verificado el {{ $laboratorio->usuario->email_verified_at}}
+                            </span>
+                        @else
+                            <span
+                                class="inline-block bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">
+                                No verificado
+                            </span>
+                        @endif
+                    </div>
                 </div>
             </section>
 

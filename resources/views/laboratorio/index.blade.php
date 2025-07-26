@@ -75,9 +75,9 @@
                         <th class="px-4 py-2 text-left">Acciones</th>
                         <th class="px-4 py-2 text-left">Fecha/Hora</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
-                        <th class="px-4 py-2 text-left">Código</th>
-                        <th class="px-4 py-2 text-left">Responsable</th>
-                        <th class="px-4 py-2 text-left">País</th>
+                        <th class="px-4 py-2 text-left">Correo</th>
+                        <th class="px-4 py-2 text-left">WhatsApp</th>
+                        <th class="px-4 py-2 text-left">Departamento</th>
                         <th class="px-4 py-2 text-left">Estado</th>
                     </tr>
                 </thead>
@@ -127,16 +127,16 @@
                             name: 'nombre_lab'
                         },
                         {
-                            data: 'codigo',
-                            name: 'usuario.username',
+                            data: 'email',
+                            name: 'usuario.email',
                         },
                         {
-                            data: 'respo_lab',
-                            name: 'respo_lab'
+                            data: 'wapp_lab',
+                            name: 'wapp_lab'
                         },
                         {
-                            data: 'pais_nombre',
-                            name: 'pais.nombre_pais'
+                            data: 'departamento_nombre',
+                            name: 'departamento.nombre_dep'
                         },
                         {
                             data: 'status_label',

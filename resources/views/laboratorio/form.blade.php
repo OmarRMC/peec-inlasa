@@ -1,34 +1,34 @@
 @php use App\Models\Permiso; @endphp
 @csrf
+@php
+    $edit = false;
+@endphp
+@if (isset($method) && $method === 'PUT')
+    @method('PUT')
     @php
-        $edit = false;
+        $edit = true;
     @endphp
-    @if (isset($method) && $method === 'PUT')
-        @method('PUT')
-        @php
-            $edit = true;
-        @endphp
-    @endif
+@endif
 
-    {{-- Datos Básicos --}}
-    <fieldset class="form-fieldset border p-4 mb-8 rounded-md max-w-3xl mx-auto">
-        {{-- <fieldset class="border p-6 mb-8 rounded-md max-w-5xl mx-auto shadow-sm"> --}}
-        <legend class="flex items-center gap-2 text-lg font-semibold mb-2 text-gray-700">
-            <i class="fas fa-flask text-primary"></i> Datos Básicos
-        </legend>
+{{-- Datos Básicos --}}
+<fieldset class="form-fieldset border p-4 mb-8 rounded-md max-w-3xl mx-auto">
+    {{-- <fieldset class="border p-6 mb-8 rounded-md max-w-5xl mx-auto shadow-sm"> --}}
+    <legend class="flex items-center gap-2 text-lg font-semibold mb-2 text-gray-700">
+        <i class="fas fa-flask text-primary"></i> Datos Básicos
+    </legend>
 
-        <div class="container-inputs grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="container-inputs grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-            {{-- Num. Registro Sedes --}}
-            <div>
-                <label for="numsedes_lab" class="label">Num. Registro Sedes</label>
-                <input type="text" name="numsedes_lab" id="numsedes_lab" maxlength="20"
-                    value="{{ old('numsedes_lab', $laboratorio->numsedes_lab ?? '') }}"
-                    class="input-standard w-full @error('numsedes_lab') border-red-500 @enderror" placeholder="0000">
-                @error('numsedes_lab')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+        {{-- Num. Registro Sedes --}}
+        <div>
+            <label for="numsedes_lab" class="label">Num. Registro Sedes</label>
+            <input type="text" name="numsedes_lab" id="numsedes_lab" maxlength="20"
+                value="{{ old('numsedes_lab', $laboratorio->numsedes_lab ?? '') }}"
+                class="input-standard w-full @error('numsedes_lab') border-red-500 @enderror" placeholder="0000">
+            @error('numsedes_lab')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
         @if (Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN]))
             {{-- Código PEEC --}}
@@ -221,7 +221,7 @@
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
-        
+
         <div>
             <label for="zona_lab" class="label required-label">Zona</label>
             <input type="text" name="zona_lab" id="zona_lab" maxlength="50"
@@ -430,15 +430,30 @@
                         class="input-standard max-w-md w-full @error('status') border-red-500 @enderror" required>
                         <option value="1" {{ old('status', $laboratorio->status ?? '') == 1 ? 'selected' : '' }}>
                             Activo</option>
-                        <option value="0" {{ old('status', $laboratorio->status ?? '') === 0 ? 'selected' : '' }}>
-                            Inactivo
-                        </option>
+                        <option value="0"
+                            {{ old('status', $laboratorio->status ?? '') === 0 ? 'selected' : '' }}>Inactivo</option>
                     </select>
                     @error('status')
-                        {{-- <p class="text-red-500 text-sm mt-1">{{ $message }}</p> --}}
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-            </div>
+                <div>
+                    <label class="inline-flex items-center space-x-2">
+                        <input type="checkbox" name="email_verified_at" value="1"
+                            {{ $laboratorio->usuario->email_verified_at ? 'checked disabled' : '' }}
+                            class="rounded text-blue-600 border-gray-300 focus:ring-blue-500">
+                        <span class="text-sm text-gray-700">
+                            {{ $laboratorio->usuario->email_verified_at ? 'Correo verificado' : 'Marcar como verificado' }}
+                        </span>
+                    </label>
+
+                    @if ($laboratorio->usuario->email_verified_at)
+                        <p class="text-sm text-green-600 mt-1">
+                            Verificado el {{ $laboratorio->usuario->email_verified_at }}
+                        </p>
+                    @endif
+                </div>
+
         </fieldset>
     @endif
 @endif
@@ -560,7 +575,8 @@
 
             let options = '<option value="">Seleccione un municipio</option>';
             municipios.forEach(mun => {
-                options +=`<option value="${mun.id}" ${munIdSelect == mun.id ?'selected':''  }>${mun.nombre_municipio}</option>`;
+                options +=
+                    `<option value="${mun.id}" ${munIdSelect == mun.id ?'selected':''  }>${mun.nombre_municipio}</option>`;
             });
             munSelect.innerHTML = options;
 

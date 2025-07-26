@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ sidebarOpen: false, sidebarCollapsed: false, openMenu: null }" x-cloak>
 
@@ -131,7 +130,7 @@
                         <i class="fas fa-bars"></i>
                     </button>
                     <h1 class="text-sm font-semibold text-indigo-600 flex items-center gap-2">
-                        <i class="fas fa-flask text-indigo-500"></i> CODIGO DISPONIBLE
+                        <i class="fas fa-flask text-indigo-500"></i> {{ Auth::user()->nombre }}
                     </h1>
                 </div>
                 <div class="relative}">
@@ -147,7 +146,7 @@
                             <div class="text-indigo-600 font-semibold">
                                 @if (Auth::user()->isLaboratorio())
                                     LABORATORIO REGISTRADO
-                                @else 
+                                @else
                                     USUARIO REGISTRADO
                                 @endif
                             </div>
@@ -185,7 +184,7 @@
         </div>
     </div>
     @stack('scripts')
-    <x-shared.notificacion-lab/>
+    <x-shared.notificacion-lab />
 </body>
 
 </html>
