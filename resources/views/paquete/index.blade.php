@@ -17,6 +17,7 @@
                         <th>Área</th>
                         <th>Descripción</th>
                         <th>Costo</th>
+                        <th># Participantes (Max Permitidos)</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -28,6 +29,7 @@
                             <td>{{ $paquete->area->descripcion ?? 'N/D' }}</td>
                             <td>{{ $paquete->descripcion }}</td>
                             <td>{{ $paquete->costo_paquete }} Bs</td>
+                            <td>{{ $paquete->max_participantes }}</td>
                             <td>
                                 @if ($paquete->status)
                                     <span class="badge badge-success">Activo</span>

@@ -17,6 +17,7 @@ class Paquete extends Model
         'descripcion',
         'costo_paquete',
         'status',
+        'max_participantes'
     ];
 
     // Relación N:1 con Area

@@ -45,7 +45,14 @@ class PaqueteController extends Controller
         $request->validate([
             'id_area' => 'required|exists:area,id',
             'descripcion' => 'required|string|max:100|unique:paquete,descripcion',
-            'costo_paquete' => 'required|integer',
+            'costo_paquete' => [
+                'required',
+                'numeric',
+                'min:0',
+                'max:15000',
+                'regex:/^\d+(\.\d{1,2})?$/'
+            ],
+            'max_participantes' => 'required|integer|min:0',
             'status' => 'required|boolean',
         ], $this->messages());
 

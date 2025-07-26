@@ -16,8 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('id_area');
             $table->string('descripcion', 100);
             $table->integer('costo_paquete');
+            $table->integer('max_participantes');
             $table->boolean('status');
-
             $table->foreign('id_area')->references('id')->on('area');
             $table->timestamps();
         });

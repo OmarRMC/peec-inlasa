@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 /**
  * Muestra una notificación toast en la esquina superior.
  */
-export function showToast({ icon = 'success', title = '', timer = 3000 }) {
+export function showToast({ icon = 'success', title = '', timer = 5000 }) {
     Swal.fire({
         toast: true,
         position: 'top-end',

@@ -141,7 +141,7 @@ class InscripcionPaqueteController extends Controller
             $vigenciaInscripcion->status = true;
             $vigenciaInscripcion->id_inscripcion = $ins->id;
             $vigenciaInscripcion->fecha_inicio = $now;
-            $vigenciaInscripcion->fecha_fin = configuracion('fecha.fin.vigencia')?? now()->addDays(2);
+            $vigenciaInscripcion->fecha_fin = configuracion('fecha.fin.vigencia') ?? now()->addDays(2);
             $vigenciaInscripcion->created_by = Auth::user()->id;
             $vigenciaInscripcion->updated_by = Auth::user()->id;
             $vigenciaInscripcion->save();
@@ -153,6 +153,7 @@ class InscripcionPaqueteController extends Controller
                     'id_paquete' => $p['id'],
                     'descripcion_paquete' => $p['descripcion'],
                     'costo_paquete' => $p['costo'],
+                    'observaciones' => $p['observaciones'],
                 ]);
                 $idsEA = EnsayoAptitud::where('id_paquete', $p['id'])
                     ->active()

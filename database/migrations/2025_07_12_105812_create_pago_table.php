@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('obs_pago', 400)->nullable();
             $table->boolean('status');
             $table->unsignedBigInteger('created_by');
-            $table->unsignedBigInteger('updated_by');
+            $table->unsignedBigInteger('updated_by')->nullable();
 
             $table->foreign('id_inscripcion')->references('id')->on('inscripcion');
             $table->foreign('created_by')->references('id')->on('users');

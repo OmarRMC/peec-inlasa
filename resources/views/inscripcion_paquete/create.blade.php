@@ -55,6 +55,7 @@
                         <th>Paquete</th>
                         <th>Área</th>
                         <th>Costo</th>
+                        <th>Observaciones</th>
                         <th>Acción</th>
                     </tr>
                 </thead>
@@ -165,6 +166,9 @@
                 seleccionados.splice(index, 1);
                 renderizarSeleccionados();
             };
+            window.guardarObservacion = function(index, valor) {
+                seleccionados[index].observaciones = valor.trim();
+            };
 
             function renderizarSeleccionados() {
                 tippy('[data-tippy-content]');
@@ -177,6 +181,15 @@
                         <td>${pkt.nombre_paquete}</td>
                         <td>${pkt.nombre_area}</td>
                         <td>${pkt.costo} Bs.</td>
+                        <td>
+                              <textarea
+                        class="w-full p-1 border rounded-md text-sm resize-none focus:outline-none focus:ring-1 focus:border-blue-300"
+                        rows="2"
+                        placeholder="Ingrese observaciones..."
+                        oninput="guardarObservacion(${index}, this.value)"
+                        >${pkt.observaciones ?? ''}
+                          </textarea>
+                        </td>
                         <td>
                              <button data-tippy-content="Quitar paquete"
                                     onclick="eliminarPaquete(${index})"
@@ -198,7 +211,8 @@
                     paquetes: seleccionados.map(pkt => ({
                         id: pkt.id,
                         descripcion: pkt.nombre_paquete,
-                        costo: pkt.costo
+                        costo: pkt.costo,
+                        observaciones: pkt.observaciones ?? ''
                     }))
                 };
 
@@ -239,15 +253,15 @@
                                 <div class="max-h-64 overflow-y-auto pr-2">
                                     <ul class="divide-y divide-gray-200">
                                         ${seleccionados.map(pkt => `
-                                                                    <li class="py-0 flex justify-between">
-                                                                        <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
-                                                                        <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
-                                                                    </li>
-                                                                `).join('')}
+                                                                                    <li class="py-0 flex justify-between">
+                                                                                        <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
+                                                                                        <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
+                                                                                    </li>
+                                                                                `).join('')}
                                     </ul>
                                 </div>
                                 <!-- Total fijo -->
-                                <div class="border-t pt-3 mt-3 text-sm flex justify-between font-semibold text-gray-800 bg-white sticky bottom-0">
+                                <div class="border-t pt-3 mt-3 text-sm flex justify-between font-semibold text-gray-800  sticky bottom-0">
                                     <span>Total</span>
                                     <span>
                                         ${seleccionados.reduce((total, pkt) => total + parseFloat(pkt.costo), 0).toFixed(2)} Bs.

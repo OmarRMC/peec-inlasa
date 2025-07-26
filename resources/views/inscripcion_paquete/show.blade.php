@@ -39,6 +39,8 @@
                         <div class="border rounded px-4 py-2 mb-2 text-sm text-gray-700 bg-gray-50">
                             <div><strong>Paquete:</strong> {{ $detalle->descripcion_paquete }}</div>
                             <div><strong>Costo:</strong> {{ number_format($detalle->costo_paquete, 2) }} Bs</div>
+                            <div><strong>Observación:</strong> {{ $detalle->observaciones ?? 'No tiene observaciones' }}
+                            </div>
                         </div>
                     @empty
                         <p class="text-gray-500 text-sm">No hay paquetes registrados.</p>
@@ -80,8 +82,10 @@
                             @endif
                             @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
                                 <div class="text-gray-500 mt-2 text-xs space-y-1">
-                                    <div>Registrado por: {{ $pago->creador->username ?? 'Desconocido' }}</div>
-                                    <div>Actualizado por: {{ $pago->editor->username ?? '---' }}</div>
+                                    <div>Registrado por: {{ $pago->creador->username ?? 'N/A' }}</div>
+                                    @if ($pago->editor->username)
+                                        <div>Anulado por: {{ $pago->editor->username ?? 'N/A' }}</div>
+                                    @endif
                                 </div>
                             @endif
                         </div>
@@ -167,7 +171,8 @@
 
             <div>
                 <label class="text-sm font-semibold">Tipo de Transacción</label>
-                <select name="tipo_transaccion" required class="w-full border rounded px-2 py-1 text-sm">
+                <select name="tipo_transaccion" id="tipo_transaccion" required
+                    class="w-full border rounded px-2 py-1 text-sm" onchange="cambiarLabelYValidacion()">
                     <option value="">Seleccione</option>
                     <option value="Depósito">Depósito</option>
                     <option value="Transferencia">Transferencia</option>
@@ -175,9 +180,10 @@
                 </select>
             </div>
 
-            <div>
-                <label class="text-sm font-semibold">N° Transacción</label>
-                <input type="text" name="nro_tranferencia" class="w-full border rounded px-2 py-1 text-sm">
+            <div id="campo_transaccion" style="display: none;">
+                <label id="label_transaccion" class="text-sm font-semibold">N° Transacción</label>
+                <input type="text" id="nro_transaccion" name="nro_tranferencia"
+                    class="w-full border rounded px-2 py-1 text-sm">
             </div>
 
             <div>
@@ -213,5 +219,28 @@
                 alert('Error al registrar el pago.');
             }
         });
+
+        function cambiarLabelYValidacion() {
+            const tipo = document.getElementById('tipo_transaccion').value;
+            const label = document.getElementById('label_transaccion');
+            const input = document.getElementById('nro_transaccion');
+            const contenedor = document.getElementById('campo_transaccion');
+
+            if (tipo === 'Efectivo') {
+                contenedor.style.display = 'block';
+                label.textContent = 'N° de Factura';
+                input.required = true;
+                input.placeholder = 'Ingrese el número de factura';
+            } else if (tipo === 'Depósito' || tipo === 'Transferencia') {
+                contenedor.style.display = 'block';
+                label.textContent = 'N° Transacción';
+                input.required = true;
+                input.placeholder = 'Ingrese el número de transacción';
+            } else {
+                contenedor.style.display = 'none';
+                input.required = false;
+                input.value = '';
+            }
+        }
     </script>
 </x-app-layout>

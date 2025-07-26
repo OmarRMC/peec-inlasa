@@ -25,19 +25,33 @@
 <div>
     <label for="descripcion" class="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
     <input type="text" name="descripcion" id="descripcion" value="{{ old('descripcion', $paquete->descripcion) }}"
-        pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{3,100}$"
-        title="Solo letras, números y espacios. Mínimo 3 y máximo 100 caracteres." maxlength="100" required
+        pattern="^(?!\d+$)(?!\s+$).{3,100}$"
+        title="Debe tener entre 3 y 100 caracteres y no puede ser solo números ni solo espacios." maxlength="100"
+        required
         class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
     @error('descripcion')
         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
     @enderror
 </div>
 
-<!-- Costo del Paquete -->
+<!-- Max participantes -->
+<div>
+    <label for="max_participantes" class="block text-sm font-semibold text-gray-700 mb-1">Numero de participantes
+        (Max)</label>
+    <input type="number" name="max_participantes" id="max_participantes"
+        value="{{ old('max_participantes', $paquete->max_participantes) }}" pattern="^[1-9][0-9]*$"
+        title="Debe ser un número entero mayor a cero" required
+        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+    @error('max_participantes')
+        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+    @enderror
+</div>
+
 <div>
     <label for="costo_paquete" class="block text-sm font-semibold text-gray-700 mb-1">Costo del Paquete (Bs)</label>
     <input type="number" name="costo_paquete" id="costo_paquete"
-        value="{{ old('costo_paquete', $paquete->costo_paquete) }}" min="0" max="10000" required
+        value="{{ old('costo_paquete', $paquete->costo_paquete) }}" min="0" max="15000" step="0.01"
+        required
         class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
     @error('costo_paquete')
         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>

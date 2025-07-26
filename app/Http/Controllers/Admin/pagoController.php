@@ -57,7 +57,6 @@ class PagoController extends Controller
             ]));
             $pago->status = true;
             $pago->created_by = Auth::user()->id;
-            $pago->updated_by = Auth::user()->id;
             $pago->save();
 
             $inscripcion = $pago->inscripcion;

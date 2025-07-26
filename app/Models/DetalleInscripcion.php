@@ -12,7 +12,8 @@ class DetalleInscripcion extends Model
         'id_inscripcion',
         'id_paquete',
         'descripcion_paquete',
-        'costo_paquete'
+        'costo_paquete',
+        'observaciones'
     ];
 
     public function inscripcion()

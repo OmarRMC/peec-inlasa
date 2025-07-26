@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_paquete');
             $table->string('descripcion_paquete', 100);
             $table->integer('costo_paquete');
-
+            $table->string('observaciones');
             $table->foreign('id_inscripcion')->references('id')->on('inscripcion');
             $table->foreign('id_paquete')->references('id')->on('paquete');
             $table->timestamps();
