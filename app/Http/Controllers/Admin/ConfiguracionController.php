@@ -4,11 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Configuracion;
+use App\Models\Permiso;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ConfiguracionController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('canany:' . Permiso::CONFIGURACION . ',' . Permiso::ADMIN);
+    }
     public function index()
     {
         $configuraciones = Configuracion::all()->pluck('valor', 'clave');

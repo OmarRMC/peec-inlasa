@@ -128,7 +128,7 @@ class Inscripcion extends Model
         // return $this->status_cuenta
         //     ? "<span class='text-green-600 font-semibold'>" . self::STATUS_CUENTA[$this->status_cuenta] - "</span>"
         //     : '<span class="text-red-600 font-semibold">Inactiva</span>';
-        return "<span class='text-green-600 font-semibold'>" . self::STATUS_CUENTA[$this->status_cuenta] - "</span>";
+        return "<span class='text-green-600 font-semibold'>" . self::STATUS_CUENTA[$this->status_cuenta] . "</span>";
     }
 
     public function getEstadoInscripcionTextoAttribute()

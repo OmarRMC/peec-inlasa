@@ -241,7 +241,7 @@
                                 {{ $ensayoMap[$id] ?? 'Sin descripción' }}</span>
                             <input type="hidden" name="ensayos_ap[]" value="{{ $id }}">
                             <button type="button"
-                                class="text-blue-600 hover:text-red-500 font-bold eliminar-chip">&times;</button>
+                                class="text-blue-600  text-lg hover:text-red-500 font-bold eliminar-chip">&times;</button>
                         </div>
                     @endforeach
                 </div>

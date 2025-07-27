@@ -65,12 +65,23 @@
                                 <option value="{{ $categoria->id }}">{{ $categoria->descripcion }}</option>
                             @endforeach
                         </select>
-                        <select id="filter-nivel" class="border-gray-300 rounded-md shadow-sm text-sm">
+                        {{-- <select id="filter-nivel" class="border-gray-300 rounded-md shadow-sm text-sm">
                             <option value="">Todos los Niveles</option>
                             @foreach ($niveles as $nivel)
                                 <option value="{{ $nivel->id }}">{{ $nivel->descripcion_nivel }}</option>
                             @endforeach
+                        </select> --}}
+                        <select id="filter-paquete" class="border-gray-300 rounded-md shadow-sm text-sm">
+                            <option value="">Seleccione un paquete</option>
+                            @foreach ($paquetes as $paquete)
+                                <option value="{{ $paquete->id }}">{{ $paquete->descripcion }}</option>
+                            @endforeach
                         </select>
+                    </div>
+                    <!-- Filtro por Paquetes -->
+                    <div class="flex flex-col space-y-1 w-full sm:w-80">
+                        <!-- Contenedor para filtros activos -->
+                        <div id="paquete-filters" class="flex flex-wrap gap-2"></div>
                     </div>
 
 
@@ -100,14 +111,14 @@
                             <th class="px-4 py-2 text-left">Fecha</th>
                             <th class="px-4 py-2 text-left">Laboratorio</th>
                             <th class="px-4 py-2 text-left">Código</th>
-                            <th class="px-4 py-2 text-left">País</th>
                             <th class="px-4 py-2 text-left">Tipo</th>
                             <th class="px-4 py-2 text-left">Categoría</th>
-                            <th class="px-4 py-2 text-left">Nivel</th>
+                            {{-- <th class="px-4 py-2 text-left">Nivel</th> --}}
                             <th class="px-4 py-2 text-left">Gestión</th>
                             <th class="px-4 py-2 text-left">Paquetes</th>
                             <th class="px-4 py-2 text-left">Costo</th>
                             <th class="px-4 py-2 text-left">Estado</th>
+                            <th class="px-4 py-2 text-left">Cuenta</th>
                         </tr>
                     </thead>
                 </table>
@@ -120,6 +131,7 @@
 
         @push('scripts')
             <script>
+                const filtrosPaquetes = new Set();
                 document.addEventListener('DOMContentLoaded', function() {
                     const table = $('#inscripciones-table').DataTable({
                         processing: true,
@@ -130,13 +142,14 @@
                                 d.pais = $('#filter-pais').val();
                                 d.tipo = $('#filter-tipo').val();
                                 d.categoria = $('#filter-categoria').val();
-                                d.nivel = $('#filter-nivel').val();
+                                // d.nivel = $('#filter-nivel').val();
                                 d.dep = $('#filter-dep').val();
                                 d.prov = $('#filter-prov').val();
                                 d.mun = $('#filter-mun').val();
                                 d.fecha_inicio = $('#filter-fecha-inicio').val();
                                 d.fecha_fin = $('#filter-fecha-fin').val();
                                 d.gestion = $('#filter-gestion').val();
+                                d.paquetes = Array.from(filtrosPaquetes);
                             }
                         },
                         order: [
@@ -160,10 +173,6 @@
                                 name: 'laboratorio.cod_lab'
                             },
                             {
-                                data: 'pais',
-                                name: 'laboratorio.pais.nombre_pais'
-                            },
-                            {
                                 data: 'tipo',
                                 name: 'laboratorio.tipo.descripcion'
                             },
@@ -171,10 +180,10 @@
                                 data: 'categoria',
                                 name: 'laboratorio.categoria.descripcion'
                             },
-                            {
-                                data: 'nivel',
-                                name: 'laboratorio.nivel.descripcion_nivel'
-                            },
+                            // {
+                            //     data: 'nivel',
+                            //     name: 'laboratorio.nivel.descripcion_nivel'
+                            // },
                             {
                                 data: 'gestion',
                                 name: 'gestion'
@@ -192,6 +201,10 @@
                             {
                                 data: 'estado',
                                 name: 'status_inscripcion'
+                            }, 
+                            {
+                                data: 'cuenta',
+                                name: 'status_cuenta'
                             }
                         ],
                         language: {
@@ -271,6 +284,36 @@
                         ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i.toUpperCase()}</option>`)
                             .prop('disabled', true));
                     }
+
+                    $('#filter-paquete').on('change', function() {
+                        const id = this.value;
+                        const text = this.options[this.selectedIndex].text;
+                        if (!id || filtrosPaquetes.has(id)) return;
+
+                        filtrosPaquetes.add(id);
+                        $('#paquete-filters').append(`
+                            <div class="bg-blue-100 text-blue-800  px-2 rounded-[5px] flex items-center justify-center gap-1 text-xs paquete-tag" data-id="${id}">
+                            ${text}
+                                <button type="button" class="text-blue-600 hover:text-red-500 font-bold text-lg remove-paquete-filter">&times;</button>
+                            </div>
+                        `);
+                        this.value = '';
+                        table.draw(); // redibujar tabla con nuevo filtro
+                    });
+
+                    // Eliminar filtros
+                    $(document).on('click', '.remove-paquete-filter', function() {
+                        const parent = $(this).closest('.paquete-tag');
+                        const id = parent.data('id');
+                        filtrosPaquetes.delete(String(id));
+                        parent.remove();
+                        table.draw();
+                    });
+
+                    // Pasar los IDs de paquetes como array al backend
+                    $('#inscripciones-table').on('preXhr.dt', function(e, settings, data) {
+                        data.paquetes = Array.from(filtrosPaquetes);
+                    });
                 });
             </script>
         @endpush

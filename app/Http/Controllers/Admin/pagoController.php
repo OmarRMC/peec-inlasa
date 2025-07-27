@@ -94,7 +94,7 @@ class PagoController extends Controller
             return response()->json([
                 'message' => 'Error al registrar el pago.',
                 'error' => $e->getMessage()
-            ], 500);
+            ], 422);
         }
     }
 

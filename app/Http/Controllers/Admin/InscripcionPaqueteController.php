@@ -33,6 +33,7 @@ class InscripcionPaqueteController extends Controller
             'provincias' => [],
             'municipios' => [],
             'categorias' => CategoriaLaboratorio::all(),
+            'paquetes' => Paquete::orderBy('descripcion', 'asc')->get(),
             'gestiones' => ['2025', '2024', '2023'],
         ]);
     }
@@ -43,7 +44,7 @@ class InscripcionPaqueteController extends Controller
             'laboratorio.tipo',
             'laboratorio.categoria',
             'laboratorio.nivel',
-            'detalleInscripciones'
+            'detalleInscripciones',
         ]);
 
         foreach (['pais', 'tipo', 'categoria', 'nivel', 'dep', 'prov', 'mun'] as $filtro) {
@@ -52,6 +53,13 @@ class InscripcionPaqueteController extends Controller
                     $q->where("id_{$filtro}", $valor);
                 });
             }
+        }
+
+        if ($request->filled('paquetes') && is_array($request->paquetes)) {
+            $paquetesIds = $request->paquetes;
+            $query->whereHas('detalleInscripciones', function ($q) use ($paquetesIds) {
+                $q->whereIn('id_paquete', $paquetesIds);
+            });
         }
         if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
             $query->whereBetween('fecha_inscripcion', [
@@ -76,12 +84,13 @@ class InscripcionPaqueteController extends Controller
             ->addColumn('paquetes', fn($i) => $i->detalleInscripciones->pluck('descripcion_paquete')->implode(', '))
             ->addColumn('costo', fn($i) => number_format($i->costo_total, 2) . ' Bs.')
             ->addColumn('estado', fn($i) => $i->getStatusInscripcion())
+            ->addColumn('cuenta', fn($i) => $i->getStatusCuenta())
             ->addColumn('acciones', function ($i) {
                 return view('inscripcion_paquete.action-buttons', [
                     'showUrl' => route('inscripcion_paquete.show', $i->id),
                 ])->render();
             })
-            ->rawColumns(['estado', 'acciones'])
+            ->rawColumns(['estado','cuenta', 'acciones'])
             ->toJson();
     }
 

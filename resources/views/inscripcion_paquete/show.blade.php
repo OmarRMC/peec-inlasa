@@ -83,7 +83,7 @@
                             @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
                                 <div class="text-gray-500 mt-2 text-xs space-y-1">
                                     <div>Registrado por: {{ $pago->creador->username ?? 'N/A' }}</div>
-                                    @if ($pago->editor->username)
+                                    @if ($pago->editor && $pago->editor->username)
                                         <div>Anulado por: {{ $pago->editor->username ?? 'N/A' }}</div>
                                     @endif
                                 </div>
