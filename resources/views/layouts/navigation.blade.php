@@ -64,7 +64,7 @@ use App\Models\Configuracion;
             <button @click="openMenu !== 20 ? openMenu = 20 : openMenu = null"
                 class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
                 <i class="fas fa-vials w-5 text-indigo-500"></i>
-                <span>Gestión de resultados</span>
+                <span>Gestión de Ensayos de Aptitud</span>
                 <i class="fas ml-auto" :class="openMenu === 20 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </button>
             <div x-show="openMenu === 20" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
@@ -75,7 +75,7 @@ use App\Models\Configuracion;
                              <a href="{{ route('ea.lab.inscritos', $ea->id) }}"
                                 class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                                 <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
-                                <strong>EA </strong> {{ $ea->descripcion }}
+                                {{ $ea->descripcion }}
                             </a>
                         </div>
                         {{-- @foreach ($ea->inscripciones as $inscripcion)

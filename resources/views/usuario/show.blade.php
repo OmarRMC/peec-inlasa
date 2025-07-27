@@ -46,7 +46,7 @@
                     <div class="space-y-2 text-sm text-gray-700">
                         @foreach ($usuario->responsablesEA as $ea)
                             <div class="border rounded px-4 py-2 bg-gray-50">
-                                <strong>Nombre EA:</strong> {{ $ea->descripcion ?? 'Sin nombre' }}
+                                <strong>Nombre: </strong> {{ $ea->descripcion ?? 'Sin nombre' }}
                                 {{-- Agrega más detalles si deseas como gestión, estado, etc. --}}
                             </div>
                         @endforeach

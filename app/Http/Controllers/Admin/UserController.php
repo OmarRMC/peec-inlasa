@@ -16,7 +16,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:' . Permiso::ADMIN)->only(['index', 'create', 'update', 'destroy']);
+        $this->middleware('can:' . Permiso::ADMIN . ',' . Permiso::GESTION_USUARIO)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
     }
     public function index()
     {

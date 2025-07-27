@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -42,6 +43,48 @@ class Laboratorio extends Model
         'updated_by',
         'email_verified_at'
     ];
+
+    protected function nombreLab(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => strtoupper($value),
+        );
+    }
+
+    protected function siglaLab(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => strtoupper($value),
+        );
+    }
+
+    protected function respoLab(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => strtoupper($value),
+        );
+    }
+
+    protected function zonaLab(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => strtoupper($value),
+        );
+    }
+
+    protected function reprelegLab(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => strtoupper($value),
+        );
+    }
+
+    protected function direccionLab(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => strtoupper($value),
+        );
+    }
 
     // Relaciones
     public function usuario()

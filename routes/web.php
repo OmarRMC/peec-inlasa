@@ -23,6 +23,7 @@ use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
+use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -89,7 +90,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
-    Route::get('/ea/{id}/labs', [LabController::class, 'profile'])->name('ea.lab.inscritos');
+    Route::get('/ea/{id}/labs', [ResponsableLaboratorioController::class, 'index'])->name('ea.lab.inscritos');
+    Route::get('/ea/{id}/labs-ajax', [ResponsableLaboratorioController::class, 'getData'])->name('ea.lab.inscritos.ajax');
 });
 
 require __DIR__ . '/auth.php';
