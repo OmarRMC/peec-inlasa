@@ -1,6 +1,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        console.log("Aqui est");
+        if (sessionStorage.getItem('notificacionVista')) return;
 
         fetch("{{ url('/lab/notificacion/verify') }}")
             .then(res => {
@@ -23,39 +23,42 @@
                     <h2 class="text-xl font-bold mb-3">${data.titulo}</h2>
                     <p class="mb-4 text-gray-600">${data.descripcion}</p>
                     <div class="mb-6 text-gray-800" id="mensaje-notificacion"></div>
-                    <div class="flex justify-end gap-4">
-                        <button data-clave="${data.clave}" id="btn-aceptar" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aceptar</button>
-                        <button id="btn-cerrar2" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cerrar</button>
-                    </div>
                 </div>
             </div>
         `;
+            /*
+            <div class="flex justify-end gap-4">
+                             <button data-clave="${data.clave}" id="btn-aceptar" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aceptar</button>
+                             <button id="btn-cerrar2" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cerrar</button>
+            </div>
+            */
             document.body.appendChild(container);
 
             // Renderizar HTML del mensaje
             document.getElementById('mensaje-notificacion').innerHTML = data.mensaje;
 
             document.getElementById('btn-cerrar').onclick = cerrarModal;
-            document.getElementById('btn-cerrar2').onclick = cerrarModal;
+            // document.getElementById('btn-cerrar2').onclick = cerrarModal;
 
-            document.getElementById('btn-aceptar').onclick = (e) => {
-                cerrarModal();
-                const clave = e.target.getAttribute('data-clave');
-                fetch("{{ url('/lab/notificacion/read') }}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        'clave': clave
-                    })
-                });
-            };
+            // document.getElementById('btn-aceptar').onclick = (e) => {
+            //     cerrarModal();
+            //     const clave = e.target.getAttribute('data-clave');
+            //     fetch("{{ url('/lab/notificacion/read') }}", {
+            //         method: 'POST',
+            //         headers: {
+            //             'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            //             'Content-Type': 'application/json'
+            //         },
+            //         body: JSON.stringify({
+            //             'clave': clave
+            //         })
+            //     });
+            // };
 
             function cerrarModal() {
                 const modal = document.getElementById('notificacion-modal');
                 if (modal) modal.remove();
+                sessionStorage.setItem('notificacionVista', '1');
             }
         }
     });

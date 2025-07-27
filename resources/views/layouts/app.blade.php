@@ -153,7 +153,8 @@
                             <div>PEEC - INLASA</div>
                             <div class="font-bold">{{ Auth::user()->username ?? 'BOL1146' }}</div>
                         </div>
-                        <form method="POST" action="{{ route('logout') }}" class="text-sm">
+                        <form method="POST" action="{{ route('logout') }}" class="text-sm"
+                            onsubmit="sessionStorage.clear()">
                             @csrf
                             <button type="submit"
                                 class="w-full text-left px-4 py-2 hover:bg-indigo-50 flex items-center gap-2">
