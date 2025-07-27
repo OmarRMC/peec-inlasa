@@ -13,16 +13,24 @@ use App\Models\Inscripcion;
 use App\Models\InscripcionEA;
 use App\Models\NivelLaboratorio;
 use App\Models\Pais;
+use App\Models\Permiso;
 use App\Models\TipoLaboratorio;
 use App\Models\VigenciaInscripcion;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
 class InscripcionPaqueteController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('canany:' . Permiso::GESTION_LABORATORIO . ',' . Permiso::ADMIN)->only(
+            ['index', 'getInscripcionesData', 'show', 'paquetesPorPrograma']
+        );
+    }
     public function index()
     {
         return view('inscripcion_paquete.index', [
@@ -88,9 +96,10 @@ class InscripcionPaqueteController extends Controller
             ->addColumn('acciones', function ($i) {
                 return view('inscripcion_paquete.action-buttons', [
                     'showUrl' => route('inscripcion_paquete.show', $i->id),
+                    'boletaPdf' => route('formulario_inscripcion_lab.pdf', $i->id),
                 ])->render();
             })
-            ->rawColumns(['estado','cuenta', 'acciones'])
+            ->rawColumns(['estado', 'cuenta', 'acciones'])
             ->toJson();
     }
 
@@ -125,6 +134,9 @@ class InscripcionPaqueteController extends Controller
 
     public function store(Request $request)
     {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES, Permiso::LABORATORIO])) {
+            abort(403, 'No se tiene Autorizacion para realizar esa accion');
+        }
         $request->validate([
             'id_lab' => 'required|exists:laboratorio,id',
             'id_formulario' => 'nullable|exists:formulario,id',

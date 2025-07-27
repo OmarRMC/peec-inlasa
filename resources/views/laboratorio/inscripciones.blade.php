@@ -47,16 +47,13 @@
                         <tr>
                             <th class="px-4 py-2 text-left">Acciones</th>
                             <th class="px-4 py-2 text-left">Fecha</th>
-                            <th class="px-4 py-2 text-left">Laboratorio</th>
-                            <th class="px-4 py-2 text-left">Código</th>
-                            <th class="px-4 py-2 text-left">País</th>
-                            <th class="px-4 py-2 text-left">Tipo</th>
-                            <th class="px-4 py-2 text-left">Categoría</th>
-                            <th class="px-4 py-2 text-left">Nivel</th>
+                            {{-- <th class="px-4 py-2 text-left">Tipo</th>
+                            <th class="px-4 py-2 text-left">Categoría</th> --}}
                             <th class="px-4 py-2 text-left">Gestión</th>
                             <th class="px-4 py-2 text-left">Paquetes</th>
                             <th class="px-4 py-2 text-left">Costo</th>
                             <th class="px-4 py-2 text-left">Estado</th>
+                            <th class="px-4 py-2 text-left">E. Cuenta</th>
                         </tr>
                     </thead>
                 </table>
@@ -76,7 +73,6 @@
                         ajax: {
                             url: "{{ route('lab_inscripcion.ajax.data') }}",
                             data: function(d) {
-
                             }
                         },
                         order: [
@@ -91,30 +87,22 @@
                                 data: 'fecha',
                                 name: 'fecha_inscripcion'
                             },
-                            {
-                                data: 'nombre_lab',
-                                name: 'laboratorio.nombre_lab'
-                            },
-                            {
-                                data: 'codigo_lab',
-                                name: 'laboratorio.cod_lab'
-                            },
-                            {
-                                data: 'pais',
-                                name: 'laboratorio.pais.nombre_pais'
-                            },
-                            {
-                                data: 'tipo',
-                                name: 'laboratorio.tipo.descripcion'
-                            },
-                            {
-                                data: 'categoria',
-                                name: 'laboratorio.categoria.descripcion'
-                            },
-                            {
-                                data: 'nivel',
-                                name: 'laboratorio.nivel.descripcion_nivel'
-                            },
+                            // {
+                            //     data: 'nombre_lab',
+                            //     name: 'laboratorio.nombre_lab'
+                            // },      
+                            // {
+                            //     data: 'tipo',
+                            //     name: 'laboratorio.tipo.descripcion'
+                            // },
+                            // {
+                            //     data: 'categoria',
+                            //     name: 'laboratorio.categoria.descripcion'
+                            // },
+                            // {
+                            //     data: 'nivel',
+                            //     name: 'laboratorio.nivel.descripcion_nivel'
+                            // },
                             {
                                 data: 'gestion',
                                 name: 'gestion'
@@ -132,6 +120,10 @@
                             {
                                 data: 'estado',
                                 name: 'status_inscripcion'
+                            }, 
+                            {
+                                data: 'cuenta',
+                                name: 'status_cuenta'
                             }
                         ],
                         language: {

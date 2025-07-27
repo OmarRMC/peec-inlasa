@@ -16,6 +16,7 @@ use App\Notifications\VerificarCorreoLab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -25,7 +26,7 @@ class LaboratorioController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('canany:' . Permiso::GESTION_LABORATORIO . ',' . Permiso::ADMIN);
+        $this->middleware('canany:' . Permiso::GESTION_LABORATORIO . ',' . Permiso::ADMIN)->only(['index', 'create', 'store', 'show', 'edit', 'destroy', 'getData']);
     }
 
     public function index()
@@ -109,7 +110,7 @@ class LaboratorioController extends Controller
             $lab = Laboratorio::create([
                 'id_usuario' => $user->id,
                 'cod_lab' => $username,
-                'antcod_peec' => $request->antcod_peec,
+                'antcod_peec' => $username,
                 'numsedes_lab' => $request->numsedes_lab,
                 'nit_lab' => $request->nit_lab,
                 'nombre_lab' => $request->nombre_lab,
@@ -224,8 +225,6 @@ class LaboratorioController extends Controller
             'status' => 'nullable|boolean',
         ], $this->messages());
         $user->nombre = $request->nombre_lab;
-        $user->username = $request->username ?? $user->username;
-        $user->email = $request->mail_lab;
         $user->telefono = $request->telefono;
         $user->ci = $request->ci_respo_lab ?: '00000000';
 
@@ -236,36 +235,43 @@ class LaboratorioController extends Controller
         if ($request->email_verified_at && !$user->email_verified_at) {
             $user->email_verified_at = now();
         }
-        $user->save();
-        // Actualizar laboratorio
-        $laboratorio->update([
-            'cod_lab' => $request->cod_lab,
-            'antcod_peec' => $request->antcod_peec,
-            'numsedes_lab' => $request->numsedes_lab,
-            'nit_lab' => $request->nit_lab,
-            'nombre_lab' => $request->nombre_lab,
-            'sigla_lab' => $request->sigla_lab,
-            'id_nivel' => $request->id_nivel,
-            'id_tipo' => $request->id_tipo,
-            'id_categoria' => $request->id_categoria,
-            'respo_lab' => $request->respo_lab,
-            'ci_respo_lab' => $request->ci_respo_lab,
-            'repreleg_lab' => $request->repreleg_lab,
-            'ci_repreleg_lab' => $request->ci_repreleg_lab,
-            'id_pais' => $request->id_pais,
-            'id_dep' => $request->id_dep,
-            'id_prov' => $request->id_prov,
-            'id_municipio' => $request->id_municipio,
-            'zona_lab' => $request->zona_lab,
-            'direccion_lab' => $request->direccion_lab,
-            'wapp_lab' => $request->wapp_lab,
-            'wapp2_lab' => $request->wapp2_lab,
-            'mail_lab' => $request->mail_lab,
-            'mail2_lab' => $request->mail2_lab,
-            'status' => $request->status ?? $user->status,
-            'updated_by' => Auth::id(),
-        ]);
 
+        if (Gate::any(abilities: [Permiso::GESTION_LABORATORIO, Permiso::ADMIN])) {
+            if ($request->mail_lab != $laboratorio->mail_lab) {
+                $laboratorio->mail_lab = $request->mail_lab;
+                $user->email_verified_at = null;
+                $user->email = $request->mail_lab;
+            }
+        }
+        if ($request->has('status')) {
+            $user->status = $request->status;
+        }
+        $user->save();
+
+        $laboratorio->numsedes_lab = $request->numsedes_lab;
+        $laboratorio->nit_lab          = $request->nit_lab;
+        $laboratorio->nombre_lab       = $request->nombre_lab;
+        $laboratorio->sigla_lab        = $request->sigla_lab;
+        $laboratorio->id_nivel         = $request->id_nivel;
+        $laboratorio->id_tipo          = $request->id_tipo;
+        $laboratorio->id_categoria     = $request->id_categoria;
+        $laboratorio->respo_lab        = $request->respo_lab;
+        $laboratorio->ci_respo_lab     = $request->ci_respo_lab;
+        $laboratorio->repreleg_lab     = $request->repreleg_lab;
+        $laboratorio->ci_repreleg_lab  = $request->ci_repreleg_lab;
+        $laboratorio->id_pais          = $request->id_pais;
+        $laboratorio->id_dep           = $request->id_dep;
+        $laboratorio->id_prov          = $request->id_prov;
+        $laboratorio->id_municipio     = $request->id_municipio;
+        $laboratorio->zona_lab         = $request->zona_lab;
+        $laboratorio->direccion_lab    = $request->direccion_lab;
+        $laboratorio->wapp_lab         = $request->wapp_lab;
+        $laboratorio->wapp2_lab        = $request->wapp2_lab;
+        $laboratorio->mail2_lab        = $request->mail2_lab;
+        $laboratorio->status           = $request->status ?? $user->status;
+        $laboratorio->updated_by       = Auth::id();
+
+        $laboratorio->save();
         $user = Auth::user();
 
         if ($user->isLaboratorio()) {

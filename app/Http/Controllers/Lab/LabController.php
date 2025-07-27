@@ -103,12 +103,14 @@ class LabController extends Controller
             ->addColumn('paquetes', fn($i) => $i->detalleInscripciones->pluck('descripcion_paquete')->implode(', '))
             ->addColumn('costo', fn($i) => number_format($i->costo_total, 2) . ' Bs.')
             ->addColumn('estado', fn($i) => $i->getStatusInscripcion())
+            ->addColumn('cuenta', fn($i) => $i->getStatusCuenta())
             ->addColumn('acciones', function ($i) {
                 return view('inscripcion_paquete.action-buttons', [
                     'showUrl' => route('lab.inscripcion.show', $i->id),
+                    'boletaPdf' => route('formulario_inscripcion_lab.pdf', $i->id),
                 ])->render();
             })
-            ->rawColumns(['estado', 'acciones'])
+            ->rawColumns(['estado', 'cuenta', 'acciones'])
             ->toJson();
     }
 
@@ -120,11 +122,13 @@ class LabController extends Controller
 
         $user = Auth::user();
         $laboratorio = $user->laboratorio;
-        // $programas = $laboratorio->tipo->programas()->get();
-        $programas  = Programa::active()->get();
-        // $programas = Programa::whereHas('tipos', fn($q) => $q->where('id_tipo', $tipoLab))
-        //     ->where('status', true)
-        //     ->get();
+        $tipoLabId = $laboratorio->id_tipo;
+
+        $programas = Programa::active()
+            ->whereHas('areas.paquetes.tiposLaboratorios', function ($query) use ($tipoLabId) {
+                $query->where('tipo_laboratorio_id', $tipoLabId);
+            })
+            ->get();
         $redirectTo =  route('lab.ins.index');
         return view('inscripcion_paquete.create', compact('laboratorio', 'programas', 'redirectTo'));
     }
@@ -137,9 +141,10 @@ class LabController extends Controller
 
         // Asegurarse que la inscripción pertenezca al laboratorio autenticado
         $inscripcion = $laboratorio->inscripciones()
-            ->with(['laboratorio', 'detalleInscripciones', 'pagos', 'documentos', 'vigencia'])
+            ->with(['laboratorio', 'detalleInscripciones', 'pagos' => function ($query) {
+                $query->where('status', 1);
+            }, 'documentos', 'vigencia'])
             ->findOrFail($id);
-
         $programas = Programa::active()->get();
         $backTo = route('lab.ins.index');
 

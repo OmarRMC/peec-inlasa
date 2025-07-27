@@ -134,6 +134,7 @@
                 @endforelse
             </section>
 
+            @if(Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN]))
             <!-- Vigencia -->
             <section class="p-6">
                 <h2 class="text-lg font-semibold text-blue-700 mb-4">📅 Vigencia</h2>
@@ -149,6 +150,7 @@
                     <p class="text-gray-500 text-sm">No se registró vigencia.</p>
                 @endif
             </section>
+            @endif
         </div>
     </div>
 

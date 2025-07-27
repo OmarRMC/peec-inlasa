@@ -84,7 +84,7 @@
 {{-- Información Responsable --}}
 <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
     <legend class="flex items-center gap-2 text-lg font-semibold mb-2">
-        <i class="fas fa-user-check text-primary"></i> Información del Responsable
+        <i class="fas fa-user-check text-primary"></i> Responsable del Laboratorio
     </legend>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -279,7 +279,8 @@
             <label for="mail_lab" class="label required-label">Correo Principal</label>
             <input type="email" name="mail_lab" id="mail_lab" maxlength="50"
                 value="{{ old('mail_lab', $laboratorio->mail_lab ?? '') }}"
-                class="input-standard max-w-md w-full @error('mail_lab') border-red-500 @enderror" required>
+                class="input-standard max-w-md w-full @error('mail_lab') border-red-500 @enderror" required
+                @disabled(!Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN]))>
             @error('mail_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
