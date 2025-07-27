@@ -183,6 +183,7 @@ class Permiso extends Model
     public const ADMIN = 'admin';
     public const ADMIN_NAME = 'Administrador';
 
+    public const DELETE_GESTION_PROGRAMAS = 'DELETE_PROGRAMAS_GESTION';
 
     // ------------------------------
     // PERMISOS_HABILITADOS

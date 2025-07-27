@@ -1,3 +1,6 @@
+@php
+    use App\Models\Permiso;
+@endphp
 <x-app-layout>
     <div class="container py-6 max-w-4xl">
         <!-- Encabezado -->
@@ -17,7 +20,8 @@
                         <th>Área</th>
                         <th>Descripción</th>
                         <th>Costo</th>
-                        <th># Participantes (Max Permitidos)</th>
+                        <th>Max. Participantes</th>
+                        <th>Tipo Laboratorios</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -30,6 +34,7 @@
                             <td>{{ $paquete->descripcion }}</td>
                             <td>{{ $paquete->costo_paquete }} Bs</td>
                             <td>{{ $paquete->max_participantes }}</td>
+                            <td>{{ $paquete->tiposLaboratorios->pluck('descripcion')->implode(', ') }}</td>
                             <td>
                                 @if ($paquete->status)
                                     <span class="badge badge-success">Activo</span>
@@ -44,15 +49,17 @@
                                         data-tippy-content="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form method="POST" action="{{ route('paquete.destroy', $paquete->id) }}"
-                                        class="delete-form inline" data-nombre="{{ $paquete->descripcion }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" data-tippy-content="Eliminar"
-                                            class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
+                                    @if (Gate::any(Permiso::DELETE_GESTION_PROGRAMAS))
+                                        <form method="POST" action="{{ route('paquete.destroy', $paquete->id) }}"
+                                            class="delete-form inline" data-nombre="{{ $paquete->descripcion }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" data-tippy-content="Eliminar"
+                                                class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
