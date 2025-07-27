@@ -282,7 +282,7 @@
 
                     function resetFilters(ids) {
                         ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i.toUpperCase()}</option>`)
-                            .prop('disabled', true));
+                            .prop('disabled', true));   
                     }
 
                     $('#filter-paquete').on('change', function() {
