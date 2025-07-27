@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Paquete;
 use App\Models\Area;
+use App\Models\Configuracion;
+use App\Models\Laboratorio;
 use App\Models\Programa;
 use App\Models\TipoLaboratorio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class PaqueteController extends Controller
@@ -131,29 +134,47 @@ class PaqueteController extends Controller
     public function getPaquetesPorPrograma(Request $request)
     {
         $programaId = $request->query('programa_id');
+        $labId = $request->lab_id;
+        $laboratorio = Laboratorio::findOrFail($labId);
+        $tipoLabId = $laboratorio->id_tipo;
 
         if (!$programaId) {
             return datatables()->of(collect())->toJson();
         }
 
-        $programa = Programa::with(['areas.paquetes'])->find($programaId);
+        $paquetes = collect();
 
-        if (!$programa) {
+        $paquetesDB = Paquete::with(['area', 'detalleInscripciones.inscripcion'])->active()
+            ->whereHas('area', function ($query) use ($request) {
+                $query->where('id_programa', $request->programa_id);
+            })
+            ->whereHas('tiposLaboratorios', function ($query) use ($tipoLabId) {
+                $query->where('tipo_laboratorio_id', $tipoLabId);
+            })
+            ->where('max_participantes', '>', 0)
+            ->get()
+            ->filter(function ($paquete) {
+                $gestionActual = configuracion(Configuracion::GESTION_ACTUAL);
+                $inscritosActuales = $paquete->detalleInscripciones->filter(function ($detalle) use ($gestionActual) {
+                    return optional($detalle->inscripcion)->gestion == $gestionActual;
+                })->count();
+                return $inscritosActuales < $paquete->max_participantes;
+            });
+
+        // detalles de incripciones
+
+        if (!$paquetesDB) {
             return datatables()->of(collect())->toJson();
         }
 
-        $paquetes = collect();
-
-        foreach ($programa->areas as $area) {
-            foreach ($area->paquetes as $paquete) {
-                $paquetes->push([
-                    'id' => $paquete->id,
-                    'nombre_paquete' => $paquete->descripcion,
-                    'costo' => $paquete->costo_paquete,
-                    'nombre_area' => $area->descripcion,
-                    'status' => $paquete->status ?? 1,
-                ]);
-            }
+        foreach ($paquetesDB as $paquete) {
+            $paquetes->push([
+                'id' => $paquete->id,
+                'nombre_paquete' => $paquete->descripcion,
+                'costo' => $paquete->costo_paquete,
+                'nombre_area' => $paquete->area->descripcion,
+                'status' => $paquete->status ?? 1,
+            ]);
         }
 
         return DataTables::of($paquetes)

@@ -443,7 +443,7 @@
                             {{ $laboratorio->usuario->email_verified_at ? 'checked disabled' : '' }}
                             class="rounded text-blue-600 border-gray-300 focus:ring-blue-500">
                         <span class="text-sm text-gray-700">
-                            {{ $laboratorio->usuario->email_verified_at ? 'Correo verificado' : 'Marcar como verificado' }}
+                            {{ $laboratorio->usuario->email_verified_at ? 'Correo verificado' : 'Verficar el correo principal del Laboratorio' }}
                         </span>
                     </label>
 

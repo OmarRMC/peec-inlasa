@@ -1,5 +1,3 @@
-
-
 @if (session('success'))
     <script>
         Swal.fire({
@@ -43,3 +41,17 @@
 @endif
 
 
+
+@if (session('warning'))
+    <script>
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'warning',
+            title: '{{ session('warning') }}',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+    </script>
+@endif

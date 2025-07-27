@@ -88,21 +88,28 @@ class InscripcionPaqueteController extends Controller
     public function create($labId)
     {
         $laboratorio = Laboratorio::findOrFail($labId);
-        $programas = $laboratorio->tipo->programas()->get();
+        $tipoLabId = $laboratorio->id_tipo;
 
-        $programas  = Programa::active()->get();
-
-        // $programas = Programa::whereHas('tipos', fn($q) => $q->where('id_tipo', $tipoLab))
-        //     ->where('status', true)
-        //     ->get();
-
+        $programas = Programa::active()
+            ->whereHas('areas.paquetes.tiposLaboratorios', function ($query) use ($tipoLabId) {
+                $query->where('tipo_laboratorio_id', $tipoLabId);
+            })
+            ->get();
         return view('inscripcion_paquete.create', compact('laboratorio', 'programas'));
     }
 
     public function paquetesPorPrograma(Request $request)
     {
-        $paquetes = Paquete::where('id_area', $request->programa_id)
-            ->where('status', true)
+        $labId = $request->lab_id;
+        $laboratorio = Laboratorio::findOrFail($labId);
+        $tipoLabId = $laboratorio->id_tipo;
+        $paquetes = Paquete::active()
+            ->whereHas('area', function ($query) use ($request) {
+                $query->where('programa_id', $request->programa_id);
+            })
+            ->whereHas('tiposLaboratorios', function ($query) use ($tipoLabId) {
+                $query->where('tipo_laboratorio_id', $tipoLabId);
+            })
             ->get(['id', 'descripcion', 'costo_paquete']);
         return response()->json($paquetes);
     }

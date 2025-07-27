@@ -109,7 +109,7 @@
                     tablaPaquetesDT = $('#tablaPaquetes').DataTable({
                         processing: true,
                         serverSide: true,
-                        ajax: `/admin/paquetes/programa?programa_id=${programaId}`,
+                        ajax: `/admin/paquetes/programa?programa_id=${programaId}&lab_id=${LAB_ID}`,
                         columns: [{
                                 data: 'acciones',
                                 orderable: false,
@@ -181,17 +181,10 @@
                         <td>${pkt.nombre_paquete}</td>
                         <td>${pkt.nombre_area}</td>
                         <td>${pkt.costo} Bs.</td>
-                        <td>
-                              <textarea
-                        class="w-full p-1 border rounded-md text-sm resize-none focus:outline-none focus:ring-1 focus:border-blue-300"
-                        rows="2"
-                        placeholder="Ingrese observaciones..."
-                        oninput="guardarObservacion(${index}, this.value)"
-                        >${pkt.observaciones ?? ''}
-                          </textarea>
+                        <td class='text_obs'>
                         </td>
                         <td>
-                             <button data-tippy-content="Quitar paquete"
+                        <button data-tippy-content="Quitar paquete"
                                     onclick="eliminarPaquete(${index})"
                                     class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
                             >
@@ -199,6 +192,16 @@
                         </button>
                         </td>
                     `;
+                    const textarea = document.createElement('textarea');
+                    textarea.className =
+                        "w-full p-1 border rounded-md text-sm resize-none focus:outline-none focus:ring-1 focus:border-blue-300";
+                    textarea.rows = 2;
+                    textarea.placeholder = "Ingrese observaciones...";
+                    textarea.value = pkt.observaciones ?? '';
+                    textarea.oninput = function() {
+                        guardarObservacion(index, this.value);
+                    };
+                    tr.querySelector('.text_obs').appendChild(textarea);
                     tablaSeleccionados.appendChild(tr);
                 });
                 totalSpan.textContent = `${total} Bs.`;
@@ -253,11 +256,11 @@
                                 <div class="max-h-64 overflow-y-auto pr-2">
                                     <ul class="divide-y divide-gray-200">
                                         ${seleccionados.map(pkt => `
-                                                                                    <li class="py-0 flex justify-between">
-                                                                                        <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
-                                                                                        <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
-                                                                                    </li>
-                                                                                `).join('')}
+                                                    <li class="py-0 flex justify-between">
+                                                        <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
+                                                        <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
+                                                    </li>
+                                                    `).join('')}
                                     </ul>
                                 </div>
                                 <!-- Total fijo -->

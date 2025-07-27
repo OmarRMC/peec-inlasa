@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 
@@ -134,12 +135,16 @@ class LaboratorioController extends Controller
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
             ]);
-
-            $user->notify(new VerificarCorreoLab($user, $lab));
             DB::commit();
+            try {
+                $user->notify(new VerificarCorreoLab($user, $lab));
+            } catch (\Throwable $th) {
+                return redirect()->route('laboratorio.index')->with('warning', 'Laboratorio registrado correctamente, pero no se pudo enviar el correo de verificación.');
+            }
             return redirect()->route('laboratorio.index')->with('success', 'Laboratorio registrado correctamente. Se envió un correo de verificación.');
         } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error('Error al iniciar transacción: ' . $e->getMessage());
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Lo sentimos, no se pudo registrar el laboratorio. Inténtelo de nuevo en unos momentos.');
