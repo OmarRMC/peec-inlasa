@@ -112,10 +112,19 @@
             <section class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-blue-700 mb-4">📁 Documentos</h2>
-                    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
-                        <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
-                            Aprobar
-                        </button>
+                    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]) &&
+                            ($inscripcion->estaEnRevision() || ($inscripcion->estaVencido() && !$inscripcion->estaPagado())))
+                        <form method="POST" action="{{ route('inscripcion-paquetes.aprobar', $inscripcion->id) }}">
+                            @csrf
+                            <button type="submit"
+                                onclick="return confirm('¿Estás seguro de aprobar esta inscripción?')"
+                                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                                Aprobar
+                            </button>
+                        </form>
+                    @endif
+                    @if ($inscripcion->estaAprobado())
+                        <span class="text-green-700 text-sm bg-green-100 px-3 py-1 rounded">Aprobado</span>
                     @endif
                 </div>
 
@@ -134,22 +143,22 @@
                 @endforelse
             </section>
 
-            @if(Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN]))
-            <!-- Vigencia -->
-            <section class="p-6">
-                <h2 class="text-lg font-semibold text-blue-700 mb-4">📅 Vigencia</h2>
-                @if ($inscripcion->vigencia)
-                    <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
-                        <div><strong>Inicio:</strong> {{ $inscripcion->vigencia->fecha_inicio }}</div>
-                        <div><strong>Fin:</strong> {{ $inscripcion->vigencia->fecha_fin }}</div>
-                        <div><strong>Estado:</strong>
-                            <x-status-badge :value="$inscripcion->vigencia->status" />
+            @if (Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN]))
+                <!-- Vigencia -->
+                <section class="p-6">
+                    <h2 class="text-lg font-semibold text-blue-700 mb-4">📅 Vigencia</h2>
+                    @if ($inscripcion->vigencia)
+                        <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+                            <div><strong>Inicio:</strong> {{ $inscripcion->vigencia->fecha_inicio }}</div>
+                            <div><strong>Fin:</strong> {{ $inscripcion->vigencia->fecha_fin }}</div>
+                            <div><strong>Estado:</strong>
+                                <x-status-badge :value="$inscripcion->vigencia->status" />
+                            </div>
                         </div>
-                    </div>
-                @else
-                    <p class="text-gray-500 text-sm">No se registró vigencia.</p>
-                @endif
-            </section>
+                    @else
+                        <p class="text-gray-500 text-sm">No se registró vigencia.</p>
+                    @endif
+                </section>
             @endif
         </div>
     </div>

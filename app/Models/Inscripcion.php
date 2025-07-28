@@ -44,6 +44,34 @@ class Inscripcion extends Model
         'gestion'
     ];
 
+    public function estaEnRevision(): bool
+    {
+        return $this->status_inscripcion === self::STATUS_EN_REVISION;
+    }
+
+    // Verifica si el estado es "Aprobado"
+    public function estaAprobado(): bool
+    {
+        return $this->status_inscripcion === self::STATUS_APROBADO;
+    }
+
+    // Verifica si el estado es "Vencido"
+    public function estaVencido(): bool
+    {
+        return $this->status_inscripcion === self::STATUS_VENCIDO;
+    }
+
+    // Verifica si el estado de cuenta es "Pagado"
+    public function estaPagado(): bool
+    {
+        return $this->status_cuenta === self::STATUS_PAGADO;
+    }
+
+    // Verifica si el estado de cuenta es "Deudor"
+    public function esDeudor(): bool
+    {
+        return $this->status_cuenta === self::STATUS_DEUDOR;
+    }
     public function laboratorio()
     {
         return $this->belongsTo(Laboratorio::class, 'id_lab');

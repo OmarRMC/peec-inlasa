@@ -66,6 +66,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
         Route::get('/create/{lab}', [InscripcionPaqueteController::class, 'create'])
             ->name('inscripcion.create');
         Route::post('/paquetes', [InscripcionPaqueteController::class, 'store'])->name('inscripcion-paquetes.store');
+        Route::post('/{id}/aprobar', [InscripcionPaqueteController::class, 'aprobarInscripcion'])->name('inscripcion-paquetes.aprobar');
     });
 
     Route::post('/pago', [PagoController::class, 'store'])->name('pago.store');

@@ -201,7 +201,7 @@
                             {
                                 data: 'estado',
                                 name: 'status_inscripcion'
-                            }, 
+                            },
                             {
                                 data: 'cuenta',
                                 name: 'status_cuenta'
@@ -282,7 +282,7 @@
 
                     function resetFilters(ids) {
                         ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i.toUpperCase()}</option>`)
-                            .prop('disabled', true));   
+                            .prop('disabled', true));
                     }
 
                     $('#filter-paquete').on('change', function() {

@@ -27,8 +27,8 @@ class InscripcionPaqueteController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('canany:' . Permiso::GESTION_LABORATORIO . ',' . Permiso::ADMIN)->only(
-            ['index', 'getInscripcionesData', 'show', 'paquetesPorPrograma']
+        $this->middleware('canany:' . Permiso::GESTION_INSCRIPCIONES . ',' . Permiso::ADMIN)->only(
+            ['index', 'getInscripcionesData', 'show', 'paquetesPorPrograma', 'aprobarInscripcion']
         );
     }
     public function index()
@@ -215,6 +215,15 @@ class InscripcionPaqueteController extends Controller
         }
     }
 
+    public function aprobarInscripcion(Request $request,  $id)
+    {
+        $ins = Inscripcion::findOrFail($id);
+        $ins->status_inscripcion = Inscripcion::STATUS_APROBADO;
+        $ins->updated_by = Auth::user()->id;
+        $ins->updated_at = now();
+        $ins->save();
+        return back()->with('success', 'La inscripción fue aprobada exitosamente.');
+    }
 
     public function show($id)
     {
