@@ -1,3 +1,7 @@
+@php
+    use App\Models\Inscripcion;
+@endphp
+
 <x-app-layout>
     <div class="px-4 py-6 max-w-7xl mx-auto">
         <!-- Encabezado -->
@@ -71,6 +75,19 @@
                                 <option value="{{ $nivel->id }}">{{ $nivel->descripcion_nivel }}</option>
                             @endforeach
                         </select> --}}
+
+                        <select id="filter-status-inscripcion" class="border-gray-300 rounded-md shadow-sm text-sm">
+                            <option value="">Estados de Inscripción</option>
+                            @foreach (Inscripcion::STATUS_INSCRIPCION as $key => $value)
+                                <option value="{{ $key }}">{{ $value }}</option>
+                            @endforeach
+                        </select>
+                        <select id="filter-status-cuenta" class="border-gray-300 rounded-md shadow-sm text-sm">
+                            <option value="">Estados de cuenta</option>
+                            @foreach (Inscripcion::STATUS_CUENTA as $key => $value)
+                                <option value="{{ $key }}">{{ $value }}</option>
+                            @endforeach
+                        </select>
                         <select id="filter-paquete" class="border-gray-300 rounded-md shadow-sm text-sm">
                             <option value="">Seleccione un paquete</option>
                             @foreach ($paquetes as $paquete)
@@ -143,6 +160,8 @@
                                 d.tipo = $('#filter-tipo').val();
                                 d.categoria = $('#filter-categoria').val();
                                 // d.nivel = $('#filter-nivel').val();
+                                d.status_ins = $('#filter-status-inscripcion').val();
+                                d.status_cuenta = $('#filter-status-cuenta').val();
                                 d.dep = $('#filter-dep').val();
                                 d.prov = $('#filter-prov').val();
                                 d.mun = $('#filter-mun').val();
@@ -226,6 +245,8 @@
                     });
                     $('#filter-pais, #filter-tipo, #filter-categoria, #filter-nivel').on('change', () => table.draw());
 
+                    $('#filter-status-inscripcion, #filter-status-cuenta').on('change', () => table.draw());
+
                     $('#filter-pais').on('change', async function() {
                         const pais = this.value;
                         $('#filter-dep').prop('disabled', !pais).html('<option>Cargando...</option>');
@@ -276,6 +297,7 @@
                             false);
                         table.draw();
                     });
+
 
                     $('#filter-mun').on('change', () => table.draw());
                     $('#filter-fecha-inicio, #filter-fecha-fin, #filter-gestion').on('change', () => table.draw());

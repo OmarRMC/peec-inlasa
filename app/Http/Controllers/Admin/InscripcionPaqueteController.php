@@ -79,6 +79,17 @@ class InscripcionPaqueteController extends Controller
         if ($request->filled('gestion')) {
             $query->where('gestion', $request->gestion);
         }
+        if ($request->has('status_cuenta') && $request->get('status_cuenta')) {
+            Log::info('$request->status_cuenta');
+            Log::info($request->status_cuenta ? '1' : '01');
+            $query->where('status_cuenta', $request->status_cuenta);
+        }
+
+        if ($request->has('status_ins') && $request->get('status_ins')) {
+            Log::info('$request->status_ins');
+            Log::info($request->status_ins ? '1' : '01');
+            $query->where('status_inscripcion', $request->status_ins);
+        }
         return datatables()
             ->of($query)
             ->addColumn('nombre_lab', fn($i) => $i->laboratorio->nombre_lab ?? '-')
