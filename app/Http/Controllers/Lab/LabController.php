@@ -108,6 +108,7 @@ class LabController extends Controller
                 return view('inscripcion_paquete.action-buttons', [
                     'showUrl' => route('lab.inscripcion.show', $i->id),
                     'boletaPdf' => route('formulario_inscripcion_lab.pdf', $i->id),
+                    'contratoPdf' => route('formulario_contrato_lab.pdf', $i->id),
                 ])->render();
             })
             ->rawColumns(['estado', 'cuenta', 'acciones'])

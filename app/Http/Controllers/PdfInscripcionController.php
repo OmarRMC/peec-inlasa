@@ -45,7 +45,7 @@ class PdfInscripcionController extends Controller
             'laboratorio' => $laboratorio,
             'programas' => $programasAgrupados,
             'total' => $inscripcion->costo_total,
-            'fecha_inscripcion' =>$fechaCarbon->format('d/m/Y'),
+            'fecha_inscripcion' => $fechaCarbon->format('d/m/Y'),
             'fecha_generacion' => now()->format('d/m/Y | H:i'),
             'generado_por' => Auth::user()->username ?? 'Sistema'
         ];
@@ -59,5 +59,55 @@ class PdfInscripcionController extends Controller
             $canvas->text(40, 700, $text, $font, 9);
         });
         return $pdf->stream('formulario-inscripcion.pdf');
+    }
+
+    public function generarContrato($id)
+    {
+        $inscripcion = Inscripcion::with('laboratorio')->findOrFail($id);
+        $laboratorio = $inscripcion->laboratorio;
+        $fechaContrato = Carbon::now()->locale('es')->translatedFormat('d \d\e F \d\e Y');
+        $gestion = $inscripcion->gestion;
+        $fechaLimitePago = '31 de marzo de 2025';
+        $codLab = $laboratorio->cod_lab;
+
+        preg_match('/\d+/', $codLab, $coincidencias);
+
+        $numero = ltrim($coincidencias[0], '0');
+        $numero = $numero === '' ? '0' : $numero;
+
+        $data = [
+            'laboratorio' => $laboratorio,
+            'generado_por' => Auth::user()->username ?? 'Sistema',
+            'fecha_generacion' => now()->format('d/m/Y | H:i'),
+            'fecha_contrato' => $fechaContrato,
+            'gestion' => $gestion,
+            'fechaLimitePago' => $fechaLimitePago,
+            'convocatoria' => "Convocatoria del PEEC INLASA Gestión {$gestion}",
+            'contrato_numero' => "MSyD/INLASA/PEEC/{$numero}/{$gestion}",
+            'departamento' => $laboratorio->departamento->nombre_dep
+        ];
+
+        $pdf = Pdf::loadView('pdf.contrato_inscripcion_lab', $data);
+        $pdf->setPaper('A4', 'portrait');
+
+        $domPdf = $pdf->getDomPDF();
+        $domPdf->render();
+
+        // Acceder correctamente a font y canvas
+        $fontMetrics = $domPdf->getFontMetrics();
+        $canvas = $domPdf->getCanvas();
+        $font = $fontMetrics->getFont('DejaVu Sans', 'normal');
+
+        // Establecer numeración después del render
+        $canvas->page_script(function ($pageNumber, $pageCount, $canvas) use ($font, $fontMetrics) {
+            $text = "Página $pageNumber / $pageCount";
+            $size = 6;
+            $width = $fontMetrics->getTextWidth($text, $font, $size);
+            $x = 550 - $width;
+            $y = 810;
+            $canvas->text($x, $y, $text, $font, $size);
+        });
+
+        return $domPdf->stream('contrato-peec.pdf');
     }
 }

@@ -1,4 +1,4 @@
-@props(['showUrl', 'boletaPdf'])
+@props(['showUrl', 'boletaPdf', 'contratoPdf'])
 
 <div class="flex space-x-1">
     {{-- Ver --}}
@@ -11,5 +11,11 @@
         class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm"
         data-tippy-content="Imprimir el formulario de Inscripción">
         <i class="fas fa-file-pdf"></i>
+    </a>
+
+    <a href="{{ $contratoPdf }}" download
+        class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"
+        data-tippy-content="Descargar contrato de inscripción">
+        <i class="fas fa-download"></i>
     </a>
 </div>
