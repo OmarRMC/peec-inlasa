@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CategoriaLaboratorio;
+use App\Models\Configuracion;
 use App\Models\Laboratorio;
 use App\Models\Paquete;
 use App\Models\Programa;
 use App\Models\DetalleInscripcion;
 use App\Models\EnsayoAptitud;
+use App\Models\Formulario;
 use App\Models\Inscripcion;
 use App\Models\InscripcionEA;
 use App\Models\NivelLaboratorio;
@@ -161,9 +163,10 @@ class InscripcionPaqueteController extends Controller
             DB::beginTransaction();
             $total = collect($request->paquetes)->sum('costo');
             $now  = now();
+            $formulario = Formulario::where('proceso', Formulario::INSCRIPCION)->first();
             $ins = Inscripcion::create([
                 'id_lab' => $request->id_lab,
-                'id_formulario' => $request->id_formulario,
+                'id_formulario' => optional($formulario)->id,
                 'cant_paq' => count($request->paquetes),
                 'costo_total' => $total,
                 'obs_inscripcion' => $request->obs_inscripcion,
@@ -172,9 +175,11 @@ class InscripcionPaqueteController extends Controller
                 'status_inscripcion' => true,
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
-                'gestion' => configuracion('gestion') ?? $request->gestion,
-                'status_cuenta' => Inscripcion::STATUS_DEUDOR,
+                'gestion' => configuracion(Configuracion::GESTION_ACTUAL) ?? $request->gestion,
+                'status_cuenta' => Inscripcion::STATUS_DEUDOR
             ]);
+
+
 
             $vigenciaInscripcion = new VigenciaInscripcion();
 

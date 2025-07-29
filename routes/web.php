@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\ConfiguracionController;
 use App\Http\Controllers\Admin\DepartamentoController;
 use App\Http\Controllers\Admin\EnsayoAptitudController;
+use App\Http\Controllers\Admin\FormularioController;
 use App\Http\Controllers\Admin\InscripcionPaqueteController;
 use App\Http\Controllers\Admin\LaboratorioController;
 use App\Http\Controllers\Admin\MunicipioController;
@@ -76,12 +77,12 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
     Route::put('/configuracion/update/{seccion}', [ConfiguracionController::class, 'update'])->name('configuracion.update');
 
-    
+    Route::resource('formularios', FormularioController::class);
 });
 Route::middleware(['auth', 'usuario.activo'])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');
     Route::get('/contrato-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generarContrato'])->name('formulario_contrato_lab.pdf');
-}); 
+});
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () {
     Route::get('/profile', [LabController::class, 'profile'])->name('lab.profile');

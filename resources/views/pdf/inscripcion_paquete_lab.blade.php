@@ -131,14 +131,15 @@
             </td>
             <td style="width: 30%; text-align: right; font-size: 10px;">
                 <strong style="font-size: 11px;">FORMULARIO DE INSCRIPCION</strong><br>
-                PEEC-FOR-03.01 v.2<br>
+                {{ $formulario->codigo }} v.{{ $formulario->version }}<br>
                 <i>Fecha de inscripción: {{ $fecha_inscripcion }}</i>
             </td>
         </tr>
     </table>
 
     <div style="text-align: center; margin-top: 10px;">
-        <strong style="font-size: 13px;">Programa de Evaluación Externa de la Calidad</strong><br>
+        <strong
+            style="font-size: 13px;">{{ $formulario->titulo ?? 'Programa de Evaluación Externa de la Calidad' }}</strong><br>
         <strong style="font-size: 12px;">GESTIÓN {{ $inscripcion->gestion }}</strong>
     </div>
 
@@ -253,8 +254,7 @@
             convocatoria del PEEC INLASA 2025
             aceptando el pago de los aranceles establecidos para cada programa. El Laboratorio participante se
             compromete a
-            realizar la cancelación del total hasta
-            el 31 de marzo de la gestión {{ $inscripcion->gestion }} impostergablemente.
+            realizar la cancelación del total hasta el 31 de marzo de la gestión {{ $inscripcion->gestion }} impostergablemente.
         </i>
     </p>
 

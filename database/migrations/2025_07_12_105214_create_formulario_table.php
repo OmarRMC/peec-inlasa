@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('codigo', 25);
             $table->string('proceso', 50);
+            $table->string('titulo');
+            $table->string('version')->nullable();
+            $table->string('descripcion')->nullable();
             $table->dateTime('fec_formulario')->nullable();
             $table->boolean('status');
             $table->timestamps();

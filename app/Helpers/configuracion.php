@@ -18,10 +18,11 @@ if (!function_exists('configuracion')) {
 }
 
 if (!function_exists('formatDate')) {
-    function formatDate(string $date)
+    function formatDate(string $date, $time = true)
     {
+        $format = $time ? 'd/m/Y H:i' : 'd/m/Y';
         return Carbon::parse($date)
             ->timezone('America/La_Paz')
-            ->format('d/m/Y H:i');
+            ->format($format);
     }
 }

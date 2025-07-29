@@ -28,7 +28,8 @@ class DatabaseSeeder extends Seeder
             TipoLaboratorioSeeder::class,
             NivelLaboratorioSeeder::class,
             CategoriaLaboratorioSeeder::class,
-            ProgramaSeeder::class
+            ProgramaSeeder::class,
+            FormularioSeeder::class
         ]);
     }
 }

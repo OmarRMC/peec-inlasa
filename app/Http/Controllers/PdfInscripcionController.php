@@ -39,10 +39,11 @@ class PdfInscripcionController extends Controller
             ];
         }
         $fechaCarbon = Carbon::createFromFormat('d/m/Y H:i', $inscripcion->fecha_inscripcion);
-
+        $formulario = $inscripcion->formulario;
         $data = [
             'inscripcion' => $inscripcion,
             'laboratorio' => $laboratorio,
+            'formulario' => $formulario,
             'programas' => $programasAgrupados,
             'total' => $inscripcion->costo_total,
             'fecha_inscripcion' => $fechaCarbon->format('d/m/Y'),
