@@ -30,7 +30,7 @@
             @enderror
         </div>
 
-        @if (Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN]))
+        @if (Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN]) && false)
             {{-- Código PEEC --}}
             <div>
                 <label for="antcod_peec" class="label">Código PEEC</label>

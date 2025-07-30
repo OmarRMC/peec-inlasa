@@ -1,3 +1,9 @@
+@php
+    $estados = [
+        '1' => 'Activo',
+        '0' => 'Inactivo',
+    ];
+@endphp
 <x-app-layout>
     <div class="px-4 py-6 max-w-6xl mx-auto">
 
@@ -9,7 +15,7 @@
                 <i class="fas fa-plus-circle"></i> Nuevo Laboratorio
             </a>
         </div>
-        
+
         <!-- Filtros y Buscador -->
         <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
             <div class="flex space-x-2 text-sm">
@@ -49,7 +55,12 @@
                         <option value="{{ $nivel->id }}">{{ $nivel->descripcion_nivel }}</option>
                     @endforeach
                 </select>
-
+                <select id="filter-status" class="border-gray-300 rounded-md shadow-sm text-sm">
+                    <option value="">Todos los Estados</option>
+                    @foreach ($estados as $key => $valor)
+                        <option value="{{ $key }}">{{ $valor }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="flex items-center gap-2 justify-end">
                 <div class="relative w-full sm:w-64">
@@ -107,6 +118,7 @@
                             d.tipo = $('#filter-tipo').val();
                             d.categoria = $('#filter-categoria').val();
                             d.nivel = $('#filter-nivel').val();
+                            d.status = $('#filter-status').val();
                         }
                     },
                     order: [
@@ -159,6 +171,7 @@
                 });
 
                 $('#filter-tipo, #filter-categoria, #filter-nivel').on('change', () => table.draw());
+                $('#filter-status').on('change', () => table.draw());
                 $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());
                 $('#custom-search').on('keypress', e => {
                     if (e.which === 13) table.search($('#custom-search').val()).draw();

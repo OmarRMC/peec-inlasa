@@ -353,6 +353,9 @@ class LaboratorioController extends Controller
             }
         }
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
 
         return datatables()
             ->of($query)
@@ -374,7 +377,7 @@ class LaboratorioController extends Controller
                     'inscribirUrl' => route('inscripcion.create', $lab->id),
                     'nombre' => $lab->nombre_lab,
                     'id' => $lab->id,
-                    'activo' => $lab->status, // ← Aquí pasamos si está activo o no
+                    'activo' => $lab->status,
                 ])->render();
             })
             ->rawColumns(['status_label', 'actions'])
