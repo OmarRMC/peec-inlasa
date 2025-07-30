@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cargo;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Inscripcion;
@@ -40,10 +41,12 @@ class PdfInscripcionController extends Controller
         }
         $fechaCarbon = Carbon::createFromFormat('d/m/Y H:i', $inscripcion->fecha_inscripcion);
         $formulario = $inscripcion->formulario;
+        $fechaLimitePago = Carbon::parse($inscripcion->fecha_limite_pago)->locale('es')->translatedFormat('d \d\e F \d\e Y');
         $data = [
             'inscripcion' => $inscripcion,
             'laboratorio' => $laboratorio,
             'formulario' => $formulario,
+            'fechaLimitePago'=>$fechaLimitePago,
             'programas' => $programasAgrupados,
             'total' => $inscripcion->costo_total,
             'fecha_inscripcion' => $fechaCarbon->format('d/m/Y'),
@@ -68,7 +71,8 @@ class PdfInscripcionController extends Controller
         $laboratorio = $inscripcion->laboratorio;
         $fechaContrato = Carbon::now()->locale('es')->translatedFormat('d \d\e F \d\e Y');
         $gestion = $inscripcion->gestion;
-        $fechaLimitePago = '31 de marzo de 2025';
+        $fechaLimitePago = Carbon::parse($inscripcion->fecha_limite_pago)->locale('es')->translatedFormat('d \d\e F \d\e Y');
+        // $fechaLimitePago = '232';
         $codLab = $laboratorio->cod_lab;
 
         preg_match('/\d+/', $codLab, $coincidencias);

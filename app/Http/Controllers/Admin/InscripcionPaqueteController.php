@@ -176,7 +176,8 @@ class InscripcionPaqueteController extends Controller
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
                 'gestion' => configuracion(Configuracion::GESTION_ACTUAL) ?? $request->gestion,
-                'status_cuenta' => Inscripcion::STATUS_DEUDOR
+                'status_cuenta' => Inscripcion::STATUS_DEUDOR,
+                'fecha_limite_pago' => configuracion(Configuracion::FECHA_FIN_PAGO)
             ]);
 
 

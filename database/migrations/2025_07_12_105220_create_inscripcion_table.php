@@ -21,6 +21,7 @@ return new class extends Migration
             $table->dateTime('fecha_inscripcion');
             $table->boolean('status_cuenta');
             $table->boolean('status_inscripcion');
+            $table->date('fecha_limite_pago')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('updated_by');
             $table->string('gestion', 10);

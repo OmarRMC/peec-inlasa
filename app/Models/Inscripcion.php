@@ -41,6 +41,7 @@ class Inscripcion extends Model
         'status_inscripcion',
         'created_by',
         'updated_by',
+        'fecha_limite_pago',
         'gestion'
     ];
 

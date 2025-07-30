@@ -1,3 +1,8 @@
+@php
+    use App\Models\Formulario;
+    $formulario = new Formulario();
+    $formulario->fec_formulario = now();
+@endphp
 <x-app-layout>
     <div class="px-4 py-6 max-w-xl mx-auto">
         <div class="bg-white shadow-md rounded-xl p-6 space-y-5 border border-gray-200">

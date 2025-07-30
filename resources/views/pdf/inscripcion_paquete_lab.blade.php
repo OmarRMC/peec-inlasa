@@ -253,8 +253,7 @@
             El Laboratorio participante se compromete a cumplir con las condiciones de participación estipuladas en la
             convocatoria del PEEC INLASA 2025
             aceptando el pago de los aranceles establecidos para cada programa. El Laboratorio participante se
-            compromete a
-            realizar la cancelación del total hasta el 31 de marzo de la gestión {{ $inscripcion->gestion }} impostergablemente.
+            compromete a realizar la cancelación del total hasta el {{ $fechaLimitePago }} impostergablemente.
         </i>
     </p>
 
