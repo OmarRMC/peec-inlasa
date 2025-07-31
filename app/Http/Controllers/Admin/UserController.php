@@ -29,7 +29,9 @@ class UserController extends Controller
     public function create()
     {
         $cargos = Cargo::active()->get();
-        $permisos = Permiso::active()->get();
+        $permisos = Permiso::active()
+            ->where('clave', '!=', Permiso::LABORATORIO)
+            ->get();
         $ensayoA = EnsayoAptitud::active()->orderBy('descripcion')->get();
         return view('usuario.create', compact('cargos', 'permisos', 'ensayoA'));
     }
@@ -138,6 +140,7 @@ class UserController extends Controller
             $usuario->update(['password' => Hash::make($validated['password'])]);
         }
         $ensayoIDs = $request->input('ensayos_ap', []);
+        $usuario->permisos()->sync($request->input('permisos', []));
 
         // $ensayosData = [];
         // $ensayos = EnsayoAptitud::whereIn('id', $ensayoIDs)->get();

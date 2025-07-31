@@ -52,7 +52,7 @@
             <section class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-blue-700">💳 Pagos</h2>
-                    @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                    @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN]))
                         <button onclick="document.getElementById('modalPago').showModal()"
                             class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
                             Registrar Pago
@@ -66,7 +66,7 @@
 
                         <div class="absolute top-2 right-2">
                             @if ($pago->status)
-                                @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                                @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN]))
                                     <form method="POST" onsubmit="return confirm('¿Estás seguro de anular este pago?')"
                                         action="{{ route('pago.destroy', [$pago->id]) }}">
                                         @csrf

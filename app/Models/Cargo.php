@@ -19,6 +19,9 @@ class Cargo extends BaseModel
         'status',
     ];
 
+    const RESPOSABLE_EA="Resposable del Ensayo A.";
+    const SOPORTE="Soporte";
+
 
     /**
      * Relación con usuarios

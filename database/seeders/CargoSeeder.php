@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Cargo;
 use App\Models\Permiso;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -15,11 +16,12 @@ class CargoSeeder extends Seeder
             'status' => true
         ]);
         DB::table('cargo')->insert([
-            'nombre_cargo' => Permiso::RESPONSABLE_NAME,
+            'nombre_cargo' => Cargo::RESPOSABLE_EA,
             'status' => true
         ]);
+
         DB::table('cargo')->insert([
-            'nombre_cargo' => Permiso::LABORATORIO_NAME,
+            'nombre_cargo' => Cargo::SOPORTE,
             'status' => true
         ]);
     }

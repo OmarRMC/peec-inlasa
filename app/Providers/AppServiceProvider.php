@@ -42,7 +42,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define(Permiso::GESTION_INSCRIPCIONES, function (User $user) {
             return $user->tienePermiso(Permiso::GESTION_INSCRIPCIONES);
         });
-
+        Gate::define(Permiso::GESTION_LABORATORIO, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_LABORATORIO);
+        });
 
         Gate::define(Permiso::DELETE_GESTION_PROGRAMAS, function (User $user) {
             return false;
