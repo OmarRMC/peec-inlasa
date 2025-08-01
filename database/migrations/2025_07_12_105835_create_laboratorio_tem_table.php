@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('laboratorio_tem', function (Blueprint $table) {
             $table->id();
-            $table->string('cod_lab', 20);
+            $table->string('cod_lab', 20)->nullable();
             $table->string('antcod_peec', 10)->nullable();
             $table->string('numsedes_lab', 15)->nullable();
             $table->bigInteger('nit_lab')->nullable();

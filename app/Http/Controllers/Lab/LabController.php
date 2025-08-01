@@ -23,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class LabController extends Controller
@@ -211,10 +212,10 @@ class LabController extends Controller
 
     public function registrar(Request $request)
     {
+        Log::info('Esta llegando Aqui');
         $request->validate([
-            'cod_lab' => 'required|string|max:20|unique:laboratorio,cod_lab',
             'antcod_peec' => 'nullable|string|max:10',
-            'numsedes_lab' => 'nul  lable|string|max:15',
+            'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
             'sigla_lab' => 'nullable|string|max:20|unique:laboratorio,sigla_lab',
             'nit_lab' => 'nullable|numeric|unique:laboratorio,nit_lab',
@@ -239,8 +240,8 @@ class LabController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ], $this->messages());
 
+        Log::info('Esta llegando Aqui1');
         $laboratorio = LaboratorioTem::create([
-            'cod_lab' => $request->cod_lab,
             'antcod_peec' => $request->antcod_peec,
             'numsedes_lab' => $request->numsedes_lab,
             'nit_lab' => $request->nit_lab,
@@ -266,7 +267,7 @@ class LabController extends Controller
             'telefono' => $request->telefono,
             'password' => $request->password,
         ]);
-
+        Log::info('Esta llegando Aqui2');
         $pais = Pais::find($request->id_pais)?->nombre ?? 'Desconocido';
         $departamento = Departamento::find($request->id_dep)?->nombre_dep ?? 'Desconocido';
         $provincia = Provincia::find($request->id_prov)?->nombre_prov ?? 'Desconocido';
@@ -344,8 +345,8 @@ class LabController extends Controller
         $sigla = strtoupper($pais->sigla_pais); // Ej: BOL
 
         // Generar username incremental
-        $count = User::where('username', 'LIKE', "$sigla-%")->count() + 1;
-        $username = $sigla . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        $count = User::where('username', 'LIKE', "$sigla%")->count() + 1;
+        $username = $sigla . str_pad($count, 4, '0', STR_PAD_LEFT);
         try {
             DB::beginTransaction();
 
@@ -366,8 +367,8 @@ class LabController extends Controller
             // Crear laboratorio
             $lab = Laboratorio::create([
                 'id_usuario' => $user->id,
-                'cod_lab' => $labTem->cod_lab,
-                'antcod_peec' => $labTem->antcod_peec,
+                'cod_lab' => $username,
+                'antcod_peec' => $username,
                 'numsedes_lab' => $labTem->numsedes_lab,
                 'nit_lab' => $labTem->nit_lab,
                 'nombre_lab' => $labTem->nombre_lab,
@@ -391,7 +392,7 @@ class LabController extends Controller
                 'mail2_lab' => $labTem->mail2_lab,
                 'status' => true,
                 'created_by' => $user->id,
-                'updated_by' =>     $user->id,
+                'updated_by' =>  $user->id,
             ]);
             Mail::to($user->email)->send(new EnvioCodigoLab($user, $lab));
             DB::commit();
