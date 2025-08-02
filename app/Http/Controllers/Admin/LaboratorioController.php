@@ -57,7 +57,6 @@ class LaboratorioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'cod_lab' => 'nullable|string|max:20|unique:laboratorio,cod_lab',
             'antcod_peec' => 'nullable|string|max:10',
             'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
@@ -100,10 +99,11 @@ class LaboratorioController extends Controller
                 'username' => $username,
                 'email' => $request->mail_lab,
                 'password' => $request->password,
-                'status' => false,
+                'status' => true,
                 'ap_paterno' => 'Laboratorio_ap_paterno', // Asignar un apellido por defecto
                 'ci' => $request->ci_respo_lab ?: '00000000',
                 'telefono' => $request->telefono,
+                'email_verified_at' => now()
             ]);
 
             // Crear laboratorio
@@ -132,17 +132,17 @@ class LaboratorioController extends Controller
                 'wapp2_lab' => $request->wapp2_lab,
                 'mail_lab' => $request->mail_lab,
                 'mail2_lab' => $request->mail2_lab,
-                'status' => false,
+                'status' => true,
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
             ]);
             DB::commit();
             try {
-                $user->notify(new VerificarCorreoLab($user, $lab));
+                // $user->notify(new VerificarCorreoLab($user, $lab));
             } catch (\Throwable $th) {
-                return redirect()->route('laboratorio.index')->with('warning', 'Laboratorio registrado correctamente, pero no se pudo enviar el correo de verificación.');
+                // return redirect()->route('laboratorio.index')->with('warning', 'Laboratorio registrado correctamente, pero no se pudo enviar el correo de verificación.');
             }
-            return redirect()->route('laboratorio.index')->with('success', 'Laboratorio registrado correctamente. Se envió un correo de verificación.');
+            return redirect()->route('laboratorio.index')->with('success', 'Laboratorio registrado correctamente.');
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Error al iniciar transacción: ' . $e->getMessage());
@@ -239,7 +239,7 @@ class LaboratorioController extends Controller
         if (Gate::any(abilities: [Permiso::GESTION_LABORATORIO, Permiso::ADMIN])) {
             if ($request->mail_lab != $laboratorio->mail_lab) {
                 $laboratorio->mail_lab = $request->mail_lab;
-                $user->email_verified_at = null;
+                // $user->email_verified_at = null;
                 $user->email = $request->mail_lab;
             }
         }

@@ -334,7 +334,7 @@
                     $('#filter-fecha-inicio, #filter-fecha-fin, #filter-gestion').on('change', () => table.draw());
 
                     function resetFilters(ids) {
-                        ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i.toUpperCase()}</option>`)
+                        ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i}</option>`)
                             .prop('disabled', true));
                     }
 

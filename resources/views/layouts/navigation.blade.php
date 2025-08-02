@@ -65,12 +65,15 @@
             <div x-show="openMenu === 103" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
                 <a href="{{ route('lab.ins.index') }}"
                     class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                    <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Listado de inscripciones
+                    <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> 
+                    Listado de inscripciones
                 </a>
                 {{-- href="{{ route('formulario_contrato_lab.pdf') }}" --}}
+                @if(Auth::user()->laboratorio->tieneIscripcionGestionActual())
                 <a href="{{ route('formulario_contrato')}}" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                     <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Contrato
                 </a>
+                @endif
             </div>
         </div>
     @endif

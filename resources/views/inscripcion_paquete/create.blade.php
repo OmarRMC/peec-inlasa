@@ -46,8 +46,15 @@
             </div>
         </div>
 
+        <div>
+            <label for="observacionesGenerales"
+                class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+            <textarea id="observacionesGenerales"
+                class="w-full border border-gray-300 rounded-md shadow-sm text-sm p-2 focus:outline-none focus:ring-1 focus:ring-blue-300"
+                rows="1"></textarea>
+        </div>
         <!-- Tabla de paquetes seleccionados (fuera del modal) -->
-        <div class="overflow-x-auto mb-4 mt-10">
+        <div class="overflow-x-auto mb-4 mt-5">
             <h3 class="font-semibold mb-2">Paquetes Seleccionados</h3>
             <table class="table w-full text-sm">
                 <thead>
@@ -196,7 +203,7 @@
                     textarea.className =
                         "w-full p-1 border rounded-md text-sm resize-none focus:outline-none focus:ring-1 focus:border-blue-300";
                     textarea.rows = 2;
-                    textarea.placeholder = "Ingrese observaciones...";
+                    // textarea.placeholder = "Ingrese observaciones...";
                     textarea.value = pkt.observaciones ?? '';
                     textarea.oninput = function() {
                         guardarObservacion(index, this.value);
@@ -206,11 +213,12 @@
                 });
                 totalSpan.textContent = `${total} Bs.`;
             }
-
             const registrarInscription = () => {
+                const observacionesGenerales = document.getElementById('observacionesGenerales').value.trim();
                 const data = {
                     id_lab: LAB_ID,
                     gestion: new Date().getFullYear(),
+                    obs_inscripcion: observacionesGenerales,
                     paquetes: seleccionados.map(pkt => ({
                         id: pkt.id,
                         descripcion: pkt.nombre_paquete,
@@ -256,11 +264,11 @@
                                 <div class="max-h-64 overflow-y-auto pr-2">
                                     <ul class="divide-y divide-gray-200">
                                         ${seleccionados.map(pkt => `
-                                                    <li class="py-0 flex justify-between">
-                                                        <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
-                                                        <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
-                                                    </li>
-                                                    `).join('')}
+                                                                    <li class="py-0 flex justify-between">
+                                                                        <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
+                                                                        <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
+                                                                    </li>
+                                                                    `).join('')}
                                     </ul>
                                 </div>
                                 <!-- Total fijo -->

@@ -163,4 +163,9 @@ class Laboratorio extends Model
             $fechaInicio <= $hoy &&
             $fechaFin >= $hoy;
     }
+
+    public function tieneIscripcionGestionActual()
+    {
+        return $this->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_ACTUAL))->exists();
+    }
 }

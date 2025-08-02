@@ -15,6 +15,7 @@
             <section class="p-6">
                 <h2 class="text-lg font-semibold text-blue-700 mb-4">📄 Datos de Inscripción</h2>
                 <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+                    <div><strong>Codigo Lab:</strong> {{ $inscripcion->laboratorio->cod_lab }}</div>
                     <div><strong>Laboratorio:</strong> {{ $inscripcion->laboratorio->nombre_lab }}</div>
                     <div><strong>Fecha de Inscripción:</strong> {{ $inscripcion->fecha_inscripcion }}</div>
                     <div><strong>Gestión:</strong> {{ $inscripcion->gestion }}</div>

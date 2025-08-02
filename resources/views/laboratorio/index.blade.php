@@ -5,10 +5,10 @@
     ];
 @endphp
 <x-app-layout>
-    <div class="px-4 py-6 max-w-6xl mx-auto">
+    <div class="px-4 max-w-6xl mx-auto">
 
         <!-- Encabezado -->
-        <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
+        <div class="flex justify-between items-center flex-wrap gap-4">
             <h1 class="text-xl font-bold text-gray-800">Lista de Laboratorios</h1>
             <a href="{{ route('laboratorio.create') }}"
                 class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition shadow-md text-sm">
@@ -17,62 +17,64 @@
         </div>
 
         <!-- Filtros y Buscador -->
-        <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
-            <div class="flex space-x-2 text-sm">
-                <select id="filter-pais" class="border-gray-300 rounded-md shadow-sm text-sm">
+        <div class="flex justify-between items-center flex-wrap gap-3 mb-4 text-sm">
+            <!-- Filtros ubicación -->
+            <div class="flex flex-wrap gap-2">
+                <select id="filter-pais" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todos los Países</option>
                     @foreach ($paises as $pais)
                         <option value="{{ $pais->id }}">{{ $pais->nombre_pais }}</option>
                     @endforeach
                 </select>
-                <select id="filter-dep" class="border-gray-300 rounded-md shadow-sm text-sm" disabled>
+                <select id="filter-dep" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]"
+                    disabled>
                     <option value="">Seleccione Departamento</option>
                 </select>
-                <select id="filter-prov" class="border-gray-300 rounded-md shadow-sm text-sm" disabled>
+                <select id="filter-prov" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]"
+                    disabled>
                     <option value="">Seleccione Provincia</option>
                 </select>
-                <select id="filter-mun" class="border-gray-300 rounded-md shadow-sm text-sm" disabled>
+                <select id="filter-mun" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]"
+                    disabled>
                     <option value="">Seleccione Municipio</option>
                 </select>
             </div>
-            <div>
-                <!-- Nuevos filtros -->
-                <select id="filter-tipo" class="border-gray-300 rounded-md shadow-sm text-sm">
+
+            <!-- Filtros tipo, categoría, estado -->
+            <div class="flex flex-wrap gap-2">
+                <select id="filter-tipo" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todos los Tipos</option>
                     @foreach ($tipos as $tipo)
                         <option value="{{ $tipo->id }}">{{ $tipo->descripcion }}</option>
                     @endforeach
                 </select>
-                <select id="filter-categoria" class="border-gray-300 rounded-md shadow-sm text-sm">
+                <select id="filter-categoria"
+                    class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todas las Categorías</option>
                     @foreach ($categorias as $categoria)
                         <option value="{{ $categoria->id }}">{{ $categoria->descripcion }}</option>
                     @endforeach
                 </select>
-                <select id="filter-nivel" class="border-gray-300 rounded-md shadow-sm text-sm">
-                    <option value="">Todos los Niveles</option>
-                    @foreach ($niveles as $nivel)
-                        <option value="{{ $nivel->id }}">{{ $nivel->descripcion_nivel }}</option>
-                    @endforeach
-                </select>
-                <select id="filter-status" class="border-gray-300 rounded-md shadow-sm text-sm">
+                <select id="filter-status" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todos los Estados</option>
                     @foreach ($estados as $key => $valor)
                         <option value="{{ $key }}">{{ $valor }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="flex items-center gap-2 justify-end">
+
+            <!-- Buscador -->
+            <div class="flex items-center gap-2 justify-end w-full sm:w-auto">
                 <div class="relative w-full sm:w-64">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">
                         <i class="fas fa-search"></i>
                     </span>
                     <input type="search" id="custom-search"
-                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        class="w-full pl-10 pr-4 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs"
                         placeholder="Buscar laboratorio...">
                 </div>
                 <button id="btn-search"
-                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-sm">
+                    class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
@@ -85,6 +87,7 @@
                     <tr>
                         <th class="px-4 py-2 text-left">Acciones</th>
                         <th class="px-4 py-2 text-left">Fecha/Hora</th>
+                        <th class="px-4 py-2 text-left">Codigo</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
                         <th class="px-4 py-2 text-left">Correo</th>
                         <th class="px-4 py-2 text-left">WhatsApp</th>
@@ -114,10 +117,10 @@
                             d.pais = $('#filter-pais').val();
                             d.dep = $('#filter-dep').val();
                             d.prov = $('#filter-prov').val();
-                            d.mun = $('#filter-mun').val();
+                            d.municipio = $('#filter-mun').val();
                             d.tipo = $('#filter-tipo').val();
                             d.categoria = $('#filter-categoria').val();
-                            d.nivel = $('#filter-nivel').val();
+                            // d.nivel = $('#filter-nivel').val();
                             d.status = $('#filter-status').val();
                         }
                     },
@@ -133,6 +136,10 @@
                         {
                             data: 'created_at',
                             name: 'created_at',
+                        },
+                        {
+                            data: 'cod_lab',
+                            name: 'cod_lab'
                         },
                         {
                             data: 'nombre_lab',
@@ -170,7 +177,7 @@
                     }
                 });
 
-                $('#filter-tipo, #filter-categoria, #filter-nivel').on('change', () => table.draw());
+                $('#filter-tipo, #filter-categoria').on('change', () => table.draw());
                 $('#filter-status').on('change', () => table.draw());
                 $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());
                 $('#custom-search').on('keypress', e => {
@@ -222,7 +229,7 @@
                 $('#filter-mun').on('change', () => table.draw());
 
                 function resetFilters(ids) {
-                    ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i.toUpperCase()}</option>`)
+                    ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i}</option>`)
                         .prop('disabled', true));
                     table.draw();
                 }
