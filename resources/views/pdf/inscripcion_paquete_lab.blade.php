@@ -114,7 +114,7 @@
 
 <body>
 
-    <table style="width: 100%; margin-bottom: 10px;">
+    <table style="width: 100%; margin-bottom: 8px;">
         <tr style="height: 100px">
             <td style="width: 15%;  vertical-align: middle; position: relative;  padding-top: 2px;">
                 <img src="{{ public_path('img/logoinlasa.jpg') }}" alt="Logo INLASA" style="width: 90%;">
@@ -137,7 +137,7 @@
         </tr>
     </table>
 
-    <div style="text-align: center; margin-top: 10px;">
+    <div style="text-align: center;">
         <strong
             style="font-size: 13px;">{{ $formulario->titulo ?? 'Programa de Evaluación Externa de la Calidad' }}</strong><br>
         <strong style="font-size: 12px;">GESTIÓN {{ $inscripcion->gestion }}</strong>
@@ -148,54 +148,56 @@
         notificados vía correo electrónico al PEEC INLASA de manera oportuna.
     </p>
 
-    <div style="font-weight: bold; font-size: 11px; margin-top: 20px; margin-bottom: 5px;">
+    <div style="font-weight: bold; font-size: 11px; margin-top: 10px;">
         1. INFORMACION DEL LABORATORIO
     </div>
 
     <table style="width: 100%; font-size: 10px; line-height: 1; border-spacing: 0;">
         <tr>
             <td style="width: 33%;"><strong>Código del laboratorio:</strong> {{ $laboratorio->cod_lab }}</td>
-            <td style="width: 33%;"><strong>Anterior Cod. PEEC:</strong> {{ $laboratorio->antcod_peec }}</td>
-            <td><strong>Nro. registro SEDES:</strong> {{ $laboratorio->numsedes_lab ?? '' }}</td>
+            <td style="width: 33%;"><strong>Nro. registro SEDES:</strong> {{ $laboratorio->numsedes_lab ?? '' }}</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Nombre del Laboratorio:</strong> {{ $laboratorio->nombre_lab }}</td>
         </tr>
         <tr>
-            <td><strong>Sigla:</strong> {{ $laboratorio->sigla_lab }}</td>
-            <td><strong>Nivel del laboratorio:</strong> {{ $laboratorio->nivel->descripcion_nivel }}</td>
-            <td><strong>Tipo de laboratorio: </strong>{{ $laboratorio->tipo->descripcion }} /
+            <td style="width: 33%;"><strong>Sigla:</strong> {{ $laboratorio->sigla_lab }}</td>
+            <td style="width: 33%;"> <strong>Nivel del laboratorio:</strong>
+                {{ $laboratorio->nivel->descripcion_nivel }}</td>
+            <td style="width: 33%;"><strong>Tipo de laboratorio: </strong>{{ $laboratorio->tipo->descripcion }} /
                 {{ $laboratorio->categoria->descripcion }}</td>
         </tr>
         <tr>
-            <td colspan="2">
+            <td colspan="2" style="width: 50%;">
                 <strong>Resp. laboratorio:</strong> {{ $laboratorio->respo_lab }} &nbsp;&nbsp; <strong>C.I.
                     :</strong>
                 {{ $laboratorio->ci_respo_lab }}
             </td>
-            <td>
+            <td style="width: 50%;">
                 <strong>Rep. Legal:</strong> {{ $laboratorio->repreleg_lab }} &nbsp;&nbsp; <strong>C.I.
                     :</strong> {{ $laboratorio->ci_repreleg_lab }}
             </td>
         </tr>
         <tr>
-            <td><strong>Departamento:</strong> {{ $laboratorio->departamento->nombre_dep }}</td>
-            <td><strong>Provincia:</strong> {{ $laboratorio->provincia->nombre_prov }}</td>
-            <td><strong>Municipio:</strong> {{ $laboratorio->municipio->nombre_municipio }}</td>
+            <td style="width: 33%;"><strong>Departamento:</strong> {{ $laboratorio->departamento->nombre_dep }}</td>
+            <td style="width: 33%;"><strong>Provincia:</strong> {{ $laboratorio->provincia->nombre_prov }}</td>
+            <td style="width: 33%;"><strong>Municipio:</strong> {{ $laboratorio->municipio->nombre_municipio }}</td>
         </tr>
         <tr>
             <td colspan="3"><strong>Dirección:</strong> {{ $laboratorio->direccion_lab }}</td>
         </tr>
         <tr>
-            <td><strong>Zona:</strong> {{ $laboratorio->zona_lab }}</td>
-            <td><strong>Nro. Teléfono:</strong> {{ $laboratorio->usuario->telefono }}</td>
-            <td><strong>Nro. Celular(1):</strong> {{ $laboratorio->wapp_lab }}</td>
+            <td style="width: 33%;"><strong>Zona:</strong> {{ $laboratorio->zona_lab }}</td>
+            <td style="width: 33%;"><strong>Nro. Teléfono:</strong> {{ $laboratorio->usuario->telefono }}</td>
+            <td style="width: 33%;"><strong>Nro. Celular(1):</strong> {{ $laboratorio->wapp_lab }}</td>
         </tr>
         <tr>
-            <td><strong>Nro. Celular(2):</strong> {{ $laboratorio->wapp2_lab }}</td>
-            <td colspan="2">
-                <strong>E-mail (1):</strong> {{ $laboratorio->mail_lab }} &nbsp;&nbsp;&nbsp; <strong>E-mail
-                    (2):</strong> {{ $laboratorio->mail2_lab }}
+            <td style="width: 33%;"><strong>Nro. Celular(2):</strong> {{ $laboratorio->wapp2_lab }}</td>
+            <td style="width: 33%;">
+                <strong>E-mail (1):</strong> {{ $laboratorio->mail_lab }}
+            </td>
+            <td style="width: 33%;">
+                <strong>E-mail (2):</strong> {{ $laboratorio->mail2_lab }}
             </td>
         </tr>
     </table>
@@ -212,27 +214,27 @@
         </div>
 
         @foreach ($programa['areas'] as $nombreArea => $areas)
-            <div style="margin-left: 10px; font-weight: bold;">
+            <div style="margin-left: 10px;">
                 ÁREA: {{ strtoupper($nombreArea) }}
             </div>
 
-            @foreach ($areas as $line)
-                <div
-                    style="
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding-left: 15px;
-                        width: 100vw;
-                    ">
-                    <div style=" display: inline-block;">
-                        <p style="margin: 0;">{{ $line['paquete'] }}</p>
-                    </div>
-                    <div style=" display: inline-block; text-align: right; min-width: 130px;">
-                        <strong>Costo:</strong> {{ number_format($line['costo'], 0) }} Bs.
-                    </div>
-                </div>
-            @endforeach
+            <table style=" padding-left: 25px ; width: 100%; border-collapse: collapse; margin-bottom: 1px;">
+                <tbody>
+                    @foreach ($areas as $line)
+                        <tr>
+                            <td style=" width:80%; border-bottom: 1px solid #eee;">
+                                {{ $line['paquete'] }}
+                            </td>
+                            <td style=" width: 3%; border-bottom: 1px solid #eee;">
+                                <strong>Costo:</strong>
+                            </td>
+                            <td style="width: 17%; text-align: right; border-bottom: 1px solid #eee;">
+                                {{ number_format($line['costo'], 0) }} Bs.
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         @endforeach
     @endforeach
 
@@ -263,7 +265,7 @@
         <i>Fecha de inscripción: {{ $fecha_inscripcion }}</i>
     </p>
 
-    <table style="width: 100%; margin-top: 100px; font-size: 11px; text-align: center;">
+    <table style="width: 100%; margin-top: 100px; font-size: 10px; text-align: center;">
         <tr>
             <td style="width: 50%;">
                 _________________________________<br>
@@ -282,7 +284,7 @@
 
 
     {{-- Footer de página --}}
-    <div style="position: fixed; bottom: 0px; left: 0; right: 0; height: 50px; font-size: 9px;">
+    <div style="position: fixed; bottom: -15px; left: 0; right: 0; height: 50px; font-size: 9px;">
         <table style="width: 100%;">
             <tr>
                 <td style="text-align: left; width: 33%">

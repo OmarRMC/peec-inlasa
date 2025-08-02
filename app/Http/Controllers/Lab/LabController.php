@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Lab;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\PdfInscripcionController;
 use App\Mail\EnvioCodigoLab;
 use App\Mail\LaboratorioVerificacionDatos;
 use App\Models\CategoriaLaboratorio;
+use App\Models\Configuracion;
 use App\Models\Departamento;
 use App\Models\Inscripcion;
 use App\Models\Laboratorio;
@@ -59,6 +61,15 @@ class LabController extends Controller
         ]);
     }
 
+    public function generarContrato()
+    {
+        Gate::authorize(Permiso::LABORATORIO);
+        $lab = Auth::user()->laboratorio;
+        $inscripcion = $lab->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_ACTUAL))->firstOrFail();
+        $pdfController = app(PdfInscripcionController::class);
+        return $pdfController->generarContrato($inscripcion->id);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -106,10 +117,9 @@ class LabController extends Controller
             ->addColumn('estado', fn($i) => $i->getStatusInscripcion())
             ->addColumn('cuenta', fn($i) => $i->getStatusCuenta())
             ->addColumn('acciones', function ($i) {
-                return view('inscripcion_paquete.action-buttons', [
+                return view('laboratorio.inscripcion.action-btn', [
                     'showUrl' => route('lab.inscripcion.show', $i->id),
                     'boletaPdf' => route('formulario_inscripcion_lab.pdf', $i->id),
-                    'contratoPdf' => route('formulario_contrato_lab.pdf', $i->id),
                 ])->render();
             })
             ->rawColumns(['estado', 'cuenta', 'acciones'])
@@ -152,6 +162,7 @@ class LabController extends Controller
 
         return view('inscripcion_paquete.show', compact('inscripcion', 'backTo'));
     }
+
 
 
     /**
@@ -212,9 +223,7 @@ class LabController extends Controller
 
     public function registrar(Request $request)
     {
-        Log::info('Esta llegando Aqui');
         $request->validate([
-            'antcod_peec' => 'nullable|string|max:10',
             'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
             'sigla_lab' => 'nullable|string|max:20|unique:laboratorio,sigla_lab',
@@ -240,11 +249,9 @@ class LabController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ], $this->messages());
 
-        Log::info('Esta llegando Aqui1');
         $laboratorio = LaboratorioTem::create([
-            'antcod_peec' => $request->antcod_peec,
             'numsedes_lab' => $request->numsedes_lab,
-            'nit_lab' => $request->nit_lab, 
+            'nit_lab' => $request->nit_lab,
             'nombre_lab' => $request->nombre_lab,
             'sigla_lab' => $request->sigla_lab,
             'id_nivel' => $request->id_nivel,
@@ -267,7 +274,6 @@ class LabController extends Controller
             'telefono' => $request->telefono,
             'password' => $request->password,
         ]);
-        Log::info('Esta llegando Aqui2');
         $pais = Pais::find($request->id_pais)?->nombre ?? 'Desconocido';
         $departamento = Departamento::find($request->id_dep)?->nombre_dep ?? 'Desconocido';
         $provincia = Provincia::find($request->id_prov)?->nombre_prov ?? 'Desconocido';
@@ -276,18 +282,23 @@ class LabController extends Controller
         $tipo = TipoLaboratorio::find($request->id_tipo)?->descripcion ?? 'Desconocido';
         $nivel = NivelLaboratorio::find($request->id_nivel)?->descripcion_nivel ?? 'Desconocido';
 
-        Mail::to($laboratorio->mail_lab)->send(
-            new LaboratorioVerificacionDatos(
-                $laboratorio,
-                $pais,
-                $departamento,
-                $provincia,
-                $municipio,
-                $categoria,
-                $tipo,
-                $nivel
-            )
-        );
+        try {
+            Mail::to($laboratorio->mail_lab)->send(
+                new LaboratorioVerificacionDatos(
+                    $laboratorio,
+                    $pais,
+                    $departamento,
+                    $provincia,
+                    $municipio,
+                    $categoria,
+                    $tipo,
+                    $nivel
+                )
+            );
+        } catch (\Throwable $th) {
+            return redirect('login')->with('info', 'Laboratorio registrado exitosamente, No se pudo enviar el correo verificación para validar sus datos.');
+        }
+
         return redirect('login')->with('success', 'Laboratorio registrado exitosamente, Se envió un correo de verificación para validar sus datos.');
     }
 

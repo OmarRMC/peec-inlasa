@@ -64,6 +64,7 @@
 
         p {
             margin: 0;
+            line-height: 1.1;
         }
 
         div {
@@ -226,7 +227,7 @@
             a) Incumplimiento al punto 11. Pago del Servicio de la "{{ $convocatoria }}".
             b) Incumplimiento en el envío de muestras establecido en el cronograma de actividades por parte de INLASA.
             c) Incumplimiento en lo establecido en la "{{ $convocatoria }}".
-        <p>
+        <p style="text-align: justify;">
             De ocurrir una de las causas anteriormente señaladas, cualquiera de las partes deberá notificar a la otra su
             intención de
             resolver el contrato, estableciendo en forma clara y específica la causa en la que se funda.
@@ -240,12 +241,12 @@
             plazo de diez (10) días hábiles, se debe cursar una segunda carta comunicando que la resolución se ha hecho
             efectiva.
         </p>
-        <span>
+        <p style="text-align: justify;">
             Cuando se efectúe la resolución del contrato se procederá a una liquidación de saldos deudores y acreedores
             de ambas
             partes, efectuándose los pagos a que hubiere lugar, conforme la evaluación del grado de cumplimiento del
             PARTICIPANTE.
-        </span>
+        </p>
         </p>
     </div>
 
@@ -313,7 +314,7 @@
         </table>
     </div>
 
-    <div style="margin-top: 50px">
+    <div style="margin-top: 50px; font-size: 8px;">
         EEFF/CHC
         </br>
         C.c. Archivo

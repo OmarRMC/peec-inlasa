@@ -33,13 +33,13 @@
 
     @if (Gate::any([Permiso::LABORATORIO]))
         <div>
-            <button @click="openMenu !== 2 ? openMenu = 2 : openMenu = null"
+            <button @click="openMenu !== 102 ? openMenu = 102 : openMenu = null"
                 class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
                 <i class="fas fa-vials w-5 text-indigo-500"></i>
                 <span>Laboratorio</span>
                 <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </button>
-            <div x-show="openMenu === 2" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+            <div x-show="openMenu === 102" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
                 <a href="{{ route('lab.profile') }}"
                     class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                     <i class="fas fa-id-card-alt w-4 mr-1 text-indigo-500"></i> Perfil de laboratorio
@@ -50,14 +50,30 @@
                         <i class="fas fa-user-edit w-4 mr-1 text-indigo-500"></i> Actualizar tu información
                     </a>
                 @endif
-                <a href="{{ route('lab.ins.index') }}"
-                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                    <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Listado de inscripciones
-                </a>
             </div>
         </div>
     @endif
 
+    @if (Gate::any([Permiso::LABORATORIO]))
+        <div>
+            <button @click="openMenu !== 103 ? openMenu = 103 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-vials w-5 text-indigo-500"></i>
+                <span>Gestion de inscripciones</span>
+                <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 103" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="{{ route('lab.ins.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                    <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Listado de inscripciones
+                </a>
+                {{-- href="{{ route('formulario_contrato_lab.pdf') }}" --}}
+                <a href="{{ route('formulario_contrato')}}" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                    <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Contrato
+                </a>
+            </div>
+        </div>
+    @endif
     @if (Gate::any([Permiso::RESPONSABLE]))
         @php
             Auth::user()->load('responsablesEA');
@@ -147,7 +163,7 @@
     @endif
     @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES, Permiso::GESTION_LABORATORIO]))
         <div>
-            <button @click="openMenu !== 7 ? openMenu = 7 : openMenu = null"    
+            <button @click="openMenu !== 7 ? openMenu = 7 : openMenu = null"
                 class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
                 <i class="fas fa-flask w-5 text-indigo-500"></i>
                 <span>Gestión de Laboratorio</span>

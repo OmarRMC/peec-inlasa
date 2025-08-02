@@ -46,7 +46,7 @@ class PdfInscripcionController extends Controller
             'inscripcion' => $inscripcion,
             'laboratorio' => $laboratorio,
             'formulario' => $formulario,
-            'fechaLimitePago'=>$fechaLimitePago,
+            'fechaLimitePago' => $fechaLimitePago,
             'programas' => $programasAgrupados,
             'total' => $inscripcion->costo_total,
             'fecha_inscripcion' => $fechaCarbon->format('d/m/Y'),
@@ -55,12 +55,14 @@ class PdfInscripcionController extends Controller
         ];
 
         $pdf = Pdf::loadView('pdf.inscripcion_paquete_lab', $data);
-        $pdf->setPaper([0, 0, 612, 936], 'portrait');
+        // $pdf->setPaper([0, 0, 612, 936], 'portrait');
+        $pdf->setPaper('A4', 'portrait');
         $pdf->getDomPDF()->set_option("isHtml5ParserEnabled", true);
+        $pdf->render();
         $pdf->getDomPDF()->getCanvas()->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) {
             $text = "Página $pageNumber / $pageCount";
             $font = $fontMetrics->getFont('DejaVu Sans', 'normal');
-            $canvas->text(40, 700, $text, $font, 9);
+            $canvas->text(535, 810, $text, $font, 6);
         });
         return $pdf->stream('formulario-inscripcion.pdf');
     }
@@ -92,27 +94,37 @@ class PdfInscripcionController extends Controller
             'departamento' => $laboratorio->departamento->nombre_dep
         ];
 
-        $pdf = Pdf::loadView('pdf.contrato_inscripcion_lab', $data);
-        $pdf->setPaper('A4', 'portrait');
+        // $pdf = Pdf::loadView('pdf.contrato_inscripcion_lab', $data);
+        // $pdf->setPaper('A4', 'portrait');
 
-        $domPdf = $pdf->getDomPDF();
-        $domPdf->render();
+        // $domPdf = $pdf->getDomPDF();
+        // $domPdf->render();
+        $pdf = Pdf::loadView('pdf.contrato_inscripcion_lab', $data);
+        // $pdf->setPaper([0, 0, 612, 936], 'portrait');
+        $pdf->setPaper('A4', 'portrait');
+        $pdf->getDomPDF()->set_option("isHtml5ParserEnabled", true);
+        $pdf->render();
 
         // Acceder correctamente a font y canvas
-        $fontMetrics = $domPdf->getFontMetrics();
-        $canvas = $domPdf->getCanvas();
-        $font = $fontMetrics->getFont('DejaVu Sans', 'normal');
+        // $fontMetrics = $domPdf->getFontMetrics();
+        // $canvas = $domPdf->getCanvas();
+        // $font = $fontMetrics->getFont('DejaVu Sans', 'normal');
 
         // Establecer numeración después del render
-        $canvas->page_script(function ($pageNumber, $pageCount, $canvas) use ($font, $fontMetrics) {
+        // $canvas->page_script(function ($pageNumber, $pageCount, $canvas) use ($font, $fontMetrics) {
+        //     $text = "Página $pageNumber / $pageCount";
+        //     $size = 6;
+        //     $width = $fontMetrics->getTextWidth($text, $font, $size);
+        //     $x = 550 - $width;
+        //     $y = 810;
+        //     $canvas->text($x, $y, $text, $font, $size);
+        // });
+        $pdf->getDomPDF()->getCanvas()->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) {
             $text = "Página $pageNumber / $pageCount";
-            $size = 6;
-            $width = $fontMetrics->getTextWidth($text, $font, $size);
-            $x = 550 - $width;
-            $y = 810;
-            $canvas->text($x, $y, $text, $font, $size);
+            $font = $fontMetrics->getFont('DejaVu Sans', 'normal');
+            $canvas->text(535, 810, $text, $font, 6);
         });
-
-        return $domPdf->stream('contrato-peec.pdf');
+        return $pdf->stream('contrato-peec.pdf');
+        // return $domPdf->stream('contrato-peec.pdf');
     }
 }

@@ -19,10 +19,6 @@
                         <td style="padding: 8px; font-weight: bold;">Sigla:</td>
                         <td style="padding: 8px;">{{ $laboratorio->sigla_lab ?? '---' }}</td>
                     </tr>
-                    <tr style="background-color: #f0f0f0;">
-                        <td style="padding: 8px; font-weight: bold;">Código PEEC Anterior:</td>
-                        <td style="padding: 8px;">{{ $laboratorio->antcod_peec ?? '---' }}</td>
-                    </tr>
                     <tr>
                         <td style="padding: 8px; font-weight: bold;">N° de Sedes:</td>
                         <td style="padding: 8px;">{{ $laboratorio->numsedes_lab ?? '---' }}</td>
