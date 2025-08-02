@@ -249,6 +249,25 @@ class InscripcionPaqueteController extends Controller
         return back()->with('success', 'La inscripción fue aprobada exitosamente.');
     }
 
+    public function anularInscripcion(Request $request,  $id)
+    {
+        $ins = Inscripcion::findOrFail($id);
+        $ins->status_inscripcion = Inscripcion::STATUS_EN_REVISION;
+        $ins->updated_by = Auth::user()->id;
+        $ins->updated_at = now();
+        $ins->save();
+        return back()->with('success', 'La inscripción esta en revision.');
+    }
+
+    public function obsInscripcion(Request $request,  $id)
+    {
+        // $ins = Inscripcion::findOrFail($id);
+        // $ins->status_inscripcion = Inscripcion::STATUS_APROBADO;
+        // $ins->updated_by = Auth::user()->id;
+        // $ins->updated_at = now();
+        // $ins->save();
+        return back()->with('success', 'La inscripción fue aprobada exitosamente.');
+    }
     public function show($id)
     {
         // $inscripcion = Inscripcion::with([

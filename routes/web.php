@@ -25,6 +25,7 @@ use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
+use App\Models\Permiso;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -68,6 +69,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
             ->name('inscripcion.create');
         Route::post('/paquetes', [InscripcionPaqueteController::class, 'store'])->name('inscripcion-paquetes.store');
         Route::post('/{id}/aprobar', [InscripcionPaqueteController::class, 'aprobarInscripcion'])->name('inscripcion-paquetes.aprobar');
+        Route::post('/{id}/anular', [InscripcionPaqueteController::class, 'anularInscripcion'])->name('inscripcion-paquetes.anular');
+        Route::post('/{id}/obs', [InscripcionPaqueteController::class, 'obsInscripcion'])->name('inscripcion-paquetes.obserbaciones');
     });
 
     Route::post('/pago', [PagoController::class, 'store'])->name('pago.store');
@@ -79,7 +82,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
 
     Route::resource('formularios', FormularioController::class);
 });
-Route::middleware(['auth', 'usuario.activo'])->prefix('reporte')->group(function () {
+Route::middleware(['auth', 'usuario.activo', 'canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_INSCRIPCIONES])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');
     Route::get('/contrato-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generarContrato'])->name('formulario_contrato_lab.pdf');
 });
@@ -94,7 +97,6 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/notificacion/verify', [NotificacionController::class, 'getNotificacion']);
     Route::post('/notificacion/read', [NotificacionController::class, 'marcarLeido']);
     Route::get('/contrato', [LabController::class, 'generarContrato'])->name('formulario_contrato');
-    
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {

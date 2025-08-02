@@ -40,7 +40,8 @@
                         <div class="border rounded px-4 py-2 mb-2 text-sm text-gray-700 bg-gray-50">
                             <div><strong>Paquete:</strong> {{ $detalle->descripcion_paquete }}</div>
                             <div><strong>Costo:</strong> {{ number_format($detalle->costo_paquete, 2) }} Bs</div>
-                            <div><strong>Observación:</strong> {{ $detalle->observaciones ?? 'No tiene observaciones' }}
+                            <div><strong>Observación:</strong>
+                                {{ $detalle->observaciones ?? 'No tiene observaciones' }}
                             </div>
                         </div>
                     @empty
@@ -113,22 +114,67 @@
             <section class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-blue-700 mb-4">📁 Documentos</h2>
-                    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]) &&
-                            ($inscripcion->estaEnRevision() || ($inscripcion->estaVencido() && !$inscripcion->estaPagado())))
-                        <form method="POST" action="{{ route('inscripcion-paquetes.aprobar', $inscripcion->id) }}">
-                            @csrf
-                            <button type="submit"
-                                onclick="return confirm('¿Estás seguro de aprobar esta inscripción?')"
-                                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
-                                Aprobar
+
+                    <div class="flex space-x-2">
+                        {{-- Verifica si el usuario tiene permiso --}}
+                        @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                            {{-- Si está aprobado, mostrar botón de "Anular" --}}
+                            @if ($inscripcion->estaAprobado())
+                                <form method="POST"
+                                    action="{{ route('inscripcion-paquetes.anular', $inscripcion->id) }}">
+                                    @csrf
+                                    <button type="submit"
+                                        onclick="return confirm('¿Estás seguro de anular la aprobación?')"
+                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                                        Anular Aprobación
+                                    </button>
+                                </form>
+                            @else
+                                {{-- Si no está aprobado, mostrar botón de "Aprobar" --}}
+                                <form method="POST"
+                                    action="{{ route('inscripcion-paquetes.aprobar', $inscripcion->id) }}">
+                                    @csrf
+                                    <button type="submit"
+                                        onclick="return confirm('¿Estás seguro de aprobar esta inscripción?')"
+                                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                                        Aprobar
+                                    </button>
+                                </form>
+                            @endif
+
+                            {{-- Botón para registrar observaciones (siempre visible) --}}
+                            <button onclick="document.getElementById('modal-observacion').classList.remove('hidden')"
+                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">
+                                Registrar Observación
                             </button>
-                        </form>
-                    @endif
-                    @if ($inscripcion->estaAprobado())
-                        <span class="text-green-700 text-sm bg-green-100 px-3 py-1 rounded">Aprobado</span>
-                    @endif
+                        @endif
+                    </div>
                 </div>
 
+                {{-- Modal de Observación --}}
+                <div id="modal-observacion"
+                    class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                        <h3 class="text-lg font-semibold mb-4">Registrar Observación</h3>
+                        <form method="POST"
+                            action="{{ route('inscripcion-paquetes.obserbaciones', $inscripcion->id) }}">
+                            @csrf
+                            <textarea name="observacion" rows="4" required
+                                class="w-full border border-gray-300 rounded p-2 text-sm resize-none" placeholder="Escribe la observación aquí..."></textarea>
+                            <div class="mt-4 flex justify-end space-x-2">
+                                <button type="button"
+                                    onclick="document.getElementById('modal-observacion').classList.add('hidden')"
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded text-sm">
+                                    Cancelar
+                                </button>
+                                <button type="submit"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                    Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 @forelse ($inscripcion->documentos as $doc)
                     <div
                         class="border rounded px-4 py-2 mb-2 text-sm text-gray-700 bg-gray-50 flex justify-between items-center">
