@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Area;
 use App\Models\CategoriaLaboratorio;
 use App\Models\Configuracion;
 use App\Models\Laboratorio;
@@ -42,8 +43,11 @@ class InscripcionPaqueteController extends Controller
             'departamentos' => [],
             'provincias' => [],
             'municipios' => [],
+            'areas' => Area::orderBy('descripcion', 'asc')->get(),
+            'now' => now()->format('Y-m-d'),
             'categorias' => CategoriaLaboratorio::all(),
-            'paquetes' => Paquete::orderBy('descripcion', 'asc')->get(),
+            // 'paquetes' => Paquete::orderBy('descripcion', 'asc')->get(),
+            'paquetes' => [],
             'gestiones' => ['2025', '2024', '2023'],
         ]);
     }
@@ -57,7 +61,7 @@ class InscripcionPaqueteController extends Controller
             'detalleInscripciones',
         ]);
 
-        foreach (['pais', 'tipo', 'categoria', 'nivel', 'dep', 'prov', 'mun'] as $filtro) {
+        foreach (['pais', 'tipo', 'categoria', 'nivel', 'dep', 'prov', 'municipio'] as $filtro) {
             if ($valor = $request->get($filtro)) {
                 $query->whereHas('laboratorio', function ($q) use ($filtro, $valor) {
                     $q->where("id_{$filtro}", $valor);
@@ -73,8 +77,8 @@ class InscripcionPaqueteController extends Controller
         }
         if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
             $query->whereBetween('fecha_inscripcion', [
-                $request->fecha_inicio,
-                $request->fecha_fin
+                Carbon::parse($request->fecha_inicio)->startOfDay(),
+                Carbon::parse($request->fecha_fin)->endOfDay()
             ]);
         }
 

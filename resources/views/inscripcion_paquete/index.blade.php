@@ -3,119 +3,135 @@
 @endphp
 
 <x-app-layout>
-    <div class="px-4 py-6 max-w-7xl mx-auto">
+    <div class="px-4 max-w-7xl mx-auto">
         <!-- Encabezado -->
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-1">
             <h1 class="text-xl font-bold text-gray-800">Lista de Inscripciones</h1>
         </div>
 
-        <!-- Filtros -->
         <div>
-            <div class="flex flex-wrap gap-4 mb-4 text-sm">
-                <div class="flex items-center gap-2 text-sm text-gray-700">
-                    <label for="custom-length">Mostrar</label>
-                    <select id="custom-length" class="border-gray-300 rounded-md shadow-sm text-sm">
+            <!-- Filtros -->
+            <div class="flex flex-wrap gap-3 mb-4 text-sm">
+                <!-- Filtro Mostrar registros -->
+                <div class="flex items-center gap-2 flex-wrap">
+                    <label for="custom-length" class="whitespace-nowrap">Mostrar</label>
+                    <select id="custom-length"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[80px]">
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
                     </select>
-                    <span>registros</span>
+                    <span class="whitespace-nowrap">registros</span>
                 </div>
+
                 <!-- Filtro por Rango de Fecha -->
-                <div class="flex items-center gap-2 text-sm">
-                    <label for="filter-fecha-inicio">Fecha:</label>
-                    <input type="date" id="filter-fecha-inicio" class="border-gray-300 rounded-md shadow-sm text-sm">
-                    <span>a</span>
-                    <input type="date" id="filter-fecha-fin" class="border-gray-300 rounded-md shadow-sm text-sm">
+                <div class="flex flex-wrap items-center gap-2">
+                    <label for="filter-fecha-inicio" class="whitespace-nowrap">Fecha:</label>
+                    <input type="date" id="filter-fecha-inicio" value="{{ $now }}"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[120px]">
+                    <span class="whitespace-nowrap">a</span>
+                    <input type="date" id="filter-fecha-fin" value="{{ $now }}"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[120px]">
                 </div>
 
                 <!-- Filtro por Gestión -->
-                <select id="filter-gestion" class="border-gray-300 rounded-md shadow-sm text-sm">
+                <select id="filter-gestion"
+                    class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todas las Gestiones</option>
                     @foreach ($gestiones as $gestion)
                         <option value="{{ $gestion }}">{{ $gestion }}</option>
                     @endforeach
                 </select>
 
+                <!-- Filtro País / Ubicación -->
+                <div class="flex flex-wrap gap-2">
+                    <select id="filter-pais"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
+                        <option value="">Todos los Países</option>
+                        @foreach ($paises as $pais)
+                            <option value="{{ $pais->id }}">{{ $pais->nombre_pais }}</option>
+                        @endforeach
+                    </select>
+                    <select id="filter-dep" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]"
+                        disabled>
+                        <option value="">Seleccione Departamento</option>
+                    </select>
+                    <select id="filter-prov"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]" disabled>
+                        <option value="">Seleccione Provincia</option>
+                    </select>
+                    <select id="filter-mun" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]"
+                        disabled>
+                        <option value="">Seleccione Municipio</option>
+                    </select>
+                </div>
 
-                <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
-                    <div class="flex space-x-2 text-sm">
-                        <select id="filter-pais" class="border-gray-300 rounded-md shadow-sm text-sm">
-                            <option value="">Todos los Países</option>
-                            @foreach ($paises as $pais)
-                                <option value="{{ $pais->id }}">{{ $pais->nombre_pais }}</option>
-                            @endforeach
-                        </select>
-                        <select id="filter-dep" class="border-gray-300 rounded-md shadow-sm text-sm" disabled>
-                            <option value="">Seleccione Departamento</option>
-                        </select>
-                        <select id="filter-prov" class="border-gray-300 rounded-md shadow-sm text-sm" disabled>
-                            <option value="">Seleccione Provincia</option>
-                        </select>
-                        <select id="filter-mun" class="border-gray-300 rounded-md shadow-sm text-sm" disabled>
-                            <option value="">Seleccione Municipio</option>
-                        </select>
+                <!-- Filtro Tipo / Categoría / Estados -->
+                <div class="flex flex-wrap gap-2">
+                    <select id="filter-tipo"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
+                        <option value="">Todos los Tipos</option>
+                        @foreach ($tipos as $tipo)
+                            <option value="{{ $tipo->id }}">{{ $tipo->descripcion }}</option>
+                        @endforeach
+                    </select>
+                    <select id="filter-categoria"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
+                        <option value="">Todas las Categorías</option>
+                        @foreach ($categorias as $categoria)
+                            <option value="{{ $categoria->id }}">{{ $categoria->descripcion }}</option>
+                        @endforeach
+                    </select>
+                    <select id="filter-status-inscripcion"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[180px]">
+                        <option value="">Estados de Inscripción</option>
+                        @foreach (Inscripcion::STATUS_INSCRIPCION as $key => $value)
+                            <option value="{{ $key }}">{{ $value }}</option>
+                        @endforeach
+                    </select>
+                    <select id="filter-status-cuenta"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
+                        <option value="">Estados de cuenta</option>
+                        @foreach (Inscripcion::STATUS_CUENTA as $key => $value)
+                            <option value="{{ $key }}">{{ $value }}</option>
+                        @endforeach
+                    </select>
+                    <select id="filter-area"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
+                        <option value="">Todos los areas</option>
+                        @foreach ($areas as $area)
+                            <option value="{{ $area->id }}">{{ $area->descripcion }}</option>
+                        @endforeach
+                    </select>
+                    <select id="filter-paquete" disabled
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[180px]">
+                        <option value="">Seleccione un paquete</option>
+                        @foreach ($paquetes as $paquete)
+                            <option value="{{ $paquete->id }}">{{ $paquete->descripcion }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Filtros activos (paquetes) -->
+                <div class="flex space-y-1 w-full">
+                    <div id="paquete-filters" class="flex flex-wrap gap-2">
                     </div>
-                    <div>
-                        <select id="filter-tipo" class="border-gray-300 rounded-md shadow-sm text-sm">
-                            <option value="">Todos los Tipos</option>
-                            @foreach ($tipos as $tipo)
-                                <option value="{{ $tipo->id }}">{{ $tipo->descripcion }}</option>
-                            @endforeach
-                        </select>
-                        <select id="filter-categoria" class="border-gray-300 rounded-md shadow-sm text-sm">
-                            <option value="">Todas las Categorías</option>
-                            @foreach ($categorias as $categoria)
-                                <option value="{{ $categoria->id }}">{{ $categoria->descripcion }}</option>
-                            @endforeach
-                        </select>
-                        {{-- <select id="filter-nivel" class="border-gray-300 rounded-md shadow-sm text-sm">
-                            <option value="">Todos los Niveles</option>
-                            @foreach ($niveles as $nivel)
-                                <option value="{{ $nivel->id }}">{{ $nivel->descripcion_nivel }}</option>
-                            @endforeach
-                        </select> --}}
+                </div>
 
-                        <select id="filter-status-inscripcion" class="border-gray-300 rounded-md shadow-sm text-sm">
-                            <option value="">Estados de Inscripción</option>
-                            @foreach (Inscripcion::STATUS_INSCRIPCION as $key => $value)
-                                <option value="{{ $key }}">{{ $value }}</option>
-                            @endforeach
-                        </select>
-                        <select id="filter-status-cuenta" class="border-gray-300 rounded-md shadow-sm text-sm">
-                            <option value="">Estados de cuenta</option>
-                            @foreach (Inscripcion::STATUS_CUENTA as $key => $value)
-                                <option value="{{ $key }}">{{ $value }}</option>
-                            @endforeach
-                        </select>
-                        <select id="filter-paquete" class="border-gray-300 rounded-md shadow-sm text-sm">
-                            <option value="">Seleccione un paquete</option>
-                            @foreach ($paquetes as $paquete)
-                                <option value="{{ $paquete->id }}">{{ $paquete->descripcion }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <!-- Filtro por Paquetes -->
-                    <div class="flex flex-col space-y-1 w-full sm:w-80">
-                        <!-- Contenedor para filtros activos -->
-                        <div id="paquete-filters" class="flex flex-wrap gap-2"></div>
-                    </div>
-
-
-                    <div class="flex items-center gap-2 justify-end">
-                        <div class="relative w-full sm:w-64">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                                <i class="fas fa-search"></i>
-                            </span>
-                            <input type="search" id="custom-search"
-                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                placeholder="Buscar inscripciones...">
-                        </div>
-                        <button id="btn-search"
-                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-sm">
+                <!-- Buscador -->
+                <div class="flex items-center gap-2 justify-end !w-full ">
+                    <div class="relative w-full sm:w-64">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">
                             <i class="fas fa-search"></i>
-                        </button>
+                        </span>
+                        <input type="search" id="custom-search"
+                            class="w-full pl-10 pr-4 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs"
+                            placeholder="Buscar inscripciones...">
                     </div>
+                    <button id="btn-search"
+                        class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
             </div>
 
@@ -164,7 +180,7 @@
                                 d.status_cuenta = $('#filter-status-cuenta').val();
                                 d.dep = $('#filter-dep').val();
                                 d.prov = $('#filter-prov').val();
-                                d.mun = $('#filter-mun').val();
+                                d.municipio = $('#filter-mun').val();
                                 d.fecha_inicio = $('#filter-fecha-inicio').val();
                                 d.fecha_fin = $('#filter-fecha-fin').val();
                                 d.gestion = $('#filter-gestion').val();
@@ -297,7 +313,22 @@
                             false);
                         table.draw();
                     });
+                    $('#filter-area').on('change', async function() {
+                        const area = this.value;
 
+                        console.log(area);
+                        $('#filter-paquete').prop('disabled', !area).html('<option>Cargando...</option>');
+                        if (!area) {
+                            resetFilters(['paquete']);
+                            return;
+                        }
+
+                        const data = await fetch(`{{ url('/api/admin/area/${area}/paquetes') }}`).then(r => r
+                            .json());
+                        $('#filter-paquete').html('<option value="">Todos</option>' + data.map(d =>
+                            `<option value="${d.id}">${d.descripcion}</option>`)).prop('disabled',
+                            false);
+                    })
 
                     $('#filter-mun').on('change', () => table.draw());
                     $('#filter-fecha-inicio, #filter-fecha-fin, #filter-gestion').on('change', () => table.draw());

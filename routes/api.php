@@ -36,6 +36,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/departamento/{pais}', [DepartamentoController::class, 'getDataAjax']);
     Route::get('/provincia/{departamento}', [ProvinciaController::class, 'getDataAjax']);
     Route::get('/municipio/{provincia}', [MunicipioController::class, 'getDataAjax']);
+    Route::get('/area/{id}/paquetes', [PaqueteController::class, 'getPaquetePorAreaAjax']);
 
     // Route::resource('nivel_laboratorio', NivelLaboratorioController::class);
     // Route::resource('tipo_laboratorio', TipoLaboratorioController::class);

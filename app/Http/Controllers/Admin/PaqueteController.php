@@ -197,4 +197,11 @@ class PaqueteController extends Controller
             ->rawColumns(['acciones'])
             ->toJson();
     }
+
+    public function getPaquetePorAreaAjax(Request $request, $id)
+    {
+        $area = Area::with('paquetes')->findOrFail($id);
+        $paquetes = $area->paquetes;
+        return response()->json($paquetes);
+    }
 }
