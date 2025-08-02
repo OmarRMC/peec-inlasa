@@ -115,7 +115,7 @@
             </br>
             Por otro lado, el Laboratorio <strong>{{ $laboratorio->nombre_lab }}</strong> participante del Programa de
             Evaluación Externa de la Calidad - INLASA {{ $gestion }}, con domicilio establecido en
-            <strong>{{ $laboratorio->direccion_lab }}</strong>
+            <strong>{{ $laboratorio->zona_lab }}, {{ $laboratorio->direccion_lab }}</strong>
             de la ciudad/departamento de <strong>{{ $departamento }}</strong>, legalmente representado
             por <strong>{{ $laboratorio->repreleg_lab }}</strong>, titular de la cedula identidad
             Nro. <strong>{{ $laboratorio->ci_repreleg_lab }}</strong>, bajo responsabilidad técnica del

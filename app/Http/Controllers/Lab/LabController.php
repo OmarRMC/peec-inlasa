@@ -244,7 +244,7 @@ class LabController extends Controller
         $laboratorio = LaboratorioTem::create([
             'antcod_peec' => $request->antcod_peec,
             'numsedes_lab' => $request->numsedes_lab,
-            'nit_lab' => $request->nit_lab,
+            'nit_lab' => $request->nit_lab, 
             'nombre_lab' => $request->nombre_lab,
             'sigla_lab' => $request->sigla_lab,
             'id_nivel' => $request->id_nivel,
