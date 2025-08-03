@@ -27,7 +27,8 @@ class AreaController extends Controller
 
     public function index()
     {
-        $areas = Area::with('programa')->get();
+        $areas = Area::with('programa')->orderBy('created_at', 'desc')->paginate(20);
+
         return view('area.index', compact('areas'));
     }
 

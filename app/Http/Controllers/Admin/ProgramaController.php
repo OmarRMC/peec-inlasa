@@ -25,7 +25,7 @@ class ProgramaController extends Controller
 
     public function index()
     {
-        $programas = Programa::get();
+        $programas = Programa::orderBy('created_at', 'desc')->paginate(20);
         return view('programa.index', compact('programas'));
     }
 

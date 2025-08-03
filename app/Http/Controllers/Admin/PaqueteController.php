@@ -34,7 +34,7 @@ class PaqueteController extends Controller
 
     public function index()
     {
-        $paquetes = Paquete::with(['area', 'tiposLaboratorios'])->orderByDesc('created_at')
+        $paquetes = Paquete::with(['area', 'area.programa', 'tiposLaboratorios'])->orderByDesc('created_at')
             ->paginate(20);
         return view('paquete.index', compact('paquetes'));
     }

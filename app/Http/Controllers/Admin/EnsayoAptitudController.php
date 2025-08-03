@@ -24,7 +24,7 @@ class EnsayoAptitudController extends Controller
 
     public function index()
     {
-        $ensayos = EnsayoAptitud::with('paquete')->get();
+        $ensayos = EnsayoAptitud::with(['paquete', 'paquete.area'])->orderBy('created_at', 'desc')->paginate(20);
         return view('ensayo_aptitud.index', compact('ensayos'));
     }
 

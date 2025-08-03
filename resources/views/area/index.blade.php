@@ -18,7 +18,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Programa</th>
-                        <th>Descripción</th>
+                        <th>Area</th>
                         <th>Máx. Paquetes</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -66,6 +66,9 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div class="mt-4">
+            {{ $areas->links() }}
         </div>
     </div>
 </x-app-layout>

@@ -15,8 +15,9 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Area</th>
                         <th>Paquete</th>
-                        <th>Descripción</th>
+                        <th>Ensayo A.</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -25,6 +26,7 @@
                     @forelse ($ensayos as $ensayo)
                         <tr>
                             <td>{{ $ensayo->id }}</td>
+                            <td>{{ $ensayo->paquete->area->descripcion ?? 'N/D' }}</td>
                             <td>{{ $ensayo->paquete->descripcion ?? 'N/D' }}</td>
                             <td>{{ $ensayo->descripcion }}</td>
                             <td>
@@ -61,6 +63,9 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div class="mt-4">
+            {{ $ensayos->links() }}
         </div>
     </div>
 </x-app-layout>

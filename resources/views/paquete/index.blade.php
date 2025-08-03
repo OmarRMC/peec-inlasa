@@ -2,7 +2,7 @@
     use App\Models\Permiso;
 @endphp
 <x-app-layout>
-    <div class="container py-6 max-w-4xl">
+    <div class="container py-6 max-w-6xl">
         <!-- Encabezado -->
         <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
             <h1 class="text-xl font-bold text-primary">Lista de Paquetes</h1>
@@ -17,8 +17,9 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Programa</th>
                         <th>Área</th>
-                        <th>Descripción</th>
+                        <th>Paquete</th>
                         <th>Costo</th>
                         <th>Max. Participantes</th>
                         <th>Tipo Laboratorios</th>
@@ -30,6 +31,7 @@
                     @forelse ($paquetes as $paquete)
                         <tr>
                             <td>{{ $paquete->id }}</td>
+                            <td>{{ $paquete->area->programa->descripcion ?? 'N/D' }}</td>
                             <td>{{ $paquete->area->descripcion ?? 'N/D' }}</td>
                             <td>{{ $paquete->descripcion }}</td>
                             <td>{{ $paquete->costo_paquete }} Bs</td>
