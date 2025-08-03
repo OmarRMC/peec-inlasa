@@ -119,7 +119,7 @@ class LabController extends Controller
             ->addColumn('acciones', function ($i) {
                 return view('laboratorio.inscripcion.action-btn', [
                     'showUrl' => route('lab.inscripcion.show', $i->id),
-                    'boletaPdf' => route('formulario_inscripcion_lab.pdf', $i->id),
+                    'boletaPdf' => route('formulario_inscripcion', $i->id),
                 ])->render();
             })
             ->rawColumns(['estado', 'cuenta', 'acciones'])
@@ -414,5 +414,14 @@ class LabController extends Controller
             \Log::error('Error al iniciar transacción: ' . $e->getMessage());
             return redirect('login')->with('error', 'Ocurrió un error al registrar la información. Por favor, inténtelo nuevamente.');
         }
+    }
+
+    public function generarFormularioIns(Request $request, $id)
+    {
+        Gate::authorize(Permiso::LABORATORIO);
+        $lab = Auth::user()->laboratorio;
+        $inscripcion = $lab->inscripciones()->findOrFail($id);
+        $pdfController = app(PdfInscripcionController::class);
+        return $pdfController->generar($inscripcion->id);
     }
 }

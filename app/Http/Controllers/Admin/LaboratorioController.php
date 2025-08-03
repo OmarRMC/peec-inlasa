@@ -289,6 +289,11 @@ class LaboratorioController extends Controller
         $laboratorio = Laboratorio::findOrFail($id);
         $user = $laboratorio->usuario;
 
+        if ($laboratorio->inscripciones()->exists()) {
+            return response()->json([
+                'message' => 'No se puede eliminar el laboratorio porque tiene inscripciones registradas.'
+            ], 422);
+        }
         $laboratorio->delete();
 
         if ($user) {
