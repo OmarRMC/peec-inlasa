@@ -16,8 +16,10 @@ return new class extends Migration
             $table->unsignedBigInteger('id_inscripcion');
             $table->date('fecha_pago');
             $table->string('tipo_transaccion', 25);
-            $table->bigInteger('nro_tranferencia')->nullable();
-            $table->integer('monto_pagado');
+            $table->string('nro_factura')->nullable();
+            $table->string('nro_tranferencia')->nullable();
+            $table->decimal('monto_pagado', 15, 5);
+            $table->string('razon_social');
             $table->string('obs_pago', 400)->nullable();
             $table->boolean('status');
             $table->unsignedBigInteger('created_by');

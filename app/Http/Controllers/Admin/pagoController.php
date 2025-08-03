@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PagoController extends Controller
 {
@@ -24,6 +25,8 @@ class PagoController extends Controller
             'tipo_transaccion'  => 'required|string|max:50',
             'nro_tranferencia'  => 'nullable|string|max:100',
             'obs_pago'          => 'nullable|string|max:255',
+            'nro_factura'  => 'nullable|string|max:100',
+            'razon_social' =>  'nullable|string|max:255',
             // 'status'            => 'required|in:Pendiente,Aprobado,Rechazado',
         ]);
 
@@ -45,16 +48,18 @@ class PagoController extends Controller
             //     'obs_pago',
             //     'status',
             // ]));
-            $pago   = new Pago();
-            $pago->fill($request->only([
-                'id_inscripcion',
-                'fecha_pago',
-                'monto_pagado',
-                'tipo_transaccion',
-                'nro_tranferencia',
-                'obs_pago',
 
-            ]));
+            Log::info('$request->monto_pagado');
+            Log::info($request->monto_pagado);
+            $pago   = new Pago();
+            $pago->id_inscripcion    = $request->id_inscripcion;
+            $pago->fecha_pago        = $request->fecha_pago;
+            $pago->monto_pagado      = $request->monto_pagado;
+            $pago->tipo_transaccion  = $request->tipo_transaccion;
+            $pago->nro_tranferencia  = $request->nro_tranferencia;
+            $pago->obs_pago          = $request->obs_pago;
+            $pago->razon_social      = $request->razon_social;
+            $pago->nro_factura       = $request->nro_factura;
             $pago->status = true;
             $pago->created_by = Auth::user()->id;
             $pago->save();

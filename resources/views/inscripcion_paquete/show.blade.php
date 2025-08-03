@@ -99,6 +99,8 @@
                                 #{{ $pago->nro_tranferencia }}
                             @endif
                         </div>
+                        <div><strong>Nro Factura.:</strong> {{ $pago->nro_factura ?: '/' }}</div>
+                        <div><strong>Razon Social:</strong> {{ $pago->razon_social ?: '/' }}</div>
                         <div><strong>Obs.:</strong> {{ $pago->obs_pago ?: 'Sin observaciones' }}</div>
 
                         {{-- Estado (opcional) --}}
@@ -211,52 +213,73 @@
     </div>
 
     <dialog id="modalPago" class="rounded-lg shadow-lg backdrop:bg-black/30">
-        <form id="formPago" class="bg-white p-6 rounded-lg space-y-4 w-80">
+        <form id="formPago" class="bg-white p-6 rounded-lg space-y-2 w-80">
             <h2 class="text-lg font-bold text-blue-700 mb-2">Registrar Pago</h2>
             @csrf
             <input type="hidden" name="id_inscripcion" value="{{ $inscripcion->id }}">
 
             <div>
                 <label class="text-sm font-semibold">Fecha de Pago</label>
-                <input type="date" name="fecha_pago" required class="w-full border rounded px-2 py-1 text-sm">
+                <input type="date" name="fecha_pago" required class="w-full border rounded px-2 text-sm"
+                    value="{{ now()->format('Y-m-d') }}">
             </div>
 
-            <div>
-                <label class="text-sm font-semibold">Monto</label>
-                <input type="number" name="monto_pagado" step="0.01" required
-                    class="w-full border rounded px-2 py-1 text-sm">
-            </div>
+            <div class="flex gap-2">
+                <div>
+                    <label class="text-sm font-semibold">Monto</label>
+                    <input type="number" name="monto_pagado" step="0.01" min="0" required
+                        class="w-full border rounded px-2 text-sm" pattern="^\d+(\.\d{1,2})?$"
+                        title="Solo números con hasta 2 decimales">
+                </div>
 
-            <div>
-                <label class="text-sm font-semibold">Tipo de Transacción</label>
-                <select name="tipo_transaccion" id="tipo_transaccion" required
-                    class="w-full border rounded px-2 py-1 text-sm" onchange="cambiarLabelYValidacion()">
-                    <option value="">Seleccione</option>
-                    <option value="Depósito">Depósito</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Efectivo">Efectivo</option>
-                </select>
+                <div>
+                    <label class="text-sm font-semibold">Tipo de Transacción</label>
+                    <select name="tipo_transaccion" id="tipo_transaccion" required
+                        class="w-full border rounded px-2 text-sm" onchange="cambiarLabelYValidacion()">
+                        <option value="">Seleccione</option>
+                        <option value="Depósito">Depósito</option>
+                        <option value="Transferencia">Transferencia</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Sigep">Sigep</option>
+                    </select>
+                </div>
             </div>
 
             <div id="campo_transaccion" style="display: none;">
                 <label id="label_transaccion" class="text-sm font-semibold">N° Transacción</label>
                 <input type="text" id="nro_transaccion" name="nro_tranferencia"
-                    class="w-full border rounded px-2 py-1 text-sm">
+                    class="w-full border rounded px-2 text-sm" pattern="^[A-Za-z0-9\-]{4,30}$"
+                    title="Entre 4 y 30 caracteres. Letras, números o guiones.">
+            </div>
+
+            <div id="nro_factura">
+                <label id="label_transaccion" class="text-sm font-semibold">N° Factura</label>
+                <input type="text" id="nro_factura" name="nro_factura" required
+                    class="w-full border rounded px-2 text-sm" pattern="^\d{1,20}$"
+                    title="Solo números, hasta 20 dígitos.">
+            </div>
+
+            <div>
+                <label class="text-sm font-semibold">Razon Social</label>
+                <textarea name="razon_social" class="w-full border rounded px-2 text-sm" rows="1" required pattern=".{3,100}"
+                    title="Debe tener entre 3 y 100 caracteres."></textarea>
             </div>
 
             <div>
                 <label class="text-sm font-semibold">Observaciones</label>
-                <textarea name="obs_pago" class="w-full border rounded px-2 py-1 text-sm" rows="2"></textarea>
+                <textarea name="obs_pago" class="w-full border rounded px-2 text-sm" rows="2" pattern=".{0,255}"
+                    title="Máximo 255 caracteres."></textarea>
             </div>
 
-            <div class="flex justify-end space-x-2 pt-4">
+            <div class="flex justify-end space-x-2">
                 <button type="button" onclick="document.getElementById('modalPago').close()"
                     class="text-gray-500 hover:underline text-sm">Cancelar</button>
                 <button type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">Guardar</button>
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 rounded text-sm py-2">Guardar</button>
             </div>
         </form>
     </dialog>
+
     <script>
         document.getElementById('formPago').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -284,21 +307,28 @@
             const input = document.getElementById('nro_transaccion');
             const contenedor = document.getElementById('campo_transaccion');
 
-            if (tipo === 'Efectivo') {
-                contenedor.style.display = 'block';
-                label.textContent = 'N° de Factura';
-                input.required = true;
-                input.placeholder = 'Ingrese el número de factura';
-            } else if (tipo === 'Depósito' || tipo === 'Transferencia') {
+            if (tipo === 'Depósito' || tipo === 'Transferencia' || tipo === 'Sigep') {
                 contenedor.style.display = 'block';
                 label.textContent = 'N° Transacción';
                 input.required = true;
-                input.placeholder = 'Ingrese el número de transacción';
             } else {
                 contenedor.style.display = 'none';
                 input.required = false;
                 input.value = '';
             }
+            // if (tipo === 'Efectivo') {
+            //     // contenedor.style.display = 'none';
+            //     // label.textContent = 'N° de Factura';
+            //     // input.required = true;
+            //     // input.placeholder = 'Ingrese el número de factura';
+            // } else if (tipo === 'Depósito' || tipo === 'Transferencia' || tipo === 'Sigep') {
+            //     contenedor.style.display = 'block';
+            //     label.textContent = 'N° Transacción';
+            //     input.required = true;
+            //     // input.placeholder = 'Ingrese el número de transacción';
+            // } else {
+
+            // }
         }
     </script>
 </x-app-layout>

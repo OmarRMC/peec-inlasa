@@ -17,7 +17,9 @@ class Pago extends Model
         'obs_pago',
         'status',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'nro_factura',
+        'razon_social',
     ];
 
     public function inscripcion()
