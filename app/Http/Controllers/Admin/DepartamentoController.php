@@ -104,7 +104,7 @@ class DepartamentoController extends Controller
      */
     public function getDataAjax(Pais $pais)
     {
-        $departamentos = $pais->departamentos()->active()->get();
+        $departamentos = $pais->departamentos()->active()->orderBy('nombre_dep')->get();
         // $departamentos = Departamento::active()->where('id_pais', $pais->id)
         //     ->select('id', 'nombre_dep', 'sigla_dep', 'status_dep')
         //     ->get();

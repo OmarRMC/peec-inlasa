@@ -79,7 +79,7 @@ class ProvinciaController extends Controller
 
     public function getDataAjax(Departamento $departamento)
     {
-        $provincias = Provincia::where('id_dep', $departamento->id)->get();
+        $provincias = Provincia::where('id_dep', $departamento->id)->orderBy('nombre_prov')->get();
         return response()->json($provincias);
     }
 }

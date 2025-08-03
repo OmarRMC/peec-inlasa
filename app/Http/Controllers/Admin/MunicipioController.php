@@ -80,7 +80,7 @@ class MunicipioController extends Controller
 
     public function getDataAjax(Provincia $provincia)
     {
-        $municipios = Municipio::where('id_prov', $provincia->id)->get();
+        $municipios = Municipio::where('id_prov', $provincia->id)->orderBy('nombre_municipio')->get();
         return response()->json($municipios);
     }
 }
