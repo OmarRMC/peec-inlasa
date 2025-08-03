@@ -5,10 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\EnsayoAptitud;
 use App\Models\Paquete;
+use App\Models\Permiso;
 use Illuminate\Http\Request;
 
 class EnsayoAptitudController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+    }
     private function messages()
     {
         return [

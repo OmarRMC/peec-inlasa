@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\General;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -176,6 +177,8 @@ class Permiso extends Model
 
     public const GESTION_LABORATORIO = 'gestion.laboratorio';
     public const GESTION_LABORATORIO_NAME = 'Gestión de laboratorio';
+    public const GESTION_GEOGRAFICA = 'gestion.geografica';
+    public const GESTION_GEOGRAFICA_NAME = 'Gestión Geográfica';
 
     public const GESTION_PROGRAMAS_AREAS_PAQUETES_EA = 'gestion.programas.areas.paquetes.ea';
     public const GESTION_PROGRAMAS_AREAS_PAQUETES_EA_NAME = 'Gestión de programas, áreas, paquetes y EA';
@@ -193,6 +196,7 @@ class Permiso extends Model
         self::VER_ESCRITORIO => self::VER_ESCRITORIO_NAME,
         self::CONFIGURACION => self::CONFIGURACION_NAME,
         self::GESTION_USUARIO => self::GESTION_USUARIO_NAME,
+        self::GESTION_GEOGRAFICA => self::GESTION_GEOGRAFICA_NAME,
         self::GESTION_INSCRIPCIONES => self::GESTION_INSCRIPCIONES_NAME,
         self::GESTION_PAGOS => self::GESTION_PAGOS_NAME,
         self::GESTION_LABORATORIO => self::GESTION_LABORATORIO_NAME,
@@ -217,5 +221,10 @@ class Permiso extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'usuario_permiso', 'id_permiso', 'id_usuario')->withTimestamps();
+    }
+    public function scopeListar(Builder $query): Builder
+    {
+        return $query->where('clave', '!=', Permiso::LABORATORIO)
+            ->where('clave', '!=', Permiso::RESPONSABLE);
     }
 }

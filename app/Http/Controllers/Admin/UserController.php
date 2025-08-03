@@ -16,7 +16,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:' . Permiso::ADMIN . ',' . Permiso::GESTION_USUARIO)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_USUARIO)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
     }
     public function index()
     {
@@ -29,8 +29,7 @@ class UserController extends Controller
     public function create()
     {
         $cargos = Cargo::active()->get();
-        $permisos = Permiso::active()
-            ->where('clave', '!=', Permiso::LABORATORIO)
+        $permisos = Permiso::active()->listar()
             ->get();
         $ensayoA = EnsayoAptitud::active()->orderBy('descripcion')->get();
         return view('usuario.create', compact('cargos', 'permisos', 'ensayoA'));
@@ -100,7 +99,7 @@ class UserController extends Controller
     public function edit(User $usuario)
     {
         $cargos = Cargo::active()->get();
-        $permisos = Permiso::active()->get();
+        $permisos = Permiso::active()->listar()->get();
         $ensayoA = EnsayoAptitud::active()->get();
 
         $ensayosSeleccionados = old('ensayos_ap', $usuario->responsablesEA()->pluck('ensayo_aptitud.id')->toArray());

@@ -10,10 +10,11 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class VerificarCorreoUser extends Notification implements ShouldQueue
+// class VerificarCorreoUser extends Notification implements ShouldQueue 
+class VerificarCorreoUser extends Notification
 {
     //implements ShouldQueue
-    use \Illuminate\Bus\Queueable;
+    // use \Illuminate\Bus\Queueable;
 
     protected $usuario;
     public function __construct($usuario)

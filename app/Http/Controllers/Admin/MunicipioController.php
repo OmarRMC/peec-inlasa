@@ -4,11 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Municipio;
+use App\Models\Permiso;
 use App\Models\Provincia;
 use Illuminate\Http\Request;
 
 class MunicipioController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_GEOGRAFICA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+    }
     public function index()
     {
         $municipios = Municipio::with('provincia')->latest()->get();

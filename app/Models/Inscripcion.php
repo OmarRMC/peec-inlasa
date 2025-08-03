@@ -15,6 +15,7 @@ class Inscripcion extends Model
 
     const STATUS_VENCIDO = 3;
 
+    const STATUS_ANULADO = 4;
 
     const STATUS_PAGADO = 1;
 
@@ -23,6 +24,7 @@ class Inscripcion extends Model
         self::STATUS_EN_REVISION => 'En revision',
         self::STATUS_APROBADO => 'Aprobado',
         self::STATUS_VENCIDO => 'Vencido',
+        self::STATUS_ANULADO => 'Anulado',
     ];
 
     const STATUS_CUENTA = [
@@ -60,6 +62,12 @@ class Inscripcion extends Model
     public function estaVencido(): bool
     {
         return $this->status_inscripcion === self::STATUS_VENCIDO;
+    }
+
+
+    public function estaAnulado(): bool
+    {
+        return $this->status_inscripcion === self::STATUS_ANULADO;
     }
 
     // Verifica si el estado de cuenta es "Pagado"
@@ -142,6 +150,10 @@ class Inscripcion extends Model
                         " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
                     </span>";
             case self::STATUS_VENCIDO:
+                return "<span class='inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full shadow-sm'>
+                        " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
+                    </span>";
+            case self::STATUS_ANULADO:
                 return "<span class='inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full shadow-sm'>
                         " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
                     </span>";

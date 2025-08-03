@@ -7,6 +7,7 @@ use App\Models\Paquete;
 use App\Models\Area;
 use App\Models\Configuracion;
 use App\Models\Laboratorio;
+use App\Models\Permiso;
 use App\Models\Programa;
 use App\Models\TipoLaboratorio;
 use Illuminate\Http\Request;
@@ -17,6 +18,10 @@ use Yajra\DataTables\Facades\DataTables;
 
 class PaqueteController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+    }
     private function messages()
     {
         return [

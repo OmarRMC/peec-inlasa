@@ -4,10 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pais;
+use App\Models\Permiso;
 use Illuminate\Http\Request;
 
 class PaisController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_GEOGRAFICA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+    }
     public function index()
     {
         $paises = Pais::all();

@@ -27,6 +27,14 @@ class AppServiceProvider extends ServiceProvider
             return $user->isLaboratorio();
         });
 
+        Gate::define(Permiso::CONFIGURACION, function (User $user) {
+            return $user->tienePermiso(Permiso::CONFIGURACION);;
+        });
+
+        Gate::define(Permiso::GESTION_USUARIO, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_USUARIO);;
+        });
+
         Gate::define(Permiso::ADMIN, function (User $user) {
             return $user->tienePermiso(Permiso::ADMIN);
         });
@@ -36,7 +44,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define(Permiso::GESTION_PAGOS, function (User $user) {
-            return $user->tienePermiso(Permiso::GESTION_PAGOS);;
+            return $user->tienePermiso(Permiso::GESTION_PAGOS);
+        });
+
+        Gate::define(Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA);
         });
 
         Gate::define(Permiso::GESTION_INSCRIPCIONES, function (User $user) {
@@ -48,6 +60,14 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define(Permiso::DELETE_GESTION_PROGRAMAS, function (User $user) {
             return false;
+        });
+
+        Gate::define(Permiso::VER_ESCRITORIO, function (User $user) {
+            return $user->tienePermiso(Permiso::VER_ESCRITORIO);
+        });
+
+        Gate::define(Permiso::GESTION_GEOGRAFICA, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_GEOGRAFICA);
         });
     }
 }
