@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Area;
 use App\Models\Cargo;
 use App\Models\EnsayoAptitud;
 use App\Models\Permiso;
@@ -10,6 +11,7 @@ use App\Models\User;
 use App\Notifications\VerificarCorreoUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -31,8 +33,9 @@ class UserController extends Controller
         $cargos = Cargo::active()->get();
         $permisos = Permiso::active()->listar()
             ->get();
+        $areas = Area::active()->active()->orderBy('descripcion')->get();
         $ensayoA = EnsayoAptitud::active()->orderBy('descripcion')->get();
-        return view('usuario.create', compact('cargos', 'permisos', 'ensayoA'));
+        return view('usuario.create', compact('cargos', 'permisos', 'ensayoA', 'areas'));
     }
 
     public function store(Request $request)
@@ -90,20 +93,38 @@ class UserController extends Controller
         $usuario->load([
             'cargo',
             'permisos',
-            'responsablesEA'
+            'responsablesEA',
+            'responsablesEA.paquete'
         ]);
-
-        return view('usuario.show', compact('usuario'));
+        $responsablesEA = $usuario->responsablesEA;
+        return view('usuario.show', compact('usuario', 'responsablesEA'));
     }
 
     public function edit(User $usuario)
     {
+        $usuario->load([
+            'cargo',
+            'permisos',
+            'responsablesEA',
+            'responsablesEA.paquete'
+        ]);
         $cargos = Cargo::active()->get();
         $permisos = Permiso::active()->listar()->get();
         $ensayoA = EnsayoAptitud::active()->get();
+        $areas = Area::active()->active()->orderBy('descripcion')->get();
+        $responsablesEA = $usuario->responsablesEA->mapWithKeys(function ($ensayo) {
+            $paquete = $ensayo->paquete;
+            $descPaquete = mb_strtolower(trim($paquete->descripcion), 'UTF-8');
+            $descEnsayo = mb_strtolower(trim($ensayo->descripcion), 'UTF-8');
 
-        $ensayosSeleccionados = old('ensayos_ap', $usuario->responsablesEA()->pluck('ensayo_aptitud.id')->toArray());
-        return view('usuario.edit', compact('usuario', 'cargos', 'permisos', 'ensayoA', 'ensayosSeleccionados'));
+            $descripcion = $descPaquete === $descEnsayo
+                ? $ensayo->descripcion
+                : "$paquete->descripcion - $ensayo->descripcion";
+
+            return [$ensayo->id => $descripcion];
+        });
+        $ensayosSeleccionados = old('ensayos_ap', $responsablesEA);
+        return view('usuario.edit', compact('usuario', 'cargos', 'permisos', 'ensayoA', 'ensayosSeleccionados', 'areas'));
     }
 
     public function update(Request $request, User $usuario)

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Area;
 use App\Models\EnsayoAptitud;
 use App\Models\Paquete;
 use App\Models\Permiso;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EnsayoAptitudController extends Controller
 {
@@ -76,5 +78,35 @@ class EnsayoAptitudController extends Controller
     {
         $ensayoAptitud->delete();
         return redirect()->route('ensayo_aptitud.index')->with('success', 'Ensayo de Aptitud eliminado correctamente.');
+    }
+
+    public function getEnsayoPorAreaAjax(Request $request, $id)
+    {
+        $area = Area::active()
+            ->with([
+                'paquetes' => function ($query) {
+                    $query->active();
+                },
+                'paquetes.ensayosAptitud' => function ($query) {
+                    $query->active();
+                },
+            ])
+            ->findOrFail($id);
+        Log::info('$area');
+        Log::info($area);
+        $ensayos = $area->paquetes->flatMap(function ($paquete) {
+            return $paquete->ensayosAptitud->map(function ($ensayo) use ($paquete) {
+                $descPaquete = mb_strtolower(trim($paquete->descripcion), 'UTF-8');
+                $descEnsayo = mb_strtolower(trim($ensayo->descripcion), 'UTF-8');
+
+                return [
+                    'id' => $ensayo->id,
+                    'descripcion' => $descPaquete === $descEnsayo
+                        ? $ensayo->descripcion
+                        : "$paquete->descripcion - $ensayo->descripcion"
+                ];
+            });
+        });
+        return response()->json($ensayos);
     }
 }

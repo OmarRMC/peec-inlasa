@@ -1,9 +1,16 @@
+@php
+    $edit = false;
+@endphp
 @csrf
 @if (isset($method) && $method === 'PUT')
     @method('PUT')
+    @php
+        $edit = true;
+    @endphp
 @endif
 @php
     $ensayosSeleccionados = $ensayosSeleccionados ?? []; // array de IDs
+    $ensayosDB = $ensayosSeleccionados;
     $ensayoMap = $ensayoA->pluck('descripcion', 'id')->toArray(); // [id => descripcion]
 @endphp
 
@@ -208,45 +215,62 @@
                     @error('is_responsable') border-red-400 @enderror">
                 <label for="is_responsable" class="text-sm text-gray-700">
                     @if (empty($ensayosSeleccionados))
-                        Responsable
+                        Asignar Responsable de Ensayo A.
                     @else
-                        Agregar REA
+                        Agregar otro Responsable de Ensayo de A.
                     @endif
                 </label>
             </div>
-
-            <div class="hidden" id="ensayoSelect">
-                <label for="ensayo_ap" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                    <i class="fas fa-clipboard-list text-gray-400"></i> Ensayo de aptitud
-                </label>
-                <select id="ensayo_ap"
-                    class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Selecciona ensayo de aptitud</option>
-                    @foreach ($ensayoA as $ensayo)
-                        <option value="{{ $ensayo->id }}">{{ $ensayo->descripcion }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                @if (!empty($ensayosSeleccionados))
-                    <span>
-                        Responsable de los EA:
-                    </span>
-                @endif
-                <div id="ensayoChipsContainer" class="flex flex-wrap gap-2 mt-3">
-                    @foreach ($ensayosSeleccionados as $id)
-                        <div class="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm gap-2 ensayo-chip"
-                            data-id="{{ $id }}">
-                            <span>
-                                {{ $ensayoMap[$id] ?? 'Sin descripción' }}</span>
-                            <input type="hidden" name="ensayos_ap[]" value="{{ $id }}">
-                            <button type="button"
-                                class="text-blue-600  text-lg hover:text-red-500 font-bold eliminar-chip">&times;</button>
-                        </div>
-                    @endforeach
+        </div>
+        <div>
+            <div class="hidden flex gap-6 w-full my-2" id="ensayoSelect">
+                <div class="w-1/2">
+                    <label for="select-area"
+                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                        <i class="fas fa-clipboard-list text-gray-400"></i> Selecionar Area
+                    </label>
+                    <select id="select-area"
+                        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecciona area</option>
+                        @foreach ($areas as $area)
+                            <option value="{{ $area->id }}">{{ $area->descripcion }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="w-1/2">
+                    <label for="ensayo_ap"
+                        class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                        <i class="fas fa-clipboard-list text-gray-400"></i> Ensayo de aptitud
+                    </label>
+                    <select id="ensayo_ap"
+                        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                        disabled>
+                        <option value="">Selecciona Ensayo de A.</option>
+                        @foreach ($ensayoA as $ensayo)
+                            <option value="{{ $ensayo->id }}">{{ $ensayo->descripcion }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
-
+        </div>
+        <div>
+            @if (!empty($ensayosSeleccionados))
+                <span>
+                    Responsable de los EA:
+                </span>
+            @endif
+            <div id="ensayoChipsContainer" class="flex flex-wrap gap-2 mt-3">
+                @foreach ($ensayosSeleccionados as $id => $value)
+                    <div class="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm gap-2 ensayo-chip"
+                        data-id="{{ $id }}">
+                        <span>
+                            {{ $value ?? 'Sin descripción' }}</span>
+                        <input type="hidden" name="ensayos_ap[]" value="{{ $id }}">
+                        <button type="button"
+                            class="text-blue-600  text-lg hover:text-red-500 font-bold eliminar-chip">&times;</button>
+                    </div>
+                @endforeach
+            </div>
         </div>
     </section>
 
@@ -281,6 +305,25 @@
             ensayoSelectWrapper.classList.add('block');
         }
 
+        const filterArea = document.getElementById('select-area');
+        filterArea.addEventListener('change', async function() {
+            const area = this.value;
+
+            const ensayo_ap = document.getElementById('ensayo_ap');
+            ensayo_ap.innerHTML = '<option>Cargando...</option>';
+            ensayo_ap.disabled = !area;
+            if (!area) {
+                ensayo_ap.innerHTML = '<option>Selecionar Ensayo A.</option>';
+                // resetFilters(['paquete']);
+                return;
+            }
+            const data = await fetch(`{{ url('/api/admin/area/${area}/paquetes/ensayos') }}`).then(r => r
+                .json());
+            $('#ensayo_ap').html('<option value="">Todos</option>' + data.map(d =>
+                `<option value="${d.id}">${d.descripcion}</option>`)).prop('disabled',
+                false);
+        })
+
         isResponsableCheckbox.addEventListener('change', () => {
             if (isResponsableCheckbox.checked) {
                 ensayoSelectWrapper.classList.remove('hidden');
@@ -288,8 +331,8 @@
             } else {
                 ensayoSelectWrapper.classList.add('hidden');
                 ensayoSelectWrapper.classList.remove('block');
-                selectedEnsayos = [];
-                chipsContainer.innerHTML = '';
+                // selectedEnsayos = [];
+                // chipsContainer.innerHTML = '';
             }
         });
 

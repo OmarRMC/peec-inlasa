@@ -40,14 +40,14 @@
             </section>
 
             <!-- Ensayos de Aptitud -->
-            @if ($usuario->responsablesEA->isNotEmpty())
+            @if ($responsablesEA->isNotEmpty())
                 <section class="p-6">
                     <h2 class="text-lg font-semibold text-blue-700 mb-4">🧪 Ensayos de Aptitud a Cargo</h2>
                     <div class="space-y-2 text-sm text-gray-700">
                         @foreach ($usuario->responsablesEA as $ea)
                             <div class="border rounded px-4 py-2 bg-gray-50">
-                                <strong>Nombre: </strong> {{ $ea->descripcion ?? 'Sin nombre' }}
-                                {{-- Agrega más detalles si deseas como gestión, estado, etc. --}}
+                                <strong>Paquete: </strong>{{ $ea->paquete->descripcion }} , 
+                                <strong>Ensayo de Aptitud: </strong>{{ $ea->descripcion ?? 'Sin nombre' }}
                             </div>
                         @endforeach
                     </div>

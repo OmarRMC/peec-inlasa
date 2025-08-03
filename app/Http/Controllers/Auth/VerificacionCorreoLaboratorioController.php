@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class VerificacionCorreoLaboratorioController extends Controller
 {
@@ -14,6 +15,7 @@ class VerificacionCorreoLaboratorioController extends Controller
     {
         $user = User::findOrFail($id);
 
+        Log::info('Esto aqui');
         if (! hash_equals((string) $hash, sha1($user->email))) {
             abort(403, 'El enlace de verificación no es válido.');
         }
@@ -24,12 +26,14 @@ class VerificacionCorreoLaboratorioController extends Controller
         $user->markEmailAsVerified();
         $user->status = true;
         $user->save();
+        Log::info('Esto aqui1');
         if($user->laboratorio){
             $lab= $user->laboratorio; 
             $lab->status = true; 
             $lab->save();
         }
 
+        
         event(new Verified($user));
         Auth::login($user);
         return redirect()->route('dashboard')->with('success', 'Correo verificado correctamente. Bienvenido al sistema.');
