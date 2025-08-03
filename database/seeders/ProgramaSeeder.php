@@ -38,9 +38,9 @@ class ProgramaSeeder extends Seeder
             ['id' => 9, 'id_programa' => 4, 'descripcion' => 'BACTERIOLOGÍA CLÍNICA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 10, 'id_programa' => 4, 'descripcion' => 'TUBERCULOSIS', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 11, 'id_programa' => 4, 'descripcion' => 'MICROBIOLOGIA DE ALIMENTOS', 'status' => false, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 12, 'id_programa' => 5, 'descripcion' => 'HEMATOLOGÍA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 13, 'id_programa' => 5, 'descripcion' => 'SEROLOGÍA INFECCIOSA Y PARASITOLOGÍA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 14, 'id_programa' => 6, 'descripcion' => 'SEROLOGÍA INFECCIOSA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 12, 'id_programa' => 5, 'descripcion' => 'HEMATOLOGÍA BS', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 13, 'id_programa' => 5, 'descripcion' => 'SEROLOGÍA INFECCIOSA Y PARASITOLOGÍA BS', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 14, 'id_programa' => 6, 'descripcion' => 'SEROLOGÍA INFECCIOSA ITS', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 15, 'id_programa' => 7, 'descripcion' => 'SARS-COV-2', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 16, 'id_programa' => 7, 'descripcion' => 'PANEL VIRAL RESPIRATORIO', 'status' => false, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 17, 'id_programa' => 7, 'descripcion' => 'VIRUS DEL PAPILOMA HUMANO (HPV)', 'status' => false, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
@@ -49,8 +49,8 @@ class ProgramaSeeder extends Seeder
             ['id' => 20, 'id_programa' => 9, 'descripcion' => 'MARCADORES CARDIACOS', 'status' => false, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 21, 'id_programa' => 10, 'descripcion' => 'CITOLOGÍA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 22, 'id_programa' => 1, 'descripcion' => 'HEMATOLOGÍA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 23, 'id_programa' => 1, 'descripcion' => 'QUÍMICA SANGUÍNEA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 24, 'id_programa' => 1, 'descripcion' => 'INMUNOHEMATOLOGÍA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
+            // ['id' => 23, 'id_programa' => 1, 'descripcion' => 'QUÍMICA SANGUÍNEA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
+            // ['id' => 24, 'id_programa' => 1, 'descripcion' => 'INMUNOHEMATOLOGÍA', 'status' => true, 'max_paquetes_inscribir' => 0, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         DB::table('paquete')->insertOrIgnore([
@@ -71,7 +71,7 @@ class ProgramaSeeder extends Seeder
             ['id' => 15, 'max_participantes' => 5, 'id_area' => 8, 'descripcion' => 'Leishmania', 'costo_paquete' => 380, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 16, 'max_participantes' => 5, 'id_area' => 9, 'descripcion' => 'Bacteriología', 'costo_paquete' => 2000, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 17, 'max_participantes' => 5, 'id_area' => 10, 'descripcion' => 'Baciloscopía', 'costo_paquete' => 380, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 18, 'max_participantes' => 5, 'id_area' => 12, 'descripcion' => 'Hemoglobina y Hematocrito', 'costo_paquete' => 550, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
+            // ['id' => 18, 'max_participantes' => 5, 'id_area' => 12, 'descripcion' => 'Hemoglobina y Hematocrito', 'costo_paquete' => 550, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 19, 'max_participantes' => 5, 'id_area' => 13, 'descripcion' => 'Serología', 'costo_paquete' => 1100, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 20, 'max_participantes' => 5, 'id_area' => 14, 'descripcion' => 'Serología infecciosa', 'costo_paquete' => 550, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 21, 'max_participantes' => 5, 'id_area' => 15, 'descripcion' => 'SARS-CoV-2 por RT-PCR', 'costo_paquete' => 1950, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
@@ -83,12 +83,12 @@ class ProgramaSeeder extends Seeder
             ['id' => 27, 'max_participantes' => 5, 'id_area' => 22, 'descripcion' => 'Frotis sanguíneo avanzado', 'costo_paquete' => 350, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 28, 'max_participantes' => 5, 'id_area' => 3, 'descripcion' => 'Examen químico y sedimento urinario - Paquete 1', 'costo_paquete' => 330, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 29, 'max_participantes' => 5, 'id_area' => 3, 'descripcion' => 'Examen químico y sedimento urinario - Paquete 2', 'costo_paquete' => 380, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 30, 'max_participantes' => 5, 'id_area' => 23, 'descripcion' => 'Química Sanguínea: Paquete 1', 'costo_paquete' => 1500, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 31, 'max_participantes' => 5, 'id_area' => 23, 'descripcion' => 'Química Sanguínea: Paquete 2', 'costo_paquete' => 2300, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 32, 'max_participantes' => 5, 'id_area' => 23, 'descripcion' => 'Química Sanguínea: Paquete 3', 'costo_paquete' => 2800, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 33, 'max_participantes' => 5, 'id_area' => 24, 'descripcion' => 'Grupo sanguíneo', 'costo_paquete' => 450, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 34, 'max_participantes' => 5, 'id_area' => 24, 'descripcion' => 'Coombs Directo e Indirecto', 'costo_paquete' => 450, 'status' => false, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 35, 'max_participantes' => 5, 'id_area' => 12, 'descripcion' => 'Grupo Sanguíneo', 'costo_paquete' => 450, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
+            // ['id' => 30, 'max_participantes' => 5, 'id_area' => 23, 'descripcion' => 'Química Sanguínea: Paquete 1', 'costo_paquete' => 1500, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
+            // ['id' => 31, 'max_participantes' => 5, 'id_area' => 23, 'descripcion' => 'Química Sanguínea: Paquete 2', 'costo_paquete' => 2300, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
+            // ['id' => 32, 'max_participantes' => 5, 'id_area' => 23, 'descripcion' => 'Química Sanguínea: Paquete 3', 'costo_paquete' => 2800, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
+            // ['id' => 33, 'max_participantes' => 5, 'id_area' => 24, 'descripcion' => 'Grupo sanguíneo', 'costo_paquete' => 450, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
+            // ['id' => 34, 'max_participantes' => 5, 'id_area' => 24, 'descripcion' => 'Coombs Directo e Indirecto', 'costo_paquete' => 450, 'status' => false, 'created_at' => now(), 'updated_at' => now()],
+            // ['id' => 35, 'max_participantes' => 5, 'id_area' => 12, 'descripcion' => 'Grupo Sanguíneo', 'costo_paquete' => 450, 'status' => true, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         DB::table('ensayo_aptitud')->insertOrIgnore([
@@ -127,11 +127,11 @@ class ProgramaSeeder extends Seeder
             ['id' => 33, 'id_paquete' => 27, 'descripcion' => 'FROTIS SANGUÍNEO', 'status' => 1],
             ['id' => 34, 'id_paquete' => 28, 'descripcion' => 'UROANÁLISIS ', 'status' => 1],
             ['id' => 35, 'id_paquete' => 29, 'descripcion' => 'UROANÁLISIS ', 'status' => 1],
-            ['id' => 36, 'id_paquete' => 30, 'descripcion' => 'QUÍMICA SANGUÍNEA', 'status' => 1],
-            ['id' => 37, 'id_paquete' => 31, 'descripcion' => 'QUÍMICA SANGUÍNEA', 'status' => 1],
-            ['id' => 38, 'id_paquete' => 32, 'descripcion' => 'QUÍMICA SANGUÍNEA', 'status' => 1],
-            ['id' => 39, 'id_paquete' => 33, 'descripcion' => 'GRUPO SANGUÍNEO', 'status' => 1],
-            ['id' => 40, 'id_paquete' => 34, 'descripcion' => 'GRUPO SANGUÍNEO', 'status' => 1],
+            // ['id' => 36, 'id_paquete' => 30, 'descripcion' => 'QUÍMICA SANGUÍNEA', 'status' => 1],
+            // ['id' => 37, 'id_paquete' => 31, 'descripcion' => 'QUÍMICA SANGUÍNEA', 'status' => 1],
+            // ['id' => 38, 'id_paquete' => 32, 'descripcion' => 'QUÍMICA SANGUÍNEA', 'status' => 1],
+            // ['id' => 39, 'id_paquete' => 33, 'descripcion' => 'GRUPO SANGUÍNEO', 'status' => 1],
+            // ['id' => 40, 'id_paquete' => 34, 'descripcion' => 'GRUPO SANGUÍNEO', 'status' => 1],
         ]);
     }
 }

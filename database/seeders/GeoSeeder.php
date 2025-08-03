@@ -108,8 +108,118 @@ class GeoSeeder extends Seeder
             ['id' => 1, 'id_prov' => 1, 'nombre_municipio' => 'SUCRE', 'cod_municipio' => 10101, 'status_municipio' => true],
             ['id' => 2, 'id_prov' => 1, 'nombre_municipio' => 'YOTALA', 'cod_municipio' => 10102, 'status_municipio' => true],
             ['id' => 3, 'id_prov' => 1, 'nombre_municipio' => 'POROMA', 'cod_municipio' => 10103, 'status_municipio' => true],
-            ['id' => 4, 'id_prov' => 2, 'nombre_municipio' => 'VILLA AZURDUY', 'cod_municipio' => 10201, 'status_municipio' => true],
-            ['id' => 5, 'id_prov' => 2, 'nombre_municipio' => 'TARVITA', 'cod_municipio' => 10202, 'status_municipio' => true],
+            // ['id' => 4, 'id_prov' => 2, 'nombre_municipio' => 'VILLA AZURDUY', 'cod_municipio' => 10201, 'status_municipio' => true],
+            // ['id' => 5, 'id_prov' => 2, 'nombre_municipio' => 'TARVITA', 'cod_municipio' => 10202, 'status_municipio' => true],
+            // ['id' => 1, 'id_prov' => 1, 'nombre_municipio' => 'SUCRE',    'cod_municipio' => 10101, 'status_municipio' => true],
+            // ['id' => 2, 'id_prov' => 1, 'nombre_municipio' => 'YOTALA',   'cod_municipio' => 10102, 'status_municipio' => true],
+            // ['id' => 3, 'id_prov' => 1, 'nombre_municipio' => 'POROMA',   'cod_municipio' => 10103, 'status_municipio' => true],
+
+            // Azurduy (id_prov = 2)
+            ['id' => 4, 'id_prov' => 2, 'nombre_municipio' => 'AZURDUY',  'cod_municipio' => 10201, 'status_municipio' => true],
+            ['id' => 5, 'id_prov' => 2, 'nombre_municipio' => 'TARVITA',   'cod_municipio' => 10202, 'status_municipio' => true],
+            ['id' => 6, 'id_prov' => 2, 'nombre_municipio' => 'SAN PEDRO', 'cod_municipio' => 10203, 'status_municipio' => true], // cantón adicional :contentReference[oaicite:1]{index=1}
+
+            // Zudañez (id_prov = 3)
+            ['id' => 7, 'id_prov' => 3, 'nombre_municipio' => 'VILLA ZUDAÑEZ', 'cod_municipio' => 10301, 'status_municipio' => true],
+            ['id' => 8, 'id_prov' => 3, 'nombre_municipio' => 'PRESTO',         'cod_municipio' => 10302, 'status_municipio' => true],
+            ['id' => 9, 'id_prov' => 3, 'nombre_municipio' => 'MOJONGOYA',      'cod_municipio' => 10303, 'status_municipio' => true], // corregido a Villa Mojocoya
+            ['id' => 10, 'id_prov' => 3, 'nombre_municipio' => 'ICLA',          'cod_municipio' => 10304, 'status_municipio' => true],
+
+            // Tomina (id_prov = 4)
+            ['id' => 11, 'id_prov' => 4, 'nombre_municipio' => 'PADILLA',    'cod_municipio' => 10401, 'status_municipio' => true],
+            ['id' => 12, 'id_prov' => 4, 'nombre_municipio' => 'TOMINA',     'cod_municipio' => 10402, 'status_municipio' => true],
+            ['id' => 13, 'id_prov' => 4, 'nombre_municipio' => 'SOPACHUY',   'cod_municipio' => 10403, 'status_municipio' => true],
+            ['id' => 14, 'id_prov' => 4, 'nombre_municipio' => 'VILLA ALCALÁ', 'cod_municipio' => 10404, 'status_municipio' => true],
+            ['id' => 15, 'id_prov' => 4, 'nombre_municipio' => 'EL VILLAR',  'cod_municipio' => 10405, 'status_municipio' => true],
+
+            // Hernando Siles (id_prov = 5)
+            ['id' => 16, 'id_prov' => 5, 'nombre_municipio' => 'MONTEAGUDO', 'cod_municipio' => 10501, 'status_municipio' => true],
+            ['id' => 17, 'id_prov' => 5, 'nombre_municipio' => 'HUACARETA',  'cod_municipio' => 10502, 'status_municipio' => true],
+            ['id' => 18, 'id_prov' => 5, 'nombre_municipio' => 'SAN PABLO',  'cod_municipio' => 10503, 'status_municipio' => true], // sección adicional :contentReference[oaicite:2]{index=2}
+
+            // Yamparáez (id_prov = 6)
+            ['id' => 19, 'id_prov' => 6, 'nombre_municipio' => 'TARABUCO',  'cod_municipio' => 10601, 'status_municipio' => true],
+            ['id' => 20, 'id_prov' => 6, 'nombre_municipio' => 'YAMPARAEZ', 'cod_municipio' => 10602, 'status_municipio' => true],
+            ['id' => 21, 'id_prov' => 6, 'nombre_municipio' => 'VILLA CHARCAS', 'cod_municipio' => 10603, 'status_municipio' => true], // integrar Nor Cinti sección incluida en Yamparáez contexto :contentReference[oaicite:3]{index=3}
+
+            // Nor Cinti (id_prov = 7)
+            ['id' => 22, 'id_prov' => 7, 'nombre_municipio' => 'CAMARGO',      'cod_municipio' => 10701, 'status_municipio' => true],
+            ['id' => 23, 'id_prov' => 7, 'nombre_municipio' => 'SAN LUCAS',    'cod_municipio' => 10702, 'status_municipio' => true],
+            ['id' => 24, 'id_prov' => 7, 'nombre_municipio' => 'INCAHUASI',    'cod_municipio' => 10703, 'status_municipio' => true],
+            ['id' => 25, 'id_prov' => 7, 'nombre_municipio' => 'VILLA CHARCAS', 'cod_municipio' => 10704, 'status_municipio' => true],
+
+            // Belisario Boeto (id_prov = 8)
+            ['id' => 26, 'id_prov' => 8, 'nombre_municipio' => 'VILLA SERRANO', 'cod_municipio' => 10801, 'status_municipio' => true],
+
+            // Sud Cinti (id_prov = 9)
+            ['id' => 27, 'id_prov' => 9, 'nombre_municipio' => 'VILLA ABECIA', 'cod_municipio' => 10901, 'status_municipio' => true],
+            ['id' => 28, 'id_prov' => 9, 'nombre_municipio' => 'CULPINA',        'cod_municipio' => 10902, 'status_municipio' => true],
+            ['id' => 29, 'id_prov' => 9, 'nombre_municipio' => 'LAS CARRERAS',  'cod_municipio' => 10903, 'status_municipio' => true],
+
+            // Luis Calvo (id_prov = 10)
+            ['id' => 30, 'id_prov' => 10, 'nombre_municipio' => 'MUYUPAMPA',    'cod_municipio' => 11001, 'status_municipio' => true],
+            ['id' => 31, 'id_prov' => 10, 'nombre_municipio' => 'HUACAYA',       'cod_municipio' => 11002, 'status_municipio' => true],
+            ['id' => 32, 'id_prov' => 10, 'nombre_municipio' => 'MACHARETÍ',     'cod_municipio' => 11003, 'status_municipio' => true],
+
+            // Provincia Murillo (id_dep = 2, id_prov suponemos siguiente consecutivo)
+            ['id' => 33, 'id_prov' => 11, 'nombre_municipio' => 'NUESTRA SEÑORA DE LA PAZ', 'cod_municipio' => 20101, 'status_municipio' => true],
+            ['id' => 34, 'id_prov' => 11, 'nombre_municipio' => 'EL ALTO', 'cod_municipio' => 20102, 'status_municipio' => true],
+            ['id' => 35, 'id_prov' => 11, 'nombre_municipio' => 'PALCA', 'cod_municipio' => 20103, 'status_municipio' => true],
+            ['id' => 36, 'id_prov' => 11, 'nombre_municipio' => 'MECAPACA', 'cod_municipio' => 20104, 'status_municipio' => true],
+            ['id' => 37, 'id_prov' => 11, 'nombre_municipio' => 'ACHOCALLA', 'cod_municipio' => 20105, 'status_municipio' => true],
+
+            // Provincia Omasuyos (id_prov = 12)
+            ['id' => 38, 'id_prov' => 12, 'nombre_municipio' => 'ACHACACHI', 'cod_municipio' => 20201, 'status_municipio' => true],
+            ['id' => 39, 'id_prov' => 12, 'nombre_municipio' => 'ANCORAIMES', 'cod_municipio' => 20202, 'status_municipio' => true],
+            ['id' => 40, 'id_prov' => 12, 'nombre_municipio' => 'HUARINA', 'cod_municipio' => 20203, 'status_municipio' => true],
+            ['id' => 41, 'id_prov' => 12, 'nombre_municipio' => 'CHUA COCANI', 'cod_municipio' => 20204, 'status_municipio' => true],
+            ['id' => 42, 'id_prov' => 12, 'nombre_municipio' => 'HUATAJATA', 'cod_municipio' => 20205, 'status_municipio' => true],
+
+            // Provincia Pacajes (id_prov = 15)
+            ['id' => 43, 'id_prov' => 15, 'nombre_municipio' => 'CORO CORO', 'cod_municipio' => 21501, 'status_municipio' => true],
+            ['id' => 44, 'id_prov' => 15, 'nombre_municipio' => 'CAQUIAVIRI', 'cod_municipio' => 21502, 'status_municipio' => true],
+            ['id' => 45, 'id_prov' => 15, 'nombre_municipio' => 'CALACOTO', 'cod_municipio' => 21503, 'status_municipio' => true],
+            ['id' => 46, 'id_prov' => 15, 'nombre_municipio' => 'COMANCHE', 'cod_municipio' => 21504, 'status_municipio' => true],
+            ['id' => 47, 'id_prov' => 15, 'nombre_municipio' => 'CHARAÑA', 'cod_municipio' => 21505, 'status_municipio' => true],
+
+            // Provincia Camacho (id_prov = 5)
+            ['id' => 48, 'id_prov' => 5, 'nombre_municipio' => 'PUERTO ACOSTA', 'cod_municipio' => 20501, 'status_municipio' => true],
+            ['id' => 49, 'id_prov' => 5, 'nombre_municipio' => 'MOCOMOCO', 'cod_municipio' => 20502, 'status_municipio' => true],
+            ['id' => 50, 'id_prov' => 5, 'nombre_municipio' => 'ESCOMA', 'cod_municipio' => 20503, 'status_municipio' => true],
+
+            // Provincia Muñecas (id_prov = 7)
+            ['id' => 51, 'id_prov' => 7, 'nombre_municipio' => 'CHUMA', 'cod_municipio' => 20701, 'status_municipio' => true],
+            ['id' => 52, 'id_prov' => 7, 'nombre_municipio' => 'AYATA', 'cod_municipio' => 20702, 'status_municipio' => true],
+            ['id' => 53, 'id_prov' => 7, 'nombre_municipio' => 'AUCAPATA', 'cod_municipio' => 20703, 'status_municipio' => true],
+
+            // Provincia Larecaja (id_prov = 6)
+            ['id' => 54, 'id_prov' => 6, 'nombre_municipio' => 'SORATA', 'cod_municipio' => 20601, 'status_municipio' => true],
+            ['id' => 55, 'id_prov' => 6, 'nombre_municipio' => 'GUANAY', 'cod_municipio' => 20602, 'status_municipio' => true],
+            ['id' => 56, 'id_prov' => 6, 'nombre_municipio' => 'TACACOMA', 'cod_municipio' => 20603, 'status_municipio' => true],
+
+            // Provincia Franz Tamayo (id_prov = 17)
+            ['id' => 57, 'id_prov' => 17, 'nombre_municipio' => 'APOLO', 'cod_municipio' => 21701, 'status_municipio' => true],
+            ['id' => 58, 'id_prov' => 17, 'nombre_municipio' => 'PELECHUCO', 'cod_municipio' => 21702, 'status_municipio' => true],
+
+
+            ['id' => 59, 'id_prov' => 47, 'nombre_mun' => 'ORURO',             'cod_municipio' => 40001, 'status_mun' => true],
+            ['id' => 60, 'id_prov' => 48, 'nombre_mun' => 'SALINAS DE GARCÍA MENDOZA', 'cod_municipio' => 40002, 'status_mun' => true],
+            ['id' => 61, 'id_prov' => 49, 'nombre_mun' => 'CORQUE',            'cod_municipio' => 40003, 'status_mun' => true],
+            ['id' => 62, 'id_prov' => 50, 'nombre_mun' => 'TURCO',             'cod_municipio' => 40004, 'status_mun' => true],
+            ['id' => 63, 'id_prov' => 51, 'nombre_mun' => 'HUACHACALLA',       'cod_municipio' => 40005, 'status_mun' => true],
+            ['id' => 64, 'id_prov' => 52, 'nombre_mun' => 'POOPO',             'cod_municipio' => 40006, 'status_mun' => true],
+            ['id' => 65, 'id_prov' => 53, 'nombre_mun' => 'HUAJLLAMARKA',      'cod_municipio' => 40007, 'status_mun' => true],
+            ['id' => 66, 'id_prov' => 54, 'nombre_mun' => 'SALINAS',           'cod_municipio' => 40008, 'status_mun' => true],
+            ['id' => 67, 'id_prov' => 55, 'nombre_mun' => 'SABAYA',            'cod_municipio' => 40009, 'status_mun' => true],
+            ['id' => 68, 'id_prov' => 56, 'nombre_mun' => 'TOTORA',            'cod_municipio' => 40010, 'status_mun' => true],
+            ['id' => 69, 'id_prov' => 57, 'nombre_mun' => 'TOMAS BARRÓN',      'cod_municipio' => 40011, 'status_mun' => true],
+            ['id' => 70, 'id_prov' => 58, 'nombre_mun' => 'SANTIAGO DE HUAYLLAMARCA', 'cod_municipio' => 40012, 'status_mun' => true],
+            ['id' => 71, 'id_prov' => 59, 'nombre_mun' => 'SAN PEDRO DE TOTORA', 'cod_municipio' => 40013, 'status_mun' => true],
+            ['id' => 72, 'id_prov' => 60, 'nombre_mun' => 'SANTIAGO DE HUARI', 'cod_municipio' => 40014, 'status_mun' => true],
+            ['id' => 73, 'id_prov' => 61, 'nombre_mun' => 'LA RIVERA',         'cod_municipio' => 40015, 'status_mun' => true],
+            ['id' => 74, 'id_prov' => 62, 'nombre_mun' => 'BELEN DE ANDAMARCA', 'cod_municipio' => 40016, 'status_mun' => true],
+
+
         ]);
     }
 }
