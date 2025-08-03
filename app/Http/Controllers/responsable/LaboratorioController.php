@@ -47,18 +47,13 @@ class LaboratorioController extends Controller
         Log::info('$idEa');
         Log::info($idEa);
         // Obtener IDs de laboratorios inscritos en el EA
-        $laboratorioIds = InscripcionEA::with('inscripcion')
-            ->where('id_ea', $idEa)
-            ->get()
-            ->pluck('inscripcion.id_lab')
-            ->values()
-            ->toArray();
+        $query = InscripcionEA::with(['inscripcion', 'inscripcion.laboratorio.departamento', 'inscripcion.laboratorio.usuario'])
+            ->where('id_ea', $idEa);
 
-        Log::info('$laboratorioIds');
-        Log::info($laboratorioIds);
+        // Log::info($Inscripciones);
         // Consultar solo los laboratorios filtrados por ID
-        $query = Laboratorio::whereIn('id', $laboratorioIds)
-            ->with(['pais', 'usuario', 'departamento', 'provincia', 'municipio', 'tipo', 'categoria', 'nivel']);
+        // $query = Laboratorio::whereIn('id', $laboratorioIds)
+        //     ->with(['pais', 'usuario', 'departamento', 'provincia', 'municipio', 'tipo', 'categoria', 'nivel']);
 
         // Aplicar filtros adicionales
         foreach (['pais', 'dep', 'prov', 'mun', 'tipo', 'categoria', 'nivel'] as $f) {
@@ -70,28 +65,33 @@ class LaboratorioController extends Controller
         // Retornar respuesta para DataTables
         return datatables()
             ->of($query)
-            ->addColumn('pais_nombre', fn($lab) => $lab->pais->nombre_pais)
-            ->addColumn('departamento_nombre', fn($lab) => $lab->departamento->nombre_dep ?? '-')
-            ->addColumn('provincia_nombre', fn($lab) => $lab->provincia->nombre_prov ?? '-')
-            ->addColumn('municipio_nombre', fn($lab) => $lab->municipio->nombre_municipio ?? '-')
-            ->addColumn('codigo', fn($lab) => $lab->usuario->username)
-            ->addColumn('tipo_nombre', fn($lab) => $lab->tipo->nombre_tipo ?? '-')
-            ->addColumn('categoria_nombre', fn($lab) => $lab->categoria->nombre_categoria ?? '-')
-            ->addColumn('nivel_nombre', fn($lab) => $lab->nivel->nombre ?? '-')
-            ->addColumn('email', fn($lab) => $lab->usuario->email ?? '-')
-            ->addColumn('status_label', fn($lab) => $lab->status ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>')
-            ->addColumn('actions', function ($lab) {
+            ->addColumn('fecha_inscripcion', fn($ins) => $ins->inscripcion->fecha_inscripcion)
+            ->addColumn('nombre_lab', fn($ins) => $ins->inscripcion->laboratorio->nombre_lab)
+            ->addColumn('mail_lab', fn($ins) => $ins->inscripcion->laboratorio->mail_lab)
+            ->addColumn('wapp_lab', fn($ins) => $ins->inscripcion->laboratorio->wapp_lab)
+            // ->addColumn('nombre_lab', fn($ins) => $ins->inscripcion->laboratorio->nombre_lab)
+            ->addColumn('nombre_dep', fn($ins) => $ins->inscripcion->laboratorio->departamento->nombre_dep ?? '-')
+            ->addColumn('provincia_nombre', fn($ins) => $ins->inscripcion->laboratorio->provincia->nombre_prov ?? '-')
+            ->addColumn('municipio_nombre', fn($ins) => $ins->inscripcion->laboratorio->municipio->nombre_municipio ?? '-')
+            ->addColumn('codigo', fn($ins) => $ins->inscripcion->laboratorio->cod_lab)
+            ->addColumn('tipo_nombre', fn($ins) => $ins->inscripcion->laboratorio->tipo->nombre_tipo ?? '-')
+            ->addColumn('categoria_nombre', fn($ins) => $ins->inscripcion->laboratorio->categoria->nombre_categoria ?? '-')
+            ->addColumn('nivel_nombre', fn($ins) => $ins->inscripcion->laboratorio->nivel->nombre ?? '-')
+            ->addColumn('email', fn($ins) => $ins->inscripcion->laboratorio->usuario->email ?? '-')
+            ->addColumn('status_label', fn($ins) => $ins->inscripcion->laboratorio->status ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>')
+            ->addColumn('status_inscripcion', fn($ins) => $ins->inscripcion->getStatusInscripcion() ?? '-')
+            ->addColumn('actions', function ($ins) {
                 return view('responsable.lab.action-buttons', [
                     // 'showUrl' => route('laboratorio.show', $lab->id),
                     // 'editUrl' => route('laboratorio.edit', $lab->id),
                     // 'deleteUrl' => route('laboratorio.destroy', $lab->id),
                     // 'inscribirUrl' => route('inscripcion.create', $lab->id),
-                    'nombre' => $lab->nombre_lab,
-                    'id' => $lab->id,
-                    'activo' => $lab->status,
+                    // 'nombre' => $lab->nombre_lab,
+                    // 'id' => $lab->id,
+                    // 'activo' => $lab->status,
                 ])->render();
             })
-            ->rawColumns(['status_label', 'actions'])
+            ->rawColumns(['status_label', 'actions', 'status_inscripcion'])
             ->toJson();
     }
 }

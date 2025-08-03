@@ -3,7 +3,7 @@
 
         <!-- Encabezado -->
         <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
-            <h1 class="text-xl font-bold text-gray-800">Lista de Laboratorios inscritos a
+            <h1 class="text-xl font-bold text-gray-800">Lista de inscripciones a
                 {{ $ensayosAptitud->descripcion }}</h1>
         </div>
 
@@ -71,6 +71,7 @@
                     <tr>
                         <th class="px-4 py-2 text-left">Acciones</th>
                         <th class="px-4 py-2 text-left">Fecha/Hora</th>
+                        <th class="px-4 py-2 text-left">Codigo</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
                         <th class="px-4 py-2 text-left">Correo</th>
                         <th class="px-4 py-2 text-left">WhatsApp</th>
@@ -116,28 +117,32 @@
                             searchable: false
                         },
                         {
-                            data: 'created_at',
-                            name: 'created_at',
+                            data: 'fecha_inscripcion',
+                            name: 'inscripcion.fecha_inscripcion',
+                        },
+                        {
+                            data: 'codigo',
+                            name: 'inscripcion.laboratorio.cod_lab'
                         },
                         {
                             data: 'nombre_lab',
-                            name: 'nombre_lab'
+                            name: 'inscripcion.laboratorio.nombre_lab'
                         },
                         {
                             data: 'email',
-                            name: 'usuario.email',
+                            name: 'inscripcion.laboratorio.mail_lab',
                         },
                         {
                             data: 'wapp_lab',
-                            name: 'wapp_lab'
+                            name: 'inscripcion.laboratorio.wapp_lab',
                         },
                         {
-                            data: 'departamento_nombre',
-                            name: 'departamento.nombre_dep'
+                            data: 'nombre_dep',
+                            name: 'inscripcion.laboratorio.departamento.nombre_dep'
                         },
                         {
-                            data: 'status_label',
-                            name: 'status',
+                            data: 'status_inscripcion',
+                            name: 'inscripcion.status_inscripcion',
                         },
                     ],
                     language: {

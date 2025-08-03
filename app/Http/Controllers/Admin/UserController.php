@@ -227,7 +227,7 @@ class UserController extends Controller
     {
         $query = User::with(['cargo', 'permisos'])
             ->whereDoesntHave('laboratorio')
-            ->select(['id', 'created_at', 'username', 'nombre', 'ap_paterno', 'ap_materno', 'id_cargo', 'status']);
+            ->select(['id', 'created_at', 'username', 'nombre', 'ap_paterno', 'ap_materno', 'id_cargo', 'status', 'email', 'telefono']);
 
         // $query = User::with('cargo')
         //     ->select(['id', 'username', 'nombre', 'ap_paterno', 'ap_materno', 'id_cargo', 'status']);

@@ -46,6 +46,8 @@
                         <th class="px-4 py-2 text-left">Fecha hora</th>
                         <th class="px-4 py-2 text-left">Usuario</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
+                        <th class="px-4 py-2 text-left">Telefono</th>
+                        <th class="px-4 py-2 text-left">Correo</th>
                         <th class="px-4 py-2 text-left">Cargo</th>
                         <th class="px-4 py-2 text-left">Estado</th>
                         <th class="px-4 py-2 text-left">Acciones</th>
@@ -81,6 +83,14 @@
                         {
                             data: 'nombre_completo',
                             name: 'nombre'
+                        },
+                        {
+                            data: 'telefono',
+                            name: 'telefono'
+                        },
+                        {
+                            data: 'email',
+                            name: 'email'
                         },
                         {
                             data: 'cargo',
