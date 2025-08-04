@@ -1,3 +1,7 @@
+@php
+    use App\Models\Permiso;
+@endphp
+
 <x-app-layout>
     <div class="container py-6 max-w-4xl">
         <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
@@ -36,15 +40,18 @@
                                         data-tippy-content="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form method="POST" action="{{ route('categoria_laboratorio.destroy', $categoria->id) }}"
-                                        class="delete-form inline" data-nombre="{{ $categoria->descripcion }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" data-tippy-content="Eliminar"
-                                            class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
+                                    @if (Gate::any(Permiso::DELETE_GESTION_PROGRAMAS))
+                                        <form method="POST"
+                                            action="{{ route('categoria_laboratorio.destroy', $categoria->id) }}"
+                                            class="delete-form inline" data-nombre="{{ $categoria->descripcion }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" data-tippy-content="Eliminar"
+                                                class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
