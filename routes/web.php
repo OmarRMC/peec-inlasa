@@ -70,6 +70,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
         Route::post('/paquetes', [InscripcionPaqueteController::class, 'store'])->name('inscripcion-paquetes.store');
         Route::post('/{id}/aprobar', [InscripcionPaqueteController::class, 'aprobarInscripcion'])->name('inscripcion-paquetes.aprobar');
         Route::post('/{id}/anular', [InscripcionPaqueteController::class, 'anularInscripcion'])->name('inscripcion-paquetes.anular');
+        Route::post('/{id}/revision', [InscripcionPaqueteController::class, 'enRevision'])->name('inscripcion-paquetes.enRevision');
         Route::post('/{id}/obs', [InscripcionPaqueteController::class, 'obsInscripcion'])->name('inscripcion-paquetes.obserbaciones');
     });
 

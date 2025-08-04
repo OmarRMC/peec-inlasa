@@ -12,7 +12,7 @@
         <div class="bg-white shadow-md rounded-lg overflow-hidden divide-y divide-gray-200">
 
             <!-- Datos Generales -->
-            <section class="p-6">
+            <section class="p-6 relative">
                 <h2 class="text-lg font-semibold text-blue-700 mb-4">📄 Datos de Inscripción</h2>
                 <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
                     <div><strong>Codigo Lab:</strong> {{ $inscripcion->laboratorio->cod_lab }}</div>
@@ -29,6 +29,33 @@
                         <x-status-badge :value="$inscripcion->estado_pago_texto ?? ''" />
                     </div>
                     <div><strong>Observaciones:</strong> {{ $inscripcion->obs_inscripcion ?? '-' }}</div>
+                </div>
+                <div class="absolute top-2 right-2">
+                    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                        @if ($inscripcion->estaAprobado() || $inscripcion->estaAnulado())
+                            <form method="POST"
+                                action="{{ route('inscripcion-paquetes.enRevision', $inscripcion->id) }}">
+                                @csrf
+                                <button type="submit"
+                                    onclick="return confirm('¿Estás seguro de dejar esta inscripción en revisión?')"
+                                    class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-medium px-4 py-2 rounded shadow-sm text-sm transition duration-150"
+                                    title="Pasar a estado En Revisión">
+                                    Establecer en Revisión
+                                </button>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('inscripcion-paquetes.anular', $inscripcion->id) }}">
+                                @csrf
+                                <button type="submit"
+                                    onclick="return confirm('¿Estás seguro de anular la inscripción?')"
+                                    class="bg-red-100 hover:bg-red-200 text-red-800 font-medium px-4 py-2 rounded shadow-sm text-sm transition duration-150"
+                                    title="Anular esta inscripción">
+                                    Anular la Inscripción
+                                </button>
+                            </form>
+                        @endif
+                    @endif
+
                 </div>
             </section>
 
@@ -120,29 +147,23 @@
                     <div class="flex space-x-2">
                         {{-- Verifica si el usuario tiene permiso --}}
                         @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
-                            {{-- Si está aprobado, mostrar botón de "Anular" --}}
                             @if ($inscripcion->estaAprobado())
-                                <form method="POST"
-                                    action="{{ route('inscripcion-paquetes.anular', $inscripcion->id) }}">
-                                    @csrf
-                                    <button type="submit"
-                                        onclick="return confirm('¿Estás seguro de anular la aprobación?')"
-                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
-                                        Anular Aprobación
-                                    </button>
-                                </form>
+                                <p class="text-green-700 font-medium bg-green-50 p-2">Documentos aprobados</p>
                             @else
-                                {{-- Si no está aprobado, mostrar botón de "Aprobar" --}}
+                                {{-- Botón para aprobar inscripción --}}
                                 <form method="POST"
                                     action="{{ route('inscripcion-paquetes.aprobar', $inscripcion->id) }}">
                                     @csrf
                                     <button type="submit"
                                         onclick="return confirm('¿Estás seguro de aprobar esta inscripción?')"
-                                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">
+                                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
+                                        aria-label="Aprobar inscripción" title="Aprobar inscripción">
                                         Aprobar
                                     </button>
                                 </form>
                             @endif
+
+
 
                             {{-- Botón para registrar observaciones (siempre visible) --}}
                             <button onclick="document.getElementById('modal-observacion').classList.remove('hidden')"
@@ -168,7 +189,7 @@
                                     onclick="document.getElementById('modal-observacion').classList.add('hidden')"
                                     class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded text-sm">
                                     Cancelar
-                                </button>
+                                </butto
                                 <button type="submit"
                                     class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
                                     Guardar

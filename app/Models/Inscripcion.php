@@ -29,7 +29,7 @@ class Inscripcion extends Model
 
     const STATUS_CUENTA = [
         self::STATUS_PAGADO => 'Pagado',
-        self::STATUS_DEUDOR => 'Deudor',
+        self::STATUS_DEUDOR => 'Pendiente',
     ];
 
     protected $fillable = [
