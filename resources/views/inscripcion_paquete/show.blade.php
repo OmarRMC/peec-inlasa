@@ -177,27 +177,68 @@
                 {{-- Modal de Observación --}}
                 <div id="modal-observacion"
                     class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-                    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                        <h3 class="text-lg font-semibold mb-4">Registrar Observación</h3>
+                    <div class="bg-white p-4 rounded-lg shadow-lg w-full max-w-3xl">
+                        <h3 class="text-base font-bold mb-3 text-blue-700">📝 Observaciones por Documento</h3>
+
                         <form method="POST"
                             action="{{ route('inscripcion-paquetes.obserbaciones', $inscripcion->id) }}">
                             @csrf
-                            <textarea name="observacion" rows="4" required
-                                class="w-full border border-gray-300 rounded p-2 text-sm resize-none" placeholder="Escribe la observación aquí..."></textarea>
+
+                            @php
+                                $documentos = [
+                                    'Contrato firmado',
+                                    'Formulario de inscripción',
+                                    'Poder legal',
+                                    'Carnet Identidad',
+                                    'Registro de comercio',
+                                    'Designación de responsable',
+                                ];
+                                $categoria = $inscripcion->laboratorio->categoria->descripcion ?? '-';
+                            @endphp
+
+                            <div class="text-sm text-gray-600 mb-3">
+                                <strong>Categoría del laboratorio:</strong> {{ $categoria }}
+                            </div>
+
+                            <table class="w-full text-sm border border-gray-200">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="p-2 text-left">Documento</th>
+                                        <th class="p-2 text-left">Observación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($documentos as $i => $doc)
+                                        <tr class="border-t border-gray-100">
+                                            <td class="p-1">
+                                                {{ $doc }}
+                                                <input type="hidden" name="titulo[]" value="{{ $doc }}">
+                                            </td>
+                                            <td class="p-1">
+                                                <textarea name="observacion[]" rows="2" class="w-full border border-gray-300 rounded p-1 text-xs resize-none"
+                                                    placeholder="Sin observación">Sin observación</textarea>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+
                             <div class="mt-4 flex justify-end space-x-2">
                                 <button type="button"
                                     onclick="document.getElementById('modal-observacion').classList.add('hidden')"
-                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded text-sm">
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm">
                                     Cancelar
-                                </butto
+                                </button>
                                 <button type="submit"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-sm font-semibold">
                                     Guardar
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
+
+
                 @forelse ($inscripcion->documentos as $doc)
                     <div
                         class="border rounded px-4 py-2 mb-2 text-sm text-gray-700 bg-gray-50 flex justify-between items-center">

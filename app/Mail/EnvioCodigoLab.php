@@ -29,7 +29,7 @@ class EnvioCodigoLab extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Envio Codigo Lab',
+            subject: 'Su inscripción fue aceptada',
         );
     }
 

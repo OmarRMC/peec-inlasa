@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EnvioCodigoLab;
 use App\Models\Area;
 use App\Models\CategoriaLaboratorio;
 use App\Models\Configuracion;
@@ -25,6 +26,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use PhpParser\Node\Stmt\TryCatch;
 
 class InscripcionPaqueteController extends Controller
 {
@@ -123,6 +126,14 @@ class InscripcionPaqueteController extends Controller
 
     public function create($labId)
     {
+        if (
+            !(
+                Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]) ||
+                (Gate::any([Permiso::LABORATORIO]) && Configuracion::esPeriodoInscripcion())
+            )
+        ) {
+            return redirect()->back()->with('error', 'No tienes permisos para realizar esta acción.');
+        }
         $laboratorio = Laboratorio::findOrFail($labId);
         $tipoLabId = $laboratorio->id_tipo;
 
@@ -246,6 +257,13 @@ class InscripcionPaqueteController extends Controller
         $ins->updated_by = Auth::user()->id;
         $ins->updated_at = now();
         $ins->save();
+        $lab =  $ins->laboratorio;
+        $user = $lab->usuario;
+        try {
+            Mail::to($user->email)->send(new EnvioCodigoLab($user, $lab));
+        } catch (\Throwable $th) {
+            return back()->with('warning', 'La inscripción fue aprobada correctamente, pero no se pudo enviar el correo de notificación.');
+        }
         return back()->with('success', 'La inscripción fue aprobada exitosamente.');
     }
 
@@ -276,7 +294,9 @@ class InscripcionPaqueteController extends Controller
         // $ins->updated_by = Auth::user()->id;
         // $ins->updated_at = now();
         // $ins->save();
-        return back()->with('success', 'La inscripción fue aprobada exitosamente.');
+
+        
+        return back()->with('success', 'Las observaciones fueron enviadas.');
     }
     public function show($id)
     {
