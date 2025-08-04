@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\EnvioCodigoLab;
+use App\Mail\EnvioObsLab;
 use App\Models\Area;
 use App\Models\CategoriaLaboratorio;
 use App\Models\Configuracion;
@@ -294,8 +295,18 @@ class InscripcionPaqueteController extends Controller
         // $ins->updated_by = Auth::user()->id;
         // $ins->updated_at = now();
         // $ins->save();
+        $ins = Inscripcion::findOrFail($id);
+        $lab =  $ins->laboratorio;
+        $user = $lab->usuario;
+        $obs = $request->observacion;
+        $titulo =  $request->titulo;
+        $observaciones = [];
+        try {
+            Mail::to($user->email)->send(new EnvioObsLab($user, $lab, $observaciones));
+        } catch (\Throwable $th) {
+            return back()->with('warning', 'Las observaciones no se pudo enviar el correo de notificación.');
+        }
 
-        
         return back()->with('success', 'Las observaciones fueron enviadas.');
     }
     public function show($id)
