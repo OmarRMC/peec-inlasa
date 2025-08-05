@@ -1,4 +1,4 @@
-@props(['showUrl', 'boletaPdf', 'contratoPdf'])
+@props(['showUrl', 'boletaPdf', 'contratoPdf', 'inscripcion'])
 
 <div class="flex space-x-1">
     {{-- Ver --}}
@@ -12,5 +12,17 @@
         data-tippy-content="Imprimir el formulario de Inscripción">
         <i class="fas fa-file-pdf"></i>
     </a>
+
+    @if (!$inscripcion->estaAnulado() && $inscripcion->estaEnRevision())
+        <form method="POST" action="{{ route('inscripciones.anular', $inscripcion->id) }}">
+            @csrf
+            @method('PUT')
+            <button type="submit" onclick="return confirm('¿Estás seguro de anular esta inscripción?')"
+                class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
+                data-tippy-content="Anular inscripción">
+                <i class="fas fa-ban"></i>
+            </button>
+        </form>
+    @endif
 
 </div>

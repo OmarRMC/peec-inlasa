@@ -120,6 +120,7 @@ class LabController extends Controller
                 return view('laboratorio.inscripcion.action-btn', [
                     'showUrl' => route('lab.inscripcion.show', $i->id),
                     'boletaPdf' => route('formulario_inscripcion', $i->id),
+                    'inscripcion' => $i,
                 ])->render();
             })
             ->rawColumns(['estado', 'cuenta', 'acciones'])
@@ -423,5 +424,16 @@ class LabController extends Controller
         $inscripcion = $lab->inscripciones()->findOrFail($id);
         $pdfController = app(PdfInscripcionController::class);
         return $pdfController->generar($inscripcion->id);
+    }
+
+    public function anularInscripcion(Request $request, $id)
+    {
+        Gate::authorize(Permiso::LABORATORIO);
+        $lab = Auth::user()->laboratorio;
+        $inscripcion = $lab->inscripciones()->findOrFail($id);
+        $inscripcion->status_inscripcion = Inscripcion::STATUS_ANULADO;
+        $inscripcion->updated_by = Auth::user()->id;
+        $inscripcion->save();
+        return back()->with('success', 'Se anulo  su  Inscripcion.');
     }
 }

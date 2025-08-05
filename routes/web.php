@@ -99,6 +99,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::post('/notificacion/read', [NotificacionController::class, 'marcarLeido']);
     Route::get('/contrato', [LabController::class, 'generarContrato'])->name('formulario_contrato');
     Route::get('/formulario-ins/{id}', [LabController::class, 'generarFormularioIns'])->name('formulario_inscripcion');
+    Route::put('/inscripcion/{id}/anular', [LabController::class, 'anularInscripcion'])->name('inscripciones.anular');
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
