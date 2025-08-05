@@ -71,7 +71,7 @@ class UserController extends Controller
             'status'     => $request->status,
         ]);
 
-        $usuario->notify(new VerificarCorreoUser($usuario));
+        // $usuario->notify(new VerificarCorreoUser($usuario));
         $usuario->permisos()->sync($request->input('permisos', []));
 
         $ensayoIDs = $request->input('ensayos_ap', []);

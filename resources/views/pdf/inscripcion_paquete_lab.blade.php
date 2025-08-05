@@ -168,16 +168,19 @@
                 {{ $laboratorio->categoria->descripcion }}</td>
         </tr>
         <tr>
-            <td colspan="2" style="width: 50%;">
+            <td colspan="3">
                 <strong>Resp. laboratorio:</strong> {{ $laboratorio->respo_lab }} &nbsp;&nbsp; <strong>C.I.
                     :</strong>
                 {{ $laboratorio->ci_respo_lab }}
             </td>
-            <td style="width: 50%;">
+        </tr>
+        <tr>
+            <td colspan="3">
                 <strong>Rep. Legal:</strong> {{ $laboratorio->repreleg_lab }} &nbsp;&nbsp; <strong>C.I.
                     :</strong> {{ $laboratorio->ci_repreleg_lab }}
             </td>
         </tr>
+
         <tr>
             <td style="width: 33%;"><strong>Departamento:</strong> {{ $laboratorio->departamento->nombre_dep }}</td>
             <td style="width: 33%;"><strong>Provincia:</strong> {{ $laboratorio->provincia->nombre_prov }}</td>
@@ -193,10 +196,12 @@
         </tr>
         <tr>
             <td style="width: 33%;"><strong>Nro. Celular(2):</strong> {{ $laboratorio->wapp2_lab }}</td>
-            <td style="width: 33%;">
+            <td colspan="2" style="width: 67%">
                 <strong>E-mail (1):</strong> {{ $laboratorio->mail_lab }}
             </td>
-            <td style="width: 33%;">
+        </tr>
+        <tr>
+            <td colspan="3">
                 <strong>E-mail (2):</strong> {{ $laboratorio->mail2_lab }}
             </td>
         </tr>

@@ -308,7 +308,7 @@
                     _________________________________<br>
                     {{ $laboratorio->repreleg_lab }}<br>
                     <strong> REPRESENTANTE LEGAL/PROPIETARIO </strong><br>
-                    <strong>LABORATORIO CLINICO</strong> {{ $laboratorio->nombre_lab }}
+                    <strong>LABORATORIO CLINICO {{ $laboratorio->nombre_lab }}</strong>
                 </td>
             </tr>
         </table>

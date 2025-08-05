@@ -71,7 +71,7 @@
                 </a>
                 {{-- href="{{ route('formulario_contrato_lab.pdf') }}" --}}
                 @if (Auth::user()->laboratorio->tieneIscripcionGestionActual())
-                    <a href="{{ route('formulario_contrato') }}"
+                    <a href="{{ route('formulario_contrato') }}" target="_blank"
                         class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                         <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Contrato
                     </a>

@@ -14,8 +14,8 @@
     </a>
 
     <a href="{{ $contratoPdf }}" target="_blank"
-        class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"
-        data-tippy-content="Descargar contrato de inscripción">
-        <i class="fas fa-download"></i>
+        class="bg-blue-100 hover:bg-blue-200 text-blue-700 pl-2 pr-2 py-1 rounded shadow-sm"
+        data-tippy-content="Generar contrato de inscripción">
+        <i class="fas fa-file-signature"></i>
     </a>
 </div>

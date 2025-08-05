@@ -61,7 +61,7 @@ class LaboratorioController extends Controller
             'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
             'sigla_lab' => 'nullable|string|max:20|unique:laboratorio,sigla_lab',
-            'nit_lab' => 'required|numeric|unique:laboratorio,nit_lab',
+            'nit_lab' => 'required|numeric',
             'id_nivel' => 'required|exists:nivel_laboratorio,id',
             'id_tipo' => 'required|exists:tipo_laboratorio,id',
             'id_categoria' => 'required|exists:categoria,id',
@@ -202,7 +202,7 @@ class LaboratorioController extends Controller
             'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
             'sigla_lab' => 'nullable|string|max:20|unique:laboratorio,sigla_lab,' . $laboratorio->id,
-            'nit_lab' => 'required|numeric|unique:laboratorio,nit_lab,' . $laboratorio->id,
+            'nit_lab' => 'required|numeric',
             'id_nivel' => 'required|exists:nivel_laboratorio,id',
             'id_tipo' => 'required|exists:tipo_laboratorio,id',
             'id_categoria' => 'required|exists:categoria,id',
@@ -352,7 +352,7 @@ class LaboratorioController extends Controller
     {
         $query = Laboratorio::query()->with(['pais', 'usuario', 'departamento', 'provincia', 'municipio', 'tipo', 'categoria', 'nivel']);
 
-        foreach (['pais', 'dep', 'prov', 'mun', 'tipo', 'categoria', 'nivel'] as $f) {
+        foreach (['pais', 'dep', 'prov', 'municipio', 'tipo', 'categoria', 'nivel'] as $f) {
             if ($val = $request->get($f)) {
                 $query->where("id_{$f}", $val);
             }
