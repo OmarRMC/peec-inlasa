@@ -1,0 +1,112 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Area;
+use App\Models\EnsayoAptitud;
+use App\Models\Paquete;
+use App\Models\Permiso;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+class EnsayoAptitudController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+    }
+    private function messages()
+    {
+        return [
+            'id_paquete.required' => 'El paquete es obligatorio.',
+            'id_paquete.exists' => 'El paquete seleccionado no existe.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'descripcion.string' => 'La descripción debe ser un texto válido.',
+            'descripcion.max' => 'La descripción no debe exceder 100 caracteres.',
+            'status.required' => 'El estado es obligatorio.',
+            'status.boolean' => 'El estado debe ser verdadero o falso.',
+        ];
+    }
+
+    public function index()
+    {
+        $ensayos = EnsayoAptitud::with(['paquete', 'paquete.area'])->orderBy('created_at', 'desc')->paginate(20);
+        return view('ensayo_aptitud.index', compact('ensayos'));
+    }
+
+    public function create()
+    {
+        $paquetes = Paquete::active()->get();
+        return view('ensayo_aptitud.create', compact('paquetes'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'id_paquete' => 'required|exists:paquete,id',
+            'descripcion' => 'required|string|max:100',
+            'status' => 'required|boolean',
+        ], $this->messages());
+
+        EnsayoAptitud::create($request->all());
+
+        return redirect()->route('ensayo_aptitud.index')->with('success', 'Ensayo de Aptitud creado correctamente.');
+    }
+
+    public function edit(EnsayoAptitud $ensayoAptitud)
+    {
+        $paquetes = Paquete::active()->get();
+        $ensayo_aptitud = $ensayoAptitud;
+        return view('ensayo_aptitud.edit', compact('ensayo_aptitud', 'paquetes'));
+    }
+
+    public function update(Request $request, EnsayoAptitud $ensayoAptitud)
+    {
+        $request->validate([
+            'id_paquete' => 'required|exists:paquete,id',
+            'descripcion' => 'required|string|max:100',
+            'status' => 'required|boolean',
+        ], $this->messages());
+
+        $ensayoAptitud->update($request->all());
+
+        return redirect()->route('ensayo_aptitud.index')->with('success', 'Ensayo de Aptitud actualizado correctamente.');
+    }
+
+    public function destroy(EnsayoAptitud $ensayoAptitud)
+    {
+        $ensayoAptitud->delete();
+        return redirect()->route('ensayo_aptitud.index')->with('success', 'Ensayo de Aptitud eliminado correctamente.');
+    }
+
+    public function getEnsayoPorAreaAjax(Request $request, $id)
+    {
+        $area = Area::active()
+            ->with([
+                'paquetes' => function ($query) {
+                    $query->active();
+                },
+                'paquetes.ensayosAptitud' => function ($query) {
+                    $query->active();
+                },
+            ])
+            ->findOrFail($id);
+        Log::info('$area');
+        Log::info($area);
+        $ensayos = $area->paquetes->flatMap(function ($paquete) {
+            return $paquete->ensayosAptitud->map(function ($ensayo) use ($paquete) {
+                $descPaquete = mb_strtolower(trim($paquete->descripcion), 'UTF-8');
+                $descEnsayo = mb_strtolower(trim($ensayo->descripcion), 'UTF-8');
+
+                return [
+                    'id' => $ensayo->id,
+                    'descripcion' => $descPaquete === $descEnsayo
+                        ? $ensayo->descripcion
+                        : "$paquete->descripcion - $ensayo->descripcion"
+                ];
+            });
+        });
+        return response()->json($ensayos);
+    }
+}

@@ -65,7 +65,9 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // 'timezone' => 'UTC',
+    'timezone' => 'America/La_Paz',
+
 
     /*
     |--------------------------------------------------------------------------
@@ -122,5 +124,5 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
-
+    'gestion_delete_off' => env('GESTION_DELETE_OFF', false)
 ];

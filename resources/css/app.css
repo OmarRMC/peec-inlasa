@@ -1,3 +1,228 @@
+@import "@fortawesome/fontawesome-free/css/all.min.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* styles.css */
+
+/* Variables de color */
+:root {
+    --color-primary: #2563eb;
+    --color-primary-hover: #3b82f6;
+    --color-white: #ffffff;
+    --color-text-primary: #1f2937;
+    --color-text-secondary: #4b5563;
+    --color-text-muted: #6b7280;
+    --color-border: #d1d5db;
+    --color-focus-border: #60a5fa;
+    --color-focus-ring: #93c5fd;
+    --color-bg-table: #ffffff;
+    --color-bg-header-table: #f3f4f6;
+    --color-border-table: #e5e7eb;
+    --color-status-active: #22c55e;
+    --color-status-inactive: #ef4444;
+}
+
+/* Botones principales */
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-hover);
+}
+
+/* Inputs estándar */
+.input-standard {
+    /* width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease; */
+    @apply mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500;
+
+}
+
+.input-standard:focus {
+    /* border-color: var(--color-focus-border);
+    box-shadow: 0 0 0 3px var(--color-focus-ring); */
+}
+
+/* Tabla */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-table);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: var(--color-bg-header-table);
+}
+
+.table th,
+.table td {
+    padding: 0.5rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border-table);
+}
+
+/* Texto */
+.text-primary {
+    color: var(--color-text-primary);
+    /* color:#1f2937 */
+    /* @apply text-gray-800 */
+}
+
+.text-secondary {
+    color: var(--color-text-secondary);
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+/* Estados */
+.status-active {
+    display: inline-block;
+    background-color: var(--color-status-active);
+    color: var(--color-white);
+    /* padding: 0.25rem 0.5rem; */
+    padding: 2px 1px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    /* border-radius: 9999px; */
+    background-origin: 4px;
+    user-select: none;
+}
+
+.status-inactive {
+    display: inline-block;
+    background-color: var(--color-status-inactive);
+    color: var(--color-white);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    user-select: none;
+}
+
+
+/* Botones secundarios (ej. cancelar) */
+.btn-secondary {
+    background-color: #f3f4f6;
+    /* gris claro */
+    color: var(--color-text-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-border);
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb;
+    /* gris un poco más oscuro */
+}
+
+/* Badges para estados */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    user-select: none;
+    color: var(--color-white);
+}
+
+.badge-success {
+    background-color: var(--color-status-active);
+}
+
+.badge-danger {
+    background-color: var(--color-status-inactive);
+}
+
+/* Contenedor principal */
+.container {
+    /* max-width: 1280px; */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+
+/* Iconos con color primario */
+.icon-primary {
+    color: var(--color-primary);
+}
+
+/* Formato para etiquetas en formularios (label) */
+.label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+}
+
+.required-label::after {
+    content: ' (*)';
+    color: red;
+    font-weight: bold;
+}
+
+/* Inputs y selects que usan clase input-standard */
+/* Ya los tienes */
+
+/* Listados tipo ul */
+.list-disc {
+    list-style-type: disc;
+    padding-left: 1.25rem;
+    /* para alinear bien */
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+
+/* Hover para labels en checkbox */
+.label-hover:hover {
+    background-color: #ebf4ff;
+    /* azul claro para hover */
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+/* Checkbox con color primario */
+.accent-primary {
+    accent-color: var(--color-primary);
+}
+
+.card-login{
+    box-shadow: 1px 1px 8px rgba(14, 13, 13, 0.685);
+}

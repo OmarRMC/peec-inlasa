@@ -8,7 +8,9 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Lab\LabController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -16,6 +18,11 @@ Route::middleware('guest')->group(function () {
         ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store']);
+
+    Route::get('lab/register', [LabController::class, 'create'])->name('form.registro.tem.lab');
+    Route::post('lab/register', [LabController::class, 'registrar'])->name('registro.tem.lab');
+
+    Route::get('/confirmar-datos/{id}', [LabController::class, 'confirmarDatos'])->name('confirmar.datos.lab');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -39,7 +46,10 @@ Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+    // Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+    //     ->middleware(['signed', 'throttle:6,1'])
+    //     ->name('verification.verify');
+    Route::get('/email/verify/{id}/{hash}', [VerificacionCorreoLaboratorioController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
 

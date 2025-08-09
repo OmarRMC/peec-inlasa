@@ -1,100 +1,320 @@
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+@php
+    use App\Models\Permiso;
+    use App\Models\Configuracion;
+@endphp
+<!-- Navigation -->
+<nav class="flex-1 px-2 py-4 space-y-1 text-sm overflow-y-auto">
+    @if (true || Gate::any([Permiso::ADMIN, Permiso::VER_ESCRITORIO, Permiso::LABORATORIO]))
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+            <i class="fas fa-home w-5 text-indigo-500"></i>
+            <span>Escritorio</span>
+        </a>
+    @endif
+    <!-- Gestión de Inscripciones -->
+    @if (Gate::any([Permiso::ADMIN]))
+        <div>
+            <button @click="openMenu !== 1 ? openMenu = 1 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-file-signature w-5 text-indigo-500"></i>
+                <span>Inscripciones</span>
+                <i class="fas ml-auto" :class="openMenu === 1 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 1" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                {{-- <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-list"></i> Ver Inscripciones</a> --}}
+                <a href="{{ route('formularios.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                    <i class="fas fa-file-alt"></i> Formularios
+                </a>
+                {{-- <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-file-alt"></i> Documentos</a> --}}
+            </div>
+        </div>
+    @endif
+
+    @if (Gate::any([Permiso::LABORATORIO]))
+        <div>
+            <button @click="openMenu !== 102 ? openMenu = 102 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-vials w-5 text-indigo-500"></i>
+                <span>Laboratorio</span>
+                <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 102" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="{{ route('lab.profile') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                    <i class="fas fa-id-card-alt w-4 mr-1 text-indigo-500"></i> Perfil de laboratorio
+                </a>
+                @if (Configuracion::esPeriodoInscripcion())
+                    <a href="{{ route('lab.profile.edit') }}"
+                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                        <i class="fas fa-user-edit w-4 mr-1 text-indigo-500"></i> Actualizar tu información
                     </a>
-                </div>
-
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                </div>
-            </div>
-
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+                @endif
             </div>
         </div>
-    </div>
+    @endif
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
+    @if (Gate::any([Permiso::LABORATORIO]))
+        <div>
+            <button @click="openMenu !== 103 ? openMenu = 103 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-vials w-5 text-indigo-500"></i>
+                <span>Gestion de inscripciones</span>
+                <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 103" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="{{ route('lab.ins.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                    <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i>
+                    Listado de inscripciones
+                </a>
+                {{-- href="{{ route('formulario_contrato_lab.pdf') }}" --}}
+                @if (Auth::user()->laboratorio->tieneIscripcionGestionActual())
+                    <a href="{{ route('formulario_contrato') }}" target="_blank"
+                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                        <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Contrato
+                    </a>
+                @endif
             </div>
         </div>
-    </div>
+    @endif
+    @if (Gate::any([Permiso::RESPONSABLE]))
+        @php
+            Auth::user()->load('responsablesEA');
+        @endphp
+        <div>
+            <button @click="openMenu !== 20 ? openMenu = 20 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-vials w-5 text-indigo-500"></i>
+                <span>Gestión de Ensayos de Aptitud</span>
+                <i class="fas ml-auto" :class="openMenu === 20 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 20" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                @foreach (Auth::user()->responsablesEA as $ea)
+                    <div>
+                        <div class="font-semibold text-indigo-700 px-3 py-1">
+                            {{-- <i class="fas fa-vial"></i> EA: {{ $ea->descripcion }} --}}
+                            <a href="{{ route('ea.lab.inscritos', $ea->id) }}"
+                                class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                                <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
+                                {{ $ea->descripcion }}
+                            </a>
+                        </div>
+                        {{-- @foreach ($ea->inscripciones as $inscripcion)
+                            <a href="{{ route('ruta.lab.resultados', $inscripcion->laboratorio->id) }}"
+                                class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                                <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
+                                {{ $inscripcion->laboratorio->nombre }}
+                            </a>
+                        @endforeach --}}
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+
+    <!-- Certificados -->
+    @if (Gate::any([Permiso::ADMIN]))
+        <div>
+            <button @click="openMenu !== 2 ? openMenu = 2 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-certificate w-5 text-indigo-500"></i>
+                <span>Certificados</span>
+                <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 2" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-certificate"></i> Participación</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-medal"></i> Desempeño</a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN, Permiso::CONFIGURACION]))
+        <div>
+            <a href="{{ route('configuracion.index') }}"
+                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                <i class="fas fa-cogs w-5 text-indigo-500"></i>
+                <span>Configuración</span>
+            </a>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN]))
+        <!-- Recursos Laboratorio -->
+        <div>
+            <button @click="openMenu !== 3 ? openMenu = 3 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-vials w-5 text-indigo-500"></i>
+                <span>Recursos Lab.</span>
+                <i class="fas ml-auto" :class="openMenu === 3 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 3" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-file-contract"></i> Contrato 2025</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-bullhorn"></i> Convocatoria</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-gavel"></i> Resolución</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-file-alt"></i> Protocolos</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-exclamation-triangle"></i> Quejas</a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-clipboard"></i> Formularios de Queja</a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES, Permiso::GESTION_LABORATORIO]))
+        <div>
+            <button @click="openMenu !== 7 ? openMenu = 7 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-flask w-5 text-indigo-500"></i>
+                <span>Gestión de Laboratorio</span>
+                <i class="fas ml-auto" :class="openMenu === 7 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 7" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+
+                @if (Gate::any([Permiso::ADMIN]))
+                    <a href="{{ route('nivel_laboratorio.index') }}"
+                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                        <i class="fas fa-layer-group"></i> Nivel de Laboratorio
+                    </a>
+                @endif
+                @if (Gate::any([Permiso::ADMIN]))
+                    <a href="{{ route('tipo_laboratorio.index') }}"
+                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                        <i class="fas fa-vial"></i> Tipo de Laboratorio
+                    </a>
+                @endif
+                @if (Gate::any([Permiso::ADMIN]))
+                    <a href="{{ route('categoria_laboratorio.index') }}"
+                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                        <i class="fas fa-tags"></i> Categoría
+                    </a>
+                @endif
+                @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_LABORATORIO]))
+                    <a href="{{ route('laboratorio.index') }}"
+                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                        <i class="fas fa-flask"></i> Laboratorios registrados
+                    </a>
+                @endif
+                @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                    <a href="{{ route('inscripcion_paquete.index') }}"
+                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                        <i class="fas fa-file-signature"></i> Inscripciones a paquetes
+                    </a>
+                @endif
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA]))
+        <!--  Programas , Area , Paquetes y Ensayo Aptutud -->
+        <div>
+            <button @click="openMenu !== 4 ? openMenu = 4 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-boxes w-5 text-indigo-500"></i>
+                <span>Programas</span>
+                <i class="fas ml-auto" :class="openMenu === 4 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 4" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+
+                <a href="{{ route('programa.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-clipboard-list"></i> <!-- icono para “Programas” -->
+                    Programas
+                </a>
+
+                <a href="{{ route('area.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-layer-group"></i> <!-- icono para “Area” -->
+                    Área
+                </a>
+
+                <a href="{{ route('paquete.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-box-open"></i> <!-- icono para “Paquetes” -->
+                    Paquetes
+                </a>
+
+                <a href="{{ route('ensayo_aptitud.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-vials"></i> <!-- icono para “Ensayo de Aptitud” -->
+                    Ensayo de Aptitud
+                </a>
+
+            </div>
+
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_GEOGRAFICA]))
+        <!-- Ubicación Geográfica -->
+        <div>
+            <button @click="openMenu !== 6 ? openMenu = 6 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-globe-americas w-5 text-indigo-500"></i>
+                <span>Ubicación</span>
+                <i class="fas ml-auto" :class="openMenu === 6 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 6" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="{{ route('pais.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-flag"></i> País
+                </a>
+                <a href="{{ route('departamento.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-map"></i> Departamento
+                </a>
+                <a href="{{ route('provincia.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-map-marked-alt"></i> Provincia
+                </a>
+                <a href="{{ route('municipio.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                    <i class="fas fa-city"></i> Municipio
+                </a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_USUARIO]))
+        <!-- Usuarios y Roles -->
+        <div>
+            <button @click="openMenu !== 5 ? openMenu = 5 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-users w-5 text-indigo-500"></i>
+                <span>Usuarios</span>
+                <i class="fas ml-auto" :class="openMenu === 5 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 5" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="{{ route('usuario.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-user"></i>
+                    Usuarios</a>
+                <a href="{{ route('cargos.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-user-tag"></i> Cargos</a>
+                <a href="{{ route('permiso.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-key"></i>
+                    Permisos</a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::ADMIN]))
+        {{-- <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                    <i class="fas fa-database w-5 text-indigo-500"></i>
+                    <span>Datos Laboratorio</span>
+                </a> --}}
+
+        <a href="#" class="flex items-center gap-3 text-red-600 px-3 py-2 rounded hover:bg-red-50">
+            <i class="fas fa-book w-5"></i>
+            <span>Manual Usuario</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+            <i class="fas fa-info-circle w-5 text-indigo-500"></i>
+            <span>Acerca de</span>
+        </a>
+    @endif
 </nav>
