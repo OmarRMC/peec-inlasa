@@ -14,8 +14,8 @@
                     </ul>
                 </div>
             @endif
-
-            @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'], ['id' => 'gestion', 'title' => 'Gestión Actual'], ['id' => 'notificacion', 'title' => 'Notificaciones']] as $item)
+            {{-- , ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'] --}}
+            @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'],['id' => 'gestion', 'title' => 'Gestión de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones']] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -93,7 +93,7 @@
                                     </form>
                                 @break
 
-                                @case('vigencia')
+                                {{-- @case('vigencia')
                                     <form action="{{ route($config, 'periodo-vigencia') }}" method="POST">
                                         @csrf @method('PUT')
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -121,14 +121,14 @@
                                                     class="fas fa-save mr-1"></i>Guardar</button>
                                         </div>
                                     </form>
-                                @break
+                                @break --}}
 
                                 @case('gestion')
                                     <form action="{{ route($config, 'gestion') }}" method="POST">
                                         @csrf @method('PUT')
                                         <div>
                                             <label for="{{ Configuracion::GESTION_ACTUAL }}"
-                                                class="block text-sm font-medium">Año de Gestión</label>
+                                                class="block text-sm font-medium">Gestion de inscripcion</label>
                                             <input type="number" name="{{ Configuracion::GESTION_ACTUAL }}"
                                                 id="{{ Configuracion::GESTION_ACTUAL }}"
                                                 value="{{ old(Configuracion::GESTION_ACTUAL, configuracion(Configuracion::GESTION_ACTUAL) ?? date('Y')) }}"

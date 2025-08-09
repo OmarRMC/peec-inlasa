@@ -205,7 +205,7 @@ class InscripcionPaqueteController extends Controller
             $vigenciaInscripcion->status = true;
             $vigenciaInscripcion->id_inscripcion = $ins->id;
             $vigenciaInscripcion->fecha_inicio = $now;
-            $vigenciaInscripcion->fecha_fin = configuracion('fecha.fin.vigencia') ?? now()->addDays(2);
+            $vigenciaInscripcion->fecha_fin = now()->endOfYear();
             $vigenciaInscripcion->created_by = Auth::user()->id;
             $vigenciaInscripcion->updated_by = Auth::user()->id;
             $vigenciaInscripcion->save();
