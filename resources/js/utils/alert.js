@@ -90,7 +90,7 @@ export function confirmDelete({ csrfToken, table }) {
 }
 
 
-export function confirmAsyncHandle({ handle, html, title, text , icon = 'warning' }) {
+export function confirmAsyncHandle({ handle, html, title, text, icon = 'warning' }) {
     confirmDialog({
         html: html || '',
         title: title || 'Confirmar acción',

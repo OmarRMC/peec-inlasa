@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AprobarInscripcion;
 use App\Mail\EnvioCodigoLab;
 use App\Mail\EnvioObsLab;
 use App\Models\Area;
@@ -200,12 +201,13 @@ class InscripcionPaqueteController extends Controller
 
 
 
+            $gestion= configuracion(Configuracion::GESTION_ACTUAL); 
             $vigenciaInscripcion = new VigenciaInscripcion();
 
             $vigenciaInscripcion->status = true;
             $vigenciaInscripcion->id_inscripcion = $ins->id;
             $vigenciaInscripcion->fecha_inicio = $now;
-            $vigenciaInscripcion->fecha_fin = now()->endOfYear();
+            $vigenciaInscripcion->fecha_fin = Carbon::create($gestion)->endOfYear();;
             $vigenciaInscripcion->created_by = Auth::user()->id;
             $vigenciaInscripcion->updated_by = Auth::user()->id;
             $vigenciaInscripcion->save();
@@ -261,8 +263,9 @@ class InscripcionPaqueteController extends Controller
         $lab =  $ins->laboratorio;
         $user = $lab->usuario;
         try {
-            Mail::to($user->email)->send(new EnvioCodigoLab($user, $lab));
+            Mail::to($user->email)->send(new AprobarInscripcion($user, $lab));
         } catch (\Throwable $th) {
+            Log::info($th->getMessage()); 
             return back()->with('warning', 'La inscripción fue aprobada correctamente, pero no se pudo enviar el correo de notificación.');
         }
         return back()->with('success', 'La inscripción fue aprobada exitosamente.');
@@ -299,11 +302,17 @@ class InscripcionPaqueteController extends Controller
         $lab =  $ins->laboratorio;
         $user = $lab->usuario;
         $obs = $request->observacion;
+        Log::info('$obs');
+        Log::info($obs);
         $titulo =  $request->titulo;
-        $observaciones = [];
+        Log::info('$titulo');
+        Log::info($titulo);
+        $observaciones = array_combine($titulo, $obs);
+        Log::info($observaciones);
         try {
             Mail::to($user->email)->send(new EnvioObsLab($user, $lab, $observaciones));
         } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             return back()->with('warning', 'Las observaciones no se pudo enviar el correo de notificación.');
         }
 
