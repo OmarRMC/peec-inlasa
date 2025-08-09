@@ -12,7 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 confirmButtonColor: '#e3342f',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    popup: 'swal2-sm',
+                    title: 'text-base',
+                    htmlContainer: 'text-sm'
+                }
             }).then(result => {
                 if (result.isConfirmed) this.submit();
             });

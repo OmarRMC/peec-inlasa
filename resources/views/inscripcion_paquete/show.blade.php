@@ -430,16 +430,7 @@
             });
         }
 
-        // CSS para hacer la alerta más pequeña
-        const style = document.createElement('style');
-        style.innerHTML = `
-        .swal2-sm {
-            width: 350px !important;
-            font-size: 14px !important;
-        }
-    `;
-        document.head.appendChild(style);
-
+    
         // Asignar alertas a cada formulario
         document.getElementById('en-revision-inscripcion')?.addEventListener('submit', function(e) {
             e.preventDefault();
