@@ -1,6 +1,6 @@
 import './bootstrap';
 import './swal-confirm';
-import { confirmDelete, showToast, confirmDialog, showError , confirmAsyncHandle } from './utils/alert';
+import { confirmDelete, showToast, confirmDialog, showError , confirmAsyncHandle, mostrarAlertaConfirmacion } from './utils/alert';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import Swal from 'sweetalert2';
@@ -18,6 +18,7 @@ window.Alpine = Alpine;
 window.Swal = Swal;
 window.confirmDelete = confirmDelete;
 window.confirmAsyncHandle = confirmAsyncHandle;
+window.mostrarAlertaConfirmacion = mostrarAlertaConfirmacion;
 
 document.addEventListener('DOMContentLoaded', () => {
     tippy('[data-tippy-content]');

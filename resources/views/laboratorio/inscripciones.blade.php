@@ -142,6 +142,19 @@
                         drawCallback: () => {
                             tippy('[data-tippy-content]');
                             setupPagination(table);
+                            const anularInscripciones = document.querySelectorAll('.anular-inscripcion');
+                            anularInscripciones.forEach(form => {
+                                form.addEventListener('submit', function(e) {
+                                    e.preventDefault();
+                                    mostrarAlertaConfirmacion(
+                                        '¿Anular Inscripción?',
+                                        'Esta acción no se puede deshacer.',
+                                        'error',
+                                        'Sí, anular',
+                                        () => this.submit()
+                                    );
+                                });
+                            });
                         }
                     });
                     $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());

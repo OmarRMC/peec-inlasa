@@ -110,3 +110,25 @@ export function confirmAsyncHandle({ handle, html, title, text, icon = 'warning'
         }
     });
 }
+
+export function mostrarAlertaConfirmacion(titulo, texto, icono, textoConfirmacion, callback) {
+    Swal.fire({
+        title: titulo,
+        text: texto,
+        icon: icono,
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: textoConfirmacion,
+        cancelButtonText: 'Cancelar',
+        customClass: {
+            popup: 'swal2-sm',
+            title: 'text-base',
+            htmlContainer: 'text-sm'
+        }
+    }).then(result => {
+        if (result.isConfirmed && typeof callback === "function") {
+            callback();
+        }
+    });
+}
