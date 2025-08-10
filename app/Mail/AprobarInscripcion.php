@@ -15,13 +15,15 @@ class AprobarInscripcion extends Mailable
 
     protected $usuario;
     protected $laboratorio;
+    protected $gestion;
     /**
      * Create a new message instance.
      */
-    public function __construct($usuario, $laboratorio)
+    public function __construct($usuario, $laboratorio, $gestion)
     {
         $this->usuario = $usuario;
         $this->laboratorio = $laboratorio;
+        $this->gestion = $gestion;
     }
 
     /**
@@ -44,6 +46,7 @@ class AprobarInscripcion extends Mailable
             with: [
                 'usuario' => $this->usuario,
                 'laboratorio' => $this->laboratorio,
+                'gestion' => $this->gestion,
             ],
         );
     }

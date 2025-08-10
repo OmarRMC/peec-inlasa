@@ -199,7 +199,7 @@ class InscripcionPaqueteController extends Controller
 
 
 
-            $gestion= configuracion(Configuracion::GESTION_ACTUAL); 
+            $gestion = configuracion(Configuracion::GESTION_ACTUAL);
             $vigenciaInscripcion = new VigenciaInscripcion();
 
             $vigenciaInscripcion->status = true;
@@ -260,10 +260,11 @@ class InscripcionPaqueteController extends Controller
         $ins->save();
         $lab =  $ins->laboratorio;
         $user = $lab->usuario;
+        $gestion = $ins->gestion;
         try {
-            Mail::to($user->email)->send(new AprobarInscripcion($user, $lab));
+            Mail::to($user->email)->send(new AprobarInscripcion($user, $lab, $gestion));
         } catch (\Throwable $th) {
-            Log::info($th->getMessage()); 
+            Log::info($th->getMessage());
             return back()->with('warning', 'La inscripción fue aprobada correctamente, pero no se pudo enviar el correo de notificación.');
         }
         return back()->with('success', 'La inscripción fue aprobada exitosamente.');

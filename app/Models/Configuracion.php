@@ -38,7 +38,7 @@ class Configuracion extends Model
     public const NOTIFICACION_MENSAJE = 'notificacion.mensaje';
     public const NOTIFICACION_FECHA_INICIO = 'notificacion.fecha_inicio';
     public const NOTIFICACION_FECHA_FIN = 'notificacion.fecha_fin';
-
+    public const EMAIL_INFORMACION = 'email.informacion';
 
     public static function esPeriodoInscripcion()
     {

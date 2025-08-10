@@ -23,6 +23,9 @@
 
     <p>Gracias,<br>Equipo SIGPEEC</p>
 @endsection --}}
+@php
+    use App\Models\Configuracion;
+@endphp
 
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -53,7 +56,7 @@
     </w:WordDocument>
     </xml><![endif]-->
     <style type="text/css">
-      .btn {
+        .btn {
             display: inline-block;
             padding: 12px 25px;
             background-color: #2563EB;
@@ -62,6 +65,7 @@
             border-radius: 6px;
             font-weight: bold;
         }
+
         .rollover:hover .rollover-first {
             max-height: 0px !important;
             display: none !important;
@@ -590,8 +594,9 @@
                                                                         style="border-style:solid;border-color:#1376C8;background:#1376C8;border-width:0px;display:inline-block;border-radius:3px;width:auto"><a
                                                                             href="https://drive.google.com/drive/folders/1L0bXKo45Caj6iaXe7FgSl_ycYIrr7Fjf"
                                                                             target="_blank" class="a"
-                                                                            style="mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:18px;padding:10px 20px 10px 20px;display:inline-block;background:#1376C8;border-radius:3px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:21.6px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #1376C8">GESTION
-                                                                            {{ now()->year }}</a></span></td>
+                                                                            style="mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:18px;padding:10px 20px 10px 20px;display:inline-block;background:#1376C8;border-radius:3px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:21.6px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #1376C8">
+                                                                            GESTION {{ $gestion }}
+                                                                        </a></span></td>
                                                             </tr>
                                                             <tr style="border-collapse:collapse">
                                                                 <td align="left" style="padding:0;Margin:0">
@@ -601,6 +606,11 @@
                                                                         pégalo en un navegador.
                                                                         https://drive.google.com/drive/folders/1L0bXKo45Caj6iaXe7FgSl_ycYIrr7Fjf
                                                                     </p>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td align="left" style="padding:0;Margin:0">
+                                                                    {!! configuracion(Configuracion::EMAIL_INFORMACION) !!}
                                                                 </td>
                                                             </tr>
                                                         </table>
