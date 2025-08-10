@@ -7,6 +7,7 @@ use App\Models\Area;
 use App\Models\Permiso;
 use App\Models\Programa;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class AreaController extends Controller
 {
@@ -47,7 +48,13 @@ class AreaController extends Controller
     {
         $request->validate([
             'id_programa' => 'required|exists:programa,id',
-            'descripcion' => 'required|string|max:50|unique:area,descripcion',
+            'descripcion' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('area', 'descripcion')
+                    ->where(fn($query) => $query->where('id_programa', $request->id_programa)),
+            ],
             'status' => 'required|boolean',
             'max_paquetes_inscribir' => 'required|integer',
         ], $this->messages());
@@ -67,11 +74,17 @@ class AreaController extends Controller
     {
         $request->validate([
             'id_programa' => 'required|exists:programa,id',
-            'descripcion' => 'required|string|max:50|unique:area,descripcion,' . $area->id,
+            'descripcion' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('area', 'descripcion')
+                    ->ignore($area->id)
+                    ->where(fn($query) => $query->where('id_programa', $request->id_programa)),
+            ],
             'status' => 'required|boolean',
             'max_paquetes_inscribir' => 'required|integer',
         ], $this->messages());
-
         $area->update($request->all());
 
         return redirect()->route('area.index')->with('success', 'Área actualizada correctamente.');

@@ -141,7 +141,7 @@
             </a>
         </div>
     @endif
-    @if (Gate::any([Permiso::ADMIN]))
+    @if (Gate::any([Permiso::ADMIN, Permiso::LABORATORIO]))
         <!-- Recursos Laboratorio -->
         <div>
             <button @click="openMenu !== 3 ? openMenu = 3 : openMenu = null"
@@ -151,8 +151,8 @@
                 <i class="fas ml-auto" :class="openMenu === 3 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </button>
             <div x-show="openMenu === 3" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
-                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                        class="fas fa-file-contract"></i> Contrato 2025</a>
+                {{-- <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-file-contract"></i> Contrato 2025</a> --}}
                 <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                         class="fas fa-bullhorn"></i> Convocatoria</a>
                 <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i

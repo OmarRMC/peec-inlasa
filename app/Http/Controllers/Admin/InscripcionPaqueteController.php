@@ -176,8 +176,6 @@ class InscripcionPaqueteController extends Controller
             'paquetes.*.costo' => 'required|integer|min:0',
             'obs_inscripcion' => 'nullable|string|max:255',
         ]);
-        Log::info('$request->obs_inscripcion');
-        Log::info($request->obs_inscripcion);
         try {
             DB::beginTransaction();
             $total = collect($request->paquetes)->sum('costo');

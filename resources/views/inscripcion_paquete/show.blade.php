@@ -159,7 +159,7 @@
             <section class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-blue-700 mb-4">📁 Documentos</h2>
-
+                    @if (!$inscripcion->estaAnulado())
                     <div class="flex space-x-2">
                         {{-- Verifica si el usuario tiene permiso --}}
                         @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
@@ -186,7 +186,9 @@
                                 </button>
                             @endif
                         @endif
+
                     </div>
+                    @endif
                 </div>
 
                 {{-- Modal de Observación --}}
