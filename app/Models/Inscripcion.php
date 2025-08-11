@@ -16,6 +16,7 @@ class Inscripcion extends Model
     const STATUS_VENCIDO = 3;
 
     const STATUS_ANULADO = 4;
+    const STATUS_EN_OBSERVACION = 5;
 
     const STATUS_PAGADO = 1;
 
@@ -25,6 +26,7 @@ class Inscripcion extends Model
         self::STATUS_APROBADO => 'Aprobado',
         self::STATUS_VENCIDO => 'Vencido',
         self::STATUS_ANULADO => 'Anulado',
+        self::STATUS_EN_OBSERVACION => 'En observación'
     ];
 
     const STATUS_CUENTA = [
@@ -142,34 +144,48 @@ class Inscripcion extends Model
     {
         switch ($this->status_inscripcion) {
             case self::STATUS_EN_REVISION:
-                return "<span class='inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full shadow-sm'>
-                        " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
-                    </span>";
+                return "<span class='inline-flex items-center px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded shadow-sm'>
+                    " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
+                </span>";
             case self::STATUS_APROBADO:
-                return "<span class='inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full shadow-sm'>
-                        " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
-                    </span>";
+                return "<span class='inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded shadow-sm'>
+                    " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
+                </span>";
             case self::STATUS_VENCIDO:
-                return "<span class='inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full shadow-sm'>
-                        " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
-                    </span>";
+                return "<span class='inline-flex items-center px-2 py-0.5 bg-orange-100 text-orange-800 text-xs font-medium rounded shadow-sm'>
+                    " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
+                </span>";
             case self::STATUS_ANULADO:
-                return "<span class='inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full shadow-sm'>
-                        " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
-                    </span>";
+                return "<span class='inline-flex items-center px-2 py-0.5 bg-gray-300 text-gray-800 text-xs font-medium rounded shadow-sm'>
+                    " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
+                </span>";
+            case self::STATUS_EN_OBSERVACION:
+                return "<span class='inline-flex items-center px-2 py-0.5 bg-red-100 text-red-800 text-xs font-medium rounded shadow-sm'>
+                    " . self::STATUS_INSCRIPCION[$this->status_inscripcion] . "
+                </span>";
             default:
-                return "<span class='inline-flex items-center px-2 py-1 bg-gray-100 text-gray-800 text-xs font-semibold rounded-full shadow-sm'>
-                        ...
-                    </span>";
+                return "<span class='inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-800 text-xs font-medium rounded shadow-sm'>
+                    ...
+                </span>";
         }
     }
 
     public function getStatusCuenta()
     {
-        // return $this->status_cuenta
-        //     ? "<span class='text-green-600 font-semibold'>" . self::STATUS_CUENTA[$this->status_cuenta] - "</span>"
-        //     : '<span class="text-red-600 font-semibold">Inactiva</span>';
-        return "<span class='text-green-600 font-semibold'>" . self::STATUS_CUENTA[$this->status_cuenta] . "</span>";
+        switch ($this->status_cuenta) {
+            case self::STATUS_PAGADO:
+                return "<span class='inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded shadow-sm'>
+                        " . self::STATUS_CUENTA[$this->status_cuenta] . "
+                    </span>";
+            case self::STATUS_DEUDOR:
+                return "<span class='inline-flex items-center px-2 py-0.5 bg-red-100 text-red-800 text-xs font-medium rounded shadow-sm'>
+                        " . self::STATUS_CUENTA[$this->status_cuenta] . "
+                    </span>";
+            default:
+                return "<span class='inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-800 text-xs font-medium rounded shadow-sm'>
+                        Desconocido
+                    </span>";
+        }
     }
 
     public function getEstadoInscripcionTextoAttribute()

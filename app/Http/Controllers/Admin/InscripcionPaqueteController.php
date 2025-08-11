@@ -298,15 +298,21 @@ class InscripcionPaqueteController extends Controller
         // $ins->updated_at = now();
         // $ins->save();
         $ins = Inscripcion::findOrFail($id);
+        $ins->status_inscripcion = Inscripcion::STATUS_EN_OBSERVACION;
+        $ins->updated_by = Auth::user()->id;
+        $ins->updated_at = now();
+        $ins->save();
         $lab =  $ins->laboratorio;
         $user = $lab->usuario;
         $obs = $request->observacion;
         Log::info('$obs');
         Log::info($obs);
         $titulo =  $request->titulo;
-        Log::info('$titulo');
-        Log::info($titulo);
+
         $observaciones = array_combine($titulo, $obs);
+        $observaciones = array_filter($observaciones, function ($valor) {
+            return !empty(trim($valor));
+        });
         Log::info($observaciones);
         try {
             Mail::to($user->email)->send(new EnvioObsLab($user, $lab, $observaciones));
