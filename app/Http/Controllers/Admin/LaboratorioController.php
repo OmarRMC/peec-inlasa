@@ -88,8 +88,20 @@ class LaboratorioController extends Controller
         $sigla = strtoupper($pais->sigla_pais); // Ej: BOL
 
         // Generar username incremental
-        $count = User::where('username', 'LIKE', "$sigla%")->count() + 1;
-        $username = $sigla . str_pad($count, 4, '0', STR_PAD_LEFT);
+        // $count = User::where('username', 'LIKE', "$sigla%")->count() + 1;
+        // $username = $sigla . str_pad($count, 4, '0', STR_PAD_LEFT);
+        $lastUser = User::where('username', 'LIKE', "$sigla%")
+            ->orderByDesc('username')
+            ->first();
+
+        if ($lastUser) {
+            $lastNumber = (int) substr($lastUser->username, strlen($sigla));
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        $username = $sigla . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
 
         // Crear usuario
         try {

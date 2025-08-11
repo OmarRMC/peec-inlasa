@@ -228,7 +228,7 @@ class LabController extends Controller
             'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
             'sigla_lab' => 'nullable|string|max:20|unique:laboratorio,sigla_lab',
-            'nit_lab' => 'nullable|numeric|unique:laboratorio,nit_lab',
+            'nit_lab' => 'nullable|numeric',
             'id_nivel' => 'required|exists:nivel_laboratorio,id',
             'id_tipo' => 'required|exists:tipo_laboratorio,id',
             'id_categoria' => 'required|exists:categoria,id',
