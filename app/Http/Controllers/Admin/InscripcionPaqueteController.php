@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AprobarInscripcion;
 use App\Mail\EnvioCodigoLab;
 use App\Mail\EnvioObsLab;
 use App\Models\Area;
@@ -175,8 +176,6 @@ class InscripcionPaqueteController extends Controller
             'paquetes.*.costo' => 'required|integer|min:0',
             'obs_inscripcion' => 'nullable|string|max:255',
         ]);
-        Log::info('$request->obs_inscripcion');
-        Log::info($request->obs_inscripcion);
         try {
             DB::beginTransaction();
             $total = collect($request->paquetes)->sum('costo');
@@ -200,12 +199,13 @@ class InscripcionPaqueteController extends Controller
 
 
 
+            $gestion = configuracion(Configuracion::GESTION_ACTUAL);
             $vigenciaInscripcion = new VigenciaInscripcion();
 
             $vigenciaInscripcion->status = true;
             $vigenciaInscripcion->id_inscripcion = $ins->id;
             $vigenciaInscripcion->fecha_inicio = $now;
-            $vigenciaInscripcion->fecha_fin = now()->endOfYear();
+            $vigenciaInscripcion->fecha_fin = Carbon::create($gestion)->endOfYear();;
             $vigenciaInscripcion->created_by = Auth::user()->id;
             $vigenciaInscripcion->updated_by = Auth::user()->id;
             $vigenciaInscripcion->save();
@@ -260,9 +260,11 @@ class InscripcionPaqueteController extends Controller
         $ins->save();
         $lab =  $ins->laboratorio;
         $user = $lab->usuario;
+        $gestion = $ins->gestion;
         try {
-            Mail::to($user->email)->send(new EnvioCodigoLab($user, $lab));
+            Mail::to($user->email)->send(new AprobarInscripcion($user, $lab, $gestion));
         } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             return back()->with('warning', 'La inscripción fue aprobada correctamente, pero no se pudo enviar el correo de notificación.');
         }
         return back()->with('success', 'La inscripción fue aprobada exitosamente.');
@@ -296,14 +298,26 @@ class InscripcionPaqueteController extends Controller
         // $ins->updated_at = now();
         // $ins->save();
         $ins = Inscripcion::findOrFail($id);
+        $ins->status_inscripcion = Inscripcion::STATUS_EN_OBSERVACION;
+        $ins->updated_by = Auth::user()->id;
+        $ins->updated_at = now();
+        $ins->save();
         $lab =  $ins->laboratorio;
         $user = $lab->usuario;
         $obs = $request->observacion;
+        Log::info('$obs');
+        Log::info($obs);
         $titulo =  $request->titulo;
-        $observaciones = [];
+
+        $observaciones = array_combine($titulo, $obs);
+        $observaciones = array_filter($observaciones, function ($valor) {
+            return !empty(trim($valor));
+        });
+        Log::info($observaciones);
         try {
             Mail::to($user->email)->send(new EnvioObsLab($user, $lab, $observaciones));
         } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             return back()->with('warning', 'Las observaciones no se pudo enviar el correo de notificación.');
         }
 

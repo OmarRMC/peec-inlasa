@@ -33,26 +33,42 @@
                 <div class="absolute top-2 right-2">
                     @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
                         @if ($inscripcion->estaAprobado() || $inscripcion->estaAnulado())
-                            <form method="POST"
+                            <form method="POST" id="en-revision-inscripcion"
                                 action="{{ route('inscripcion-paquetes.enRevision', $inscripcion->id) }}">
                                 @csrf
                                 <button type="submit"
-                                    onclick="return confirm('¿Estás seguro de dejar esta inscripción en revisión?')"
                                     class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-medium px-4 py-2 rounded shadow-sm text-sm transition duration-150"
                                     title="Pasar a estado En Revisión">
                                     Establecer en Revisión
                                 </button>
                             </form>
                         @else
-                            <form method="POST" action="{{ route('inscripcion-paquetes.anular', $inscripcion->id) }}">
+                            <form method="POST" id="anular-inscripcion"
+                                action="{{ route('inscripcion-paquetes.anular', $inscripcion->id) }}">
                                 @csrf
                                 <button type="submit"
-                                    onclick="return confirm('¿Estás seguro de anular la inscripción?')"
                                     class="bg-red-100 hover:bg-red-200 text-red-800 font-medium px-4 py-2 rounded shadow-sm text-sm transition duration-150"
                                     title="Anular esta inscripción">
                                     Anular la Inscripción
                                 </button>
                             </form>
+                            {{-- <script>
+                                const formAnular = document.getElementById('anular-inscripcion');
+                                formAnular.addEventListener('submit', function(e) {
+                                    e.preventDefault();
+                                    Swal.fire({
+                                        title: `¿Estás seguro de anular la inscripción?`,
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#e3342f',
+                                        cancelButtonColor: '#6c757d',
+                                        confirmButtonText: 'Anular',
+                                        cancelButtonText: 'Cancelar'
+                                    }).then(result => {
+                                        if (result.isConfirmed) formAnular.submit();
+                                    });
+                                })
+                            </script> --}}
                         @endif
                     @endif
 
@@ -96,7 +112,7 @@
                         <div class="absolute top-2 right-2">
                             @if ($pago->status)
                                 @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN]))
-                                    <form method="POST" onsubmit="return confirm('¿Estás seguro de anular este pago?')"
+                                    <form method="POST" id='anular-pago'
                                         action="{{ route('pago.destroy', [$pago->id]) }}">
                                         @csrf
                                         @method('DELETE')
@@ -143,35 +159,36 @@
             <section class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-blue-700 mb-4">📁 Documentos</h2>
+                    @if (!$inscripcion->estaAnulado())
+                        <div class="flex space-x-2">
+                            {{-- Verifica si el usuario tiene permiso --}}
+                            @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                                @if ($inscripcion->estaAprobado())
+                                    <p class="text-green-700 text-sm bg-green-50 p-2">Documentos aprobados</p>
+                                @else
+                                    {{-- Botón para aprobar inscripción --}}
+                                    <form method="POST" id="aprobar-inscripcion"
+                                        action="{{ route('inscripcion-paquetes.aprobar', $inscripcion->id) }}">
+                                        @csrf
+                                        <button type="submit" {{-- onclick="return confirm('¿Estás seguro de aprobar esta inscripción?')" --}}
+                                            class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
+                                            aria-label="Aprobar inscripción" title="Aprobar inscripción">
+                                            Aprobar
+                                        </button>
+                                    </form>
+                                @endif
 
-                    <div class="flex space-x-2">
-                        {{-- Verifica si el usuario tiene permiso --}}
-                        @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
-                            @if ($inscripcion->estaAprobado())
-                                <p class="text-green-700 font-medium bg-green-50 p-2">Documentos aprobados</p>
-                            @else
-                                {{-- Botón para aprobar inscripción --}}
-                                <form method="POST"
-                                    action="{{ route('inscripcion-paquetes.aprobar', $inscripcion->id) }}">
-                                    @csrf
-                                    <button type="submit"
-                                        onclick="return confirm('¿Estás seguro de aprobar esta inscripción?')"
-                                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
-                                        aria-label="Aprobar inscripción" title="Aprobar inscripción">
-                                        Aprobar
+                                @if (!$inscripcion->estaAprobado())
+                                    <button
+                                        onclick="document.getElementById('modal-observacion').classList.remove('hidden')"
+                                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">
+                                        Registrar Observación
                                     </button>
-                                </form>
+                                @endif
                             @endif
 
-
-
-                            {{-- Botón para registrar observaciones (siempre visible) --}}
-                            <button onclick="document.getElementById('modal-observacion').classList.remove('hidden')"
-                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">
-                                Registrar Observación
-                            </button>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Modal de Observación --}}
@@ -215,8 +232,7 @@
                                                 <input type="hidden" name="titulo[]" value="{{ $doc }}">
                                             </td>
                                             <td class="p-1">
-                                                <textarea name="observacion[]" rows="2" class="w-full border border-gray-300 rounded p-1 text-xs resize-none"
-                                                    placeholder="Sin observación">Sin observación</textarea>
+                                                <textarea name="observacion[]" rows="2" class="w-full border border-gray-300 rounded p-1 text-xs resize-none"></textarea>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -262,9 +278,9 @@
                         <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
                             <div><strong>Inicio:</strong> {{ $inscripcion->vigencia->fecha_inicio }}</div>
                             <div><strong>Fin:</strong> {{ $inscripcion->vigencia->fecha_fin }}</div>
-                            <div><strong>Estado:</strong>
+                            {{-- <div><strong>Estado:</strong>
                                 <x-status-badge :value="$inscripcion->vigencia->status" />
-                            </div>
+                            </div> --}}
                         </div>
                     @else
                         <p class="text-gray-500 text-sm">No se registró vigencia.</p>
@@ -392,5 +408,55 @@
 
             // }
         }
+        // Función genérica para mostrar alertas
+        // function mostrarAlertaConfirmacion(titulo, texto, icono, textoConfirmacion, callback) {
+        // }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('en-revision-inscripcion')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                mostrarAlertaConfirmacion(
+                    '¿Pasar a Revisión?',
+                    'La inscripción se pondrá en estado de revisión.',
+                    'warning',
+                    'Sí, en revisión',
+                    () => this.submit()
+                );
+            });
+
+            document.getElementById('anular-inscripcion')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                mostrarAlertaConfirmacion(
+                    '¿Anular Inscripción?',
+                    'Esta acción no se puede deshacer.',
+                    'error',
+                    'Sí, anular',
+                    () => this.submit()
+                );
+            });
+
+            document.getElementById('aprobar-inscripcion')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                mostrarAlertaConfirmacion(
+                    '¿Aprobar Inscripción?',
+                    'La inscripción quedará aprobada.',
+                    'success',
+                    'Aprobar',
+                    () => this.submit()
+                );
+            });
+
+            document.getElementById('anular-pago')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                mostrarAlertaConfirmacion(
+                    '¿Anular Pago?',
+                    'Este pago se marcará como anulado.',
+                    'error',
+                    'Sí, anular',
+                    () => this.submit()
+                );
+            });
+        });
     </script>
 </x-app-layout>

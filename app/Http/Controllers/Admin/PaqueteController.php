@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
 class PaqueteController extends Controller
@@ -55,7 +56,13 @@ class PaqueteController extends Controller
     {
         $request->validate([
             'id_area' => 'required|exists:area,id',
-            'descripcion' => 'required|string|max:100|unique:paquete,descripcion',
+            'descripcion' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('paquete', 'descripcion')
+                    ->where(fn($query) => $query->where('id_area', $request->id_area)),
+            ],
             'costo_paquete' => [
                 'required',
                 'numeric',
@@ -86,8 +93,22 @@ class PaqueteController extends Controller
     {
         $request->validate([
             'id_area' => 'required|exists:area,id',
-            'descripcion' => 'required|string|max:100|unique:paquete,descripcion,' . $paquete->id,
-            'costo_paquete' => 'required|integer',
+            'descripcion' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('paquete', 'descripcion')
+                    ->ignore($paquete->id)
+                    ->where(fn($query) => $query->where('id_area', $request->id_area)),
+            ],
+            'costo_paquete' => [
+                'required',
+                'numeric',
+                'min:0',
+                'max:15000',
+                'regex:/^\d+(\.\d{1,2})?$/'
+            ],
+            'max_participantes' => 'required|integer|min:0',
             'tipo_laboratorio_ids' => 'array',
             'tipo_laboratorio_ids.*' => 'exists:tipo_laboratorio,id',
             'status' => 'required|boolean',

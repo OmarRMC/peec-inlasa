@@ -228,7 +228,7 @@ class LabController extends Controller
             'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
             'sigla_lab' => 'nullable|string|max:20|unique:laboratorio,sigla_lab',
-            'nit_lab' => 'nullable|numeric|unique:laboratorio,nit_lab',
+            'nit_lab' => 'nullable|numeric',
             'id_nivel' => 'required|exists:nivel_laboratorio,id',
             'id_tipo' => 'required|exists:tipo_laboratorio,id',
             'id_categoria' => 'required|exists:categoria,id',
@@ -406,9 +406,15 @@ class LabController extends Controller
                 'created_by' => $user->id,
                 'updated_by' =>  $user->id,
             ]);
-            Mail::to($user->email)->send(new EnvioCodigoLab($user, $lab));
-            DB::commit();
-            $labTem->delete();
+            try {
+                Mail::to($user->email)->send(new EnvioCodigoLab($user, $lab));
+                DB::commit();
+                $labTem->delete();
+            } catch (\Throwable $th) {
+                \Log::error('Error al enviar el correo de confirmación: ' . $th->getMessage());
+                DB::rollBack();
+                return redirect('login')->with('info', 'Laboratorio confirmado exitosamente, pero no se pudo enviar el correo de confirmación.');
+            }
             return redirect('login')->with('success', 'El laboratorio fue confirmado y registrado correctamente. Se ha enviado el código asignado al correo electrónico principal proporcionado.');
         } catch (\Throwable $e) {
             DB::rollBack();

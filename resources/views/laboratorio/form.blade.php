@@ -385,6 +385,7 @@
             <label for="password" class="label  {{ !$edit ? 'required-label' : '' }}">Contraseña</label>
             <div class="relative">
                 <input type="password" name="password" id="password"
+                    autocomplete="off"
                     @unless ($edit) required @endunless
                     class="input-standard pr-10 w-full @error('password') border-red-500 @enderror"
                     placeholder="Mínimo 8 caracteres">
@@ -404,6 +405,7 @@
                 Contraseña</label>
             <div class="relative">
                 <input type="password" name="password_confirmation" id="password_confirmation"
+                   autocomplete="off"
                     @unless ($edit) required @endunless
                     class="input-standard pr-10 w-full @error('password_confirmation') border-red-500 @enderror"
                     placeholder="Repetir contraseña">

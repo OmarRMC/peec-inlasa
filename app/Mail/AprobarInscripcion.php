@@ -9,31 +9,30 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class EnvioObsLab extends Mailable
+class AprobarInscripcion extends Mailable
 {
     use Queueable, SerializesModels;
 
     protected $usuario;
     protected $laboratorio;
-
-    protected $observaciones;
-
+    protected $gestion;
     /**
      * Create a new message instance.
      */
-    public function __construct($usuario, $laboratorio, $observaciones)
+    public function __construct($usuario, $laboratorio, $gestion)
     {
         $this->usuario = $usuario;
         $this->laboratorio = $laboratorio;
-        $this->observaciones = $observaciones;
+        $this->gestion = $gestion;
     }
+
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Su inscripcion tiene observaciones',
+            subject: 'Su inscripción fue Aprobada',
         );
     }
 
@@ -43,11 +42,11 @@ class EnvioObsLab extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.obs_docs_lab',
+            view: 'emails.aprobar_inscripcion',
             with: [
                 'usuario' => $this->usuario,
                 'laboratorio' => $this->laboratorio,
-                'observaciones' => $this->observaciones
+                'gestion' => $this->gestion,
             ],
         );
     }

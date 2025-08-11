@@ -69,6 +69,7 @@ class UserController extends Controller
             'password'   => $request->password,
             'id_cargo'   => $request->id_cargo,
             'status'     => $request->status,
+            'email_verified_at' => now()
         ]);
 
         // $usuario->notify(new VerificarCorreoUser($usuario));

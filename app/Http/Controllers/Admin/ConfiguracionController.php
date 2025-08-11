@@ -116,6 +116,14 @@ class ConfiguracionController extends Controller
                 configuracion(Configuracion::NOTIFICACION_FECHA_FIN, $request->notificacion_fecha_fin);
                 break;
 
+            case 'email.informacion':
+                $request->validate([
+                    'email_informacion' => 'required|string',
+                ], [
+                    'email_informacion.string' => 'El mensaje debe ser una cadena de texto.',
+                ]);
+                configuracion(Configuracion::EMAIL_INFORMACION, $request->email_informacion);
+                break;
             default:
                 return redirect()->back()->with('error', 'Error en registrar la Configuración.');
         }

@@ -199,7 +199,7 @@
                         </button>
                         </td>
                     `;
-                    const textarea = document.createElement('textarea');
+                    const textarea = document.createElement('input');
                     textarea.className =
                         "w-full p-1 border rounded-md text-sm resize-none focus:outline-none focus:ring-1 focus:border-blue-300";
                     textarea.rows = 2;

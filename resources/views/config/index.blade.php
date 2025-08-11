@@ -15,7 +15,7 @@
                 </div>
             @endif
             {{-- , ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'] --}}
-            @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'],['id' => 'gestion', 'title' => 'Gestión de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones']] as $item)
+            @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'gestion', 'title' => 'Gestión de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.informacion', 'title' => 'Información personalizada para email']] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -122,7 +122,6 @@
                                         </div>
                                     </form>
                                 @break --}}
-
                                 @case('gestion')
                                     <form action="{{ route($config, 'gestion') }}" method="POST">
                                         @csrf @method('PUT')
@@ -200,6 +199,23 @@
 
                                         <p class="text-xs text-gray-500 mt-2">La fecha fin debe ser posterior o igual a la
                                             fecha inicio.</p>
+
+                                        <div class="text-right mt-4">
+                                            <button type="submit" class="btn-primary"><i
+                                                    class="fas fa-save mr-1"></i>Guardar</button>
+                                        </div>
+                                    </form>
+                                @break
+
+                                @case('email.informacion')
+                                    <form action="{{ route($config, 'email.informacion') }}" method="POST">
+                                        @csrf @method('PUT')
+                                        <div>
+                                            <label for="{{ Configuracion::EMAIL_INFORMACION }}"
+                                                class="block text-sm font-medium">Informacion (HTML permitido)</label>
+                                            <textarea name="{{ Configuracion::EMAIL_INFORMACION }}" id="{{ Configuracion::EMAIL_INFORMACION }}" rows="5"
+                                                class="input-standard" required>{{ old(Configuracion::EMAIL_INFORMACION, configuracion(Configuracion::EMAIL_INFORMACION) ?? '') }}</textarea>
+                                        </div>
 
                                         <div class="text-right mt-4">
                                             <button type="submit" class="btn-primary"><i

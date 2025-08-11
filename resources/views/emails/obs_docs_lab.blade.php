@@ -1,3 +1,6 @@
+@php
+use App\Models\Configuracion;
+@endphp
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="es">
  <head>
@@ -171,7 +174,7 @@ a[x-apple-data-detectors],
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">El código asignado a su laboratorio es el siguiente:</p></td>
                      </tr>
                      <tr style="border-collapse:collapse">
-                      <td align="left" style="padding:0;Margin:0;padding-top:10px"><h2 style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:24px;font-style:normal;font-weight:bold;line-height:28.8px;color:#0b5394">CÓDIGO:&nbsp;</h2><h2 style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:26px;font-style:normal;font-weight:bold;line-height:31.2px;color:#0b5394"><br></h2></td>
+                      <td align="left" style="padding:0;Margin:0;padding-top:10px"><h2 style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:24px;font-style:normal;font-weight:bold;line-height:28.8px;color:#0b5394">CÓDIGO:&nbsp;{{ $usuario->username}}</h2><h2 style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:26px;font-style:normal;font-weight:bold;line-height:31.2px;color:#0b5394"><br></h2></td>
                      </tr>
                      <tr style="border-collapse:collapse">
                       <td align="left" bgcolor="#0b5394" valign="middle" height="39" class="h-auto" style="padding:5px;Margin:0"><h1 style="Margin:0;font-family:tahoma, verdana, segoe, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:24px;font-style:normal;font-weight:normal;line-height:28.8px;color:#ffffff"><b>OBSERVACIONES EN DOCUMENTACIÓN&nbsp;</b></h1></td>
@@ -179,15 +182,16 @@ a[x-apple-data-detectors],
                      <tr style="border-collapse:collapse">
                       <td align="left" class="c" style="padding:0;Margin:0"><p class="b" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px"></p><p class="b" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px"><br></p><p class="b" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px">Su inscripción está bajo el estado de&nbsp;<strong>Tolerancia Documental</strong>, lo que implica que es necesario subsanar las siguientes observaciones:</p>
                        <ol style="font-family:arial, 'helvetica neue', helvetica, sans-serif;padding:0px 0px 0px 40px;margin-top:15px;margin-bottom:15px">
-                        <li class="b" style="color:#333333;margin:0px 0px 15px;font-size:12px;line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif"><p style="Margin:0;mso-line-height-rule:exactly;mso-margin-bottom-alt:15px;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px;mso-margin-top-alt:15px"><strong>Matrícula de Comercio</strong>:</p>
+                        @foreach ($observaciones as $key=>$obs)
+                        <li class="b" style="color:#333333;margin:0px 0px 15px;font-size:12px;line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif"><p style="Margin:0;mso-line-height-rule:exactly;mso-margin-bottom-alt:15px;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px;mso-margin-top-alt:15px"><strong>{{$key}}</strong>:</p>
                          <ul style="font-family:arial, 'helvetica neue', helvetica, sans-serif;padding:0px 0px 0px 40px;margin-top:15px;margin-bottom:15px">
-                          <li style="color:#333333;margin:0px 0px 15px;font-size:12px;line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif"><span style="line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:12px">Descripción</span></li>
-                         </ul></li>
-                        <li class="b" style="color:#333333;margin:0px 0px 15px;font-size:12px;line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif"><p style="Margin:0;mso-line-height-rule:exactly;mso-margin-bottom-alt:15px;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px"><strong>Contrato</strong>:</p>
-                         <ul style="font-family:arial, 'helvetica neue', helvetica, sans-serif;padding:0px 0px 0px 40px;margin-top:15px;margin-bottom:15px">
-                          <li style="color:#333333;margin:0px 0px 15px;font-size:12px;line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif"><span style="line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:12px">Descripción</span></li>
-                         </ul></li>
-                       </ol><p class="b" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px"><br></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><br></p></td>
+                          <li style="color:#333333;margin:0px 0px 15px;font-size:12px;line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif"><span style="line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:12px">{{$obs}}</span></li>
+                         </ul>
+                        </li>                        
+                        @endforeach
+                       </ol>
+                       
+                       <p class="b" style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px"><br></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><br></p></td>
                      </tr>
                      <tr style="border-collapse:collapse">
                       <td align="justify" class="a" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><span class="b" style="font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:12px">Por favor, realice las correcciones indicadas y envíe los documentos actualizados respondiendo a este correo o al correo&nbsp;<strong><a style="mso-line-height-rule:exactly;text-decoration:underline;color:#1376C8;font-size:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif" href="">controlexterno.inlasa@gmail.com</a></strong>, especificando el código y nombre de su laboratorio.</span></p><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"><span class="b" style="font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:12px"><br></span></p></td>
@@ -213,6 +217,11 @@ a[x-apple-data-detectors],
                      </tr>
                      <tr style="border-collapse:collapse">
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:16.5px;letter-spacing:0;color:#333333;font-size:11px;text-align:center">Si esto no funciona, copia el siguiente link y pégalo en un navegador. https://drive.google.com/drive/folders/1L0bXKo45Caj6iaXe7FgSl_ycYIrr7Fjf</p></td>
+                     </tr>
+                     <tr>
+                        <td align="left" style="padding:0;Margin:0">
+                        {!! configuracion(Configuracion::EMAIL_INFORMACION) !!}
+                      </td>
                      </tr>
                    </table></td>
                  </tr>

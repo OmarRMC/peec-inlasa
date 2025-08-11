@@ -14,10 +14,10 @@
     </a>
 
     @if (!$inscripcion->estaAnulado() && $inscripcion->estaEnRevision())
-        <form method="POST" action="{{ route('inscripciones.anular', $inscripcion->id) }}">
+        <form method="POST" class="anular-inscripcion" action="{{ route('inscripciones.anular', $inscripcion->id) }}">
             @csrf
             @method('PUT')
-            <button type="submit" onclick="return confirm('¿Estás seguro de anular esta inscripción?')"
+            <button type="submit"
                 class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
                 data-tippy-content="Anular inscripción">
                 <i class="fas fa-ban"></i>
