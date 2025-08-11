@@ -232,8 +232,7 @@
                                                 <input type="hidden" name="titulo[]" value="{{ $doc }}">
                                             </td>
                                             <td class="p-1">
-                                                <textarea name="observacion[]" rows="2" class="w-full border border-gray-300 rounded p-1 text-xs resize-none"
-                                                    placeholder="Sin observación">Sin observación</textarea>
+                                                <textarea name="observacion[]" rows="2" class="w-full border border-gray-300 rounded p-1 text-xs resize-none"></textarea>
                                             </td>
                                         </tr>
                                     @endforeach

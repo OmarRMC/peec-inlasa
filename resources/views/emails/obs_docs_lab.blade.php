@@ -1,3 +1,6 @@
+@php
+use App\Models\Configuracion;
+@endphp
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="es">
  <head>
@@ -214,6 +217,11 @@ a[x-apple-data-detectors],
                      </tr>
                      <tr style="border-collapse:collapse">
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:16.5px;letter-spacing:0;color:#333333;font-size:11px;text-align:center">Si esto no funciona, copia el siguiente link y pégalo en un navegador. https://drive.google.com/drive/folders/1L0bXKo45Caj6iaXe7FgSl_ycYIrr7Fjf</p></td>
+                     </tr>
+                     <tr>
+                        <td align="left" style="padding:0;Margin:0">
+                        {!! configuracion(Configuracion::EMAIL_INFORMACION) !!}
+                      </td>
                      </tr>
                    </table></td>
                  </tr>
