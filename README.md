@@ -108,14 +108,12 @@ npm run build
 
 ---
 
-## 🔑 Usuario inicial
+## 🔑 Usuario inicial (Admin)
 
 Después de instalar, puedes ingresar con:
 
-- **Usuario:** admin@peec-inlasa.com  
+- **Usuario:** admin  
 - **Contraseña:** password
-
-> Recuerda cambiar la contraseña después del primer inicio de sesión.
 
 ---
 
