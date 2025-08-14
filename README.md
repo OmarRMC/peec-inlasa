@@ -1,7 +1,7 @@
 # Sistema Web PEEC-INLASA
 
 Este sistema web está desarrollado en **Laravel 12** para la gestión de programas y procesos del **PEEC - INLASA**.  
-Incluye módulos para la administración de usuarios, gestión de laboratorios, inscripción a paquetes, validación de documentos y más.
+Incluye módulos para la administración de usuarios, gestión de laboratorios, inscripción a paquetes, documentos y más.
 
 ## 📋 Requisitos previos
 
