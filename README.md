@@ -140,9 +140,3 @@ public/         # Archivos públicos
 - **Tailwind CSS**
 - **JavaScript (ES6)**
 - **npm / Vite**
-
----
-
-## 📜 Licencia
-
-Este proyecto es propiedad del **PEEC - INLASA** y su uso está restringido.
