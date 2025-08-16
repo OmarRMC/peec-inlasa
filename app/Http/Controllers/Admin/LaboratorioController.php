@@ -26,11 +26,14 @@ class LaboratorioController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('canany:' . Permiso::GESTION_LABORATORIO . ',' . Permiso::ADMIN)->only(['index', 'create', 'store', 'show', 'edit', 'destroy', 'getData']);
+        $this->middleware('canany:' . Permiso::GESTION_LABORATORIO . ',' . Permiso::ADMIN)->only(['create', 'store', 'show', 'edit', 'destroy']);
     }
 
     public function index()
     {
+        if (!Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])) {
+            abort(403, 'No tienes permiso para acceder a esta acción.');
+        }
         $laboratorios = Laboratorio::with('usuario')->latest()->paginate(10);
         // Cargar países para el filtro
         $paises = Pais::active()->get();
@@ -362,6 +365,9 @@ class LaboratorioController extends Controller
 
     public function getData(Request $request)
     {
+        if (!Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])) {
+            abort(403, 'No tienes permiso para acceder a esta acción.');
+        }
         $query = Laboratorio::query()->with(['pais', 'usuario', 'departamento', 'provincia', 'municipio', 'tipo', 'categoria', 'nivel']);
 
         foreach (['pais', 'dep', 'prov', 'municipio', 'tipo', 'categoria', 'nivel'] as $f) {

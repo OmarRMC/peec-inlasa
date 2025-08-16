@@ -126,9 +126,9 @@
             </button>
             <div x-show="openMenu === 2" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
                 <a href="{{ route('configuracion.cerfificado') }}"
-    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-    <i class="fas fa-cog"></i> Configuración
-</a>
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                    <i class="fas fa-cog"></i> Configuración
+                </a>
                 <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                         class="fas fa-certificate"></i> Participación
                 </a>
@@ -200,7 +200,7 @@
                         <i class="fas fa-tags"></i> Categoría
                     </a>
                 @endif
-                @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_LABORATORIO]))
+                @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_LABORATORIO, Permiso::GESTION_INSCRIPCIONES]))
                     <a href="{{ route('laboratorio.index') }}"
                         class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
                         <i class="fas fa-flask"></i> Laboratorios registrados
