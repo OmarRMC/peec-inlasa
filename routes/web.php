@@ -80,6 +80,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
 
     Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
     Route::put('/configuracion/update/{seccion}', [ConfiguracionController::class, 'update'])->name('configuracion.update');
+    Route::get('/configuracion/certificado', [ConfiguracionController::class, 'certificados'])->name('configuracion.cerfificado');
 
     Route::resource('formularios', FormularioController::class);
 });
