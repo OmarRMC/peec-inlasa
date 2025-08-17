@@ -159,7 +159,8 @@
                 <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                         class="fas fa-certificate"></i> Participación
                 </a>
-                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                <a href="{{ route('certificado-desempeno.index') }}"
+                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                         class="fas fa-medal"></i> Desempeño
                 </a>
             </div>

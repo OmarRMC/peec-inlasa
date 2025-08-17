@@ -84,6 +84,10 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/configuracion/certificado', [ConfiguracionController::class, 'certificados'])->name('configuracion.cerfificado');
 
     Route::resource('formularios', FormularioController::class);
+
+    Route::get('/desempeno/detalle-certificado/data', [InscripcionPaqueteController::class, 'certificadoDesempenoIndex'])->name('certificado-desempeno.index');
+    Route::get('/desempeno/detalle-certificado/ajax/{id}/data', [InscripcionPaqueteController::class,  'certificadoDesempenoAjaxIndex'])->name('certificado-desempeno.ajax.index');
+    Route::get('/certificados-desempeno/ea/{id}/labs', [InscripcionPaqueteController::class,  'certificadoDesempenoListLabs'])->name('certificados.desempeno.labs.show');    
 });
 Route::middleware(['auth', 'usuario.activo', 'canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_INSCRIPCIONES])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');
