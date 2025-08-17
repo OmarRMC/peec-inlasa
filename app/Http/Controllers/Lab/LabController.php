@@ -164,7 +164,45 @@ class LabController extends Controller
         return view('inscripcion_paquete.show', compact('inscripcion', 'backTo'));
     }
 
+    public function certificadosDisponibles()
+    {
+        Gate::authorize(Permiso::LABORATORIO);
+        $user = Auth::user();
+        $laboratorio = $user->laboratorio;
+        $inscripciones = $laboratorio->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', function ($query) {
+                $query->Publicado();
+            })
+            ->with(['certificado.detalles'])
+            ->get()
+            ->map(function ($inscripcion) {
+                $tiene = $inscripcion->certificado
+                    ->detalles
+                    ->contains(function ($detalle) {
+                        return !is_null($detalle->calificacion_certificado);
+                    });
+                $inscripcion->tiene_certificado_desempeno = $tiene;
+                return $inscripcion;
+            });
 
+        $certificadosDisponibles = $inscripciones
+            ->groupBy('gestion')
+            ->map(function ($inscripciones) {
+                $tieneDesempeno = $inscripciones->contains(function ($inscripcion) {
+                    return $inscripcion->tiene_certificado_desempeno;
+                });
+
+                return (object) [
+                    'inscripciones' => $inscripciones,
+                    'tiene_certificado_desempeno' => $tieneDesempeno,
+                    'codigo' => $inscripciones->first()->laboratorio->cod_lab ?? ''
+                ];
+            });
+        return view('certificados.lab.certificados_disponibles', compact('certificadosDisponibles'));
+    }
+
+    public function getCertificadosDisponibleData() {}
 
     /**
      * Show the form for creating a new resource.

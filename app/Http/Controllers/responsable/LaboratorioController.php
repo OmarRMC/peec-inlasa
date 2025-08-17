@@ -170,16 +170,17 @@ class LaboratorioController extends Controller
                 [
                     'gestion_certificado' => $inscripcion->gestion,
                     'nombre_coordinador' => $configCoordRed->nombre,
-                    'nombre_jefe'        => $configEvalExt->nombre,
-                    'nombre_director'    => $configDirGen->nombre,
-                    'firma_coordinador'  => $configCoordRed->imagen,
-                    'firma_jefe'         => $configEvalExt->imagen,
-                    'firma_director'     => $configDirGen->imagen,
+                    'nombre_jefe' => $configEvalExt->nombre,
+                    'nombre_director' => $configDirGen->nombre,
+                    'firma_coordinador' => $configCoordRed->imagen,
+                    'firma_jefe' => $configEvalExt->imagen,
+                    'firma_director' => $configDirGen->imagen,
                     'nombre_laboratorio' => $lab->nombre_lab,
+                    'cod_lab' => $lab->cod_lab,
                     'codigo_certificado' => null,
-                    'tipo_certificado'   => 1,
+                    'tipo_certificado' => 1,
                     'status_certificado' => 0,
-                    'publicado'          => 0,
+                    'publicado' => 0,
                 ]
             );
             DetalleCertificado::updateOrCreate(
@@ -305,7 +306,7 @@ class LaboratorioController extends Controller
             ->addColumn('cod_lab', fn($ea) => $ea->inscripcion->laboratorio->cod_lab)
             ->addColumn('wapp_lab', fn($ea) => $ea->inscripcion->laboratorio->wapp_lab)
             ->addColumn('mail_lab', fn($ea) => $ea->inscripcion->laboratorio->mail_lab ?? '-')
-            ->addColumn('desempeno', fn($ea)=>$ea->inscripcion->certificado->detalles->first()?->calificacion_certificado ?? '')
+            ->addColumn('desempeno', fn($ea) => $ea->inscripcion->certificado->detalles->first()?->calificacion_certificado ?? '')
             ->toJson();
     }
 }

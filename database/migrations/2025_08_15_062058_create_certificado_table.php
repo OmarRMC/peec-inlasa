@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('certificado', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_inscripcion');
+            $table->string('cod_lab', 20)->nullable();
             $table->integer('gestion_certificado')->unsigned();
             $table->string('nombre_coordinador', 200);
             $table->string('nombre_jefe', 200);

@@ -157,10 +157,28 @@
                     <i class="fas fa-cog"></i> Configuración
                 </a>
                 <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                        class="fas fa-certificate"></i> Participación
+                        class="fas fa-certificate"></i> Participación y Desempeño
                 </a>
                 <a href="{{ route('certificado-desempeno.index') }}"
                     class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-medal"></i> Modificar el Desempeño
+                </a>
+            </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::LABORATORIO]))
+        <div>
+            <button @click="openMenu !== 300 ? openMenu = 300 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-certificate w-5 text-indigo-500"></i>
+                <span>Certificados</span>
+                <i class="fas ml-auto" :class="openMenu === 300 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 300" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                <a href="{{route('lab.certificados.disponibles.index')}}" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                        class="fas fa-certificate"></i> Participación
+                </a>
+                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                         class="fas fa-medal"></i> Desempeño
                 </a>
             </div>

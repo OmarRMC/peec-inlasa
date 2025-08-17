@@ -87,7 +87,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
 
     Route::get('/desempeno/detalle-certificado/data', [InscripcionPaqueteController::class, 'certificadoDesempenoIndex'])->name('certificado-desempeno.index');
     Route::get('/desempeno/detalle-certificado/ajax/{id}/data', [InscripcionPaqueteController::class,  'certificadoDesempenoAjaxIndex'])->name('certificado-desempeno.ajax.index');
-    Route::get('/certificados-desempeno/ea/{id}/labs', [InscripcionPaqueteController::class,  'certificadoDesempenoListLabs'])->name('certificados.desempeno.labs.show');    
+    Route::get('/certificados-desempeno/ea/{id}/labs', [InscripcionPaqueteController::class,  'certificadoDesempenoListLabs'])->name('certificados.desempeno.labs.show');
 });
 Route::middleware(['auth', 'usuario.activo', 'canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_INSCRIPCIONES])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');
@@ -106,6 +106,9 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/contrato', [LabController::class, 'generarContrato'])->name('formulario_contrato');
     Route::get('/formulario-ins/{id}', [LabController::class, 'generarFormularioIns'])->name('formulario_inscripcion');
     Route::put('/inscripcion/{id}/anular', [LabController::class, 'anularInscripcion'])->name('inscripciones.anular');
+
+    Route::get('/certificados', [LabController::class, 'certificadosDisponibles'])->name('lab.certificados.disponibles.index');
+    Route::get('/certificados/ajax/data', [LabController::class, 'getCertificadosDisponibleData'])->name('certificados.ajax.data');
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {

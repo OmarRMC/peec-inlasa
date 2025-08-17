@@ -10,9 +10,6 @@ class Certificado extends Model
     use HasFactory;
 
     protected $table = 'certificado';
-    // protected $primaryKey = 'id_certificado';
-    // public $incrementing = false; // porque definiste manualmente el PK como integer
-    // protected $keyType = 'int';
 
     protected $fillable = [
         'id_inscripcion',
@@ -30,6 +27,7 @@ class Certificado extends Model
         'status_certificado',
         'created_by',
         'updated_by',
+        'cod_lab',
         'publicado'
     ];
 
@@ -41,5 +39,19 @@ class Certificado extends Model
     public function detalles()
     {
         return $this->hasMany(DetalleCertificado::class, 'id_certificado');
+    }
+
+    public function scopePublicado($query)
+    {
+        return $query->where('publicado', true);
+    }
+
+    public function scopeNoPublicado($query)
+    {
+        return $query->where('publicado', false);
+    }
+    public function scopeConDetalles($query)
+    {
+        return $query->has('detalles');
     }
 }
