@@ -22,6 +22,7 @@ class ConfiguracionSeeder extends Seeder
       Configuracion::FECHA_FIN_VIGENCIA       => $now->copy()->addMonths(12)->format('Y-m-d'),
 
       Configuracion::GESTION_ACTUAL           => $now->year,
+      Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION => $now->year,
 
       Configuracion::NOTIFICACION_KEY         => 'info-general',
       Configuracion::NOTIFICACION_TITULO      => 'Bienvenido al sistema SIGPEEC',

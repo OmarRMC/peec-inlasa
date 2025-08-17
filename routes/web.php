@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\ConfiguracionController;
 use App\Http\Controllers\Admin\DepartamentoController;
+use App\Http\Controllers\Admin\DetalleCertificadoController;
 use App\Http\Controllers\Admin\EnsayoAptitudController;
 use App\Http\Controllers\Admin\FormularioController;
 use App\Http\Controllers\Admin\InscripcionPaqueteController;
@@ -105,7 +106,13 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
     Route::get('/ea/{id}/labs', [ResponsableLaboratorioController::class, 'index'])->name('ea.lab.inscritos');
+    Route::get('/ea/{id}/certificados', [ResponsableLaboratorioController::class, 'showUploadCertificado'])->name('ea.lab.certificados');
+    Route::post('/ea/{id}/subir_ponderaciones', [ResponsableLaboratorioController::class, 'uploadCertificadoData'])->name('ea.lab.subir.ponderaciones');
+    Route::get('/ea/{id}/en_revision', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoTemporal'])->name('ea.lab.desempeno.temporal');
     Route::get('/ea/{id}/labs-ajax', [ResponsableLaboratorioController::class, 'getData'])->name('ea.lab.inscritos.ajax');
+    Route::post('/detalle-certificado/{id}', [DetalleCertificadoController::class, 'update'])->name('detalle-certificado.update');
+    Route::post('/ea/{id}/certificado/confirmar', [ResponsableLaboratorioController::class, 'confirmarDatosCertificados'])->name('confirmar.datos.certificados');
+    Route::get('/ea/{id}/certificado/confirmados', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoConfirmados'])->name('ea.lab.desempeno.confirmado');
 });
 
 require __DIR__ . '/auth.php';

@@ -25,4 +25,6 @@ class DetalleInscripcion extends Model
     {
         return $this->belongsTo(Paquete::class, 'id_paquete');
     }
+
+    
 }

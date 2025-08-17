@@ -111,6 +111,33 @@
                     </div>
                 @endforeach
             </div>
+            <button @click="openMenu !== 21 ? openMenu = 21 : openMenu = null"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-vials w-5 text-indigo-500"></i>
+                <span>Certificados</span>
+                <i class="fas ml-auto" :class="openMenu === 20 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 21" x-collapse.duration.200ms class="ml-8 mt-1 space-y-1">
+                @foreach (Auth::user()->responsablesEA as $ea)
+                    <div>
+                        <div class="font-semibold text-indigo-700 px-3 py-1">
+                            {{-- <i class="fas fa-vial"></i> EA: {{ $ea->descripcion }} --}}
+                            <a href="{{ route('ea.lab.certificados', $ea->id) }}"
+                                class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                                <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
+                                {{ $ea->descripcion }}
+                            </a>
+                        </div>
+                        {{-- @foreach ($ea->inscripciones as $inscripcion)
+                            <a href="{{ route('ruta.lab.resultados', $inscripcion->laboratorio->id) }}"
+                                class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                                <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
+                                {{ $inscripcion->laboratorio->nombre }}
+                            </a>
+                        @endforeach --}}
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
 

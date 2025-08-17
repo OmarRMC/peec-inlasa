@@ -166,17 +166,19 @@ class ConfiguracionController extends Controller
                 ]);
 
                 $actuales = [
-                    Configuracion::CARGO_EVALUACION_EXTERNA => json_decode(configuracion(Configuracion::CARGO_EVALUACION_EXTERNA), true) ?? [],
-                    Configuracion::CARGO_COORDINADORA_RED  => json_decode(configuracion(Configuracion::CARGO_COORDINADORA_RED), true) ?? [],
-                    Configuracion::CARGO_DIRECTORA_GENERAL => json_decode(configuracion(Configuracion::CARGO_DIRECTORA_GENERAL), true) ?? [],
+                    Configuracion::CARGO_EVALUACION_EXTERNA => configuracion(Configuracion::CARGO_EVALUACION_EXTERNA) ?? (object) [],
+                    Configuracion::CARGO_COORDINADORA_RED  => configuracion(Configuracion::CARGO_COORDINADORA_RED) ?? (object) [],
+                    Configuracion::CARGO_DIRECTORA_GENERAL => configuracion(Configuracion::CARGO_DIRECTORA_GENERAL) ?? (object) [],
                 ];
+
                 $nuevos = [
                     Configuracion::CARGO_EVALUACION_EXTERNA => $request->evaluacion_externa,
                     Configuracion::CARGO_COORDINADORA_RED  => $request->coordinadora_red,
                     Configuracion::CARGO_DIRECTORA_GENERAL => $request->directora_general,
                 ];
+
                 foreach ($nuevos as $clave => $datosNuevos) {
-                    $datosActuales = $actuales[$clave] ?? [];
+                    $datosActuales = $actuales[$clave] ?? (object) [];
 
                     if (isset($datosNuevos['imagen']) && $datosNuevos['imagen'] instanceof \Illuminate\Http\UploadedFile) {
                         $folder = str_replace('_', '-', strtolower($clave));
@@ -190,17 +192,29 @@ class ConfiguracionController extends Controller
                             $nombreArchivo,
                             ['visibility' => Visibility::PUBLIC]
                         );
+
                         $datosNuevos['imagen'] = Storage::url($path);
                     } else {
-                        $datosNuevos['imagen'] = $datosActuales['imagen'] ?? null;
+                        $datosNuevos['imagen'] = $datosActuales->imagen ?? null;
                     }
-
-                    if ($datosNuevos != $datosActuales) {
-                        $datosFinales = array_merge($datosActuales, $datosNuevos);
+                    $arrActuales = (array) $datosActuales;
+                    if ($datosNuevos != $arrActuales) {
+                        $datosFinales = array_merge($arrActuales, $datosNuevos);
                         configuracion($clave, $datosFinales);
                     }
                 }
                 break;
+            case 'gestionCertificado':
+                $request->validate([
+                    'registro_ponderaciones_certificados_gestion' => 'required|digits:4',
+                ], [
+                    'registro_ponderaciones_certificados_gestion.required' => 'El campo gestión actual es obligatorio.',
+                    'registro_ponderaciones_certificados_gestion.digits' => 'La gestión debe contener exactamente 4 dígitos.',
+                ]);
+
+                configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION, $request->registro_ponderaciones_certificados_gestion);
+                break;
+
             default:
                 return redirect()->back()->with('error', 'Error en registrar la Configuración.');
         }

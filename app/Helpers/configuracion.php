@@ -12,7 +12,9 @@ if (!function_exists('configuracion')) {
                 ['valor' => is_array($valor) ? json_encode($valor, JSON_UNESCAPED_UNICODE) : (string) $valor]
             );
         } else {
-            return Configuracion::find($key)?->valor;
+            $config = Configuracion::find($key)?->valor;
+            $decoded = json_decode($config);
+            return json_last_error() === JSON_ERROR_NONE ? $decoded : $config;
         }
     }
 }
