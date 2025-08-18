@@ -22,6 +22,7 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
+use App\Http\Controllers\CertificadoController;
 use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
@@ -88,6 +89,10 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/desempeno/detalle-certificado/data', [InscripcionPaqueteController::class, 'certificadoDesempenoIndex'])->name('certificado-desempeno.index');
     Route::get('/desempeno/detalle-certificado/ajax/{id}/data', [InscripcionPaqueteController::class,  'certificadoDesempenoAjaxIndex'])->name('certificado-desempeno.ajax.index');
     Route::get('/certificados-desempeno/ea/{id}/labs', [InscripcionPaqueteController::class,  'certificadoDesempenoListLabs'])->name('certificados.desempeno.labs.show');
+
+    Route::get('/certificados/desempeno-participacion', [CertificadoController::class,  'certificadoDesempenoParticionListLabs'])->name('list.cert.participacion.desemp');
+
+    Route::post('/certificados/publicar/{gestion}', [CertificadoController::class,  'publicarCertificado'])->name('certificados.publicar');
 });
 Route::middleware(['auth', 'usuario.activo', 'canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_INSCRIPCIONES])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');
