@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_certificado');
             $table->unsignedBigInteger('id_paquete')->nullable();
             $table->unsignedBigInteger('id_ea');
+            $table->string('detalle_area');
             $table->string('detalle_ea', 400);
             $table->string('calificacion_certificado', 100)->nullable();
             $table->boolean('temporal')->default(0);

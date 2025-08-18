@@ -109,6 +109,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
 
     Route::get('/certificados', [LabController::class, 'certificadosDisponibles'])->name('lab.certificados.disponibles.index');
     Route::get('/certificados/ajax/data', [LabController::class, 'getCertificadosDisponibleData'])->name('certificados.ajax.data');
+    Route::get('/certificados/participacion/{gestion}', [LabController::class, 'certificadoPartificacionPDF'])->name('lab.certificados.participacion.pdf');
+    Route::get('/certificados/desemp/{gestion}', [LabController::class, 'certificadoDesempPDF'])->name('certificados.desemp.pdf');
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {

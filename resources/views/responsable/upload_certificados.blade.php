@@ -55,11 +55,11 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                             <i class="fas fa-search"></i>
                         </span>
-                        <input type="search" id="custom-search"
+                        <input type="search" id="custom-search-tem"
                             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                             placeholder="Buscar laboratorio...">
                     </div>
-                    <button id="btn-search"
+                    <button id="btn-search-tem"
                         class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-sm">
                         <i class="fas fa-search"></i>
                     </button>
@@ -117,11 +117,11 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                             <i class="fas fa-search"></i>
                         </span>
-                        <input type="search" id="custom-search"
+                        <input type="search" id="custom-search-ok"
                             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
                             placeholder="Buscar laboratorio...">
                     </div>
-                    <button id="btn-search"
+                    <button id="btn-search-ok"
                         class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-sm">
                         <i class="fas fa-search"></i>
                     </button>
@@ -167,23 +167,23 @@
                     ],
                     columns: [{
                             data: 'created_at',
-                            name: 'inscripcion.certificado.detalles.created_at'
+                            name: 'certificado.detalles.created_at'
                         },
                         {
                             data: 'cod_lab',
-                            name: 'inscripcion.laboratorio.cod_lab'
+                            name: 'laboratorio.cod_lab'
                         },
                         {
                             data: 'nombre_lab',
-                            name: 'inscripcion.laboratorio.nombre_lab'
+                            name: 'laboratorio.nombre_lab'
                         },
                         {
                             data: 'mail_lab',
-                            name: 'inscripcion.laboratorio.mail_lab',
+                            name: 'laboratorio.mail_lab',
                         },
                         {
                             data: 'wapp_lab',
-                            name: 'inscripcion.laboratorio.wapp_lab'
+                            name: 'laboratorio.wapp_lab'
                         },
                         {
                             data: 'actions',
@@ -234,9 +234,9 @@
                     }
                 });
 
-                $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());
-                $('#custom-search').on('keypress', e => {
-                    if (e.which === 13) table.search($('#custom-search').val()).draw();
+                $('#btn-search-tem').on('click', () => table.search($('#custom-search-tem').val()).draw());
+                $('#custom-search-tem').on('keypress', e => {
+                    if (e.which === 13) table.search($('#custom-search-tem').val()).draw();
                 });
                 $('#custom-length-tem').on('change', function() {
                     table.page.len(this.value).draw();
@@ -253,27 +253,27 @@
                     ],
                     columns: [{
                             data: 'created_at',
-                            name: 'inscripcion.certificado.detalles.created_at'
+                            name: 'certificado.detalles.created_at'
                         },
                         {
                             data: 'cod_lab',
-                            name: 'inscripcion.laboratorio.cod_lab'
+                            name: 'laboratorio.cod_lab'
                         },
                         {
                             data: 'nombre_lab',
-                            name: 'inscripcion.laboratorio.nombre_lab'
+                            name: 'laboratorio.nombre_lab'
                         },
                         {
                             data: 'mail_lab',
-                            name: 'inscripcion.laboratorio.mail_lab',
+                            name: 'laboratorio.mail_lab',
                         },
                         {
                             data: 'wapp_lab',
-                            name: 'inscripcion.laboratorio.wapp_lab'
+                            name: 'laboratorio.wapp_lab'
                         },
                         {
                             data: 'desempeno',
-                            name: 'inscripcion.certificado.detalles.calificacion_certificado'
+                            name: 'certificado.detalles.calificacion_certificado'
                         }
                     ],
                     language: {
@@ -288,6 +288,10 @@
                             paginationSelector: '#custom-pagination-certificado-ok'
                         });
                     }
+                });
+                $('#btn-search-ok').on('click', () => table2.search($('#custom-search-ok').val()).draw());
+                $('#custom-search-ok').on('keypress', e => {
+                    if (e.which === 13) table2.search($('#custom-search-ok').val()).draw();
                 });
                 $('#custom-length-ok').on('change', function() {
                     table2.page.len(this.value).draw();

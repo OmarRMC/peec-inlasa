@@ -31,7 +31,8 @@
 
                             <!-- Participación -->
                             <td class="px-4 py-3 text-center">
-                                <a href="#"
+                                <a href="{{ route('lab.certificados.participacion.pdf', ['gestion' => $gestion]) }}"
+                                    target="_blank"
                                     class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500 text-blue-600 hover:bg-blue-50 transition text-xs font-medium"
                                     data-tippy-content="Descargar certificado de participación">
                                     <i class="fas fa-file-pdf"></i> PDF
@@ -41,7 +42,8 @@
                             <!-- Desempeño -->
                             <td class="px-4 py-3 text-center">
                                 @if ($data->tiene_certificado_desempeno)
-                                    <a href="#" target="_blank"
+                                    <a href="{{ route('certificados.desemp.pdf', ['gestion' => $gestion]) }}"
+                                        target="_blank"
                                         class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-600 text-green-700 hover:bg-green-50 transition text-xs font-medium"
                                         data-tippy-content="Descargar certificado de desempeño">
                                         <i class="fas fa-file-signature"></i> PDF

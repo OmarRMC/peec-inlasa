@@ -7,6 +7,7 @@ use App\Models\CategoriaLaboratorio;
 use App\Models\Certificado;
 use App\Models\Configuracion;
 use App\Models\DetalleCertificado;
+use App\Models\Inscripcion;
 use App\Models\InscripcionEA;
 use App\Models\NivelLaboratorio;
 use App\Models\Pais;
@@ -133,6 +134,7 @@ class LaboratorioController extends Controller
         }
         $inscripciones = InscripcionEA::with([
             'inscripcion',
+            'ensayoAptitud.paquete.area',
             'inscripcion.laboratorio.departamento',
             'inscripcion.laboratorio.usuario'
         ])
@@ -190,6 +192,7 @@ class LaboratorioController extends Controller
                 ],
                 [
                     'detalle_ea' => $inscripcionEA->descripcion_ea,
+                    'detalle_area' => $inscripcionEA->ensayoAptitud->paquete->area->descripcion ?? null,
                     'calificacion_certificado' => $fila['desempeno'] != 'NULL' ? $fila['desempeno'] : null,
                     'updated_by' => $responsable->id,
                     'temporal' => true,
@@ -203,32 +206,36 @@ class LaboratorioController extends Controller
     {
         $responsable = Auth::user();
         $responsable->responsablesEA->findOrFail($idEa);
-        $query = InscripcionEA::with([
-            'inscripcion',
-            'inscripcion.laboratorio',
-            'inscripcion.certificado.detalles'
-        ])
-            ->where('inscripcion_ea.id_ea', $idEa)
-            ->whereHas('inscripcion', function ($q) {
-                $q->whereYear('fecha_inscripcion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
-                    ->Aprobado();
-            })
-            ->whereHas('inscripcion.certificado.detalles', function ($q) use ($idEa) {
+
+        $query = Inscripcion::with([
+            'laboratorio',
+            'certificado',
+            'certificado.detalles' => function ($q) use ($idEa) {
                 $q->where('temporal', true)
                     ->where('id_ea', $idEa);
-            });
+            }
+        ])
+            ->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
+            ->Aprobado()
+            ->whereHas('ensayos', function ($q) use ($idEa) {
+                $q->where('id_ea', $idEa);
+            })
+            ->whereHas('certificado.detalles', function ($q) use ($idEa) {
+                $q->where('temporal', true)
+                    ->where('id_ea', $idEa);
+            })->get();
 
         return datatables()
             ->of($query)
-            ->addColumn('created_at', fn($ea) => $ea->inscripcion->certificado->detalles->first()?->created_at ?? '-')
-            ->addColumn('nombre_lab', fn($ea) => $ea->inscripcion->laboratorio->nombre_lab)
-            ->addColumn('cod_lab', fn($ea) => $ea->inscripcion->laboratorio->cod_lab)
-            ->addColumn('wapp_lab', fn($ea) => $ea->inscripcion->laboratorio->wapp_lab)
-            ->addColumn('mail_lab', fn($ea) => $ea->inscripcion->laboratorio->mail_lab ?? '-')
-            ->addColumn('actions', function ($ea) {
+            ->addColumn('created_at', fn($insc) => $insc->certificado->detalles->first()?->created_at ?? '-')
+            ->addColumn('nombre_lab', fn($insc) => $insc->laboratorio->nombre_lab)
+            ->addColumn('cod_lab', fn($insc) => $insc->laboratorio->cod_lab)
+            ->addColumn('wapp_lab', fn($insc) => $insc->laboratorio->wapp_lab)
+            ->addColumn('mail_lab', fn($insc) => $insc->laboratorio->mail_lab ?? '-')
+            ->addColumn('actions', function ($insc) {
                 return view('responsable.certificados.action-buttons', [
-                    'updateUrl' => route('detalle-certificado.update', $ea->inscripcion->certificado->detalles->first()?->id),
-                    'desempeno' => $ea->inscripcion->certificado->detalles->first()?->calificacion_certificado ?? '',
+                    'updateUrl' => route('detalle-certificado.update', $insc->certificado->detalles->first()?->id),
+                    'desempeno' => $insc->certificado->detalles->first()?->calificacion_certificado ?? '',
                 ])->render();
             })
             ->rawColumns(['actions'])
@@ -243,24 +250,25 @@ class LaboratorioController extends Controller
         $responsable = Auth::user();
         $responsable->responsablesEA->findOrFail($idEa);
 
-        $query = InscripcionEA::with([
-            'inscripcion',
-            'inscripcion.laboratorio',
-            'inscripcion.certificado.detalles'
+        $query = Inscripcion::with([
+            'laboratorio',
+            'certificado',
+            'certificado.detalles' => function ($q) use ($idEa) {
+                $q->where('temporal', true)
+                    ->where('id_ea', $idEa);
+            }
         ])
-            ->where('inscripcion_ea.id_ea', $idEa)
-            ->whereHas('inscripcion', function ($q) {
-                $q->whereYear('fecha_inscripcion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
-                    ->Aprobado();
+            ->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
+            ->Aprobado()
+            ->whereHas('ensayos', function ($q) use ($idEa) {
+                $q->where('id_ea', $idEa);
             })
-            ->whereHas('inscripcion.certificado.detalles', function ($q) use ($idEa) {
+            ->whereHas('certificado.detalles', function ($q) use ($idEa) {
                 $q->where('temporal', true)
                     ->where('id_ea', $idEa);
             })->get();
-
         try {
-            foreach ($query as $inscripcionEA) {
-                $inscripcion = $inscripcionEA->inscripcion;
+            foreach ($query as $inscripcion) {
                 $certificado = $inscripcion->certificado;
                 $detalle = $certificado->detalles->first();
 
@@ -284,29 +292,31 @@ class LaboratorioController extends Controller
     {
         $responsable = Auth::user();
         $responsable->responsablesEA->findOrFail($idEa);
-        $query = InscripcionEA::with([
-            'inscripcion',
-            'inscripcion.laboratorio',
-            'inscripcion.certificado.detalles'
-        ])
-            ->where('inscripcion_ea.id_ea', $idEa)
-            ->whereHas('inscripcion', function ($q) {
-                $q->whereYear('fecha_inscripcion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
-                    ->Aprobado();
-            })
-            ->whereHas('inscripcion.certificado.detalles', function ($q) use ($idEa) {
+        $query = Inscripcion::with([
+            'laboratorio',
+            'certificado',
+            'certificado.detalles' => function ($q) use ($idEa) {
                 $q->where('temporal', false)
                     ->where('id_ea', $idEa);
-            });
-
+            }
+        ])
+            ->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
+            ->Aprobado()
+            ->whereHas('ensayos', function ($q) use ($idEa) {
+                $q->where('id_ea', $idEa);
+            })
+            ->whereHas('certificado.detalles', function ($q) use ($idEa) {
+                $q->where('temporal', false)
+                    ->where('id_ea', $idEa);
+            })->get();
         return datatables()
             ->of($query)
-            ->addColumn('created_at', fn($ea) => $ea->inscripcion->certificado->detalles->first()?->created_at ?? '-')
-            ->addColumn('nombre_lab', fn($ea) => $ea->inscripcion->laboratorio->nombre_lab)
-            ->addColumn('cod_lab', fn($ea) => $ea->inscripcion->laboratorio->cod_lab)
-            ->addColumn('wapp_lab', fn($ea) => $ea->inscripcion->laboratorio->wapp_lab)
-            ->addColumn('mail_lab', fn($ea) => $ea->inscripcion->laboratorio->mail_lab ?? '-')
-            ->addColumn('desempeno', fn($ea) => $ea->inscripcion->certificado->detalles->first()?->calificacion_certificado ?? '')
+            ->addColumn('created_at', fn($ins) => $ins->certificado->detalles->first()?->created_at ?? '-')
+            ->addColumn('nombre_lab', fn($ins) => $ins->laboratorio->nombre_lab)
+            ->addColumn('cod_lab', fn($ins) => $ins->laboratorio->cod_lab)
+            ->addColumn('wapp_lab', fn($ins) => $ins->laboratorio->wapp_lab)
+            ->addColumn('mail_lab', fn($ins) => $ins->laboratorio->mail_lab ?? '-')
+            ->addColumn('desempeno', fn($ins) => $ins->certificado->detalles->first()?->calificacion_certificado ?? '')
             ->toJson();
     }
 }

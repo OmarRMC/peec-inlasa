@@ -22,13 +22,13 @@ class DetalleCertificado extends Model
         'calificacion_certificado',
         'updated_by',
         'temporal',
+        'detalle_area'
     ];
 
     public function certificado()
     {
         return $this->belongsTo(Certificado::class, 'id_certificado');
     }
-    
     public function getCreatedAtAttribute($value)
     {
         return formatDate($value);
