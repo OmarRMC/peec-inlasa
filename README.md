@@ -210,6 +210,7 @@ public/storage
 - hacia la carpeta:
 ```bash
 storage/app/public
+```
 ---
 # Instalación de Imagick (Para QR)
 - Descarga la DLL de Imagick
