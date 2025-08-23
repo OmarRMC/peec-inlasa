@@ -143,8 +143,8 @@ public/         # Archivos públicos
 
 # Migración a XAMPP
 ## Mover el archivo del proyecto al httpdocs
-# Crear 2 VirtualHost 
-# Editar **httpd-vhosts.conf**
+## Crear 2 VirtualHost 
+## Editar **httpd-vhosts.conf**
 1. Archivo en:
 2. Abre con permisos de administrador:
 ```bash
@@ -210,4 +210,30 @@ public/storage
 - hacia la carpeta:
 ```bash
 storage/app/public
+---
+# Instalación de Imagick (Para QR)
+- Descarga la DLL de Imagick
+[Version de Imaginck](https://pecl.php.net/package/imagick)
+[Para windows](https://pecl.php.net/package/imagick/3.8.0/windows)
+> Nota: Thread Safe (TS) x..
+- Copiar la DLL a XAMPP
+1. Copia php_imagick.dll en la carpeta ext de tu PHP:
+```bash
+C:\xampp\php\ext\
 ```
+2. Si el zip trae más DLLs (como CORE_*.dll y IM_MOD_*.dll), cópialas a la carpeta (Recomendación ordenar por tipo):
+```bash
+C:\xampp\php\
+```
+> NOTA: Esto asegura que Imagick tenga todas las dependencias.
+- Edita tu php.ini
+1. Abre el archivo php.ini de XAMPP:
+```bash
+C:\xampp\php\php.ini
+```
+2. Al final del archivo, agrega esta línea:
+```bash
+extension=php_imagick.dll
+```
+3. Guarda el archivo.
+> Nota: Reinicia Apache
