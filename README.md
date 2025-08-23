@@ -138,3 +138,76 @@ public/         # Archivos públicos
 - **Tailwind CSS**
 - **JavaScript (ES6)**
 - **npm / Vite**
+
+---
+
+# Migración a XAMPP
+## Mover el archivo del proyecto al httpdocs
+# Crear 2 VirtualHost 
+# Editar **httpd-vhosts.conf**
+1. Archivo en:
+2. Abre con permisos de administrador:
+```bash
+C:\xampp\apache\conf\extra\httpd-vhosts.conf
+```
+3. Agrega lo siguiente:
+```bash
+# Dominio principal que apunta a htdocs
+<VirtualHost *:80>
+    ServerName inlasa.bo
+    DocumentRoot "C:/xampp/htdocs"
+    <Directory "C:/xampp/htdocs">
+        Options Indexes FollowSymLinks Includes ExecCGI
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+# Subdominio que apunta a peec-inlasa/public
+<VirtualHost *:80>
+    ServerName peec.inlasa.bo
+    DocumentRoot "C:/xampp/htdocs/peec-inlasa/public"
+    <Directory "C:/xampp/htdocs/peec-inlasa/public">
+        Options Indexes FollowSymLinks Includes ExecCGI
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
+## Editar hosts de Windows
+1. Abre con permisos de administrador:
+```bash
+C:\Windows\System32\drivers\etc\hosts
+```
+2. Agrega al final estas líneas:
+```bash
+127.0.0.1   inlasa.bo
+127.0.0.1   peec.inlasa.bo
+```
+# Configuraciones  php render de PDF 
+## En XAMPP (Windows)
+1. Ve a la carpeta donde está tu PHP, por ejemplo:
+```bash
+C:\xampp\php\php.ini
+```
+2. Abre php.ini con un editor de texto.
+3. Busca la línea:
+```bash
+;extension=gd
+```
+4. Quítale el ; (punto y coma) para habilitarla
+```bash
+extension=gd
+```
+# Ejecutar el siguiente comando para los archivos
+```bash
+php artisan storage:link
+```
+- Este comando en Laravel crea un enlace simbólico (shortcut) desde la carpeta:
+```bash
+public/storage
+```
+- hacia la carpeta:
+```bash
+storage/app/public
+```

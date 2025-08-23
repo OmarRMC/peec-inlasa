@@ -152,7 +152,7 @@
         .sig {
             display: table-cell;
             text-align: center;
-            vertical-align: bottom;
+            vertical-align: middle;
             padding: 0 4mm;
         }
 
@@ -174,8 +174,24 @@
             line-height: 1.25;
         }
 
+        .sig .instituto {
+            font-size: 8pt;
+            line-height: 1.25;
+        }
+
+        .firma {
+            position: relative;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
         /* Imágenes de firmas (opcionales) arriba de la línea) */
-        .sig img.signature {
+        .firma img.signature {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
             height: 18mm;
             margin-bottom: 2mm;
             object-fit: contain;
@@ -245,9 +261,9 @@
                 <img class="seal" src="{{ public_path('img/logoinlasa.jpg') }}" alt="Sello INLASA">
                 {{-- Logos (Bicentenario, Bolivia, Ministerio) --}}
                 <div class="logos">
-                    <img src="{{ public_path('img/logoinlasa.jpg') }}" alt="Bicentenario de Bolivia">
-                    <img src="{{ public_path('img/logoinlasa.jpg') }}" alt="Bolivia">
-                    <img src="{{ public_path('img/logoinlasa.jpg') }}" alt="Ministerio de Salud y Deportes">
+                    <img src="{{ '/img/logoinlasa.jpg' }}" alt="Bicentenario de Bolivia">
+                    <img src="{{ '/img/logoinlasa.jpg' }}" alt="Bolivia">
+                    <img src="{{ '/img/logoinlasa.jpg' }}" alt="Ministerio de Salud y Deportes">
                 </div>
             </div>
 
@@ -275,12 +291,63 @@
             </div>
 
             <!-- Firmas -->
-            <div class="signatures">
+            <table class="signatures">
+                <tr>
+                    <td class='firma'>
+                        @if (!empty($cert->firma_jefe))
+                            <img class="signature" src="{{ public_path($cert->firma_jefe) }}" alt="Firma Jefe">
+                        @endif
+                    </td>
+                    <td class='firma'>
+                        @if (!empty($cert->firma_coordinador))
+                            <img class="signature" src="{{ public_path($cert->firma_coordinador) }}" alt="Firma Coordinadora">
+                        @endif
+                    </td>
+                    <td class='firma'>
+                        @if (!empty($cert->firma_director))
+                            <img class="signature" src="{{ public_path($cert->firma_director) }}" alt="Firma Directora">
+                        @endif
+                    </td>
+                </tr>
+                <tr>
+                    <td class='sig'>
+                        <div class="name">{{ $cert->nombre_jefe }}</div>
+                    </td>
+                    <td class='sig'>
+                        <div class="name">{{ $cert->nombre_director }}</div>
+                    </td>
+                    <td class='sig'>
+                        <div class="name">{{ $cert->nombre_director }}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class='sig'>
+                        <div class="role">JEFE PROGRAMA DE EVALUACIÓN<br>EXTERNA DE LA CALIDAD</div>
+                    </td>
+                    <td class='sig'>
+                        <div class="role">COORDINADORA DIVISIÓN RED DE<br>LABORATORIOS DE SALUD PÚBLICA</div>
+                    </td>
+                    <td class='sig'>
+                        <div class="role">DIRECTORA GENERAL EJECUTIVA</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class='sig'>
+                        <div class="instituto">INLASA</div>
+                    </td>
+                    <td class='sig'>
+                        <div class="instituto">INLASA</div>
+                    </td>
+                    <td class='sig'>
+                        <div class="instituto">INLASA</div>
+                    </td>
+                </tr>
+            </table>
+            {{-- <div class="signatures">
                 <div class="sig">
                     @if (!empty($cert->firma_jefe))
                         <img class="signature" src="{{ public_path($cert->firma_jefe) }}" alt="Firma Jefe">
                     @endif
-                    <div class="line"></div>
                     <div class="name">{{ $cert->nombre_jefe }}</div>
                     <div class="role">JEFE PROGRAMA DE EVALUACIÓN<br>EXTERNA DE LA CALIDAD<br>INLASA</div>
                 </div>
@@ -289,7 +356,6 @@
                         <img class="signature" src="{{ public_path($cert->firma_coordinador) }}"
                             alt="Firma Coordinadora">
                     @endif
-                    <div class="line"></div>
                     <div class="name">{{ $cert->nombre_coordinador }}</div>
                     <div class="role">COORDINADORA DIVISIÓN RED DE<br>LABORATORIOS DE SALUD PÚBLICA<br>INLASA</div>
                 </div>
@@ -297,11 +363,10 @@
                     @if (!empty($cert->firma_director))
                         <img class="signature" src="{{ public_path($cert->firma_director) }}" alt="Firma Directora">
                     @endif
-                    <div class="line"></div>
                     <div class="name">{{ $cert->nombre_director }}</div>
                     <div class="role">DIRECTORA GENERAL EJECUTIVA<br>INLASA</div>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="gestion">Gestión {{ $cert->gestion_certificado }}</div>
 

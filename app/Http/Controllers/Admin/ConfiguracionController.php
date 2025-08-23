@@ -193,7 +193,7 @@ class ConfiguracionController extends Controller
                             ['visibility' => Visibility::PUBLIC]
                         );
 
-                        $datosNuevos['imagen'] = Storage::url($path);
+                        $datosNuevos['imagen'] = "/storage/{$path}";
                     } else {
                         $datosNuevos['imagen'] = $datosActuales->imagen ?? null;
                     }
