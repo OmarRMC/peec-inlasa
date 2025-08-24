@@ -219,7 +219,7 @@
             position: absolute;
             left: 3mm;
             bottom: 2mm;
-            font-size: 6pt;
+            font-size: 7pt;
             line-height: 1;
             text-align: justify;
             width: 55%;

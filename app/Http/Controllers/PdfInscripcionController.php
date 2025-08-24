@@ -9,6 +9,7 @@ use App\Models\Inscripcion;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PdfInscripcionController extends Controller
 {
@@ -54,6 +55,7 @@ class PdfInscripcionController extends Controller
             'generado_por' => Auth::user()->username ?? 'Sistema'
         ];
 
+        // return view('pdf.inscripcion_paquete_lab', $data);
         $pdf = Pdf::loadView('pdf.inscripcion_paquete_lab', $data);
         // $pdf->setPaper([0, 0, 612, 936], 'portrait');
         $pdf->setPaper('A4', 'portrait');
@@ -91,7 +93,8 @@ class PdfInscripcionController extends Controller
             'fechaLimitePago' => $fechaLimitePago,
             'convocatoria' => "Convocatoria del PEEC INLASA Gestión {$gestion}",
             'contrato_numero' => "MSyD/INLASA/PEEC/{$numero}/{$gestion}",
-            'departamento' => $laboratorio->departamento->nombre_dep
+            'departamento_raw' => $laboratorio->departamento->nombre_dep,
+            'departamento' => Str::title(strtolower($laboratorio->departamento->nombre_dep))
         ];
 
         // $pdf = Pdf::loadView('pdf.contrato_inscripcion_lab', $data);
