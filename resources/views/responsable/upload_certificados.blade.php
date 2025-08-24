@@ -17,7 +17,7 @@
 
         <div id="section-upload" class="bg-white rounded-lg shadow p-6">
             <h2 class="text-lg font-bold text-gray-800 mb-4">Subir los datos para la certificación de gestión
-                {{ $gestion }} - Ensayo A. {{ $ensayosAptitud->descripcion }}</h2>
+                {{ $gestion }} - Ensayo A. {!! $descripcion !!}</h2>
             <form action="{{ route('ea.lab.subir.ponderaciones', ['id' => $idEA]) }}" method="POST"
                 enctype="multipart/form-data"
                 class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 transition"

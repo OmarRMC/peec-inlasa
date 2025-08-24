@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Normalizer;
 
 class LaboratorioController extends Controller
 {
@@ -105,9 +106,24 @@ class LaboratorioController extends Controller
     {
         $responsable = Auth::user();
         $ensayosAptitud = $responsable->responsablesEA->findOrFail($id);
+        $paquete = $ensayosAptitud->paquete;
         $idEA = $ensayosAptitud->id;
+
+        $eaDesc = mb_strtolower(
+            trim(Normalizer::normalize($ensayosAptitud->descripcion, Normalizer::FORM_C)),
+            'UTF-8',
+        );
+        $paqueteDesc = mb_strtolower(
+            trim(Normalizer::normalize($paquete->descripcion, Normalizer::FORM_C)),
+            'UTF-8',
+        );
+        $descripcion = $ensayosAptitud->descripcion;
+        if($eaDesc != $paqueteDesc){
+            $descripcion ="</br>  $paquete->descripcion / $ensayosAptitud->descripcion";
+        }
+
         $gestion = configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year;
-        return view('responsable.upload_certificados', compact('ensayosAptitud', 'idEA', 'gestion'));
+        return view('responsable.upload_certificados', compact('ensayosAptitud', 'idEA', 'gestion', 'descripcion'));
     }
     public function uploadCertificadoData(Request $request, $id)
     {
