@@ -40,18 +40,15 @@ class DetalleCertificadoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        if (!Gate::any([Permiso::ADMIN, Permiso::RESPONSABLE])) {
+        if (!Gate::any([Permiso::ADMIN,  Permiso::GESTION_CERTIFICADOS])) {
             return response()->json(['message' => 'No tienes permiso para realizar esta acción.'], 403);
         }
-        $responsable = Auth::user();
-        // if (Gate::any([Permiso::RESPONSABLE])) {
-        //     $responsable->responsablesEA->findOrFail($id);
-        // }
         $request->validate([
             'calificacion_certificado' => 'nullable|string|max:100',
         ]);
         $DetalleCertificado = DetalleCertificado::findOrFail($id);
         $DetalleCertificado->calificacion_certificado = $request->calificacion_certificado;
+        $DetalleCertificado->updated_by = Auth::user()->id;
         $DetalleCertificado->save();
         return response()->json(['message' => 'Detalle certificado actualizado correctamente.']);
     }

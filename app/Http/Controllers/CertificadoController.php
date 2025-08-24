@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Certificado;
+use App\Models\Configuracion;
 use App\Models\Inscripcion;
+use App\Models\Permiso;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
 class CertificadoController extends Controller
@@ -52,11 +55,17 @@ class CertificadoController extends Controller
 
     public function certificadoDesempenoParticionListLabs()
     {
-        $gestiones = ['2025', '2024', '2023'];
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS])) {
+            return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
+        }
+        $gestiones = Configuracion::GESTION_FILTER;
         return view('certificados.admin.des_participacion', compact('gestiones'));
     }
     public function publicarCertificado(Request $request, $gestion)
     {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS])) {
+            return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
+        }
         $total = Certificado::where('gestion_certificado', $gestion)
             ->noPublicado()
             ->whereHas('inscripcion', fn($q) => $q->Aprobado())

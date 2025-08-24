@@ -53,7 +53,7 @@ class InscripcionPaqueteController extends Controller
             'categorias' => CategoriaLaboratorio::all(),
             // 'paquetes' => Paquete::orderBy('descripcion', 'asc')->get(),
             'paquetes' => [],
-            'gestiones' => ['2025', '2024', '2023'],
+            'gestiones' => Configuracion::GESTION_FILTER,
         ]);
     }
     public function getInscripcionesData(Request $request)
@@ -398,10 +398,9 @@ class InscripcionPaqueteController extends Controller
 
     public function certificadoDesempenoIndex(Request $request)
     {
-        if (!Gate::any([Permiso::ADMIN])) {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS])) {
             return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
         }
-
         $ensayos = EnsayoAptitud::query()
             ->select('ensayo_aptitud.*')
             ->join('paquete', 'ensayo_aptitud.id_paquete', '=', 'paquete.id')
@@ -413,7 +412,7 @@ class InscripcionPaqueteController extends Controller
             ->paginate(20);
         $gestion = $request->gestion ?? now()->year;
         return view('certificados.desempeno.index', [
-            'gestiones' => ['2025', '2024', '2023'],
+            'gestiones' => Configuracion::GESTION_FILTER,
             'gestion' => $gestion,
             'ensayos' => $ensayos,
         ]);
@@ -510,7 +509,7 @@ class InscripcionPaqueteController extends Controller
     public function certificadoDesempenoListLabs($id)
     {
         $idEA = $id;
-        $gestiones = ['2026', '2025', '2024', '2023'];
+        $gestiones = Configuracion::GESTION_FILTER;
         $ensayoA = EnsayoAptitud::findOrFail($idEA);
         return view('certificados.desempeno.show', compact('idEA', 'gestiones', 'ensayoA'));
     }

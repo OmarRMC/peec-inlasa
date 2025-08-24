@@ -20,6 +20,7 @@ class Configuracion extends Model
         'valor',
     ];
 
+    const GESTION_FILTER = ['2025', '2024', '2023', '2022'];
     // Claves centralizadas como constantes
     public const FECHA_INICIO_INSCRIPCION = 'fecha_inicio_inscripcion';
     public const FECHA_FIN_INSCRIPCION = 'fecha_fin_inscripcion';

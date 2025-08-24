@@ -90,7 +90,7 @@ class LabController extends Controller
             'provincias' => [],
             'municipios' => [],
             'categorias' => [],
-            'gestiones' => ['2025', '2024', '2023'],
+            'gestiones' => Configuracion::GESTION_FILTER,
         ]);
     }
 
