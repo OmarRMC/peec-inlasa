@@ -522,11 +522,11 @@ class LabController extends Controller
                 $codigoCertificado = $inscripcion->id;
             }
         }
-        // return view('certificados.pdf.desemp', ['data' => $dataPorArea, 'qr'=>$qr]); 
         $url = route('verificar.certificado', ['code' => $codigoCertificado, 'type' => Certificado::TYPE_DESEMP]);
         $qr = base64_encode(
-            QrCode::format('png')->size(220)->margin(1)->generate($url)
+            QrCode::format('png')->size(400)->margin(1)->generate($url)
         );
+        // return view('certificados.pdf.desemp', ['data' => $dataPorArea, 'qr'=>$qr]); 
         $pdf = Pdf::loadView('certificados.pdf.desemp', ['data' => $dataPorArea, 'qr' => $qr])
             ->setPaper('A4', 'portrait');
         $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
