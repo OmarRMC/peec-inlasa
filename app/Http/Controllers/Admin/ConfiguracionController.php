@@ -204,17 +204,25 @@ class ConfiguracionController extends Controller
                     }
                 }
                 break;
-            case 'gestionCertificado':
+            case 'periodo.registro.desemp':
                 $request->validate([
+                    'fecha_inicio_registro_certificados' => 'required|date',
+                    'fecha_fin_registro_certificados' => 'required|date|after_or_equal:fecha_inicio_registro_certificados',
                     'registro_ponderaciones_certificados_gestion' => 'required|digits:4',
                 ], [
+                    'fecha_inicio_registro_certificados.required' => 'La fecha de inicio es obligatoria.',
+                    'fecha_inicio_registro_certificados.date' => 'La fecha de inicio debe ser una fecha válida.',
+                    'fecha_fin_registro_certificados.required' => 'La fecha de fin es obligatoria.',
+                    'fecha_fin_registro_certificados.date' => 'La fecha de fin debe ser una fecha válida.',
+                    'fecha_fin_registro_certificados.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
                     'registro_ponderaciones_certificados_gestion.required' => 'El campo gestión actual es obligatorio.',
                     'registro_ponderaciones_certificados_gestion.digits' => 'La gestión debe contener exactamente 4 dígitos.',
                 ]);
 
+                configuracion(Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS, $request->fecha_inicio_registro_certificados);
+                configuracion(Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS, $request->fecha_fin_registro_certificados);
                 configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION, $request->registro_ponderaciones_certificados_gestion);
                 break;
-
             default:
                 return redirect()->back()->with('error', 'Error en registrar la Configuración.');
         }

@@ -40,7 +40,7 @@ class DetalleCertificadoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        if (!Gate::any([Permiso::ADMIN,  Permiso::GESTION_CERTIFICADOS])) {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS, Permiso::RESPONSABLE])) {
             return response()->json(['message' => 'No tienes permiso para realizar esta acción.'], 403);
         }
         $request->validate([

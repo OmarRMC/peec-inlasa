@@ -14,7 +14,7 @@
                     </ul>
                 </div>
             @endif
-            @foreach ([['id' => 'certificado', 'title' => 'Cetificado'], ['id' => 'gestionCertificado', 'title' => 'Gestión de registro de certificados']] as $item)
+            @foreach ([['id' => 'certificado', 'title' => 'Certificado'], ['id' => 'periodoRegistroDesemp', 'title' => 'Periodo de Registro de Desempeño (para Certificados)']] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -68,7 +68,7 @@
                                                                 accept="image/*" class="mt-1 input-standard">
                                                             @if (isset($config->imagen))
                                                                 <div class="mt-2 text-center">
-                                                                    <img src="{{ $config->imagen."?v='".time()."'" }}"
+                                                                    <img src="{{ $config->imagen . "?v='" . time() . "'" }}"
                                                                         alt="Firma  de {{ $config->nombre }}"
                                                                         class="h-16 object-contain mx-auto">
                                                                 </div>
@@ -85,12 +85,34 @@
                                     </form>
                                 @break
 
-                                @case('gestionCertificado')
-                                    <form action="{{ route($config, 'gestionCertificado') }}" method="POST">
+                                @case('periodoRegistroDesemp')
+                                    <form action="{{ route($config, 'periodo.registro.desemp') }}" method="POST">
                                         @csrf @method('PUT')
-                                        <div>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label for="{{ Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS }}"
+                                                    class="block text-sm font-medium">Fecha Inicio</label>
+                                                <input type="date"
+                                                    name="{{ Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS }}"
+                                                    id="{{ Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS }}"
+                                                    value="{{ old(Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS, configuracion(Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS) ?? '') }}"
+                                                    class="mt-1 input-standard" required>
+                                            </div>
+                                            <div>
+                                                <label for="{{ Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS }}"
+                                                    class="block text-sm font-medium">Fecha Fin</label>
+                                                <input type="date"
+                                                    name="{{ Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS }}"
+                                                    id="{{ Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS }}"
+                                                    value="{{ old(Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS, configuracion(Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS) ?? '') }}"
+                                                    class="mt-1 input-standard" required>
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-2">La fecha fin debe ser posterior a la fecha inicio.
+                                        </p>
+                                        <div class="mt-1">
                                             <label for="{{ Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION }}"
-                                                class="block text-sm font-medium">Gestion de registro de Certificados</label>
+                                                class="block text-sm font-medium">Para la Gestion de inscripciones</label>
                                             <input type="number"
                                                 name="{{ Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION }}"
                                                 id="{{ Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION }}"
@@ -98,8 +120,8 @@
                                                 class="mt-1 input-standard" min="2020" max="2100" required>
                                         </div>
                                         <div class="text-right mt-4">
-                                            <button type="submit" class="btn-primary"><i
-                                                    class="fas fa-save mr-1"></i>Guardar</button>
+                                            <button type="submit" class="btn-primary"><i class="fas fa-save mr-1"></i>Guardar
+                                            </button>
                                         </div>
                                     </form>
                                 @break

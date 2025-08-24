@@ -23,7 +23,10 @@ return new class extends Migration
             $table->string('firma_jefe', 100);
             $table->string('firma_director', 100);
             $table->string('nombre_laboratorio', 400);
-            $table->string('codigo_certificado', 10)->nullable();
+            $table->string('codigo_certificado', 50)->nullable();
+            $table->string('cargo_coordinador', 200)->nullable();
+            $table->string('cargo_jefe', 200)->nullable();
+            $table->string('cargo_director', 200)->nullable();
             $table->tinyInteger('tipo_certificado')->nullable();
             $table->unsignedBigInteger('id_redaccion')->nullable();
             $table->tinyInteger('status_certificado')->default(0);

@@ -29,13 +29,17 @@
      </tr>
      <tr>
          <td class='sig'>
-             <div class="role">JEFE PROGRAMA DE EVALUACIÓN EXTERNA DE LA CALIDAD</div>
+             <div class="role"> {{ $cert->cargo_jefe ?? 'JEFE PROGRAMA DE EVALUACIÓN EXTERNA DE LA CALIDAD' }}</div>
          </td>
          <td class='sig'>
-             <div class="role">COORDINADORA DIVISIÓN RED DE LABORATORIOS DE SALUD PÚBLICA</div>
-         </td>
+             <div class="role">
+                 {{ $cert->cargo_coordinador ?? 'COORDINADORA DIVISIÓN RED DE LABORATORIOS DE SALUD PÚBLICA' }}
+             </div>
+         </td>  
          <td class='sig'>
-             <div class="role">DIRECTORA GENERAL EJECUTIVA</div>
+             <div class="role">
+                 {{ $cert->cargo_director ?? 'DIRECTORA GENERAL EJECUTIVA' }}
+             </div>
          </td>
      </tr>
      <tr>

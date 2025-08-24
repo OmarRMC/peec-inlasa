@@ -242,4 +242,17 @@ class Laboratorio extends Model
                     </span>";
         }
     }
+
+    protected function telefono(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => "{$this->usuario->telefono}"
+        );
+    }
+    protected function username(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => "{$this->usuario->username}"
+        );
+    }
 }

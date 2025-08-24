@@ -104,6 +104,9 @@ class LaboratorioController extends Controller
 
     public function showUploadCertificado($id)
     {
+        if (!Configuracion::estaHabilitadoCargarCertificado()) {
+            return redirect('/')->with('error', 'El periodo para la carga de desempeño no está habilitado actualmente.');
+        }
         $responsable = Auth::user();
         $ensayosAptitud = $responsable->responsablesEA->findOrFail($id);
         $paquete = $ensayosAptitud->paquete;
@@ -118,8 +121,8 @@ class LaboratorioController extends Controller
             'UTF-8',
         );
         $descripcion = $ensayosAptitud->descripcion;
-        if($eaDesc != $paqueteDesc){
-            $descripcion ="</br>  $paquete->descripcion / $ensayosAptitud->descripcion";
+        if ($eaDesc != $paqueteDesc) {
+            $descripcion = "</br>  $paquete->descripcion / $ensayosAptitud->descripcion";
         }
 
         $gestion = configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year;
@@ -127,6 +130,11 @@ class LaboratorioController extends Controller
     }
     public function uploadCertificadoData(Request $request, $id)
     {
+        if (!Configuracion::estaHabilitadoCargarCertificado()) {
+            return response()->json([
+                'error' => 'El periodo para la carga de desempeño no está habilitado actualmente.'
+            ], 422);
+        }
         $responsable = Auth::user();
 
         $request->validate([
@@ -196,7 +204,10 @@ class LaboratorioController extends Controller
                     'cod_lab' => $lab->cod_lab,
                     'codigo_certificado' => null,
                     'tipo_certificado' => 1,
-                    'status_certificado' => 0
+                    'status_certificado' => 0,
+                    'cargo_coordinador' => $configCoordRed->cargo,
+                    'cargo_jefe' => $configEvalExt->cargo,
+                    'cargo_director' => $configDirGen->cargo
                 ]
             );
             DetalleCertificado::updateOrCreate(

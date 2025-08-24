@@ -496,7 +496,10 @@ class LabController extends Controller
             ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
             ->with(['certificado.detalles'])
             ->get();
-
+        if ($inscripciones->isEmpty()) {
+            return redirect('/')
+                ->with('info', '⚠️ No se encontraron certificados registrados para la gestión seleccionada.');
+        }
         $dataPorArea = [];
         $codigoCertificado = '';
         foreach ($inscripciones as $inscripcion) {

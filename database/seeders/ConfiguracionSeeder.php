@@ -42,7 +42,9 @@ class ConfiguracionSeeder extends Seeder
       </div>',
       Configuracion::NOTIFICACION_FECHA_INICIO => $now->copy()->format('Y-m-d'),
       Configuracion::NOTIFICACION_FECHA_FIN    => $now->copy()->addMonths(6)->format('Y-m-d'),
-
+      Configuracion::EMAIL_INFORMACION => "<p style='background-color: yellow; color: black; padding: 10px; border-radius: 5px;'>Modificable desde la configuración</p>",
+      Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS => $now->copy()->format('Y-m-d'),
+      Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS =>  $now->copy()->addMonths(4)->format('Y-m-d'),
       Configuracion::CARGO_EVALUACION_EXTERNA => [
         'nombre' => 'Lic. Jhaneline Lizeth Mamani Poma',
         'cargo' => 'JEFE PROGRAMA DE EVALUACIÓN EXTERNA DE LA CALIDAD',

@@ -36,7 +36,10 @@ class Certificado extends Model
         'created_by',
         'updated_by',
         'cod_lab',
-        'publicado'
+        'publicado',
+        'cargo_coordinador',
+        'cargo_jefe',
+        'cargo_director'
     ];
 
     public function inscripcion()

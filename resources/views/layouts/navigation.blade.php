@@ -134,59 +134,61 @@
                     </div>
                 @endforeach
             </div>
-            <button @click="openMenu !== 21 ? openMenu = 21 : openMenu = null"
-                class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
-                <i class="fas fa-vials w-5 text-indigo-500"></i>
-                <span>Certificados</span>
-                <i class="fas ml-auto" :class="openMenu === 20 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-            </button>
-            <div x-show="openMenu === 21" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-                @php
-                    $user = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
-                    $ensayoAps = $user->responsablesEA;
-                @endphp
-                @foreach ($ensayoAps as $ea)
+            @if (Configuracion::estaHabilitadoCargarCertificado())
+                <button @click="openMenu !== 21 ? openMenu = 21 : openMenu = null"
+                    class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
+                    <i class="fas fa-vials w-5 text-indigo-500"></i>
+                    <span>Certificados</span>
+                    <i class="fas ml-auto" :class="openMenu === 20 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </button>
+                <div x-show="openMenu === 21" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
                     @php
-                        $paquete = $ea->paquete;
-                        $eaDesc = mb_strtolower(
-                            trim(\Normalizer::normalize($ea->descripcion, Normalizer::FORM_C)),
-                            'UTF-8',
-                        );
-                        $paqueteDesc = mb_strtolower(
-                            trim(\Normalizer::normalize($paquete->descripcion, Normalizer::FORM_C)),
-                            'UTF-8',
-                        );
+                        $user = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
+                        $ensayoAps = $user->responsablesEA;
                     @endphp
-                    <div>
-                        <div class="font-semibold text-indigo-700 px-3 py-1">
-                            {{-- <i class="fas fa-vial"></i> EA: {{ $ea->descripcion }} --}}
-                            <a href="{{ route('ea.lab.certificados', $ea->id) }}"
-                                class="block px-1 py-1 text-[10px] text-gray-600 hover:bg-indigo-100 rounded">
-                                <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
-                                <p class="inline">
-                                    @if ($eaDesc == $paqueteDesc)
-                                        <span class="text-[12px]">
-                                            {{ $ea->descripcion }}
-                                        </span>
-                                    @else
-                                        {{ $paquete->descripcion }} <br>
-                                        <span class="text-[12px]">
-                                            {{ $ea->descripcion }}
-                                        </span>
-                                    @endif
-                                </p>
-                            </a>
-                        </div>
-                        {{-- @foreach ($ea->inscripciones as $inscripcion)
+                    @foreach ($ensayoAps as $ea)
+                        @php
+                            $paquete = $ea->paquete;
+                            $eaDesc = mb_strtolower(
+                                trim(\Normalizer::normalize($ea->descripcion, Normalizer::FORM_C)),
+                                'UTF-8',
+                            );
+                            $paqueteDesc = mb_strtolower(
+                                trim(\Normalizer::normalize($paquete->descripcion, Normalizer::FORM_C)),
+                                'UTF-8',
+                            );
+                        @endphp
+                        <div>
+                            <div class="font-semibold text-indigo-700 px-3 py-1">
+                                {{-- <i class="fas fa-vial"></i> EA: {{ $ea->descripcion }} --}}
+                                <a href="{{ route('ea.lab.certificados', $ea->id) }}"
+                                    class="block px-1 py-1 text-[10px] text-gray-600 hover:bg-indigo-100 rounded">
+                                    <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
+                                    <p class="inline">
+                                        @if ($eaDesc == $paqueteDesc)
+                                            <span class="text-[12px]">
+                                                {{ $ea->descripcion }}
+                                            </span>
+                                        @else
+                                            {{ $paquete->descripcion }} <br>
+                                            <span class="text-[12px]">
+                                                {{ $ea->descripcion }}
+                                            </span>
+                                        @endif
+                                    </p>
+                                </a>
+                            </div>
+                            {{-- @foreach ($ea->inscripciones as $inscripcion)
                             <a href="{{ route('ruta.lab.resultados', $inscripcion->laboratorio->id) }}"
                                 class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                                 <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
                                 {{ $inscripcion->laboratorio->nombre }}
                             </a>
                         @endforeach --}}
-                    </div>
-                @endforeach
-            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     @endif
 

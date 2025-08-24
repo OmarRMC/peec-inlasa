@@ -53,4 +53,12 @@ class Configuracion extends Model
         $hoy = Carbon::now()->toDateString();
         return $fechaInicio <= $hoy && $hoy <= $fechaFin;
     }
+
+    public static function estaHabilitadoCargarCertificado()
+    {
+        $fechaInicio = Configuracion::where('key', Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS)->value('valor');
+        $fechaFin = Configuracion::where('key', Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS)->value('valor');
+        $hoy = Carbon::now()->toDateString();
+        return $fechaInicio <= $hoy && $hoy <= $fechaFin;
+    }
 }
