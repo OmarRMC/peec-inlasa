@@ -7,6 +7,7 @@ use App\Http\Controllers\PdfInscripcionController;
 use App\Mail\EnvioCodigoLab;
 use App\Mail\LaboratorioVerificacionDatos;
 use App\Models\CategoriaLaboratorio;
+use App\Models\Certificado;
 use App\Models\Configuracion;
 use App\Models\Departamento;
 use App\Models\Inscripcion;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class LabController extends Controller
 {
@@ -487,7 +489,6 @@ class LabController extends Controller
         Gate::authorize(Permiso::LABORATORIO);
         $user = Auth::user();
         $laboratorio = $user->laboratorio;
-
         $inscripciones = $laboratorio->inscripciones()
             ->Aprobado()
             ->whereHas('certificado', fn($query) => $query->Publicado())
@@ -497,6 +498,7 @@ class LabController extends Controller
             ->get();
 
         $dataPorArea = [];
+        $codigoCertificado = '';
         foreach ($inscripciones as $inscripcion) {
             $certificado = $inscripcion->certificado;
             $detalles = $certificado->detalles;
@@ -517,13 +519,20 @@ class LabController extends Controller
                     'ensayo' => $detalle->detalle_ea,
                     'ponderacion' => $detalle->calificacion_certificado,
                 ];
+                $codigoCertificado = $inscripcion->id;
             }
         }
-        $pdf = Pdf::loadView('certificados.pdf.desemp', ['data' => $dataPorArea])
+        // return view('certificados.pdf.desemp', ['data' => $dataPorArea, 'qr'=>$qr]); 
+        $url = route('verificar.certificado', ['code' => $codigoCertificado, 'type' => Certificado::TYPE_DESEMP]);
+        $qr = base64_encode(
+            QrCode::format('png')->size(220)->margin(1)->generate($url)
+        );
+        $pdf = Pdf::loadView('certificados.pdf.desemp', ['data' => $dataPorArea, 'qr' => $qr])
             ->setPaper('A4', 'portrait');
         $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
 
-        return $pdf->stream('certificados-desempeno.pdf');
+        $response = $pdf->stream('certificados-desempeno.pdf');
+        return $response;
     }
 
     public function certificadoPartificacionPDF($gestion)
@@ -540,6 +549,7 @@ class LabController extends Controller
         $ins = $query->with('certificado')
             ->first();
         $certificado = $ins->certificado;
+        $codigoCertificado = $ins->id;
         $query = $laboratorio->inscripciones()
             ->Aprobado()
             ->whereHas('certificado', fn($query) => $query->Publicado())
@@ -552,8 +562,11 @@ class LabController extends Controller
             ->flatten()
             ->pluck('detalle_ea')
             ->implode(', ');
-        Log::info($ensayosA);
-        $pdf = Pdf::loadView('certificados.pdf.participacion', ['ensayosA' => $ensayosA, 'certificado' => $certificado])
+        $url = route('verificar.certificado', ['code' => $codigoCertificado, 'type' => Certificado::TYPE_PARTICIPACION]);
+        $qr = base64_encode(
+            QrCode::format('png')->size(220)->margin(1)->generate($url)
+        );
+        $pdf = Pdf::loadView('certificados.pdf.participacion', ['ensayosA' => $ensayosA, 'certificado' => $certificado, 'qr' => $qr])
             ->setPaper('A4', 'portrait');
         $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
         return $pdf->stream('certificados-particiapcion.pdf');

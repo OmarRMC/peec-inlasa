@@ -168,4 +168,61 @@ class Laboratorio extends Model
     {
         return $this->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_ACTUAL))->exists();
     }
+
+    public function getDataCertificadoDesemp(string $gestion)
+    {
+        $inscripciones = $this->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', $gestion)
+            ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
+            ->with(['certificado.detalles'])
+            ->get();
+
+        $dataPorArea = [];
+        foreach ($inscripciones as $inscripcion) {
+            $certificado = $inscripcion->certificado;
+            $detalles = $certificado->detalles;
+
+            if ($detalles->isEmpty()) continue;
+
+            foreach ($detalles as $detalle) {
+                if (is_null($detalle->calificacion_certificado)) continue;
+
+                if (!isset($dataPorArea["$detalle->detalle_area"])) {
+                    $dataPorArea["$detalle->detalle_area"] = [
+                        'certificado' => $certificado,
+                        'detalles' => []
+                    ];
+                }
+
+                $dataPorArea["$detalle->detalle_area"]['detalles'][] = [
+                    'ensayo' => $detalle->detalle_ea,
+                    'ponderacion' => $detalle->calificacion_certificado,
+                ];
+            }
+        }
+        return $dataPorArea;
+    }
+
+    public function getDataCertificadoParticipacion(string $gestion)
+    {
+        $query = $this->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', $gestion);
+        $query = $this->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', $gestion);
+        $ensayosA = $query
+            ->whereHas('certificado.detalles')
+            ->with(['certificado.detalles'])
+            ->get()
+            ->pluck('certificado.detalles')
+            ->flatten()
+            ->pluck('detalle_ea')
+            ->implode(', ');
+        return $ensayosA;
+    }
 }

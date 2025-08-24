@@ -28,7 +28,7 @@
             position: relative;
             height: 275mm;
             /* deja espacio al borde superior @page */
-            border: 1px solid #CFCFCF;
+            border: 1.5px solid #aa9900;
             padding: 5mm 5mm 5mm 5mm;
         }
 
@@ -69,11 +69,10 @@
         }
 
         .seal {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 22mm;
-            height: 22mm;
+            /* left: 50%;
+            transform: translateX(-50%); */
+            width: 45mm;
+            height: 45mm;
             object-fit: contain;
         }
 
@@ -93,7 +92,6 @@
 
         /* Títulos principales */
         .title {
-            margin-top: 10mm;
             font-size: 34pt;
             font-weight: bold;
             letter-spacing: 1px;
@@ -152,7 +150,7 @@
         .sig {
             display: table-cell;
             text-align: center;
-            vertical-align: bottom;
+            vertical-align: middle;
             padding: 0 4mm;
         }
 
@@ -174,8 +172,24 @@
             line-height: 1.25;
         }
 
+        .sig .instituto {
+            font-size: 8pt;
+            line-height: 1.25;
+        }
+
+        .firma {
+            position: relative;
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
         /* Imágenes de firmas (opcionales) arriba de la línea) */
-        .sig img.signature {
+        .firma img.signature {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
             height: 18mm;
             margin-bottom: 2mm;
             object-fit: contain;
@@ -198,6 +212,7 @@
             line-height: 1.35;
             text-align: justify;
             width: 60%;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         .qr {
@@ -216,6 +231,12 @@
             object-fit: contain;
             display: block;
         }
+
+        .qr svg {
+            margin: 0px;
+            width: 100%;
+            top: 0px;
+        }
     </style>
 </head>
 
@@ -230,9 +251,6 @@
 
         <!-- Encabezado -->
         <div class="header">
-            {{-- Sello (escudo redondo INLASA) --}}
-            <img class="seal" src="{{ public_path('img/logoinlasa.jpg') }}" alt="Sello INLASA">
-            {{-- Logos (Bicentenario, Bolivia, Ministerio) --}}
             <div class="logos">
                 <img src="{{ public_path('img/logoinlasa.jpg') }}" alt="Bicentenario de Bolivia">
                 <img src="{{ public_path('img/logoinlasa.jpg') }}" alt="Bolivia">
@@ -241,10 +259,15 @@
         </div>
 
         <!-- Títulos -->
-        <div class="title" style="text-align:center;">CERTIFICADO</div>
-        <div class="subtitle" style="text-align:center;">DE PARTICIPACIÓN A</div>
-        <div class="labname" style="text-align:center;">
-            {{ mb_strtoupper($certificado->nombre_laboratorio) }}
+        <div>
+            <div style="text-align: center">
+                <img class="seal" src="{{ public_path('img/logoinlasa.jpg') }}" alt="Sello INLASA">
+            </div>
+            <div class="title" style="text-align:center;">CERTIFICADO</div>
+            <div class="subtitle" style="text-align:center;">DE PARTICIPACIÓN A</div>
+            <div class="labname" style="text-align:center;">
+                {{ mb_strtoupper($certificado->nombre_laboratorio) }}
+            </div>
         </div>
 
         <!-- Cuerpo -->
@@ -257,33 +280,60 @@
         </div>
 
         <!-- Firmas -->
-        <div class="signatures">
-            <div class="sig">
-                @if (!empty($certificado->firma_jefe))
-                    <img class="signature" src="{{ public_path($certificado->firma_jefe) }}" alt="Firma Jefe">
-                @endif
-                <div class="line"></div>
-                <div class="name">{{ $certificado->nombre_jefe }}</div>
-                <div class="role">JEFE PROGRAMA DE EVALUACIÓN<br>EXTERNA DE LA CALIDAD<br>INLASA</div>
-            </div>
-            <div class="sig">
-                @if (!empty($certificado->firma_coordinador))
-                    <img class="signature" src="{{ public_path($certificado->firma_coordinador) }}"
-                        alt="Firma Coordinadora">
-                @endif
-                <div class="line"></div>
-                <div class="name">{{ $certificado->nombre_coordinador }}</div>
-                <div class="role">COORDINADORA DIVISIÓN RED DE<br>LABORATORIOS DE SALUD PÚBLICA<br>INLASA</div>
-            </div>
-            <div class="sig">
-                @if (!empty($certificado->firma_director))
-                    <img class="signature" src="{{ public_path($certificado->firma_director) }}" alt="Firma Directora">
-                @endif
-                <div class="line"></div>
-                <div class="name">{{ $certificado->nombre_director }}</div>
-                <div class="role">DIRECTORA GENERAL EJECUTIVA<br>INLASA</div>
-            </div>
-        </div>
+        <table class="signatures">
+            <tr>
+                <td class='firma'>
+                    @if (!empty($certificado->firma_jefe))
+                        <img class="signature" src="{{ public_path($certificado->firma_jefe) }}" alt="Firma Jefe">
+                    @endif
+                </td>
+                <td class='firma'>
+                    @if (!empty($certificado->firma_coordinador))
+                        <img class="signature" src="{{ public_path($certificado->firma_coordinador) }}"
+                            alt="Firma Coordinadora">
+                    @endif
+                </td>
+                <td class='firma'>
+                    @if (!empty($certificado->firma_director))
+                        <img class="signature" src="{{ public_path($certificado->firma_director) }}"
+                            alt="Firma Directora">
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td class='sig'>
+                    <div class="name">{{ $certificado->nombre_jefe }}</div>
+                </td>
+                <td class='sig'>
+                    <div class="name">{{ $certificado->nombre_director }}</div>
+                </td>
+                <td class='sig'>
+                    <div class="name">{{ $certificado->nombre_director }}</div>
+                </td>
+            </tr>
+            <tr>
+                <td class='sig'>
+                    <div class="role">JEFE PROGRAMA DE EVALUACIÓN<br>EXTERNA DE LA CALIDAD</div>
+                </td>
+                <td class='sig'>
+                    <div class="role">COORDINADORA DIVISIÓN RED DE<br>LABORATORIOS DE SALUD PÚBLICA</div>
+                </td>
+                <td class='sig'>
+                    <div class="role">DIRECTORA GENERAL EJECUTIVA</div>
+                </td>
+            </tr>
+            <tr>
+                <td class='sig'>
+                    <div class="instituto">INLASA</div>
+                </td>
+                <td class='sig'>
+                    <div class="instituto">INLASA</div>
+                </td>
+                <td class='sig'>
+                    <div class="instituto">INLASA</div>
+                </td>
+            </tr>
+        </table>
 
         <div class="gestion">Gestión {{ $certificado->gestion_certificado }}</div>
 
@@ -296,7 +346,7 @@
 
         <!-- QR -->
         <div class="qr">
-            {{-- <img src="data:image/png;base64,{{ $qrPng }}" alt="QR"> --}}
+            <img src="data:image/png;base64,{{ $qr }}" alt="QR">
         </div>
     </div>
 </body>

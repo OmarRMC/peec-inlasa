@@ -17,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use SebastianBergmann\Type\TrueType;
 
 class LaboratorioController extends Controller
 {
@@ -181,8 +180,7 @@ class LaboratorioController extends Controller
                     'cod_lab' => $lab->cod_lab,
                     'codigo_certificado' => null,
                     'tipo_certificado' => 1,
-                    'status_certificado' => 0,
-                    'publicado' => 0,
+                    'status_certificado' => 0
                 ]
             );
             DetalleCertificado::updateOrCreate(
@@ -277,7 +275,6 @@ class LaboratorioController extends Controller
                     $detalle->updated_by = $responsable->id;
                     $detalle->save();
                     $certificado->status_certificado = 1;
-                    $certificado->publicado = 0;
                     $certificado->save();
                 }
             }

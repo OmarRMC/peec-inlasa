@@ -11,6 +11,14 @@ class Certificado extends Model
 
     protected $table = 'certificado';
 
+    const TYPE_DESEMP = 1;
+    const TYPE_PARTICIPACION = 2;
+
+    const NAME_TYPE_CERTIFICADO = [
+        self::TYPE_DESEMP => 'DESEMPEÑO',
+        self::TYPE_PARTICIPACION => 'PARTICIPACIÓN'
+    ];
+
     protected $fillable = [
         'id_inscripcion',
         'gestion_certificado',
