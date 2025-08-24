@@ -17,7 +17,7 @@ class CanAnyPermission
     public function handle(Request $request, Closure $next, ...$permissions): Response
     {
         if (! Gate::any($permissions)) {
-            abort(403, 'No tienes permiso para acceder a esta página.');
+            return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
         }
 
         return $next($request);

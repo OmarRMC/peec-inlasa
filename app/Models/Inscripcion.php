@@ -208,4 +208,9 @@ class Inscripcion extends Model
     {
         return $query->where('status_inscripcion', Inscripcion::STATUS_APROBADO);
     }
+
+    public function certificado()
+    {
+        return $this->hasOne(Certificado::class, 'id_inscripcion');
+    }
 }

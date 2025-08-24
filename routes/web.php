@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\ConfiguracionController;
 use App\Http\Controllers\Admin\DepartamentoController;
+use App\Http\Controllers\Admin\DetalleCertificadoController;
 use App\Http\Controllers\Admin\EnsayoAptitudController;
 use App\Http\Controllers\Admin\FormularioController;
 use App\Http\Controllers\Admin\InscripcionPaqueteController;
@@ -21,16 +22,20 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
+use App\Http\Controllers\CertificadoController;
 use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
+use App\Http\Controllers\VerificarController;
 use App\Models\Permiso;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified', 'usuario.activo'])->name('dashboard');
+
+Route::get('/verificar/{code}/certificado/{type}', [VerificarController::class, 'verificarCertificado'])->name('verificar.certificado');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -59,6 +64,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::resource('laboratorio', LaboratorioController::class);
     Route::get('laboratorio/ajax/data', [LaboratorioController::class, 'getData'])->name('laboratorio.ajax.data');
     Route::resource('laboratorio', LaboratorioController::class);
+    Route::get('/searchLab', [LaboratorioController::class, 'getLabBySearch'])->name('getSearchLab');
 
     Route::prefix('inscripcion')->group(function () {
         Route::get('/', [InscripcionPaqueteController::class, 'index'])->name('inscripcion_paquete.index');
@@ -80,8 +86,17 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
 
     Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
     Route::put('/configuracion/update/{seccion}', [ConfiguracionController::class, 'update'])->name('configuracion.update');
+    Route::get('/configuracion/certificado', [ConfiguracionController::class, 'certificados'])->name('configuracion.cerfificado');
 
     Route::resource('formularios', FormularioController::class);
+
+    Route::get('/desempeno/detalle-certificado/data', [InscripcionPaqueteController::class, 'certificadoDesempenoIndex'])->name('certificado-desempeno.index');
+    Route::get('/desempeno/detalle-certificado/ajax/{id}/data', [InscripcionPaqueteController::class,  'certificadoDesempenoAjaxIndex'])->name('certificado-desempeno.ajax.index');
+    Route::get('/certificados-desempeno/ea/{id}/labs', [InscripcionPaqueteController::class,  'certificadoDesempenoListLabs'])->name('certificados.desempeno.labs.show');
+
+    Route::get('/certificados/desempeno-participacion', [CertificadoController::class,  'certificadoDesempenoParticionListLabs'])->name('list.cert.participacion.desemp');
+
+    Route::post('/certificados/publicar/{gestion}', [CertificadoController::class,  'publicarCertificado'])->name('certificados.publicar');
 });
 Route::middleware(['auth', 'usuario.activo', 'canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_INSCRIPCIONES])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');
@@ -100,11 +115,22 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/contrato', [LabController::class, 'generarContrato'])->name('formulario_contrato');
     Route::get('/formulario-ins/{id}', [LabController::class, 'generarFormularioIns'])->name('formulario_inscripcion');
     Route::put('/inscripcion/{id}/anular', [LabController::class, 'anularInscripcion'])->name('inscripciones.anular');
+
+    Route::get('/certificados', [LabController::class, 'certificadosDisponibles'])->name('lab.certificados.disponibles.index');
+    Route::get('/certificados/ajax/data', [LabController::class, 'getCertificadosDisponibleData'])->name('certificados.ajax.data');
+    Route::get('/certificados/participacion/{gestion}', [LabController::class, 'certificadoPartificacionPDF'])->name('lab.certificados.participacion.pdf');
+    Route::get('/certificados/desemp/{gestion}', [LabController::class, 'certificadoDesempPDF'])->name('certificados.desemp.pdf');
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
     Route::get('/ea/{id}/labs', [ResponsableLaboratorioController::class, 'index'])->name('ea.lab.inscritos');
+    Route::get('/ea/{id}/certificados', [ResponsableLaboratorioController::class, 'showUploadCertificado'])->name('ea.lab.certificados');
+    Route::post('/ea/{id}/subir_ponderaciones', [ResponsableLaboratorioController::class, 'uploadCertificadoData'])->name('ea.lab.subir.ponderaciones');
+    Route::get('/ea/{id}/en_revision', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoTemporal'])->name('ea.lab.desempeno.temporal');
     Route::get('/ea/{id}/labs-ajax', [ResponsableLaboratorioController::class, 'getData'])->name('ea.lab.inscritos.ajax');
+    Route::post('/detalle-certificado/{id}', [DetalleCertificadoController::class, 'update'])->name('detalle-certificado.update');
+    Route::post('/ea/{id}/certificado/confirmar', [ResponsableLaboratorioController::class, 'confirmarDatosCertificados'])->name('confirmar.datos.certificados');
+    Route::get('/ea/{id}/certificado/confirmados', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoConfirmados'])->name('ea.lab.desempeno.confirmado');
 });
 
 require __DIR__ . '/auth.php';

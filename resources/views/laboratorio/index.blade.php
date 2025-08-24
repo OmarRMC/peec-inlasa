@@ -3,6 +3,7 @@
         '1' => 'Activo',
         '0' => 'Inactivo',
     ];
+    use App\Models\Permiso;
 @endphp
 <x-app-layout>
     <div class="px-4 max-w-6xl mx-auto">
@@ -10,10 +11,12 @@
         <!-- Encabezado -->
         <div class="flex justify-between items-center flex-wrap gap-4">
             <h1 class="text-xl font-bold text-gray-800">Lista de Laboratorios</h1>
-            <a href="{{ route('laboratorio.create') }}"
-                class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition shadow-md text-sm">
-                <i class="fas fa-plus-circle"></i> Nuevo Laboratorio
-            </a>
+            @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_LABORATORIO]))
+                <a href="{{ route('laboratorio.create') }}"
+                    class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition shadow-md text-sm">
+                    <i class="fas fa-plus-circle"></i> Nuevo Laboratorio
+                </a>
+            @endif
         </div>
 
         <!-- Filtros y Buscador -->

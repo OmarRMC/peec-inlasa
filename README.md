@@ -138,3 +138,103 @@ public/         # Archivos públicos
 - **Tailwind CSS**
 - **JavaScript (ES6)**
 - **npm / Vite**
+
+---
+
+# Migración a XAMPP
+## Mover el archivo del proyecto al httpdocs
+## Crear 2 VirtualHost 
+## Editar **httpd-vhosts.conf**
+1. Archivo en:
+2. Abre con permisos de administrador:
+```bash
+C:\xampp\apache\conf\extra\httpd-vhosts.conf
+```
+3. Agrega lo siguiente:
+```bash
+# Dominio principal que apunta a htdocs
+<VirtualHost *:80>
+    ServerName inlasa.bo
+    DocumentRoot "C:/xampp/htdocs"
+    <Directory "C:/xampp/htdocs">
+        Options Indexes FollowSymLinks Includes ExecCGI
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+# Subdominio que apunta a peec-inlasa/public
+<VirtualHost *:80>
+    ServerName peec.inlasa.bo
+    DocumentRoot "C:/xampp/htdocs/peec-inlasa/public"
+    <Directory "C:/xampp/htdocs/peec-inlasa/public">
+        Options Indexes FollowSymLinks Includes ExecCGI
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
+## Editar hosts de Windows
+1. Abre con permisos de administrador:
+```bash
+C:\Windows\System32\drivers\etc\hosts
+```
+2. Agrega al final estas líneas:
+```bash
+127.0.0.1   inlasa.bo
+127.0.0.1   peec.inlasa.bo
+```
+# Configuraciones  php render de PDF 
+## En XAMPP (Windows)
+1. Ve a la carpeta donde está tu PHP, por ejemplo:
+```bash
+C:\xampp\php\php.ini
+```
+2. Abre php.ini con un editor de texto.
+3. Busca la línea:
+```bash
+;extension=gd
+```
+4. Quítale el ; (punto y coma) para habilitarla
+```bash
+extension=gd
+```
+# Ejecutar el siguiente comando para los archivos
+```bash
+php artisan storage:link
+```
+- Este comando en Laravel crea un enlace simbólico (shortcut) desde la carpeta:
+```bash
+public/storage
+```
+- hacia la carpeta:
+```bash
+storage/app/public
+```
+---
+# Instalación de Imagick (Para QR)
+- Descarga la DLL de Imagick
+[Version de Imaginck](https://pecl.php.net/package/imagick)
+[Para windows](https://pecl.php.net/package/imagick/3.8.0/windows)
+> Nota: Thread Safe (TS) x..
+- Copiar la DLL a XAMPP
+1. Copia php_imagick.dll en la carpeta ext de tu PHP:
+```bash
+C:\xampp\php\ext\
+```
+2. Si el zip trae más DLLs (como CORE_*.dll y IM_MOD_*.dll), cópialas a la carpeta (Recomendación ordenar por tipo):
+```bash
+C:\xampp\php\
+```
+> NOTA: Esto asegura que Imagick tenga todas las dependencias.
+- Edita tu php.ini
+1. Abre el archivo php.ini de XAMPP:
+```bash
+C:\xampp\php\php.ini
+```
+2. Al final del archivo, agrega esta línea:
+```bash
+extension=php_imagick.dll
+```
+3. Guarda el archivo.
+> Nota: Reinicia Apache

@@ -17,7 +17,7 @@ class VerificacionCorreoLaboratorioController extends Controller
 
         Log::info('Esto aqui');
         if (! hash_equals((string) $hash, sha1($user->email))) {
-            abort(403, 'El enlace de verificación no es válido.');
+            return redirect('/')->with('error', 'El enlace de verificación no es válido.');
         }
         if ($user->hasVerifiedEmail()) {
             return redirect()->route('dashboard')->with('info', 'Correo ya verificado.');

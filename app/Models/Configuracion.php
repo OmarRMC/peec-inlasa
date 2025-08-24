@@ -39,7 +39,12 @@ class Configuracion extends Model
     public const NOTIFICACION_FECHA_INICIO = 'notificacion.fecha_inicio';
     public const NOTIFICACION_FECHA_FIN = 'notificacion.fecha_fin';
     public const EMAIL_INFORMACION = 'email.informacion';
-
+    public const CARGO_EVALUACION_EXTERNA = 'evaluacion_externa';
+    public const CARGO_COORDINADORA_RED   = 'coordinadora_red';
+    public const CARGO_DIRECTORA_GENERAL  = 'directora_general';
+    public const REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION = 'registro_ponderaciones_certificados_gestion';
+    public const FECHA_INICIO_REGISTRO_CERTIFICADOS = 'fecha_inicio_registro_certificados';
+    public const FECHA_FIN_REGISTRO_CERTIFICADOS    = 'fecha_fin_registro_certificados';
     public static function esPeriodoInscripcion()
     {
         $fechaInicio = Configuracion::where('key', Configuracion::FECHA_INICIO_INSCRIPCION)->value('valor');

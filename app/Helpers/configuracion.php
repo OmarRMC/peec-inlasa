@@ -4,15 +4,17 @@ use App\Models\Configuracion;
 use Carbon\Carbon;
 
 if (!function_exists('configuracion')) {
-    function configuracion(string $key, ?string $valor = null)
+    function configuracion(string $key, $valor = null)
     {
         if ($valor) {
             Configuracion::updateOrCreate(
                 ['key' => $key],
-                ['valor' => $valor]
+                ['valor' => is_array($valor) ? json_encode($valor, JSON_UNESCAPED_UNICODE) : (string) $valor]
             );
         } else {
-            return Configuracion::find($key)?->valor;
+            $config = Configuracion::find($key)?->valor;
+            $decoded = json_decode($config);
+            return json_last_error() === JSON_ERROR_NONE ? $decoded : $config;
         }
     }
 }

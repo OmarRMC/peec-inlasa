@@ -23,4 +23,10 @@ class InscripcionEA extends Model
     {
         return $this->belongsTo(EnsayoAptitud::class, 'id_ea');
     }
+
+    public function detalleCertificado()
+    {
+        return $this->hasOne(DetalleCertificado::class, 'id_ea', 'id_ea')
+            ->whereColumn('id_certificado', 'id_certificado');
+    }
 }

@@ -183,11 +183,15 @@ class Permiso extends Model
     public const GESTION_PROGRAMAS_AREAS_PAQUETES_EA = 'gestion.programas.areas.paquetes.ea';
     public const GESTION_PROGRAMAS_AREAS_PAQUETES_EA_NAME = 'Gestión de programas, áreas, paquetes y EA';
 
+
     public const ADMIN = 'admin';
     public const ADMIN_NAME = 'Administrador';
 
     public const DELETE_GESTION_PROGRAMAS = 'DELETE_PROGRAMAS_GESTION';
     public const DELETE_GESTION_PROGRAMAS_NAME = 'delete.programas.gestion';
+
+    public const GESTION_CERTIFICADOS = 'gestion.certificados';
+    public const GESTION_CERTIFICADOS_NAME = 'Gestión Certificados';
 
     // ------------------------------
     // PERMISOS_HABILITADOS
@@ -204,6 +208,7 @@ class Permiso extends Model
         self::ADMIN => self::ADMIN_NAME,
         self::RESPONSABLE => self::RESPONSABLE_NAME,
         self::LABORATORIO => self::LABORATORIO_NAME,
+        self::GESTION_CERTIFICADOS => self::GESTION_CERTIFICADOS_NAME,
     ];
 
     protected $table = 'permiso';
