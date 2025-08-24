@@ -64,6 +64,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::resource('laboratorio', LaboratorioController::class);
     Route::get('laboratorio/ajax/data', [LaboratorioController::class, 'getData'])->name('laboratorio.ajax.data');
     Route::resource('laboratorio', LaboratorioController::class);
+    Route::get('/searchLab', [LaboratorioController::class, 'getLabBySearch'])->name('getSearchLab');
 
     Route::prefix('inscripcion')->group(function () {
         Route::get('/', [InscripcionPaqueteController::class, 'index'])->name('inscripcion_paquete.index');

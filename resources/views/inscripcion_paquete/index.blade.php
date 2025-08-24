@@ -1,5 +1,6 @@
 @php
     use App\Models\Inscripcion;
+    use App\Models\Permiso;
 @endphp
 
 <x-app-layout>
@@ -7,6 +8,14 @@
         <!-- Encabezado -->
         <div class="flex justify-between items-center mb-1">
             <h1 class="text-xl font-bold text-gray-800">Lista de Inscripciones</h1>
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+                    <button id="add-inscripcion"
+                        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition shadow-md text-sm">
+                        <i class="fas fa-plus-circle"></i> Agregar Inscripción
+                    </button>
+                @endif
+            </div>
         </div>
 
         <div>
@@ -161,6 +170,46 @@
                 <div id="custom-pagination" class="flex justify-center"></div>
             </div>
         </div>
+
+        <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl relative">
+                <h2 class="text-lg font-bold mb-1">Seleccionar Laboratorio</h2>
+                <div class="flex items-center gap-2 justify-end !w-full mb-1">
+                    <div class="relative w-full sm:w-64">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="search" id="custom-search-lab"
+                            class="w-full pl-10 pr-4 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs"
+                            placeholder="Buscar laboratorio...">
+                    </div>
+                    <button id="btn-search-lab"
+                        class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+
+                <!-- Tabla de paquetes disponibles -->
+                <div class="overflow-x-auto mb-4">
+                    <table class="table w-full text-sm" id="tablaLaboratorio">
+                        <thead>
+                            <tr>
+                                <th>Codigo</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                                <th>Inscribir</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+                <!-- Botón cerrar modal -->
+                <div class="flex justify-end">
+                    <button id="cerrarModal" class="btn-secondary">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
 
         @push('scripts')
             <script>
@@ -366,6 +415,61 @@
                     // Pasar los IDs de paquetes como array al backend
                     $('#inscripciones-table').on('preXhr.dt', function(e, settings, data) {
                         data.paquetes = Array.from(filtrosPaquetes);
+                    });
+                });
+                document.addEventListener('DOMContentLoaded', function() {
+                    const modal = document.getElementById('modal');
+                    const openModalBtn = document.getElementById('add-inscripcion');
+                    const cerrarModalBtn = document.getElementById('cerrarModal');
+                    const searchLab = document.getElementById('custom-search-lab');
+                    const tablaLaboratorio = document.getElementById('tablaLaboratorio');
+                    openModalBtn.addEventListener('click', () => {
+                        modal.classList.remove('hidden');
+                    });
+                    cerrarModalBtn.addEventListener('click', () => {
+                        modal.classList.add('hidden');
+                        tablaLaboratorio.querySelector('tbody').innerHTML = '';
+                    });
+                    let value;
+                    let tablaLabDB;
+                    searchLab.addEventListener('change', (event) => {
+                        value = event.target.value;
+                    });
+                    tablaLabDB = $('#tablaLaboratorio').DataTable({
+                        processing: true,
+                        serverSide: true,
+                        ajax: "{{ route('getSearchLab') }}",
+                        columns: [{
+                                data: 'codigo',
+                                name: 'cod_lab'
+                            },
+                            {
+                                data: 'nombre_lab',
+                                name: 'nombre_lab'
+                            },
+                            {
+                                data: 'status_label',
+                                name: 'status'
+                            },
+                            {
+                                data: 'acciones',
+                                orderable: false,
+                                searchable: false
+                            }
+                        ],
+                        language: {
+                            url: "/translation/es.json"
+                        },
+                        dom: 'rt',
+                        lengthChange: false,
+                        pageLength: 10,
+                        drawCallback: function() {
+                            tippy('[data-tippy-content]');
+                        }
+                    });
+                    $('#btn-search-lab').on('click', () => tablaLabDB.search($('#custom-search-lab').val()).draw());
+                    $('#custom-search-lab').on('keypress', e => {
+                        if (e.which === 13) tablaLabDB.search($('#custom-search-lab').val()).draw();
                     });
                 });
             </script>

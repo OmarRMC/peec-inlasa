@@ -11,6 +11,10 @@ class Laboratorio extends Model
 {
     use HasFactory;
 
+    const STATUS = [
+        1 => 'Activo',
+        0 => 'Inactivo'
+    ];
     protected $table = 'laboratorio';
 
     protected $fillable = [
@@ -224,5 +228,18 @@ class Laboratorio extends Model
             ->pluck('detalle_ea')
             ->implode(', ');
         return $ensayosA;
+    }
+
+    public function getStatusRaw()
+    {
+        if ($this->status) {
+            return "<span class='inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded shadow-sm'>
+                        " . self::STATUS[$this->status] . "
+                    </span>";
+        } else {
+            return "<span class='inline-flex items-center px-2 py-0.5 bg-red-100 text-red-800 text-xs font-medium rounded shadow-sm'>
+                        " . self::STATUS[$this->status] . "
+                    </span>";
+        }
     }
 }

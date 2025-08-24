@@ -166,7 +166,7 @@ class InscripcionPaqueteController extends Controller
     public function store(Request $request)
     {
         if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES, Permiso::LABORATORIO])) {
-            abort(403, 'No se tiene Autorizacion para realizar esa accion');
+            return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
         }
         $request->validate([
             'id_lab' => 'required|exists:laboratorio,id',
@@ -399,7 +399,7 @@ class InscripcionPaqueteController extends Controller
     public function certificadoDesempenoIndex(Request $request)
     {
         if (!Gate::any([Permiso::ADMIN])) {
-            abort(403, 'No se tiene Autorizacion para realizar esa accion');
+            return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
         }
 
         $ensayos = EnsayoAptitud::query()
