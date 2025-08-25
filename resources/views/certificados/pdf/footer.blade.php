@@ -21,7 +21,7 @@
              <div class="name">{{ $cert->nombre_jefe }}</div>
          </td>
          <td class='sig'>
-             <div class="name">{{ $cert->nombre_director }}</div>
+             <div class="name">{{ $cert->nombre_coordinador }}</div>
          </td>
          <td class='sig'>
              <div class="name">{{ $cert->nombre_director }}</div>
