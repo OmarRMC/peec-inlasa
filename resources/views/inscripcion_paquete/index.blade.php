@@ -36,14 +36,14 @@
                 <!-- Filtro por Rango de Fecha -->
                 <div class="flex flex-wrap items-center gap-2">
                     <label for="filter-fecha-inicio" class="whitespace-nowrap">Fecha:</label>
-                    <input type="date" id="filter-fecha-inicio" value="{{ $now }}"
+                    <input type="date" id="filter-fecha-inicio" value="{{ $primerDiaMes }}"
                         class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[120px]">
                     <span class="whitespace-nowrap">a</span>
                     <input type="date" id="filter-fecha-fin" value="{{ $now }}"
                         class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[120px]">
                 </div>
 
-                <!-- Filtro por Gestión -->
+                <!-- Filtro por Gestión --> 
                 <select id="filter-gestion"
                     class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todas las Gestiones</option>

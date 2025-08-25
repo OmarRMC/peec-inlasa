@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'usuario.activo' => \App\Http\Middleware\VerificarUsuarioActivo::class,
             'canany' => \App\Http\Middleware\CanAnyPermission::class,
+            'forzar.cambiar.pass'=>\App\Http\Middleware\forzarCambiarPass::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

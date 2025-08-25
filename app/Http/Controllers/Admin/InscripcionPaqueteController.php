@@ -50,6 +50,7 @@ class InscripcionPaqueteController extends Controller
             'municipios' => [],
             'areas' => Area::orderBy('descripcion', 'asc')->get(),
             'now' => now()->format('Y-m-d'),
+            'primerDiaMes' => now()->startOfMonth()->format('Y-m-d'),
             'categorias' => CategoriaLaboratorio::all(),
             // 'paquetes' => Paquete::orderBy('descripcion', 'asc')->get(),
             'paquetes' => [],
