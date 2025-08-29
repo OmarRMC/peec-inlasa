@@ -54,7 +54,7 @@ class InscripcionPaqueteController extends Controller
             'categorias' => CategoriaLaboratorio::all(),
             // 'paquetes' => Paquete::orderBy('descripcion', 'asc')->get(),
             'paquetes' => [],
-            'gestiones' => Configuracion::GESTION_FILTER,
+            'gestiones' => configuracion(Configuracion::KEY_GESTION_FILTER),
         ]);
     }
     public function getInscripcionesData(Request $request)
@@ -193,14 +193,14 @@ class InscripcionPaqueteController extends Controller
                 'status_inscripcion' => true,
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
-                'gestion' => configuracion(Configuracion::GESTION_ACTUAL) ?? $request->gestion,
+                'gestion' => configuracion(Configuracion::GESTION_INSCRIPCION) ?? $request->gestion,
                 'status_cuenta' => Inscripcion::STATUS_DEUDOR,
                 'fecha_limite_pago' => configuracion(Configuracion::FECHA_FIN_PAGO)
             ]);
 
 
 
-            $gestion = configuracion(Configuracion::GESTION_ACTUAL);
+            $gestion = configuracion(Configuracion::GESTION_INSCRIPCION);
             $vigenciaInscripcion = new VigenciaInscripcion();
 
             $vigenciaInscripcion->status = true;
@@ -413,7 +413,7 @@ class InscripcionPaqueteController extends Controller
             ->paginate(20);
         $gestion = $request->gestion ?? now()->year;
         return view('certificados.desempeno.index', [
-            'gestiones' => Configuracion::GESTION_FILTER,
+            'gestiones' => configuracion(Configuracion::KEY_GESTION_FILTER),
             'gestion' => $gestion,
             'ensayos' => $ensayos,
         ]);
@@ -510,7 +510,7 @@ class InscripcionPaqueteController extends Controller
     public function certificadoDesempenoListLabs($id)
     {
         $idEA = $id;
-        $gestiones = Configuracion::GESTION_FILTER;
+        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER);
         $ensayoA = EnsayoAptitud::findOrFail($idEA);
         return view('certificados.desempeno.show', compact('idEA', 'gestiones', 'ensayoA'));
     }
