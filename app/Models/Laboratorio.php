@@ -11,6 +11,10 @@ class Laboratorio extends Model
 {
     use HasFactory;
 
+    const STATUS = [
+        1 => 'Activo',
+        0 => 'Inactivo'
+    ];
     protected $table = 'laboratorio';
 
     protected $fillable = [
@@ -167,5 +171,88 @@ class Laboratorio extends Model
     public function tieneIscripcionGestionActual()
     {
         return $this->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_ACTUAL))->exists();
+    }
+
+    public function getDataCertificadoDesemp(string $gestion)
+    {
+        $inscripciones = $this->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', $gestion)
+            ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
+            ->with(['certificado.detalles'])
+            ->get();
+
+        $dataPorArea = [];
+        foreach ($inscripciones as $inscripcion) {
+            $certificado = $inscripcion->certificado;
+            $detalles = $certificado->detalles;
+
+            if ($detalles->isEmpty()) continue;
+
+            foreach ($detalles as $detalle) {
+                if (is_null($detalle->calificacion_certificado)) continue;
+
+                if (!isset($dataPorArea["$detalle->detalle_area"])) {
+                    $dataPorArea["$detalle->detalle_area"] = [
+                        'certificado' => $certificado,
+                        'detalles' => []
+                    ];
+                }
+
+                $dataPorArea["$detalle->detalle_area"]['detalles'][] = [
+                    'ensayo' => $detalle->detalle_ea,
+                    'ponderacion' => $detalle->calificacion_certificado,
+                ];
+            }
+        }
+        return $dataPorArea;
+    }
+
+    public function getDataCertificadoParticipacion(string $gestion)
+    {
+        $query = $this->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', $gestion);
+        $query = $this->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', $gestion);
+        $ensayosA = $query
+            ->whereHas('certificado.detalles')
+            ->with(['certificado.detalles'])
+            ->get()
+            ->pluck('certificado.detalles')
+            ->flatten()
+            ->pluck('detalle_ea')
+            ->implode(', ');
+        return $ensayosA;
+    }
+
+    public function getStatusRaw()
+    {
+        if ($this->status) {
+            return "<span class='inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded shadow-sm'>
+                        " . self::STATUS[$this->status] . "
+                    </span>";
+        } else {
+            return "<span class='inline-flex items-center px-2 py-0.5 bg-red-100 text-red-800 text-xs font-medium rounded shadow-sm'>
+                        " . self::STATUS[$this->status] . "
+                    </span>";
+        }
+    }
+
+    protected function telefono(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => "{$this->usuario->telefono}"
+        );
+    }
+    protected function username(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => "{$this->usuario->username}"
+        );
     }
 }

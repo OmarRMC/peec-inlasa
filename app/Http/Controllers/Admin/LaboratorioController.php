@@ -26,11 +26,14 @@ class LaboratorioController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('canany:' . Permiso::GESTION_LABORATORIO . ',' . Permiso::ADMIN)->only(['index', 'create', 'store', 'show', 'edit', 'destroy', 'getData']);
+        $this->middleware('canany:' . Permiso::GESTION_LABORATORIO . ',' . Permiso::ADMIN)->only(['create', 'store', 'show', 'edit', 'destroy']);
     }
 
     public function index()
     {
+        if (!Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])) {
+            return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
+        }
         $laboratorios = Laboratorio::with('usuario')->latest()->paginate(10);
         // Cargar países para el filtro
         $paises = Pais::active()->get();
@@ -362,6 +365,9 @@ class LaboratorioController extends Controller
 
     public function getData(Request $request)
     {
+        if (!Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])) {
+            return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
+        }
         $query = Laboratorio::query()->with(['pais', 'usuario', 'departamento', 'provincia', 'municipio', 'tipo', 'categoria', 'nivel']);
 
         foreach (['pais', 'dep', 'prov', 'municipio', 'tipo', 'categoria', 'nivel'] as $f) {
@@ -385,7 +391,7 @@ class LaboratorioController extends Controller
             ->addColumn('categoria_nombre', fn($lab) => $lab->categoria->nombre_categoria ?? '-')
             ->addColumn('nivel_nombre', fn($lab) => $lab->nivel->nombre ?? '-')
             ->addColumn('email', fn($lab) => $lab->usuario->email ?? '-')
-            ->addColumn('status_label', fn($lab) => $lab->status ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>')
+            ->addColumn('status_label', fn($lab) => $lab->getStatusRaw())
             ->addColumn('actions', function ($lab) {
                 return view('laboratorio.action-buttons', [
                     'showUrl' => route('laboratorio.show', $lab->id),
@@ -398,6 +404,35 @@ class LaboratorioController extends Controller
                 ])->render();
             })
             ->rawColumns(['status_label', 'actions'])
+            ->toJson();
+    }
+
+    public function getLabBySearch(Request $request)
+    {
+
+        if (!Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])) {
+            return redirect('/')->with('error', 'No tienes permiso para acceder a esta sección.');
+        }
+        $query = Laboratorio::query();
+
+        return datatables()
+            ->of($query)
+            ->addColumn('codigo', fn($lab) => $lab->cod_lab)
+            ->addColumn('nombre_lab', fn($lab) => $lab->nombre_lab)
+            ->addColumn('status_label', fn($lab) => $lab->getStatusRaw())
+            ->addColumn('acciones', function ($lab) {
+                $url = route('inscripcion.create', $lab->id);
+                return '<a href="' . $url . '" 
+                    target="_blank"
+                    class="px-2 py-1 rounded-[5px] border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200 text-sm font-medium shadow-sm"
+                >
+                Inscribir
+            </a>';
+            })
+            ->filterColumn('nombre_lab', function ($query, $keyword) {
+                $query->whereRaw("LOWER(nombre_lab) LIKE ?", ["%" . strtolower($keyword) . "%"]);
+            })
+            ->rawColumns(['status_label', 'acciones'])
             ->toJson();
     }
 }

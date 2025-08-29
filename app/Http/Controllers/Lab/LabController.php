@@ -7,6 +7,7 @@ use App\Http\Controllers\PdfInscripcionController;
 use App\Mail\EnvioCodigoLab;
 use App\Mail\LaboratorioVerificacionDatos;
 use App\Models\CategoriaLaboratorio;
+use App\Models\Certificado;
 use App\Models\Configuracion;
 use App\Models\Departamento;
 use App\Models\Inscripcion;
@@ -21,12 +22,14 @@ use App\Models\Provincia;
 use App\Models\TipoLaboratorio;
 use App\Models\User;
 use App\Notifications\VerificarCorreoLab;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class LabController extends Controller
 {
@@ -87,7 +90,7 @@ class LabController extends Controller
             'provincias' => [],
             'municipios' => [],
             'categorias' => [],
-            'gestiones' => ['2025', '2024', '2023'],
+            'gestiones' => Configuracion::GESTION_FILTER,
         ]);
     }
 
@@ -164,7 +167,45 @@ class LabController extends Controller
         return view('inscripcion_paquete.show', compact('inscripcion', 'backTo'));
     }
 
+    public function certificadosDisponibles()
+    {
+        Gate::authorize(Permiso::LABORATORIO);
+        $user = Auth::user();
+        $laboratorio = $user->laboratorio;
+        $inscripciones = $laboratorio->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', function ($query) {
+                $query->Publicado();
+            })
+            ->with(['certificado.detalles'])
+            ->get()
+            ->map(function ($inscripcion) {
+                $tiene = $inscripcion->certificado
+                    ->detalles
+                    ->contains(function ($detalle) {
+                        return !is_null($detalle->calificacion_certificado);
+                    });
+                $inscripcion->tiene_certificado_desempeno = $tiene;
+                return $inscripcion;
+            });
 
+        $certificadosDisponibles = $inscripciones
+            ->groupBy('gestion')
+            ->map(function ($inscripciones) {
+                $tieneDesempeno = $inscripciones->contains(function ($inscripcion) {
+                    return $inscripcion->tiene_certificado_desempeno;
+                });
+
+                return (object) [
+                    'inscripciones' => $inscripciones,
+                    'tiene_certificado_desempeno' => $tieneDesempeno,
+                    'codigo' => $inscripciones->first()->laboratorio->cod_lab ?? ''
+                ];
+            });
+        return view('certificados.lab.certificados_disponibles', compact('certificadosDisponibles'));
+    }
+
+    public function getCertificadosDisponibleData() {}
 
     /**
      * Show the form for creating a new resource.
@@ -441,5 +482,96 @@ class LabController extends Controller
         $inscripcion->updated_by = Auth::user()->id;
         $inscripcion->save();
         return back()->with('success', 'Se anulo  su  Inscripcion.');
+    }
+
+    public function certificadoDesempPDF($gestion)
+    {
+        Gate::authorize(Permiso::LABORATORIO);
+        $user = Auth::user();
+        $laboratorio = $user->laboratorio;
+        $inscripciones = $laboratorio->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', $gestion)
+            ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
+            ->with(['certificado.detalles'])
+            ->get();
+        if ($inscripciones->isEmpty()) {
+            return redirect('/')
+                ->with('info', '⚠️ No se encontraron certificados registrados para la gestión seleccionada.');
+        }
+        $dataPorArea = [];
+        $codigoCertificado = '';
+        foreach ($inscripciones as $inscripcion) {
+            $certificado = $inscripcion->certificado;
+            $detalles = $certificado->detalles;
+
+            if ($detalles->isEmpty()) continue;
+
+            foreach ($detalles as $detalle) {
+                if (is_null($detalle->calificacion_certificado)) continue;
+
+                if (!isset($dataPorArea["$detalle->detalle_area"])) {
+                    $dataPorArea["$detalle->detalle_area"] = [
+                        'certificado' => $certificado,
+                        'detalles' => []
+                    ];
+                }
+
+                $dataPorArea["$detalle->detalle_area"]['detalles'][] = [
+                    'ensayo' => $detalle->detalle_ea,
+                    'ponderacion' => $detalle->calificacion_certificado,
+                ];
+                $codigoCertificado = $inscripcion->id;
+            }
+        }
+        $url = route('verificar.certificado', ['code' => $codigoCertificado, 'type' => Certificado::TYPE_DESEMP]);
+        $qr = base64_encode(
+            QrCode::format('png')->size(400)->margin(1)->generate($url)
+        );
+        // return view('certificados.pdf.desemp', ['data' => $dataPorArea, 'qr'=>$qr]); 
+        $pdf = Pdf::loadView('certificados.pdf.desemp', ['data' => $dataPorArea, 'qr' => $qr])
+            ->setPaper('A4', 'portrait');
+        $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
+
+        $response = $pdf->stream('certificados-desempeno.pdf');
+        return $response;
+    }
+
+    public function certificadoPartificacionPDF($gestion)
+    {
+        Gate::authorize(Permiso::LABORATORIO);
+        $user = Auth::user();
+        $laboratorio = $user->laboratorio;
+
+        $query = $laboratorio->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', $gestion);
+
+        $ins = $query->with('certificado')
+            ->first();
+        $certificado = $ins->certificado;
+        $codigoCertificado = $ins->id;
+        $query = $laboratorio->inscripciones()
+            ->Aprobado()
+            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', $gestion);
+        $ensayosA = $query
+            ->whereHas('certificado.detalles')
+            ->with(['certificado.detalles'])
+            ->get()
+            ->pluck('certificado.detalles')
+            ->flatten()
+            ->pluck('detalle_ea')
+            ->implode(', ');
+        $url = route('verificar.certificado', ['code' => $codigoCertificado, 'type' => Certificado::TYPE_PARTICIPACION]);
+        $qr = base64_encode(
+            QrCode::format('png')->size(220)->margin(1)->generate($url)
+        );
+        $pdf = Pdf::loadView('certificados.pdf.participacion', ['ensayosA' => $ensayosA, 'certificado' => $certificado, 'qr' => $qr])
+            ->setPaper('A4', 'portrait');
+        $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
+        return $pdf->stream('certificados-particiapcion.pdf');
     }
 }

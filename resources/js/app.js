@@ -19,6 +19,8 @@ window.Swal = Swal;
 window.confirmDelete = confirmDelete;
 window.confirmAsyncHandle = confirmAsyncHandle;
 window.mostrarAlertaConfirmacion = mostrarAlertaConfirmacion;
+window.showToast = showToast;
+window.showError = showError;
 
 document.addEventListener('DOMContentLoaded', () => {
     tippy('[data-tippy-content]');

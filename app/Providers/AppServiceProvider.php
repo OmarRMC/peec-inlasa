@@ -69,5 +69,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::define(Permiso::GESTION_GEOGRAFICA, function (User $user) {
             return $user->tienePermiso(Permiso::GESTION_GEOGRAFICA);
         });
+        Gate::define(Permiso::GESTION_CERTIFICADOS, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_CERTIFICADOS);
+        });
     }
 }

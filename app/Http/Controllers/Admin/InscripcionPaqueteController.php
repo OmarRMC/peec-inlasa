@@ -50,10 +50,11 @@ class InscripcionPaqueteController extends Controller
             'municipios' => [],
             'areas' => Area::orderBy('descripcion', 'asc')->get(),
             'now' => now()->format('Y-m-d'),
+            'primerDiaMes' => now()->startOfMonth()->format('Y-m-d'),
             'categorias' => CategoriaLaboratorio::all(),
             // 'paquetes' => Paquete::orderBy('descripcion', 'asc')->get(),
             'paquetes' => [],
-            'gestiones' => ['2025', '2024', '2023'],
+            'gestiones' => Configuracion::GESTION_FILTER,
         ]);
     }
     public function getInscripcionesData(Request $request)
@@ -166,7 +167,7 @@ class InscripcionPaqueteController extends Controller
     public function store(Request $request)
     {
         if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES, Permiso::LABORATORIO])) {
-            abort(403, 'No se tiene Autorizacion para realizar esa accion');
+            return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
         }
         $request->validate([
             'id_lab' => 'required|exists:laboratorio,id',
@@ -395,4 +396,122 @@ class InscripcionPaqueteController extends Controller
     //         ], 500);
     //     }
     // }
+
+    public function certificadoDesempenoIndex(Request $request)
+    {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS])) {
+            return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
+        }
+        $ensayos = EnsayoAptitud::query()
+            ->select('ensayo_aptitud.*')
+            ->join('paquete', 'ensayo_aptitud.id_paquete', '=', 'paquete.id')
+            ->join('area', 'paquete.id_area', '=', 'area.id')
+            ->with(['paquete', 'paquete.area'])
+            ->orderBy('area.descripcion', 'asc')
+            ->orderBy('paquete.descripcion', 'asc')
+            ->orderBy('ensayo_aptitud.descripcion', 'asc')
+            ->paginate(20);
+        $gestion = $request->gestion ?? now()->year;
+        return view('certificados.desempeno.index', [
+            'gestiones' => Configuracion::GESTION_FILTER,
+            'gestion' => $gestion,
+            'ensayos' => $ensayos,
+        ]);
+    }
+
+    // public function certificadoDesempenoAjaxIndex(Request $request, $idEA)
+    // {
+    //     $query = Inscripcion::with([
+    //         'laboratorio',
+    //         'certificado.detalles'
+    //     ])
+    //         ->whereHas('certificado')
+    //         ->whereHas('certificado.detalles', function ($q) {
+    //             $q->where('temporal', false);
+    //         });
+
+    //     if ($request->filled('gestion')) {
+    //         $query->where('gestion', $request->gestion);
+    //     }
+    //     if ($request->has('status_ins') && $request->get('status_ins')) {
+    //         $query->where('status_inscripcion', $request->status_ins);
+    //     }
+
+    //     // Traemos todas las inscripciones
+    //     $inscripciones = $query->get();
+
+    //     // Expandimos cada inscripción en varias filas (una por detalle)
+    //     $filas = $inscripciones->flatMap(function ($ins) {
+    //         return $ins->certificado->detalles->map(function ($detalle) use ($ins) {
+    //             return [
+    //                 'created_at' => $ins->created_at,
+    //                 'gestion'    => $ins->gestion,
+    //                 'cod_lab'    => $ins->laboratorio->cod_lab,
+    //                 'nombre_lab' => $ins->laboratorio->nombre_lab,
+    //                 'wapp_lab'   => $ins->laboratorio->wapp_lab,
+    //                 'mail_lab'   => $ins->laboratorio->mail_lab ?? '-',
+    //                 'detalle'    => $detalle, // el detalle específico (ej. calificacion_certificado)
+    //             ];
+    //         });
+    //     });
+
+    //     return datatables()
+    //         ->of($filas)
+    //         ->addColumn('calificacion', fn($row) => $row['detalle']->calificacion_certificado ?? '-')
+    //         ->addColumn('acciones', function ($row) {
+    //             return view('responsable.certificados.action-buttons', [
+    //                 'updateUrl' => route('detalle-certificado.update', $row['detalle']),
+    //                 'desempeno' => $row['detalle']->calificacion_certificado ?? '',
+    //             ])->render();
+    //         })
+    //         ->rawColumns(['acciones'])
+    //         ->toJson();
+    // }
+
+    public function certificadoDesempenoAjaxIndex(Request $request, $idEa)
+    {
+        $query = InscripcionEA::with([
+            'inscripcion',
+            'inscripcion.laboratorio',
+            'inscripcion.certificado.detalles'
+        ])
+            ->where('inscripcion_ea.id_ea', $idEa)
+            ->whereHas('inscripcion', function ($q) {
+                $q->Aprobado();
+            })
+            ->whereHas('inscripcion.certificado.detalles', function ($q) use ($idEa) {
+                $q->where('temporal', false)
+                    ->where('id_ea', $idEa);
+            });
+        if ($request->filled('gestion')) {
+            $query->whereHas('inscripcion', function ($q) use ($request) {
+                $q->where('gestion', $request->gestion);
+            });
+        }
+        return datatables()
+            ->of($query)
+            ->addColumn('created_at', fn($ea) => $ea->inscripcion->certificado->detalles->first()?->created_at ?? '-')
+            ->addColumn('nombre_lab', fn($ea) => $ea->inscripcion->laboratorio->nombre_lab)
+            ->addColumn('cod_lab', fn($ea) => $ea->inscripcion->laboratorio->cod_lab)
+            ->addColumn('wapp_lab', fn($ea) => $ea->inscripcion->laboratorio->wapp_lab)
+            ->addColumn('mail_lab', fn($ea) => $ea->inscripcion->laboratorio->mail_lab ?? '-')
+            ->addColumn('gestion', fn($ea) => $ea->inscripcion->gestion ?? '-')
+            ->addColumn('acciones', function ($ea) {
+                return view('responsable.certificados.action-buttons', [
+                    'updateUrl' => route('detalle-certificado.update', $ea->inscripcion->certificado->detalles->first()?->id),
+                    'desempeno' => $ea->inscripcion->certificado?->detalles?->first()?->calificacion_certificado ?? '',
+                ])->render();
+            })
+            ->rawColumns(['acciones'])
+            ->toJson();
+    }
+
+    //certificadoDesempenoListLabs
+    public function certificadoDesempenoListLabs($id)
+    {
+        $idEA = $id;
+        $gestiones = Configuracion::GESTION_FILTER;
+        $ensayoA = EnsayoAptitud::findOrFail($idEA);
+        return view('certificados.desempeno.show', compact('idEA', 'gestiones', 'ensayoA'));
+    }
 }
