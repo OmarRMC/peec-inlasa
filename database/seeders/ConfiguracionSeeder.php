@@ -21,7 +21,7 @@ class ConfiguracionSeeder extends Seeder
       Configuracion::FECHA_INICIO_VIGENCIA    => $now->copy()->addMonth()->format('Y-m-d'),
       Configuracion::FECHA_FIN_VIGENCIA       => $now->copy()->addMonths(12)->format('Y-m-d'),
 
-      Configuracion::GESTION_ACTUAL           => $now->year,
+      Configuracion::GESTION_INSCRIPCION           => $now->year,
       Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION => $now->year,
 
       Configuracion::NOTIFICACION_KEY         => 'info-general',
@@ -65,7 +65,8 @@ class ConfiguracionSeeder extends Seeder
         'institucion' => 'INLASA',
         'imagen'      => '/storage/firmas/firma3.png',
         'label' => 'Dir. General',
-      ]
+      ],
+      Configuracion::KEY_GESTION_FILTER => [(int) date('Y'), (int) date('Y') - 1]
     ];
 
     foreach ($datos as $key => $valor) {

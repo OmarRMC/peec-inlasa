@@ -1,3 +1,6 @@
+@php
+    use App\Models\Configuracion;
+@endphp
 @props(['showUrl', 'boletaPdf', 'contratoPdf', 'inscripcion'])
 
 <div class="flex space-x-1">
@@ -13,12 +16,11 @@
         <i class="fas fa-file-pdf"></i>
     </a>
 
-    @if (!$inscripcion->estaAnulado() && $inscripcion->estaEnRevision())
+    @if (!$inscripcion->estaAnulado() && $inscripcion->estaEnRevision() && Configuracion::esPeriodoInscripcion())
         <form method="POST" class="anular-inscripcion" action="{{ route('inscripciones.anular', $inscripcion->id) }}">
             @csrf
             @method('PUT')
-            <button type="submit"
-                class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
+            <button type="submit" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
                 data-tippy-content="Anular inscripción">
                 <i class="fas fa-ban"></i>
             </button>

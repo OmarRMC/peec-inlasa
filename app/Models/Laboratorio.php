@@ -170,7 +170,7 @@ class Laboratorio extends Model
 
     public function tieneIscripcionGestionActual()
     {
-        return $this->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_ACTUAL))->exists();
+        return $this->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_INSCRIPCION))->exists();
     }
 
     public function getDataCertificadoDesemp(string $gestion)
@@ -206,6 +206,43 @@ class Laboratorio extends Model
                 ];
             }
         }
+        return $dataPorArea;
+    }
+
+    public function seTieneDeudaPendiente()
+    {
+        $gestion = configuracion(Configuracion::GESTION_INSCRIPCION);
+        $inscripciones = $this->inscripciones()
+            ->Aprobado()
+            // ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->where('gestion', '<', $gestion)
+            // ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
+            // ->with(['certificado.detalles'])
+            ->get();
+
+        $dataPorArea = [];
+        // foreach ($inscripciones as $inscripcion) {
+        //     $certificado = $inscripcion->certificado;
+        //     $detalles = $certificado->detalles;
+
+        //     if ($detalles->isEmpty()) continue;
+
+        //     foreach ($detalles as $detalle) {
+        //         if (is_null($detalle->calificacion_certificado)) continue;
+
+        //         if (!isset($dataPorArea["$detalle->detalle_area"])) {
+        //             $dataPorArea["$detalle->detalle_area"] = [
+        //                 'certificado' => $certificado,
+        //                 'detalles' => []
+        //             ];
+        //         }
+
+        //         $dataPorArea["$detalle->detalle_area"]['detalles'][] = [
+        //             'ensayo' => $detalle->detalle_ea,
+        //             'ponderacion' => $detalle->calificacion_certificado,
+        //         ];
+        //     }
+        // }
         return $dataPorArea;
     }
 
@@ -255,4 +292,7 @@ class Laboratorio extends Model
             get: fn() => "{$this->usuario->username}"
         );
     }
+
+    // scope para determinar las si se tiene deuda pendiente 
+
 }

@@ -15,7 +15,7 @@
                 </div>
             @endif
             {{-- , ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'] --}}
-            @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'gestion', 'title' => 'Gestión de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.informacion', 'title' => 'Información personalizada para email']] as $item)
+            @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.informacion', 'title' => 'Información personalizada para email'], ['id' => 'gestion.filter', 'title' => 'Gestiones para filtros']] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -36,6 +36,14 @@
                                 @case('inscripcion')
                                     <form action="{{ route($config, 'periodo-inscripcion') }}" method="POST">
                                         @csrf @method('PUT')
+                                        <div>
+                                            <label for="{{ Configuracion::GESTION_INSCRIPCION }}"
+                                                class="block text-sm font-medium">Gestion de inscripcion</label>
+                                            <input type="number" name="{{ Configuracion::GESTION_INSCRIPCION }}"
+                                                id="{{ Configuracion::GESTION_INSCRIPCION }}"
+                                                value="{{ old(Configuracion::GESTION_INSCRIPCION, configuracion(Configuracion::GESTION_INSCRIPCION) ?? date('Y')) }}"
+                                                class="mt-1 input-standard" min="2020" max="2100" required>
+                                        </div>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label for="{{ Configuracion::FECHA_INICIO_INSCRIPCION }}"
@@ -122,15 +130,19 @@
                                         </div>
                                     </form>
                                 @break --}}
-                                @case('gestion')
-                                    <form action="{{ route($config, 'gestion') }}" method="POST">
+                                @case('gestion.filter')
+                                    @php
+                                        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER);
+                                        $gestionesStr = implode(',', $gestiones);
+                                    @endphp
+                                    <form action="{{ route($config, 'gestion.filter') }}" method="POST">
                                         @csrf @method('PUT')
                                         <div>
-                                            <label for="{{ Configuracion::GESTION_ACTUAL }}"
-                                                class="block text-sm font-medium">Gestion de inscripcion</label>
-                                            <input type="number" name="{{ Configuracion::GESTION_ACTUAL }}"
-                                                id="{{ Configuracion::GESTION_ACTUAL }}"
-                                                value="{{ old(Configuracion::GESTION_ACTUAL, configuracion(Configuracion::GESTION_ACTUAL) ?? date('Y')) }}"
+                                            <label for="{{ Configuracion::KEY_GESTION_FILTER }}"
+                                                class="block text-sm font-medium">Gestiones para filtros</label>
+                                            <input type="string" name="{{ Configuracion::KEY_GESTION_FILTER }}"
+                                                id="{{ Configuracion::KEY_GESTION_FILTER }}"
+                                                value="{{ old(Configuracion::KEY_GESTION_FILTER, $gestionesStr ?? date('Y')) }}"
                                                 class="mt-1 input-standard" min="2020" max="2100" required>
                                         </div>
                                         <div class="text-right mt-4">

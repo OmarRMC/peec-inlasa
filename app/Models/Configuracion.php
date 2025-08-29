@@ -20,7 +20,7 @@ class Configuracion extends Model
         'valor',
     ];
 
-    const GESTION_FILTER = ['2025', '2024', '2023', '2022'];
+    const KEY_GESTION_FILTER = 'key_gestion_filter';
     // Claves centralizadas como constantes
     public const FECHA_INICIO_INSCRIPCION = 'fecha_inicio_inscripcion';
     public const FECHA_FIN_INSCRIPCION = 'fecha_fin_inscripcion';
@@ -31,7 +31,7 @@ class Configuracion extends Model
     public const FECHA_INICIO_VIGENCIA = 'fecha.inicio.vigencia';
     public const FECHA_FIN_VIGENCIA = 'fecha.fin.vigencia';
 
-    public const GESTION_ACTUAL = 'gestion_actual';
+    public const GESTION_INSCRIPCION = 'gestion_inscripcion';
 
     public const NOTIFICACION_KEY = 'notificacion.key';
     public const NOTIFICACION_TITULO = 'notificacion.titulo';

@@ -180,7 +180,7 @@ class PaqueteController extends Controller
             ->where('max_participantes', '>', 0)
             ->get()
             ->filter(function ($paquete) {
-                $gestionActual = configuracion(Configuracion::GESTION_ACTUAL);
+                $gestionActual = configuracion(Configuracion::GESTION_INSCRIPCION);
                 $inscritosActuales = $paquete->detalleInscripciones->filter(function ($detalle) use ($gestionActual) {
                     return optional($detalle->inscripcion)->gestion == $gestionActual;
                 })->count();

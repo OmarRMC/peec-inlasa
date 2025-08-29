@@ -21,6 +21,7 @@ class Inscripcion extends Model
     const STATUS_PAGADO = 1;
 
     const STATUS_DEUDOR = 2;
+    
     const STATUS_INSCRIPCION = [
         self::STATUS_EN_REVISION => 'En revision',
         self::STATUS_APROBADO => 'Aprobado',

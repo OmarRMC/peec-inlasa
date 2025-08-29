@@ -36,15 +36,17 @@ class ConfiguracionController extends Controller
                 $request->validate([
                     'fecha_inicio_inscripcion' => 'required|date',
                     'fecha_fin_inscripcion' => 'required|date|after_or_equal:fecha_inicio_inscripcion',
+                    'gestion_inscripcion' => 'required|digits:4'
                 ], [
                     'fecha_inicio_inscripcion.required' => 'La fecha de inicio es obligatoria.',
                     'fecha_inicio_inscripcion.date' => 'La fecha de inicio debe ser una fecha válida.',
                     'fecha_fin_inscripcion.required' => 'La fecha de fin es obligatoria.',
                     'fecha_fin_inscripcion.date' => 'La fecha de fin debe ser una fecha válida.',
                     'fecha_fin_inscripcion.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
+                    'gestion_inscripcion.required' => 'El campo gestión actual es obligatorio.',
+                    'gestion_inscripcion.digits' => 'La gestión debe contener exactamente 4 dígitos.',
                 ]);
-
-
+                configuracion(Configuracion::GESTION_INSCRIPCION, $request->gestion_inscripcion);
                 configuracion(Configuracion::FECHA_INICIO_INSCRIPCION, $request->fecha_inicio_inscripcion);
                 configuracion(Configuracion::FECHA_FIN_INSCRIPCION, $request->fecha_fin_inscripcion);
                 break;
@@ -78,17 +80,6 @@ class ConfiguracionController extends Controller
 
                 configuracion(Configuracion::FECHA_INICIO_VIGENCIA, $request->fecha_inicio_vigencia);
                 configuracion(Configuracion::FECHA_FIN_VIGENCIA, $request->fecha_fin_vigencia);
-                break;
-
-            case 'gestion':
-                $request->validate([
-                    'gestion_actual' => 'required|digits:4',
-                ], [
-                    'gestion_actual.required' => 'El campo gestión actual es obligatorio.',
-                    'gestion_actual.digits' => 'La gestión debe contener exactamente 4 dígitos.',
-                ]);
-
-                configuracion(Configuracion::GESTION_ACTUAL, $request->gestion_actual);
                 break;
 
             case 'notificacion':
@@ -222,6 +213,20 @@ class ConfiguracionController extends Controller
                 configuracion(Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS, $request->fecha_inicio_registro_certificados);
                 configuracion(Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS, $request->fecha_fin_registro_certificados);
                 configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION, $request->registro_ponderaciones_certificados_gestion);
+                break;
+            case 'gestion.filter':
+                $request->validate([
+                    'key_gestion_filter' => [
+                        'required',
+                        'regex:/^\d{4}(,\d{4})*$/',
+                    ],
+                ], [
+                    'key_gestion_filter.required' => 'Es requerido',
+                    'key_gestion_filter.regex' => 'Debe ser años de 4 dígitos separados por coma (ej. 2025,2024)',
+                ]);
+                $gestiones = explode(',', $request->key_gestion_filter);
+                $gestiones = array_map('intval', $gestiones);
+                configuracion(Configuracion::KEY_GESTION_FILTER, json_encode($gestiones));
                 break;
             default:
                 return redirect()->back()->with('error', 'Error en registrar la Configuración.');
