@@ -52,11 +52,11 @@ class TipoLaboratorioController extends Controller
     private function validateRequest(Request $request, $id = null)
     {
         $request->validate([
-            'descripcion' => 'required|string|max:25|unique:tipo_laboratorio,descripcion,' . $id,
+            'descripcion' => 'required|string|max:50|unique:tipo_laboratorio,descripcion,' . $id,
             'status' => 'required|boolean',
         ], [
             'descripcion.required' => 'La descripción es obligatoria.',
-            'descripcion.max' => 'La descripción no debe exceder los 25 caracteres.',
+            'descripcion.max' => 'La descripción no debe exceder los 35 caracteres.',
             'descripcion.unique' => 'Este tipo de laboratorio ya existe.',
             'status.required' => 'Debe seleccionar el estado.',
             'status.boolean' => 'El estado debe ser válido.',

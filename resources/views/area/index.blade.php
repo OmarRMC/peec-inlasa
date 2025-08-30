@@ -19,7 +19,7 @@
                         <th>ID</th>
                         <th>Programa</th>
                         <th>Area</th>
-                        <th>Máx. Paquetes</th>
+                        {{-- <th>Máx. Paquetes</th> --}}
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -30,7 +30,7 @@
                             <td>{{ $area->id }}</td>
                             <td>{{ $area->programa->descripcion ?? 'N/D' }}</td>
                             <td>{{ $area->descripcion }}</td>
-                            <td>{{ $area->max_paquetes_inscribir }}</td>
+                            {{-- <td>{{ $area->max_paquetes_inscribir }}</td> --}}
                             <td>
                                 @if ($area->status)
                                     <span class="badge badge-success">Activo</span>

@@ -26,7 +26,7 @@
     <label for="descripcion" class="label">Descripción</label>
     <input type="text" name="descripcion" id="descripcion"
         value="{{ old('descripcion', $ensayo_aptitud->descripcion ?? '') }}"
-        pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{3,100}$" title="Solo letras, números y espacios. Entre 3 y 100 caracteres."
+        pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s ._-()]{3,100}$" title="Solo letras, números y espacios. Entre 3 y 100 caracteres."
         required maxlength="100" class="input-standard @error('descripcion') border-red-500 @enderror">
     @error('descripcion')
         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

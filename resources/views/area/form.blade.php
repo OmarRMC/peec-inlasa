@@ -23,7 +23,7 @@
 <div class="mb-4">
     <label for="descripcion" class="label">Descripción</label>
     <input type="text" name="descripcion" id="descripcion" value="{{ old('descripcion', $area->descripcion ?? '') }}"
-        class="input-standard @error('descripcion') border-red-500 @enderror" pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]{3,100}$"
+        class="input-standard @error('descripcion') border-red-500 @enderror" pattern="^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s -._()]{3,100}$"
         title="Solo letras y espacios. Mínimo 3 caracteres, máximo 100." required>
     @error('descripcion')
         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -31,7 +31,7 @@
 </div>
 
 <!-- Máx. paquetes -->
-<div class="mb-4">
+{{-- <div class="mb-4">
     <label for="max_paquetes_inscribir" class="label">Máx. Paquetes a Inscribir</label>
     <input type="number" name="max_paquetes_inscribir" id="max_paquetes_inscribir"
         value="{{ old('max_paquetes_inscribir', $area->max_paquetes_inscribir ?? '') }}"
@@ -40,7 +40,7 @@
     @error('max_paquetes_inscribir')
         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
     @enderror
-</div>
+</div> --}}
 
 <!-- Estado -->
 <div class="mb-6">

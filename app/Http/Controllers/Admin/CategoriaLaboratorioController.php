@@ -63,7 +63,7 @@ class CategoriaLaboratorioController extends Controller
             'descripcion.required' => 'La descripción es obligatoria.',
             'descripcion.unique' => 'La descripción ya existe.',
             'descripcion.min' => 'La descripción debe tener al menos 3 caracteres.',
-            'descripcion.max' => 'La descripción no puede tener más de 25 caracteres.',
+            'descripcion.max' => 'La descripción no puede tener más de 50 caracteres.',
             'status.required' => 'El estado es obligatorio.',
             'status.boolean' => 'El estado debe ser verdadero o falso.',
         ];

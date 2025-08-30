@@ -63,6 +63,9 @@
                     @endforelse
                 </tbody>
             </table>
+            <div class="mt-4">
+                {{ $categorias->links() }}
+            </div>
         </div>
     </div>
 </x-app-layout>

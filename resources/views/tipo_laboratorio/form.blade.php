@@ -6,8 +6,8 @@
 <div class="mb-4">
     <label for="descripcion" class="label">Descripción</label>
     <input type="text" name="descripcion" id="descripcion"
-        value="{{ old('descripcion', $tipo_laboratorio->descripcion ?? '') }}" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{3,25}$"
-        title="Solo letras, números y espacios. Entre 3 y 25 caracteres." required maxlength="25"
+        value="{{ old('descripcion', $tipo_laboratorio->descripcion ?? '') }}" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s_.()]{3,50}$"
+        title="Solo letras, números y espacios. Entre 3 y 50 caracteres." required maxlength="50"
         class="input-standard @error('descripcion') border-red-500 @enderror">
     @error('descripcion')
         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
