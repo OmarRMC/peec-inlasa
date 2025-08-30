@@ -339,10 +339,43 @@ class LabController extends Controller
                 )
             );
         } catch (\Throwable $th) {
-            return redirect('login')->with('info', 'Laboratorio registrado exitosamente, No se pudo enviar el correo verificación para validar sus datos.');
+
+            return redirect('login')->with('notice', [
+                'title' => 'Registro exitoso, pero...',
+                'message' => <<<HTML
+                <div style="text-align: left; font-size: 14px; line-height: 1.5;">
+                    Tu laboratorio fue registrado correctamente, 
+                    <b>pero no pudimos enviar el correo de verificación</b> a:
+                    <br><br>
+                    <span style="display: inline-block; margin-top: 6px; font-weight: bold; color: #dc2626; font-size: 15px;">
+                        {$laboratorio->mail_lab}
+                    </span>
+                    <br><br>
+                    ⚠️ Para continuar, por favor <b>ingresa nuevamente tus datos</b> 
+                    y asegúrate de escribir un correo válido y activo.
+                </div>
+                HTML,
+                'type' => 'warning',
+            ]);
         }
 
-        return redirect('login')->with('success', 'Laboratorio registrado exitosamente, Se envió un correo de verificación para validar sus datos.');
+        return redirect('login')->with('notice', [
+            'title' => 'Registro exitoso',
+            'message' =>  <<<HTML
+                <div style="text-align: left; font-size: 14px; line-height: 1.5;">
+                    Tu laboratorio ha sido <b>registrado temporalmente</b>. 
+                    Para <b>finalizar y oficializar tu registro</b>, debes verificar tus datos mediante el enlace que enviamos a tu correo. 
+                    <br><br>
+                    📩 Hemos enviado el correo de verificación a: 
+                    <span style="display: inline-block; margin-top: 6px; font-weight: bold; color: #1d4ed8; font-size: 15px;">
+                        {$laboratorio->mail_lab}
+                    </span>
+                    <br><br>
+                    👉 Revisa tu bandeja de entrada o la carpeta de <i>spam</i>.
+                </div>
+            HTML,
+            'type' => 'success',
+        ]);
     }
 
 
@@ -393,7 +426,29 @@ class LabController extends Controller
 
     public function confirmarDatos($id)
     {
-        $labTem = LaboratorioTem::findOrFail($id);
+        $labTem = LaboratorioTem::find($id);
+        if (!$labTem) {
+            $labTemWithTrashed = LaboratorioTem::withTrashed()->findOrFail($id);
+            $email = $labTemWithTrashed->mail_lab;
+            $user = User::where('email', $email)->first();
+            $message = <<<HTML
+                <div style="text-align: left; font-size: 14px; line-height: 1.5;">
+                    ⚠️ Este laboratorio ya fue <b>confirmado anteriormente</b>.
+                    <br><br>
+                    Tu <b>código de usuario asignado</b> es:
+                    <span style="display:inline-block; font-weight:bold; color:#1d4ed8; font-size:15px;">
+                        {$user->username}
+                    </span>
+                    <br><br>
+                    Usa este código para <b>iniciar sesión</b> junto con tu contraseña.
+                </div>
+                HTML;
+            return redirect('login')->with('notice', [
+                'title' => 'Laboratorio ya confirmado',
+                'message' => $message,
+                'type' => 'info',
+            ]);
+        }
 
         $pais = Pais::find($labTem->id_pais);
         $sigla = strtoupper($pais->sigla_pais); // Ej: BOL
@@ -448,20 +503,60 @@ class LabController extends Controller
                 'created_by' => $user->id,
                 'updated_by' =>  $user->id,
             ]);
+            $labTem->delete();
+            DB::commit();
             try {
                 Mail::to($user->email)->send(new EnvioCodigoLab($user, $lab));
-                DB::commit();
-                $labTem->delete();
+                $message = <<<HTML
+                <div style="text-align: left; font-size: 14px; line-height: 1.5;">
+                    ✅ <b>Laboratorio confirmado y registrado exitosamente.</b>
+                    <br><br>
+                    Tu <b>código de usuario asignado</b> es: 
+                    <span style="display:inline-block; font-weight:bold; color:#1d4ed8; font-size:15px;">$username</span>
+                    <br><br>
+                    Puedes usar este código para <b>iniciar sesión</b> junto con tu contraseña.
+                    <br><br>
+                    Hemos enviado un correo a <b>{$user->email}</b> con los detalles de verificación.
+                </div>
+                HTML;
+
+                return redirect('login')->with('notice', [
+                    'title' => 'Registro confirmado',
+                    'message' => $message,
+                    'type' => 'success',
+                ]);
             } catch (\Throwable $th) {
                 \Log::error('Error al enviar el correo de confirmación: ' . $th->getMessage());
-                DB::rollBack();
-                return redirect('login')->with('info', 'Laboratorio confirmado exitosamente, pero no se pudo enviar el correo de confirmación.');
+                $message = <<<HTML
+                    <div style="text-align: left; font-size: 14px; line-height: 1.5;">
+                        ✅ <b>Laboratorio confirmado y registrado correctamente.</b> 
+                        <br>
+                        ⚠️ <b>No se pudo enviar el correo de confirmación a</b> 
+                        <span style="font-weight:bold; color:#dc2626;">{$user->email}</span>.
+                        <br>
+                        Sin embargo, tu cuenta ya fue creada en el sistema y puedes acceder directamente con:
+                        <br>
+                        <b>Usuario/codigo (guárdalo bien):</b> <span style="font-weight:bold; color:#1d4ed8;">$username</span>
+                        <br>
+                        <b>Contraseña:</b> la que registraste durante la inscripción.
+                        <br>
+                        📌 <b>Importante:</b> Anota y guarda tu <span style="color:#1d4ed8; font-weight:bold;">usuario/código</span> en un lugar seguro, ya que lo necesitarás siempre para ingresar al sistema.
+                    </div>
+                HTML;
+                return redirect('login')->with('notice', [
+                    'title' => 'Registro confirmado, pero...',
+                    'message' => $message,
+                    'type' => 'warning',
+                ]);
             }
-            return redirect('login')->with('success', 'El laboratorio fue confirmado y registrado correctamente. Se ha enviado el código asignado al correo electrónico principal proporcionado.');
         } catch (\Throwable $e) {
             DB::rollBack();
             \Log::error('Error al iniciar transacción: ' . $e->getMessage());
-            return redirect('login')->with('error', 'Ocurrió un error al registrar la información. Por favor, inténtelo nuevamente.');
+            return redirect('login')->with('notice', [
+                'title' => 'Error',
+                'message' => 'Ocurrió un error al registrar la información. Por favor, inténtelo nuevamente.',
+                'type' => 'error',
+            ]);
         }
     }
 

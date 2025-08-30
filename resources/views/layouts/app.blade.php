@@ -74,11 +74,6 @@
                 left: 1rem;
             }
         }
-
-        .swal2-sm {
-            width: 350px !important;
-            font-size: 14px !important;
-        }
     </style>
 </head>
 
