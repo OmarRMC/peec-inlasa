@@ -145,7 +145,8 @@ class InscripcionPaqueteController extends Controller
                 $query->where('tipo_laboratorio_id', $tipoLabId);
             })
             ->get();
-        return view('inscripcion_paquete.create', compact('laboratorio', 'programas'));
+        $deudasPendientes = $laboratorio->deudasPendientes();
+        return view('inscripcion_paquete.create', compact('laboratorio', 'programas', 'deudasPendientes'));
     }
 
     public function paquetesPorPrograma(Request $request)
@@ -168,6 +169,13 @@ class InscripcionPaqueteController extends Controller
     {
         if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES, Permiso::LABORATORIO])) {
             return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
+        }
+        if (Gate::any([Permiso::LABORATORIO]) && !Configuracion::esPeriodoInscripcion()) {
+            session()->flash('error', 'Actualmente no se encuentra activo el periodo de inscripción.');
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Actualmente no se encuentra activo el periodo de inscripción.'
+            ], 400);
         }
         $request->validate([
             'id_lab' => 'required|exists:laboratorio,id',

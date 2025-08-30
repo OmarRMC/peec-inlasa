@@ -293,6 +293,16 @@ class Laboratorio extends Model
         );
     }
 
-    // scope para determinar las si se tiene deuda pendiente 
+    // scope para determinar las si se tiene deuda pendiente
+    public function deudasPendientes(): mixed
+    {
+        $gestion = configuracion(Configuracion::GESTION_INSCRIPCION);
 
+        return $this->inscripciones()
+            ->Aprobado()
+            ->Pendiente()
+            ->where('gestion', '<', $gestion)
+            ->with(['detalleInscripciones', 'pagos'])
+            ->get();
+    }
 }

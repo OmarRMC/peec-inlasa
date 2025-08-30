@@ -1,43 +1,86 @@
+@php
+    use App\Models\Permiso;
+    use App\Models\Configuracion;
+@endphp
 <x-app-layout>
     <div class="container py-6 max-w-5xl">
         <!-- Título y botón -->
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-bold text-primary">Inscripción de Paquetes</h1>
-            <button id="openModal" class="btn-primary">
-                <i class="fas fa-plus-circle"></i> Seleccionar Paquetes
-            </button>
-        </div>
+        @if (
+            (Gate::any([Permiso::LABORATORIO]) && Configuracion::esPeriodoInscripcion()) ||
+                Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES]))
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-xl font-bold text-primary">Inscripción de Paquetes</h1>
+                <button id="openModal" class="btn-primary">
+                    <i class="fas fa-plus-circle"></i> Seleccionar Paquetes
+                </button>
+            </div>
+        @endif
 
         <!-- Modal para seleccionar paquetes -->
         <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
             <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl relative">
-                <h2 class="text-lg font-bold mb-4">Seleccionar Paquetes</h2>
+                @if ($deudasPendientes->isNotEmpty())
+                    <div class="overflow-x-auto mb-4">
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            <strong class="font-bold">¡Atención!</strong>
+                            <span class="block">
+                                Tienes deudas pendientes y debes pagarlas antes de poder realizar nuevas inscripciones.
+                            </span>
+                        </div>
+                        <table class="table w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="">Gestión</th>
+                                    <th class="">Costo Total</th>
+                                    <th class="">Saldo</th>
+                                    <th class="">Paquetes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($deudasPendientes as $deuda)
+                                    <tr>
+                                        <td class="">{{ $deuda->gestion }}</td>
+                                        <td class="">
+                                            {{ number_format($deuda->costo_total, 2) }}</td>
+                                        <td class="">
+                                            {{ number_format($deuda->saldo, 2) }}</td>
+                                        <td class="">{{ $deuda->paquetes_descripcion }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div>
+                        <h2 class="text-lg font-bold mb-4">Seleccionar Paquetes</h2>
 
-                <!-- Selector de Programa -->
-                <div class="mb-4">
-                    <label class="block mb-1 text-sm font-medium">Programa</label>
-                    <select id="programaSelect"
-                        class="form-select block w-full border-gray-300 rounded-md shadow-sm text-sm">
-                        <option value="">Seleccione un programa...</option>
-                        @foreach ($programas as $programa)
-                            <option value="{{ $programa->id }}">{{ $programa->descripcion }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                        <!-- Selector de Programa -->
+                        <div class="mb-4">
+                            <label class="block mb-1 text-sm font-medium">Programa</label>
+                            <select id="programaSelect"
+                                class="form-select block w-full border-gray-300 rounded-md shadow-sm text-sm">
+                                <option value="">Seleccione un programa...</option>
+                                @foreach ($programas as $programa)
+                                    <option value="{{ $programa->id }}">{{ $programa->descripcion }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                <!-- Tabla de paquetes disponibles -->
-                <div class="overflow-x-auto mb-4">
-                    <table class="table w-full text-sm" id="tablaPaquetes">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Descripción</th>
-                                <th>Área</th>
-                                <th>Costo</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+                        <!-- Tabla de paquetes disponibles -->
+                        <div class="overflow-x-auto mb-4">
+                            <table class="table w-full text-sm" id="tablaPaquetes">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Descripción</th>
+                                        <th>Área</th>
+                                        <th>Costo</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Botón cerrar modal -->
                 <div class="flex justify-end">
@@ -75,9 +118,11 @@
         </div>
 
         <!-- Botón de guardar fuera del modal -->
-        <div class="flex justify-end">
-            <button id="confirmarInscripcion" class="btn-primary">Confirmar Inscripción</button>
-        </div>
+        @if ($deudasPendientes->isEmpty())
+            <div class="flex justify-end">
+                <button id="confirmarInscripcion" class="btn-primary">Confirmar Inscripción</button>
+            </div>
+        @endif
     </div>
 
     <script>
@@ -102,11 +147,15 @@
 
             cerrarModalBtn.addEventListener('click', () => {
                 modal.classList.add('hidden');
-                tablaPaquetes.querySelector('tbody').innerHTML = '';
-                programaSelect.value = '';
+                if (tablaPaquetes?.querySelector('tbody')) {
+                    tablaPaquetes.querySelector('tbody').innerHTML = '';
+                }
+                if (programaSelect) {
+                    programaSelect.value = '';
+                }
             });
             let tablaPaquetesDT;
-            programaSelect.addEventListener('change', () => {
+            programaSelect?.addEventListener('change', () => {
                 const programaId = programaSelect.value;
                 if (tablaPaquetesDT) {
                     tablaPaquetesDT.destroy();
@@ -250,7 +299,7 @@
                     })
             }
 
-            confirmarBtn.addEventListener('click', () => {
+            confirmarBtn?.addEventListener('click', () => {
                 if (seleccionados.length === 0) {
                     alert('Debe seleccionar al menos un paquete.');
                     return;
@@ -264,11 +313,11 @@
                                 <div class="max-h-64 overflow-y-auto pr-2">
                                     <ul class="divide-y divide-gray-200">
                                         ${seleccionados.map(pkt => `
-                                                                    <li class="py-0 flex justify-between">
-                                                                        <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
-                                                                        <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
-                                                                    </li>
-                                                                    `).join('')}
+                                                                                                                                                        <li class="py-0 flex justify-between">
+                                                                                                                                                            <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
+                                                                                                                                                            <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
+                                                                                                                                                        </li>
+                                                                                                                                                        `).join('')}
                                     </ul>
                                 </div>
                                 <!-- Total fijo -->

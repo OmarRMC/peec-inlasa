@@ -21,7 +21,7 @@ class Inscripcion extends Model
     const STATUS_PAGADO = 1;
 
     const STATUS_DEUDOR = 2;
-    
+
     const STATUS_INSCRIPCION = [
         self::STATUS_EN_REVISION => 'En revision',
         self::STATUS_APROBADO => 'Aprobado',
@@ -210,8 +210,18 @@ class Inscripcion extends Model
         return $query->where('status_inscripcion', Inscripcion::STATUS_APROBADO);
     }
 
+    public function scopePendiente($query)
+    {
+        return $query->where('status_cuenta', Inscripcion::STATUS_DEUDOR);
+    }
+
     public function certificado()
     {
         return $this->hasOne(Certificado::class, 'id_inscripcion');
+    }
+
+    public function getPaquetesDescripcionAttribute(): string
+    {
+        return $this->detalleInscripciones->pluck('descripcion_paquete')->implode(', ');
     }
 }
