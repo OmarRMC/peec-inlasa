@@ -145,8 +145,9 @@ class LabController extends Controller
                 $query->where('tipo_laboratorio_id', $tipoLabId);
             })
             ->get();
+        $deudasPendientes = $laboratorio->deudasPendientes();
         $redirectTo =  route('lab.ins.index');
-        return view('inscripcion_paquete.create', compact('laboratorio', 'programas', 'redirectTo'));
+        return view('inscripcion_paquete.create', compact('laboratorio', 'programas', 'redirectTo', 'deudasPendientes'));
     }
 
 
