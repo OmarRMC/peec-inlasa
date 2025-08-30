@@ -223,6 +223,11 @@
     accent-color: var(--color-primary);
 }
 
-.card-login{
+.card-login {
     box-shadow: 1px 1px 8px rgba(14, 13, 13, 0.685);
+}
+
+.swal2-sm {
+    width: 350px !important;
+    font-size: 14px !important;
 }

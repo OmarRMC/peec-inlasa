@@ -63,6 +63,8 @@
             <label for="nit_lab" class="label required-label">NIT</label>
             <input type="number" name="nit_lab" id="nit_lab"
                 value="{{ old('nit_lab', $laboratorio->nit_lab ?? '') }}"
+                min="0"
+                minlength="5"
                 class="input-standard w-full @error('nit_lab') border-red-500 @enderror" required>
             @error('nit_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -106,10 +108,10 @@
 
         <div>
             <label for="ci_respo_lab" class="label required-label">CI Responsable</label>
-            <input type="text" name="ci_respo_lab" id="ci_respo_lab" maxlength="12"
+            <input type="text" name="ci_respo_lab" id="ci_respo_lab" maxlength="15"
                 value="{{ old('ci_respo_lab', $laboratorio->ci_respo_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('ci_respo_lab') border-red-500 @enderror"
-                pattern="^[0-9][\s\S]*$"
+                pattern="^[0-9]{5,}[A-Za-z0-9\s\-]*$"
                 title="Debe comenzar con un número y no puede estar vacío ni contener solo espacios." required>
         </div>
     </div>
@@ -136,10 +138,10 @@
 
         <div>
             <label for="ci_repreleg_lab" class="label required-label">CI Representante Legal</label>
-            <input type="text" name="ci_repreleg_lab" id="ci_repreleg_lab" maxlength="12"
+            <input type="text" name="ci_repreleg_lab" id="ci_repreleg_lab" maxlength="15"
                 value="{{ old('ci_repreleg_lab', $laboratorio->ci_repreleg_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('ci_repreleg_lab') border-red-500 @enderror"
-                pattern="^[0-9][\s\S]*$"
+                pattern="^[0-9]{5,}[A-Za-z0-9\s\-]*$"
                 title="Debe comenzar con un número y no puede estar vacío ni contener solo espacios." required>
             @error('ci_repreleg_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -261,9 +263,11 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
             <label for="wapp_lab" class="label required-label">WhatsApp Principal</label>
-            <input type="number" name="wapp_lab" id="wapp_lab"
+            <input type="tel" name="wapp_lab" id="wapp_lab"
                 value="{{ old('wapp_lab', $laboratorio->wapp_lab ?? '') }}"
-                class="input-standard max-w-md w-full @error('wapp_lab') border-red-500 @enderror" required>
+                class="input-standard max-w-md w-full @error('wapp_lab') border-red-500 @enderror" required
+                maxlength="8"
+                pattern="^(6|7)\d{7}$" title="Debe ser un número válido de Bolivia (8 dígitos y comenzar con 6 o 7)">
             @error('wapp_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -271,9 +275,11 @@
 
         <div>
             <label for="wapp2_lab" class="label">WhatsApp Secundario</label>
-            <input type="number" name="wapp2_lab" id="wapp2_lab"
+            <input type="tel" name="wapp2_lab" id="wapp2_lab"
                 value="{{ old('wapp2_lab', $laboratorio->wapp2_lab ?? '') }}"
-                class="input-standard max-w-md w-full @error('wapp2_lab') border-red-500 @enderror">
+                class="input-standard max-w-md w-full @error('wapp2_lab') border-red-500 @enderror"
+                maxlength="8"
+                pattern="^(6|7)\d{7}$" title="Debe ser un número válido de Bolivia (8 dígitos y comenzar con 6 o 7)">
             @error('wapp2_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -384,8 +390,7 @@
         <div>
             <label for="password" class="label  {{ !$edit ? 'required-label' : '' }}">Contraseña</label>
             <div class="relative">
-                <input type="password" name="password" id="password"
-                    autocomplete="off"
+                <input type="password" name="password" id="password" autocomplete="off"
                     @unless ($edit) required @endunless
                     class="input-standard pr-10 w-full @error('password') border-red-500 @enderror"
                     placeholder="Mínimo 8 caracteres">
@@ -404,8 +409,7 @@
             <label for="password_confirmation" class="label {{ !$edit ? 'required-label' : '' }}">Confirmar
                 Contraseña</label>
             <div class="relative">
-                <input type="password" name="password_confirmation" id="password_confirmation"
-                   autocomplete="off"
+                <input type="password" name="password_confirmation" id="password_confirmation" autocomplete="off"
                     @unless ($edit) required @endunless
                     class="input-standard pr-10 w-full @error('password_confirmation') border-red-500 @enderror"
                     placeholder="Repetir contraseña">

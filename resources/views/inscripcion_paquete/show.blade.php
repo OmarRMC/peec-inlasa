@@ -327,6 +327,7 @@
                 <label id="label_transaccion" class="text-sm font-semibold">N° Transacción</label>
                 <input type="text" id="nro_transaccion" name="nro_tranferencia"
                     class="w-full border rounded px-2 text-sm" pattern="^[A-Za-z0-9\-]{4,30}$"
+                    maxlength="30"
                     title="Entre 4 y 30 caracteres. Letras, números o guiones.">
             </div>
 
@@ -334,18 +335,21 @@
                 <label id="label_transaccion" class="text-sm font-semibold">N° Factura</label>
                 <input type="text" id="nro_factura" name="nro_factura" required
                     class="w-full border rounded px-2 text-sm" pattern="^\d{1,20}$"
+                    maxlength="20"
                     title="Solo números, hasta 20 dígitos.">
             </div>
 
             <div>
                 <label class="text-sm font-semibold">Razon Social</label>
                 <textarea name="razon_social" class="w-full border rounded px-2 text-sm" rows="1" required pattern=".{3,100}"
+                    maxlength="100"
                     title="Debe tener entre 3 y 100 caracteres."></textarea>
             </div>
 
             <div>
                 <label class="text-sm font-semibold">Observaciones</label>
                 <textarea name="obs_pago" class="w-full border rounded px-2 text-sm" rows="2" pattern=".{0,255}"
+                    maxlength="255"
                     title="Máximo 255 caracteres."></textarea>
             </div>
 
