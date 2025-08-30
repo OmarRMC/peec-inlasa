@@ -51,12 +51,12 @@ class AreaController extends Controller
             'descripcion' => [
                 'required',
                 'string',
-                'max:50',
+                'max:100',
                 Rule::unique('area', 'descripcion')
                     ->where(fn($query) => $query->where('id_programa', $request->id_programa)),
             ],
             'status' => 'required|boolean',
-            'max_paquetes_inscribir' => 'required|integer',
+            'max_paquetes_inscribir' => 'nullable|integer',
         ], $this->messages());
 
         Area::create($request->all());
@@ -77,13 +77,13 @@ class AreaController extends Controller
             'descripcion' => [
                 'required',
                 'string',
-                'max:50',
+                'max:100',
                 Rule::unique('area', 'descripcion')
                     ->ignore($area->id)
                     ->where(fn($query) => $query->where('id_programa', $request->id_programa)),
             ],
             'status' => 'required|boolean',
-            'max_paquetes_inscribir' => 'required|integer',
+            'max_paquetes_inscribir' => 'nullable|integer',
         ], $this->messages());
         $area->update($request->all());
 

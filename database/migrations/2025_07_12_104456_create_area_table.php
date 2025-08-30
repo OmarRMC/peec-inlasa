@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('area', function (Blueprint $table) {
             $table->id();
               $table->unsignedBigInteger('id_programa');
-            $table->string('descripcion', 50);
+            $table->string('descripcion', 100);
             $table->boolean('status');
             $table->integer('max_paquetes_inscribir')->default(0);
             $table->foreign('id_programa')->references('id')->on('programa');

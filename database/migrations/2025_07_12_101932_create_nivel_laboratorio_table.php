@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('nivel_laboratorio', function (Blueprint $table) {
             $table->id();
-            $table->string('descripcion_nivel', 25);
+            $table->string('descripcion_nivel', 50);
             $table->boolean('status_nivel')->default(true);
             $table->timestamps();
         });

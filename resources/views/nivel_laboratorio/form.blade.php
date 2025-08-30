@@ -8,7 +8,7 @@
     <label for="descripcion_nivel" class="label">Descripcion del Nivel</label>
     <input type="text" name="descripcion_nivel" id="descripcion_nivel"
         value="{{ old('descripcion_nivel', $nivelLaboratorio->descripcion_nivel ?? '') }}"
-        pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s ]{3,50}$" title="Solo letras, números y espacios. Entre 3 y 50 caracteres."
+        pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s ._-()]{3,50}$" title="Solo letras, números y espacios. Entre 3 y 50 caracteres."
         required maxlength="50" class="input-standard @error('descripcion_nivel') border-red-500 @enderror">
     @error('descripcion_nivel')
         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
