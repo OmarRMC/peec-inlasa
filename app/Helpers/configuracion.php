@@ -6,10 +6,10 @@ use Carbon\Carbon;
 if (!function_exists('configuracion')) {
     function configuracion(string $key, $valor = null)
     {
-        if ($valor) {
+        if (isset($valor)) {
             Configuracion::updateOrCreate(
                 ['key' => $key],
-                ['valor' => is_array($valor) ? json_encode($valor, JSON_UNESCAPED_UNICODE) : (string) $valor]
+                ['valor' => is_array($valor) ? json_encode($valor, JSON_UNESCAPED_UNICODE) : $valor]
             );
         } else {
             $config = Configuracion::find($key)?->valor;

@@ -23,6 +23,7 @@ use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use App\Http\Controllers\CertificadoController;
+use App\Http\Controllers\DocumentosController;
 use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
@@ -120,6 +121,13 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/certificados/ajax/data', [LabController::class, 'getCertificadosDisponibleData'])->name('certificados.ajax.data');
     Route::get('/certificados/participacion/{gestion}', [LabController::class, 'certificadoPartificacionPDF'])->name('lab.certificados.participacion.pdf');
     Route::get('/certificados/desemp/{gestion}', [LabController::class, 'certificadoDesempPDF'])->name('certificados.desemp.pdf');
+
+    Route::post('inscripcion-paquetes/{id}/documentos', [DocumentosController::class, 'subirDocumentosInscripcion'])
+        ->name('inscripcion-paquetes.lab.subirDocumentos');
+    Route::post('inscripcion-paquetes/{id}/pago-documentos', [DocumentosController::class, 'subirComprobante'])
+        ->name('pago.lab.subirComprobante');
+    Route::get('/inscripciones/{id}/comprobantes', [DocumentosController::class, 'indexDocPagos'])
+        ->name('documentos.pagos.index');
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {

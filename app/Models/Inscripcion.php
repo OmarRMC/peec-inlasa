@@ -119,6 +119,18 @@ class Inscripcion extends Model
         return $this->hasMany(DocumentoInscripcion::class, 'id_inscripcion');
     }
 
+    public function documentosInscripcion()
+    {
+        return $this->hasMany(DocumentoInscripcion::class, 'id_inscripcion')
+            ->where('tipo', DocumentoInscripcion::TYPE_DOCUMENTO_INSCRIPCION);
+    }
+
+    public function documentosPago()
+    {
+        return $this->hasMany(DocumentoInscripcion::class, 'id_inscripcion')
+            ->where('tipo', DocumentoInscripcion::TYPE_DOCUMENTO_PAGO);
+    }
+
     public function vigencia()
     {
         return $this->hasOne(VigenciaInscripcion::class, 'id_inscripcion');

@@ -160,8 +160,12 @@ class LabController extends Controller
         $inscripcion = $laboratorio->inscripciones()
             ->with(['laboratorio', 'detalleInscripciones', 'pagos' => function ($query) {
                 $query->where('status', 1);
-            }, 'documentos', 'vigencia'])
-            ->findOrFail($id);
+            }, 'documentosInscripcion', 'documentosPago', 'vigencia'])
+            ->find($id);
+        if (!$inscripcion) {
+            return redirect()->route('lab.ins.index')
+                ->with('error', 'No se encontró la inscripción solicitada');
+        }
         $programas = Programa::active()->get();
         $backTo = route('lab.ins.index');
 

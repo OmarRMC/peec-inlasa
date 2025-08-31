@@ -15,7 +15,7 @@
                 </div>
             @endif
             {{-- , ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'] --}}
-            @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.informacion', 'title' => 'Información personalizada para email'], ['id' => 'gestion.filter', 'title' => 'Gestiones para filtros']] as $item)
+            @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.informacion', 'title' => 'Información personalizada para email'], ['id' => 'gestion.filter', 'title' => 'Gestiones para filtros'], ['id' => 'habilitar.docs.inscripcion', 'title' => 'Habilitar la subida de documentos de inscripción'], ['id' => 'habilitar.docs.pagos', 'title' => 'Habilitar la subida de comprobantes de pagos']] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -101,57 +101,6 @@
                                     </form>
                                 @break
 
-                                {{-- @case('vigencia')
-                                    <form action="{{ route($config, 'periodo-vigencia') }}" method="POST">
-                                        @csrf @method('PUT')
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label for="{{ Configuracion::FECHA_INICIO_VIGENCIA }}"
-                                                    class="block text-sm font-medium">Fecha Inicio</label>
-                                                <input type="date" name="{{ Configuracion::FECHA_INICIO_VIGENCIA }}"
-                                                    id="{{ Configuracion::FECHA_INICIO_VIGENCIA }}"
-                                                    value="{{ old(Configuracion::FECHA_INICIO_VIGENCIA, configuracion(Configuracion::FECHA_INICIO_VIGENCIA) ?? '') }}"
-                                                    class="mt-1 input-standard" required>
-                                            </div>
-                                            <div>
-                                                <label for="{{ Configuracion::FECHA_FIN_VIGENCIA }}"
-                                                    class="block text-sm font-medium">Fecha Fin</label>
-                                                <input type="date" name="{{ Configuracion::FECHA_FIN_VIGENCIA }}"
-                                                    id="{{ Configuracion::FECHA_FIN_VIGENCIA }}"
-                                                    value="{{ old(Configuracion::FECHA_FIN_VIGENCIA, configuracion(Configuracion::FECHA_FIN_VIGENCIA) ?? '') }}"
-                                                    class="mt-1 input-standard" required>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-2">La fecha fin debe ser posterior a la fecha inicio.
-                                        </p>
-                                        <div class="text-right mt-4">
-                                            <button type="submit" class="btn-primary"><i
-                                                    class="fas fa-save mr-1"></i>Guardar</button>
-                                        </div>
-                                    </form>
-                                @break --}}
-                                @case('gestion.filter')
-                                    @php
-                                        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER);
-                                        $gestionesStr = implode(',', $gestiones);
-                                    @endphp
-                                    <form action="{{ route($config, 'gestion.filter') }}" method="POST">
-                                        @csrf @method('PUT')
-                                        <div>
-                                            <label for="{{ Configuracion::KEY_GESTION_FILTER }}"
-                                                class="block text-sm font-medium">Gestiones para filtros</label>
-                                            <input type="string" name="{{ Configuracion::KEY_GESTION_FILTER }}"
-                                                id="{{ Configuracion::KEY_GESTION_FILTER }}"
-                                                value="{{ old(Configuracion::KEY_GESTION_FILTER, $gestionesStr ?? date('Y')) }}"
-                                                class="mt-1 input-standard" min="2020" max="2100" required>
-                                        </div>
-                                        <div class="text-right mt-4">
-                                            <button type="submit" class="btn-primary"><i
-                                                    class="fas fa-save mr-1"></i>Guardar</button>
-                                        </div>
-                                    </form>
-                                @break
-
                                 @case('notificacion')
                                     <form action="{{ route($config, 'notificacion') }}" method="POST">
                                         @csrf @method('PUT')
@@ -219,6 +168,50 @@
                                     </form>
                                 @break
 
+                                @case('gestion.filter')
+                                    @php
+                                        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER);
+                                        $gestionesStr = implode(',', $gestiones);
+                                    @endphp
+                                    <form action="{{ route($config, 'gestion.filter') }}" method="POST">
+                                        @csrf @method('PUT')
+                                        <div>
+                                            <label for="{{ Configuracion::KEY_GESTION_FILTER }}"
+                                                class="block text-sm font-medium">Gestiones para filtros</label>
+                                            <input type="string" name="{{ Configuracion::KEY_GESTION_FILTER }}"
+                                                id="{{ Configuracion::KEY_GESTION_FILTER }}"
+                                                value="{{ old(Configuracion::KEY_GESTION_FILTER, $gestionesStr ?? date('Y')) }}"
+                                                class="mt-1 input-standard" min="2020" max="2100" required>
+                                        </div>
+                                        <div class="text-right mt-4">
+                                            <button type="submit" class="btn-primary"><i
+                                                    class="fas fa-save mr-1"></i>Guardar</button>
+                                        </div>
+                                    </form>
+                                @break
+
+                                @case('gestion.filter')
+                                    @php
+                                        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER);
+                                        $gestionesStr = implode(',', $gestiones);
+                                    @endphp
+                                    <form action="{{ route($config, 'gestion.filter') }}" method="POST">
+                                        @csrf @method('PUT')
+                                        <div>
+                                            <label for="{{ Configuracion::KEY_GESTION_FILTER }}"
+                                                class="block text-sm font-medium">Gestiones para filtros</label>
+                                            <input type="string" name="{{ Configuracion::KEY_GESTION_FILTER }}"
+                                                id="{{ Configuracion::KEY_GESTION_FILTER }}"
+                                                value="{{ old(Configuracion::KEY_GESTION_FILTER, $gestionesStr ?? date('Y')) }}"
+                                                class="mt-1 input-standard" min="2020" max="2100" required>
+                                        </div>
+                                        <div class="text-right mt-4">
+                                            <button type="submit" class="btn-primary"><i
+                                                    class="fas fa-save mr-1"></i>Guardar</button>
+                                        </div>
+                                    </form>
+                                @break
+
                                 @case('email.informacion')
                                     <form action="{{ route($config, 'email.informacion') }}" method="POST">
                                         @csrf @method('PUT')
@@ -232,6 +225,56 @@
                                         <div class="text-right mt-4">
                                             <button type="submit" class="btn-primary"><i
                                                     class="fas fa-save mr-1"></i>Guardar</button>
+                                        </div>
+                                    </form>
+                                @break
+
+                                @case('habilitar.docs.inscripcion')
+                                    <form action="{{ route($config, 'habilitar.docs.inscripcion') }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="flex items-center mt-2">
+                                                <input type="checkbox"
+                                                    name="{{ Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION }}"
+                                                    id="{{ Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION }}"
+                                                    {{ configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION) ? 'checked' : '' }}
+                                                    class="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                                <label for="{{ Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION }}"
+                                                    class="text-sm font-medium">
+                                                    Habilitar la subida de documentos de inscripción
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="text-right mt-4">
+                                            <button type="submit" class="btn-primary">
+                                                <i class="fas fa-save mr-1"></i>Guardar
+                                            </button>
+                                        </div>
+                                    </form>
+                                @break
+
+                                @case('habilitar.docs.pagos')
+                                    <form action="{{ route($config, 'habilitar.docs.pagos') }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="flex items-center mt-2">
+                                                <input type="checkbox"
+                                                    name="{{ Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS }}"
+                                                    id="{{ Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS }}"
+                                                    {{ configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS) ? 'checked' : '' }}
+                                                    class="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                                <label for="{{ Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS }}"
+                                                    class="text-sm font-medium">
+                                                    Habilitar la subida de comprobantes de pagos
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="text-right mt-4">
+                                            <button type="submit" class="btn-primary">
+                                                <i class="fas fa-save mr-1"></i>Guardar
+                                            </button>
                                         </div>
                                     </form>
                                 @break
