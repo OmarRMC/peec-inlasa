@@ -228,6 +228,14 @@ class ConfiguracionController extends Controller
                 $gestiones = array_map('intval', $gestiones);
                 configuracion(Configuracion::KEY_GESTION_FILTER, json_encode($gestiones));
                 break;
+            case 'habilitar.docs.inscripcion':
+                $habilitar = !!$request->has(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION);
+                configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION, $habilitar);
+                break;
+            case 'habilitar.docs.pagos':
+                $habilitar = !!$request->has(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS);
+                configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS, $habilitar);
+                break;
             default:
                 return redirect()->back()->with('error', 'Error en registrar la Configuración.');
         }

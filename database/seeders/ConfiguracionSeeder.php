@@ -66,7 +66,9 @@ class ConfiguracionSeeder extends Seeder
         'imagen'      => '/storage/firmas/firma3.png',
         'label' => 'Dir. General',
       ],
-      Configuracion::KEY_GESTION_FILTER => [(int) date('Y'), (int) date('Y') - 1]
+      Configuracion::KEY_GESTION_FILTER => [(int) date('Y'), (int) date('Y') - 1],
+      Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION => 0,
+      Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS => 0
     ];
 
     foreach ($datos as $key => $valor) {

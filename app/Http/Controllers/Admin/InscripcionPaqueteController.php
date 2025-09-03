@@ -346,8 +346,9 @@ class InscripcionPaqueteController extends Controller
             'laboratorio',
             'detalleInscripciones',
             'pagos',
-            'documentos',
-            'vigencia'
+            'vigencia',
+            'documentosInscripcion',
+            'documentosPago'
         ])->findOrFail($id);
 
         return view('inscripcion_paquete.show', compact('inscripcion'));

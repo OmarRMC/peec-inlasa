@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('documento_inscripcion', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_inscripcion');
-            $table->integer('nombre_doc');
+            $table->string('nombre_doc');
             $table->string('ruta_doc', 100);
             $table->boolean('status');
+            $table->integer('tipo');
             $table->foreign('id_inscripcion')->references('id')->on('inscripcion');
             $table->timestamps();
         });

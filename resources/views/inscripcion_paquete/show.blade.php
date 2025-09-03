@@ -1,5 +1,15 @@
 @php
     use App\Models\Permiso;
+    use App\Models\Configuracion;
+    $documentos = [
+        'Contrato firmado',
+        'Formulario de inscripción',
+        'Poder legal',
+        'Carnet Identidad',
+        'Registro de comercio',
+        'Designación de responsable',
+    ];
+    $actualizarDocumentos = $inscripcion->documentosInscripcion->isNotEmpty();
 @endphp
 <x-app-layout>
     <div class="px-4 py-6 max-w-6xl mx-auto">
@@ -97,11 +107,29 @@
             <section class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-blue-700">💳 Pagos</h2>
-                    @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN]))
-                        <button onclick="document.getElementById('modalPago').showModal()"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
-                            Registrar Pago
-                        </button>
+                    @if (!$inscripcion->estaAnulado())
+                        <div>
+                            @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN]))
+                                <button onclick="document.getElementById('modalPago').showModal()"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                    Registrar Pago
+                                </button>
+                            @endif
+                            @if (Gate::any([Permiso::LABORATORIO]) && configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS))
+                                <button onclick="document.getElementById('modalSubirPagos').showModal()"
+                                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
+                                    aria-label="Subir documentos" title="Subir documentos">
+                                    Subir el comprobante
+                                </button>
+                            @endif
+                            @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN, Permiso::LABORATORIO]) &&
+                                    configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS) && $inscripcion->documentosPago->isNotEmpty())
+                                <a href="{{ route('documentos.pagos.index', $inscripcion->id) }}" target="_blank"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition duration-200">
+                                    Ver comprobantes
+                                </a>
+                            @endif
+                        </div>
                     @endif
                 </div>
 
@@ -186,7 +214,21 @@
                                     </button>
                                 @endif
                             @endif
-
+                            @if (
+                                !$inscripcion->estaAprobado() &&
+                                    Gate::any([Permiso::LABORATORIO]) &&
+                                    configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION) &&
+                                    Configuracion::esPeriodoInscripcion())
+                                <button onclick="document.getElementById('modalSubirDocumentos').showModal()"
+                                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
+                                    aria-label="Subir documentos" title="Subir documentos">
+                                    @if ($actualizarDocumentos)
+                                        Actualizar documentos
+                                    @else
+                                        Subir documentos
+                                    @endif
+                                </button>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -200,16 +242,7 @@
                         <form method="POST"
                             action="{{ route('inscripcion-paquetes.obserbaciones', $inscripcion->id) }}">
                             @csrf
-
                             @php
-                                $documentos = [
-                                    'Contrato firmado',
-                                    'Formulario de inscripción',
-                                    'Poder legal',
-                                    'Carnet Identidad',
-                                    'Registro de comercio',
-                                    'Designación de responsable',
-                                ];
                                 $categoria = $inscripcion->laboratorio->categoria->descripcion ?? '-';
                             @endphp
 
@@ -255,19 +288,27 @@
                 </div>
 
 
-                @forelse ($inscripcion->documentos as $doc)
-                    <div
-                        class="border rounded px-4 py-2 mb-2 text-sm text-gray-700 bg-gray-50 flex justify-between items-center">
-                        <div>
-                            <strong>Documento:</strong> {{ $doc->nombre_doc }}<br>
-                            <strong>Estado:</strong> <x-status-badge :status="$doc->status" />
+                <div class="flex flex-wrap gap-4">
+                    @forelse ($inscripcion->documentosInscripcion as $doc)
+                        <div class="border rounded p-3 bg-gray-50 text-gray-700 flex flex-col items-center w-40">
+                            <!-- Nombre del documento -->
+                            <div class="text-center mb-2">
+                                <strong class="text-sm">Documento:</strong>
+                                <p class="text-sm truncate" title="{{ $doc->nombre_doc }}">{{ $doc->nombre_doc }}</p>
+                            </div>
+
+                            <div class="mt-2 flex items-center justify-center w-40 max-h-[100px] border rounded bg-gray-50 text-gray-500 text-xs overflow-hidden"
+                                id="preview-db-{{ $doc->id }}">
+                            </div>
+                            <a href="{{ asset($doc->ruta_doc) }}" target="_blank"
+                                class="text-blue-600 text-xs px-2 py-1 border rounded hover:bg-blue-50">
+                                Ver en nueva pestaña
+                            </a>
                         </div>
-                        <a href="{{ asset('storage/' . $doc->ruta_doc) }}" target="_blank"
-                            class="text-blue-600 text-sm">Ver documento</a>
-                    </div>
-                @empty
-                    <p class="text-gray-500 text-sm">Sin documentos disponibles.</p>
-                @endforelse
+                    @empty
+                        <p class="text-gray-500 text-sm">Sin documentos disponibles.</p>
+                    @endforelse
+                </div>
             </section>
 
             @if (Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN]))
@@ -326,31 +367,27 @@
             <div id="campo_transaccion" style="display: none;">
                 <label id="label_transaccion" class="text-sm font-semibold">N° Transacción</label>
                 <input type="text" id="nro_transaccion" name="nro_tranferencia"
-                    class="w-full border rounded px-2 text-sm" pattern="^[A-Za-z0-9\-]{4,30}$"
-                    maxlength="30"
+                    class="w-full border rounded px-2 text-sm" pattern="^[A-Za-z0-9\-]{4,30}$" maxlength="30"
                     title="Entre 4 y 30 caracteres. Letras, números o guiones.">
             </div>
 
             <div id="nro_factura">
                 <label id="label_transaccion" class="text-sm font-semibold">N° Factura</label>
                 <input type="text" id="nro_factura" name="nro_factura" required
-                    class="w-full border rounded px-2 text-sm" pattern="^\d{1,20}$"
-                    maxlength="20"
+                    class="w-full border rounded px-2 text-sm" pattern="^\d{1,20}$" maxlength="20"
                     title="Solo números, hasta 20 dígitos.">
             </div>
 
             <div>
                 <label class="text-sm font-semibold">Razon Social</label>
                 <textarea name="razon_social" class="w-full border rounded px-2 text-sm" rows="1" required pattern=".{3,100}"
-                    maxlength="100"
-                    title="Debe tener entre 3 y 100 caracteres."></textarea>
+                    maxlength="100" title="Debe tener entre 3 y 100 caracteres."></textarea>
             </div>
 
             <div>
                 <label class="text-sm font-semibold">Observaciones</label>
                 <textarea name="obs_pago" class="w-full border rounded px-2 text-sm" rows="2" pattern=".{0,255}"
-                    maxlength="255"
-                    title="Máximo 255 caracteres."></textarea>
+                    maxlength="255" title="Máximo 255 caracteres."></textarea>
             </div>
 
             <div class="flex justify-end space-x-2">
@@ -358,6 +395,112 @@
                     class="text-gray-500 hover:underline text-sm">Cancelar</button>
                 <button type="submit"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-3 rounded text-sm py-2">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog id="modalSubirDocumentos" class="rounded-lg shadow-lg backdrop:bg-black/30">
+        <form method="POST" action="{{ route('inscripcion-paquetes.lab.subirDocumentos', $inscripcion->id) }}"
+            enctype="multipart/form-data" class="bg-white px-4 pb-4 rounded-lg space-y-4 w-full max-w-4xl">
+            @csrf
+            <h2 class="text-lg font-bold text-blue-700 mb-1 flex justify-between">📁
+                @if ($actualizarDocumentos)
+                    Actualiza los documentos de Inscripción
+                @else
+                    Subir Documentos de Inscripción
+                @endif
+                <span class="text-sm text-gray-700 bg-yellow-100 p-1 rounded font-medium">
+                    Tamaño máximo permitido por documento: 5MB
+                </span>
+            </h2>
+            @if ($actualizarDocumentos)
+                <p class="text-sm text-black bg-yellow-100 p-2 rounded mb-4">
+                    ⚠️ Nota: Solo suba los documentos que desea actualizar. No es necesario volver a subir los
+                    documentos existentes.
+                </p>
+            @endif
+            <div class="grid grid-cols-2 gap-4">
+                @foreach ($documentos as $i => $doc)
+                    <div class="flex flex-col space-y-2 border rounded-lg p-3 shadow-sm">
+                        <label class="text-sm font-semibold text-gray-700">{{ $doc }}</label>
+                        <input type="hidden" name="titulos[]" value="{{ $doc }}">
+
+                        <input type="file" name="documentos[]" accept="application/pdf,image/*"
+                            class="border border-gray-300 rounded px-2 py-1 text-sm preview-input"
+                            data-preview="preview-{{ $i }}" data-link="link-{{ $i }}"
+                            @if (!$actualizarDocumentos) required @endif>
+                        <div id="preview-{{ $i }}"
+                            class="mt-2 flex items-center justify-center max-h-[100px] border rounded bg-gray-50 text-gray-500 text-xs overflow-hidden">
+                            No seleccionado
+                        </div>
+
+                        <button type="button" id="link-{{ $i }}"
+                            class="hidden bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 text-xs rounded"
+                            onclick="window.open(this.dataset.url, '_blank')">
+                            🔍 Ver completo
+                        </button>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="flex justify-end space-x-2 mt-6">
+                <button type="button" onclick="document.getElementById('modalSubirDocumentos').close()"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm">
+                    Cancelar
+                </button>
+                <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-sm font-semibold">
+                    @if ($actualizarDocumentos)
+                        Actualizar Documentos
+                    @else
+                        Subir Documentos
+                    @endif
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="modalSubirPagos" class="rounded-lg shadow-lg backdrop:bg-black/30">
+        <form method="POST" action="{{ route('pago.lab.subirComprobante', $inscripcion->id) }}"
+            enctype="multipart/form-data" class="bg-white px-4 pb-4 rounded-lg space-y-4 w-full max-w-2xl">
+            @csrf
+            <h2 class="text-lg font-bold text-blue-700 mb-2 flex justify-between">
+                Subir Comprobante de Pago
+                <span class="text-sm text-gray-700 bg-yellow-100 p-1 rounded font-medium">
+                    Tamaño máximo permitido: 5MB
+                </span>
+            </h2>
+
+            <p class="text-sm text-gray-600">
+                Solo se admite <b>PDF o imágen</b>.
+            </p>
+
+            <div class="flex flex-col space-y-3">
+                <label class="text-sm font-semibold text-gray-700">Archivo del Comprobante</label>
+                <input type="file" name="comprobante" accept="application/pdf,image/*"
+                    class="border border-gray-300 rounded px-2 py-1 text-sm preview-input"
+                    data-preview="preview-comprobante" data-link="link-comprobante" required>
+
+                <div id="preview-comprobante"
+                    class="mt-2 flex items-center justify-center max-h-[120px] border rounded bg-gray-50 text-gray-500 text-xs overflow-hidden">
+                    No seleccionado
+                </div>
+
+                <button type="button" id="link-comprobante"
+                    class="hidden bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 text-xs rounded"
+                    onclick="window.open(this.dataset.url, '_blank')">
+                    🔍 Ver completo
+                </button>
+            </div>
+
+            <div class="flex justify-end space-x-2 mt-6">
+                <button type="button" onclick="document.getElementById('modalSubirPagos').close()"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm">
+                    Cancelar
+                </button>
+                <button type="submit"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-sm font-semibold">
+                    Subir Comprobante
+                </button>
             </div>
         </form>
     </dialog>
@@ -461,6 +604,101 @@
                     () => this.submit()
                 );
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            @foreach ($inscripcion->documentosInscripcion as $doc)
+                (function() {
+                    const container = document.getElementById('preview-db-{{ $doc->id }}');
+                    const url = "{{ asset($doc->ruta_doc) }}";
+                    const ext = url.split('.').pop().toLowerCase();
+
+                    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.classList.add('max-h-40', 'rounded', 'shadow');
+                        container.appendChild(img);
+                    } else if (ext === 'pdf') {
+                        fetch(url).then(res => res.arrayBuffer()).then(async function(data) {
+                            const pdf = await window.pdfjsLib.getDocument(new Uint8Array(data))
+                                .promise;
+                            const page = await pdf.getPage(1);
+                            const scale = 0.6;
+                            const viewport = page.getViewport({
+                                scale
+                            });
+
+                            const canvas = document.createElement('canvas');
+                            const context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            await page.render({
+                                canvasContext: context,
+                                viewport
+                            }).promise;
+                            container.appendChild(canvas);
+                        });
+                    } else {
+                        container.textContent = "Formato no soportado";
+                    }
+                })();
+            @endforeach
+            document.querySelectorAll('.preview-input').forEach(input => {
+                input.addEventListener('change', async function(event) {
+                    const file = event.target.files[0];
+                    const previewContainer = document.getElementById(event.target.dataset
+                        .preview);
+                    const linkBtn = document.getElementById(event.target.dataset.link);
+
+                    previewContainer.innerHTML = "";
+                    linkBtn.classList.add("hidden");
+
+                    if (!file) {
+                        previewContainer.textContent = "No seleccionado";
+                        return;
+                    }
+
+                    const fileURL = URL.createObjectURL(file);
+                    linkBtn.dataset.url = fileURL;
+                    linkBtn.classList.remove("hidden");
+
+                    if (file.type.startsWith("image/")) {
+                        const img = document.createElement("img");
+                        img.src = fileURL;
+                        img.classList.add("max-h-[100px]", "rounded", "shadow", "mx-auto",
+                            "bg-cover");
+                        previewContainer.appendChild(img);
+                    } else if (file.type === "application/pdf") {
+                        const fileReader = new FileReader();
+                        fileReader.onload = async function() {
+                            const typedArray = new Uint8Array(this.result);
+                            const pdf = await window.pdfjsLib.getDocument(typedArray)
+                                .promise;
+                            const page = await pdf.getPage(1);
+
+                            const scale = 0.5;
+                            const viewport = page.getViewport({
+                                scale
+                            });
+                            const canvas = document.createElement("canvas");
+                            const context = canvas.getContext("2d");
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            await page.render({
+                                canvasContext: context,
+                                viewport
+                            }).promise;
+                            previewContainer.appendChild(canvas);
+                        };
+                        fileReader.readAsArrayBuffer(file);
+                    } else {
+                        previewContainer.textContent = "Formato no soportado";
+                    }
+                });
+            }
+        );
         });
     </script>
 </x-app-layout>

@@ -46,6 +46,9 @@ class Configuracion extends Model
     public const REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION = 'registro_ponderaciones_certificados_gestion';
     public const FECHA_INICIO_REGISTRO_CERTIFICADOS = 'fecha_inicio_registro_certificados';
     public const FECHA_FIN_REGISTRO_CERTIFICADOS    = 'fecha_fin_registro_certificados';
+    public const HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION = 'habilitar_subida_documentos_inscripcion';
+    public const HABILITAR_SUBIDA_DOCUMENTOS_PAGOS = 'habilitar_subida_documentos_pagos';
+
     public static function esPeriodoInscripcion()
     {
         $fechaInicio = Configuracion::where('key', Configuracion::FECHA_INICIO_INSCRIPCION)->value('valor');
