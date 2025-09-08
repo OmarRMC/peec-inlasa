@@ -33,6 +33,9 @@ class LaboratorioController extends Controller
         $ensayosAptitud = $responsable->responsablesEA->findOrFail($idEa);
         $laboratorios = InscripcionEA::with('inscripcion.laboratorio')
             ->where('id_ea', $idEa)
+            ->whereHas('inscripcion', function ($q) {
+                $q->where('gestion', now()->year);
+            })
             ->get()
             ->pluck('inscripcion.laboratorio')
             ->unique('id')
@@ -54,7 +57,7 @@ class LaboratorioController extends Controller
         $query = InscripcionEA::with(['inscripcion', 'inscripcion.laboratorio.departamento', 'inscripcion.laboratorio.usuario'])
             ->where('id_ea', $idEa)
             ->whereHas('inscripcion', function ($q) {
-                $q->whereYear('fecha_inscripcion', now());
+                $q->where('gestion', now()->year);
                 $q->Aprobado();
             });
         // Log::info($Inscripciones);
@@ -163,7 +166,7 @@ class LaboratorioController extends Controller
         ])
             ->where('id_ea', $id)
             ->whereHas('inscripcion', function ($q) {
-                $q->whereYear('fecha_inscripcion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
+                $q->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
                     ->Aprobado();
             })
             ->get();

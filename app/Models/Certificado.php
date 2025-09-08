@@ -19,6 +19,13 @@ class Certificado extends Model
         self::TYPE_PARTICIPACION => 'PARTICIPACIÓN'
     ];
 
+    const STATUS_HABILITADO = 1;
+    const STATUS_INHABILITADO = 0;
+
+    const STATUS_CERTIFICADO   = [
+        self::STATUS_HABILITADO => 'Habilitado',
+        self::STATUS_INHABILITADO => 'Inhabilitado',
+    ];
     protected $fillable = [
         'id_inscripcion',
         'gestion_certificado',
@@ -64,5 +71,47 @@ class Certificado extends Model
     public function scopeConDetalles($query)
     {
         return $query->has('detalles');
+    }
+
+
+    public static function certificadoParticipacionRaw(string $url)
+    {
+        return '<a href="' . $url . '"
+                    target="_blank"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500 text-blue-600 hover:bg-blue-50 transition text-xs font-medium"
+                    data-tippy-content="Descargar certificado de participación">
+                    <i class="fas fa-file-pdf"></i> PDF
+                    </a>
+                ';
+    }
+    public static function certificadoDesepRawHabilitado(string $url)
+    {
+        return '<a href="' . $url . '"
+                    target="_blank"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-600 text-green-700 hover:bg-green-50 transition text-xs font-medium"
+                    data-tippy-content="Descargar certificado de desempeño">
+                    <i class="fas fa-file-signature"></i> PDF
+                </a>';
+    }
+
+    public static function certificadoDesepRawDeshabilitado()
+    {
+        return '<span
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-300 text-gray-400 text-xs font-medium cursor-not-allowed">
+                    <i class="fas fa-ban"></i> N/A
+                </span>';
+    }
+
+    public static function estado($inhabilitado)
+    {
+
+        if ($inhabilitado) {
+            return "<span class='inline-flex items-center px-2 py-0.5 bg-gray-300 text-gray-800 text-xs font-medium rounded shadow-sm'>
+                    " . self::STATUS_CERTIFICADO[self::STATUS_INHABILITADO] . "
+                </span>";
+        }
+        return "<span class='inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded shadow-sm'>
+                    " . self::STATUS_CERTIFICADO[self::STATUS_HABILITADO] . "
+                </span>";
     }
 }

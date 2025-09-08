@@ -196,6 +196,11 @@ class LabController extends Controller
 
         $certificadosDisponibles = $inscripciones
             ->groupBy('gestion')
+            ->filter(function ($inscripciones) {
+                return $inscripciones->every(function ($inscripcion) {
+                    return !$inscripcion->esDeudor();
+                });
+            })
             ->map(function ($inscripciones) {
                 $tieneDesempeno = $inscripciones->contains(function ($inscripcion) {
                     return $inscripcion->tiene_certificado_desempeno;
