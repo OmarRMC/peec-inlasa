@@ -43,7 +43,7 @@
                         class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[120px]">
                 </div>
 
-                <!-- Filtro por Gestión --> 
+                <!-- Filtro por Gestión -->
                 <select id="filter-gestion"
                     class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todas las Gestiones</option>
@@ -292,7 +292,7 @@
                             }
                         ],
                         language: {
-                            url: '/translation/es.json'
+                            url: "{{ asset('translation/es.json') }}"
                         },
                         dom: 'rt',
                         lengthChange: false,
@@ -458,7 +458,7 @@
                             }
                         ],
                         language: {
-                            url: "/translation/es.json"
+                            url: "{{ asset('translation/es.json') }}"
                         },
                         dom: 'rt',
                         lengthChange: false,

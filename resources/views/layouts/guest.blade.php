@@ -25,7 +25,7 @@
 <body class="font-sans text-gray-900 antialiased">
     <x-alerts.sweetalert />
     <div class="min-h-screen flex items-center justify-center bg-cover bg-center"
-        style="background-image: url('/img/fondo.jpg');">
+        style="background-image: url('{{ asset('img/fondo.jpg') }}');">
         <div>
             {{ $slot }}
         </div>

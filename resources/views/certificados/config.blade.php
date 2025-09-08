@@ -68,7 +68,7 @@
                                                                 accept="image/*" class="mt-1 input-standard">
                                                             @if (isset($config->imagen))
                                                                 <div class="mt-2 text-center">
-                                                                    <img src="{{ $config->imagen . "?v='" . time() . "'" }}"
+                                                                    <img src="{{ asset($config->imagen) . "?v='" . time() . "'" }}"
                                                                         alt="Firma  de {{ $config->nombre }}"
                                                                         class="h-16 object-contain mx-auto">
                                                                 </div>

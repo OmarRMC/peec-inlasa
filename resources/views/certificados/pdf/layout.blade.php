@@ -1,6 +1,6 @@
 @php
-    $fontRegular = storage_path('fonts/TimesNewRoman.ttf');
-    $fontBold = storage_path('fonts/TimesNewRoman-Bold.ttf');
+    // $fontRegular = storage_path('fonts/TimesNewRoman.ttf');
+    // $fontBold = storage_path('fonts/TimesNewRoman-Bold.ttf');
 @endphp
 <!DOCTYPE html>
 <html lang="es">

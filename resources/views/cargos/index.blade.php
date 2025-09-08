@@ -97,7 +97,7 @@
                         }
                     ],
                     language: {
-                        url: "/translation/es.json"
+                        url: "{{ asset('translation/es.json') }}"
                     },
 
                     drawCallback: function() {
