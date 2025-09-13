@@ -23,4 +23,9 @@ class EnsayoAptitud extends Model
     {
         return $this->belongsTo(Paquete::class, 'id_paquete');
     }
+
+    public function formularios()
+    {
+        return $this->hasMany(FormularioEnsayo::class, 'id_ensayo');
+    }
 }
