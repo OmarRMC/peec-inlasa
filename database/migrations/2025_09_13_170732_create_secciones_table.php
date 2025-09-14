@@ -16,7 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('id_formulario');
             $table->string('nombre');
             $table->text('descripcion')->nullable();
-            $table->integer('orden')->default(0);
+            $table->integer('posicion')->default(0);
+            $table->integer('cantidad_parametros')->default(0);
             $table->foreign('id_formulario')->references('id')->on('formularios')->onDelete('cascade');
             $table->timestamps();
         });

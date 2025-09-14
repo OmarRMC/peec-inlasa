@@ -11,16 +11,16 @@ class OpcionSelector extends Model
 
     protected $table = 'opciones_selector';
     protected $fillable = [
-        'grupo_selector_id',
+        'id_grupo_selector',
         'valor',
         'etiqueta',
-        'orden',
+        'posicion',
         'grupo_hijo_id'
     ];
 
     public function grupo()
     {
-        return $this->belongsTo(GrupoSelector::class, 'grupo_selector_id');
+        return $this->belongsTo(GrupoSelector::class, 'id_grupo_selector');
     }
 
     public function grupoHijo()

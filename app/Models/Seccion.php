@@ -10,7 +10,7 @@ class Seccion extends Model
     use HasFactory;
 
     protected $table = 'secciones';
-    protected $fillable = ['formulario_id', 'nombre', 'descripcion', 'orden'];
+    protected $fillable = ['formulario_id', 'nombre', 'descripcion', 'posicion', 'cantidad_parametros'];
 
     public function formulario()
     {
@@ -19,6 +19,6 @@ class Seccion extends Model
 
     public function parametros()
     {
-        return $this->hasMany(Parametro::class, 'seccion_id');
+        return $this->hasMany(Parametro::class, 'id_seccion');
     }
 }
