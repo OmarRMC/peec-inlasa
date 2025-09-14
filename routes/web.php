@@ -24,11 +24,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use App\Http\Controllers\CertificadoController;
 use App\Http\Controllers\DocumentosController;
+use App\Http\Controllers\FormularioEnsayoController;
+use App\Http\Controllers\GrupoSelectorController;
 use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
 use App\Http\Controllers\VerificarController;
+use App\Models\FormularioEnsayo;
 use App\Models\Permiso;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +73,22 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/certificados', [CertificadoController::class, 'index'])->name('admin.certificado.index');
     Route::get('/certificados/ajax', [CertificadoController::class, 'getDataCertificado'])->name('admin.certificado.ajax.index');
     Route::get('/certificados/{idLaboratorio}/descargar/{gestion}/{type}', [CertificadoController::class, 'descargarCertificado'])->name('admin.certificado.descargar');
+
+    Route::get('/formularios-ea', [FormularioEnsayoController::class, 'formulariosIndex'])->name('admin.formularios.ea');
+    Route::get('/formularios-ea/{idEA}/show', [FormularioEnsayoController::class, 'formulariosByEa'])->name('admin.formularios.show');
+    Route::get('/formularios-ea/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('admin.formularios.edit');
+    Route::post('/formularios-ea', [FormularioEnsayoController::class, 'store'])->name('admin.formularios.store');
+    Route::put('/formularios-ea/{id}', [FormularioEnsayoController::class, 'updateEstructura'])->name('admin.formularios.updateEstructura');
+
+    Route::prefix('/formularios')->name('admin.formularios.')->group(function () {
+        Route::get('/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [FormularioEnsayoController::class, 'update'])->name('update');
+    });
+    Route::prefix('/grupos-selectores')->name('admin.grupos-selectores.')->group(function () {
+        Route::get('/buscar', [GrupoSelectorController::class, 'buscar'])->name('buscar');
+        Route::post('/guardar', [GrupoSelectorController::class, 'guardar'])->name('guardar');
+        Route::delete('/eliminar/{id}', [GrupoSelectorController::class, 'eliminar'])->name('eliminar');
+    });
 
     Route::prefix('inscripcion')->group(function () {
         Route::get('/', [InscripcionPaqueteController::class, 'index'])->name('inscripcion_paquete.index');

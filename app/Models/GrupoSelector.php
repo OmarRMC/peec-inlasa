@@ -14,11 +14,11 @@ class GrupoSelector extends Model
 
     public function parametros()
     {
-        return $this->hasMany(Parametro::class, 'grupo_selector_id');
+        return $this->hasMany(Parametro::class, 'id_grupo_selector');
     }
 
     public function opciones()
     {
-        return $this->hasMany(OpcionSelector::class, 'grupo_selector_id');
+        return $this->hasMany(OpcionSelector::class, 'id_grupo_selector');
     }
 }

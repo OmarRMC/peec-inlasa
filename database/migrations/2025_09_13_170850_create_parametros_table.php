@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('unidad', 50)->nullable();
             $table->json('validacion')->nullable();
             $table->boolean('requerido')->default(false);
-            $table->integer('orden')->default(0);
+            $table->integer('posicion')->default(0);
             $table->foreign('id_seccion')
                 ->references('id')
                 ->on('secciones')

@@ -17,8 +17,8 @@ class Parametro extends Model
         'unidad',
         'validacion',
         'requerido',
-        'orden',
-        'grupo_selector_id'
+        'posicion',
+        'id_grupo_selector'
     ];
 
     protected $casts = [
@@ -33,6 +33,6 @@ class Parametro extends Model
 
     public function grupoSelector()
     {
-        return $this->belongsTo(GrupoSelector::class, 'grupo_selector_id');
+        return $this->belongsTo(GrupoSelector::class, 'id_grupo_selector');
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_grupo_hijo')->nullable();
             $table->string('valor', 255);
             $table->string('etiqueta', 255);
-            $table->integer('orden')->default(0);
+            $table->integer('posicion')->default(0);
             $table->foreign('id_grupo_selector')
                 ->references('id')
                 ->on('grupos_selectores')

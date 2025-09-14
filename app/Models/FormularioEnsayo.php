@@ -14,7 +14,7 @@ class FormularioEnsayo extends Model
 
     public function secciones()
     {
-        return $this->hasMany(Seccion::class, 'formulario_id');
+        return $this->hasMany(Seccion::class, 'id_formulario');
     }
 
     public function ensayo()
