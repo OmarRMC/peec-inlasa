@@ -29,6 +29,7 @@ use App\Http\Controllers\GrupoSelectorController;
 use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
+use App\Http\Controllers\Lab\RegistroResultadosController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
 use App\Http\Controllers\VerificarController;
 use App\Models\FormularioEnsayo;
@@ -150,6 +151,11 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
         ->name('pago.lab.subirComprobante');
     Route::get('/inscripciones/{id}/comprobantes', [DocumentosController::class, 'indexDocPagos'])
         ->name('documentos.pagos.index');
+
+    Route::get('/inscripcion-ensayos', [RegistroResultadosController::class, 'listaEnsayosInscritos'])->name('lab.inscritos-ensayos.index');
+    Route::get('/inscripcion-ensayos/{id}/formularios', [RegistroResultadosController::class, 'getFormulariosByEa'])->name('lab.inscritos-ensayos.formularios');
+    Route::get('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'formularioLlenar'])->name('lab.inscritos-ensayos.formularios.llenar');
+    Route::post('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'formularioLlenar'])->name('laboratorio.formularios.guardar');
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
