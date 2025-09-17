@@ -23,6 +23,7 @@ use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use App\Http\Controllers\CertificadoController;
+use App\Http\Controllers\CicloController;
 use App\Http\Controllers\DocumentosController;
 use App\Http\Controllers\FormularioEnsayoController;
 use App\Http\Controllers\GrupoSelectorController;
@@ -79,6 +80,12 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/formularios-ea/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('admin.formularios.edit');
     Route::post('/formularios-ea', [FormularioEnsayoController::class, 'store'])->name('admin.formularios.store');
     Route::put('/formularios-ea/{id}', [FormularioEnsayoController::class, 'updateEstructura'])->name('admin.formularios.updateEstructura');
+
+    Route::get('/ciclos/{idEa}', [CicloController::class, 'index'])->name('admin.ciclos.index');
+    Route::post('/ciclos', [CicloController::class, 'store'])->name('admin.ciclos.store');
+    Route::put('/ciclos/{id}', [CicloController::class, 'update'])->name('admin.ciclos.update');
+    Route::put('/ciclos/{id}/toggle', [CicloController::class, 'toggle'])->name('admin.ciclos.toggle');
+    Route::delete('/ciclos/{id}', [CicloController::class, 'destroy'])->name('admin.ciclos.destroy');
 
     Route::prefix('/formularios')->name('admin.formularios.')->group(function () {
         Route::get('/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('edit');
