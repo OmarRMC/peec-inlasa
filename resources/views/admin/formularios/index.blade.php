@@ -23,7 +23,7 @@
             <table class="min-w-full text-sm text-gray-800">
                 <thead class="bg-gray-100 text-xs uppercase">
                     <tr>
-                        <th class="px-3 py-2">Programa</th>
+                        <th class="px-3 py-2 w-5">Programa</th>
                         <th class="px-3 py-2">Área</th>
                         <th class="px-3 py-2">Paquete</th>
                         <th class="px-3 py-2">Ensayo</th>
@@ -71,11 +71,16 @@
                                         <td class="px-3 py-2">{{ $ensayo->descripcion }}</td>
 
                                         {{-- Acciones --}}
-                                        <td class="px-3 py-2 text-center">
+                                        <td class="px-3 py-2 text-center gap-2 flex justify-center">
                                             <a href="{{ route('admin.formularios.show', $ensayo->id) }}"
                                                 data-tippy-content="Ver Formularios"
                                                 class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm">
                                                 <i class="fas fa-file-alt"></i>
+                                            </a>
+                                            <a href="{{ route('admin.ciclos.index', $ensayo->id) }}"
+                                                data-tippy-content="Ver Ciclos"
+                                                class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm">
+                                                <i class="fas fa-calendar-alt"></i>
                                             </a>
                                         </td>
                                     </tr>

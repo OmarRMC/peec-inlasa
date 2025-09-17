@@ -28,4 +28,9 @@ class EnsayoAptitud extends Model
     {
         return $this->hasMany(FormularioEnsayo::class, 'id_ensayo');
     }
+
+    public function ciclos()
+    {
+        return $this->hasMany(Ciclo::class, 'id_ensayo');
+    }
 }
