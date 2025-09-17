@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Lab;
 
 use App\Http\Controllers\Controller;
 use App\Models\EnsayoAptitud;
+use App\Models\Formulario;
 use App\Models\FormularioEnsayo;
 use App\Models\InscripcionEA;
 use App\Models\Permiso;
@@ -59,5 +60,25 @@ class RegistroResultadosController extends Controller
         }
 
         return view('laboratorio.resultados.llenar', compact('formulario', 'laboratorio'));
+    }
+
+    function guardarResultados(Request $request, $id)
+    {
+        if (!Gate::any([Permiso::LABORATORIO])) {
+            return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
+        }
+        $laboratorio = Auth::user()->laboratorio;
+        $formulario  = FormularioEnsayo::with(['secciones.parametros.grupoSelector.opciones'])->find($id);
+        if (!$formulario) {
+            return redirect('/')->with('error', 'Formulario no encontrado.');
+        }
+
+        $data = $request->all();
+        Log::info('Info sadatos ');
+        Log::info($data);
+
+        Log::info($formulario);
+
+        return redirect()->route('lab.inscritos-ensayos.formularios.llenar', ['id' => $id])->with('success', 'Resultados guardados correctamente.');
     }
 }
