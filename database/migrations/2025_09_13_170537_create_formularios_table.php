@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('formularios', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_ensayo');
+            $table->string('color_primario', 10)->default('#ffffff');
+            $table->string('color_secundario', 10)->default('#000000');
+            $table->boolean('estado')->default(true);
             $table->string('nombre', 255);
             $table->string('codigo', 80)->nullable();
             $table->text('nota')->nullable();

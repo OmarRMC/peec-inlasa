@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_formulario');
             $table->string('nombre');
+            $table->json('headers')->nullable();
             $table->text('descripcion')->nullable();
             $table->integer('posicion')->default(0);
             $table->integer('cantidad_parametros')->default(0);

@@ -12,6 +12,10 @@ class Seccion extends Model
     protected $table = 'secciones';
     protected $fillable = ['formulario_id', 'nombre', 'descripcion', 'posicion', 'cantidad_parametros'];
 
+    protected $casts = [
+        'headers' => 'array',
+    ];
+
     public function formulario()
     {
         return $this->belongsTo(Formulario::class, 'formulario_id');
