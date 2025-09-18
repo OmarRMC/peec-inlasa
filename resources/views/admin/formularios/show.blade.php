@@ -4,10 +4,16 @@
             <h1 class="text-xl font-bold text-gray-800">
                 Formularios del Ensayo: {{ $ensayo->descripcion }}
             </h1>
-            <button onclick="document.getElementById('modalCrear').classList.remove('hidden')"
-                class="px-3 py-1 bg-green-600 text-white rounded shadow hover:bg-green-500 text-sm">
-                <i class="fas fa-plus"></i> Nuevo Formulario
-            </button>
+            <div class="flex space-x-2">
+                <button onclick="document.getElementById('modalCrear').classList.remove('hidden')"
+                    class="px-3 py-1 bg-green-600 text-white rounded shadow hover:bg-green-500 text-sm">
+                    <i class="fas fa-plus"></i> Nuevo Formulario
+                </button>
+                <button onclick="document.getElementById('modalCrear').classList.remove('hidden')"
+                    class="px-3 py-1 bg-green-600 text-white rounded shadow hover:bg-green-500 text-sm">
+                    <i class="fas fa-plus"></i> Usar Otro formulario
+                </button>
+            </div>
         </div>
 
         <div class="overflow-x-auto bg-white rounded-lg shadow">
@@ -20,6 +26,7 @@
                         <th class="px-3 py-2">Color Primario</th>
                         <th class="px-3 py-2">Color Secundario</th>
                         <th class="px-3 py-2">Estado</th>
+                        <th class="px-3 py-2">Editable Encargado</th>
                         <th class="px-3 py-2 text-center">Acciones</th>
                     </tr>
                 </thead>
@@ -44,6 +51,13 @@
                                     <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Activo</span>
                                 @else
                                     <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Inactivo</span>
+                                @endif
+                            </td>
+                            <td class="px-3 py-2">
+                                @if ($formulario->editable_por_encargado)
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">Sí</span>
+                                @else
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">No</span>
                                 @endif
                             </td>
                             <td class="px-3 py-2 text-center space-x-2">
@@ -137,6 +151,13 @@
                         class="h-4 w-4 text-blue-600 border-gray-300 rounded">
                     <label class="ml-2 text-sm text-gray-700">Activo</label>
                 </div>
+                <div class="mb-3 flex items-center">
+                    <input type="hidden" name="editable_por_encargado" value="0">
+                    <input type="checkbox" name="editable_por_encargado" id="editable_por_encargado" value="1"
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                    <label class="ml-2 text-sm text-gray-700" for="editable_por_encargado">Editable por
+                        encargado</label>
+                </div>
 
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="document.getElementById('modalCrear').classList.add('hidden')"
@@ -197,6 +218,13 @@
                     <label class="ml-2 text-sm text-gray-700">Activo</label>
                 </div>
 
+                <div class="mb-3 flex items-center">
+                    <input type="hidden" name="editable_por_encargado" value="0">
+                    <input type="checkbox" name="editable_por_encargado" value="1"
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                    <label class="ml-2 text-sm text-gray-700">Editable por encargado</label>
+                </div>
+
                 <div class="flex justify-end gap-2">
                     <button type="button"
                         class="close-modal px-3 py-1 bg-gray-300 text-gray-800 rounded shadow hover:bg-gray-400">
@@ -218,7 +246,6 @@
             const editForm = document.getElementById('formEdit');
             const baseUpdateUrl = "{{ route('admin.formularios.update', ['id' => '__ID__']) }}";
 
-            // abrir modal y llenar campos desde data-formulario (JSON)
             document.querySelectorAll('.edit-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const data = JSON.parse(btn.dataset.formulario);
@@ -234,7 +261,9 @@
                     // estado: puede venir booleano
                     const chk = editForm.querySelector('input[type="checkbox"][name="estado"]');
                     chk.checked = Boolean(data.estado);
-
+                    editForm.querySelector('input[type="checkbox"][name="editable_por_encargado"]')
+                        .checked =
+                        Boolean(data.editable_por_encargado);
                     // mostrar modal
                     editModal.classList.remove('hidden');
                 });

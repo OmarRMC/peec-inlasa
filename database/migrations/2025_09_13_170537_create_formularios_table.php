@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_ensayo');
             $table->string('color_primario', 10)->default('#ffffff');
             $table->string('color_secundario', 10)->default('#000000');
+            $table->boolean('editable_por_encargado')->default(false);
             $table->boolean('estado')->default(true);
             $table->string('nombre', 255);
             $table->string('codigo', 80)->nullable();
