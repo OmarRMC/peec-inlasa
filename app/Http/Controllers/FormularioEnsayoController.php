@@ -48,7 +48,8 @@ class FormularioEnsayoController extends Controller
                 'nota'              => ['nullable', 'string'],
                 'color_primario'    => ['nullable', 'string', 'max:10'],
                 'color_secundario'  => ['nullable', 'string', 'max:10'],
-                'estado'            => ['nullable', 'boolean']
+                'estado'            => ['nullable', 'boolean'],
+                'editable_por_encargado' => ['nullable', 'boolean']
             ],
             [
                 'id_ensayo.required' => 'El campo ensayo de aptitud es obligatorio.',
@@ -61,6 +62,7 @@ class FormularioEnsayoController extends Controller
                 'color_primario.max'         => 'El color primario no puede superar los 10 caracteres.',
                 'color_secundario.max'       => 'El color secundario no puede superar los 10 caracteres.',
                 'estado.boolean'             => 'El estado debe ser verdadero o falso.',
+                'editable_por_encargado.boolean' => 'El campo editable por encargado debe ser verdadero o falso.'
             ]
         );
         $ensayo = EnsayoAptitud::find($request->id_ensayo);
@@ -76,6 +78,7 @@ class FormularioEnsayoController extends Controller
         $formulario->color_primario = $request->color_primario;
         $formulario->color_secundario = $request->color_secundario;
         $formulario->estado = $request->estado ?? false;
+        $formulario->editable_por_encargado = $request->editable_por_encargado ?? false;
         $formulario->save();
 
         return redirect()
@@ -85,6 +88,7 @@ class FormularioEnsayoController extends Controller
 
     public function update(Request $request, $id)
     {
+        Log::info($id);
         $request->validate([
             'nombre' => 'required|string|max:255',
             'codigo' => 'nullable|string|max:80',
@@ -104,6 +108,7 @@ class FormularioEnsayoController extends Controller
         $formulario->color_primario = $request->color_primario;
         $formulario->color_secundario = $request->color_secundario;
         $formulario->estado = $request->estado;
+        $formulario->editable_por_encargado = $request->editable_por_encargado ?? false;
         $formulario->update();
 
         return redirect()->back()->with('success', 'Formulario actualizado correctamente.');
