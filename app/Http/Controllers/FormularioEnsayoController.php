@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EnsayoAptitud;
+use App\Models\Formulario;
 use App\Models\FormularioEnsayo;
 use App\Models\Programa;
 use Illuminate\Http\Request;
@@ -45,6 +46,9 @@ class FormularioEnsayoController extends Controller
                 'nombre'            => ['required', 'string', 'max:255'],
                 'codigo'            => ['nullable', 'string', 'max:80', 'unique:formularios,codigo'],
                 'nota'              => ['nullable', 'string'],
+                'color_primario'    => ['nullable', 'string', 'max:10'],
+                'color_secundario'  => ['nullable', 'string', 'max:10'],
+                'estado'            => ['nullable', 'boolean']
             ],
             [
                 'id_ensayo.required' => 'El campo ensayo de aptitud es obligatorio.',
@@ -53,6 +57,10 @@ class FormularioEnsayoController extends Controller
                 'nombre.max'                 => 'El nombre no puede superar los 255 caracteres.',
                 'codigo.max'                 => 'El código no puede superar los 80 caracteres.',
                 'codigo.unique'              => 'El código ya está en uso. Debe ser único.',
+                'nota.string'                => 'La nota debe ser una cadena de texto.',
+                'color_primario.max'         => 'El color primario no puede superar los 10 caracteres.',
+                'color_secundario.max'       => 'El color secundario no puede superar los 10 caracteres.',
+                'estado.boolean'             => 'El estado debe ser verdadero o falso.',
             ]
         );
         $ensayo = EnsayoAptitud::find($request->id_ensayo);
@@ -65,11 +73,47 @@ class FormularioEnsayoController extends Controller
         $formulario->nombre = $request->nombre;
         $formulario->codigo = $request->codigo;
         $formulario->nota = $request->nota;
+        $formulario->color_primario = $request->color_primario;
+        $formulario->color_secundario = $request->color_secundario;
+        $formulario->estado = $request->estado ?? false;
         $formulario->save();
 
         return redirect()
             ->route('admin.formularios.show', ['idEA' => $ensayo->id])
             ->with('success', 'Formulario creado exitosamente.');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'codigo' => 'nullable|string|max:80',
+            'nota' => 'nullable|string',
+            'color_primario' => 'required|string|max:10',
+            'color_secundario' => 'required|string|max:10',
+        ]);
+        $formulario = FormularioEnsayo::find($id);
+        if (!$formulario) {
+            return redirect()->back()->with('error', 'Formulario no encontrado.');
+        }
+
+        $formulario->id_ensayo = $request->id_ensayo;
+        $formulario->nombre = $request->nombre;
+        $formulario->codigo = $request->codigo;
+        $formulario->nota = $request->nota;
+        $formulario->color_primario = $request->color_primario;
+        $formulario->color_secundario = $request->color_secundario;
+        $formulario->estado = $request->estado;
+        $formulario->update();
+
+        return redirect()->back()->with('success', 'Formulario actualizado correctamente.');
+    }
+
+    public function destroy(FormularioEnsayo $formulario)
+    {
+        $formulario->delete();
+
+        return redirect()->back()->with('success', 'Formulario eliminado correctamente.');
     }
 
     public function edit($id)
