@@ -21,4 +21,8 @@ class FormularioEnsayo extends Model
     {
         return $this->belongsTo(EnsayoAptitud::class, 'id_ensayo');
     }
+    public function scopeActivo($query)
+    {
+        return $query->where('estado', true);
+    }
 }

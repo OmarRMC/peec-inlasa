@@ -82,6 +82,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/formularios-ea/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('admin.formularios.edit');
     Route::post('/formularios-ea', [FormularioEnsayoController::class, 'store'])->name('admin.formularios.store');
     Route::put('/formularios-ea/{id}', [FormularioEnsayoController::class, 'updateEstructura'])->name('admin.formularios.updateEstructura');
+    Route::post('/formularios/usar/{id}', [FormularioEnsayoController::class, 'usar'])
+        ->name('admin.formularios.usar');
 
     Route::get('/ciclos/{idEa}', [CicloController::class, 'index'])->name('admin.ciclos.index');
     Route::post('/ciclos', [CicloController::class, 'store'])->name('admin.ciclos.store');
