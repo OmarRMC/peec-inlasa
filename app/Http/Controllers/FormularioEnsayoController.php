@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\EnsayoAptitud;
 use App\Models\Formulario;
 use App\Models\FormularioEnsayo;
+use App\Models\Parametro;
 use App\Models\Programa;
+use App\Models\Seccion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -35,7 +37,9 @@ class FormularioEnsayoController extends Controller
             return redirect()->route('admin.formularios.ea')->with('error', 'Ensayo de Aptitud no encontrado.');
         }
         $formularios = $ensayo->formularios;
-        return view('admin.formularios.show', compact('ensayo', 'formularios'));
+        $formulariosDisponibles = FormularioEnsayo::where('id_ensayo', '!=', $ensayo->id)->activo()->get();
+
+        return view('admin.formularios.show', compact('ensayo', 'formularios', 'formulariosDisponibles'));
     }
 
     public function store(Request $request)
@@ -181,5 +185,50 @@ class FormularioEnsayoController extends Controller
 
         return redirect()->route('admin.formularios.edit', $id)
             ->with('success', 'Formulario actualizado correctamente ✅');
+    }
+
+    public function usar(Request $request, $id)
+    {
+        $request->validate([
+            'formulario_id' => 'required|exists:formularios,id',
+        ]);
+        $formularioBase = FormularioEnsayo::find($request->formulario_id);
+        $ensayo = EnsayoAptitud::find($id);
+
+        if (!$ensayo) {
+            return redirect()->back()->with('error', 'Ensayo de Aptitud no encontrado.');
+        }
+
+        if (!$formularioBase) {
+            return redirect()->back()->with('error', 'Formulario no encontrado.');
+        }
+        $nuevoFormulario = $formularioBase->replicate();
+        $nuevoFormulario->id_ensayo = $ensayo->id;
+        $nuevoFormulario->save();
+
+        $formularioBase->load('secciones.parametros');
+        foreach ($formularioBase->secciones as $seccionBase) {
+            $nuevaSeccion = new Seccion();
+            $nuevaSeccion->id_formulario = $nuevoFormulario->id;
+            $nuevaSeccion->nombre = $seccionBase->nombre;
+            $nuevaSeccion->descripcion = $seccionBase->descripcion;
+            $nuevaSeccion->cantidad_parametros = $seccionBase->cantidad_parametros;
+            $nuevaSeccion->save();
+
+
+            foreach ($seccionBase->parametros as $paramBase) {
+                $nuevoParametro = new Parametro();
+                $nuevoParametro->id_seccion = $nuevaSeccion->id;
+                $nuevoParametro->nombre = $paramBase->nombre;
+                $nuevoParametro->tipo = $paramBase->tipo;
+                $nuevoParametro->unidad = $paramBase->unidad;
+                $nuevoParametro->validacion = $paramBase->validacion;
+                $nuevoParametro->requerido = $paramBase->requerido;
+                $nuevoParametro->posicion = $paramBase->posicion;
+                $nuevoParametro->id_grupo_selector = $paramBase->id_grupo_selector;
+                $nuevoParametro->save();
+            }
+        }
+        return redirect()->back()->with('success', 'Formulario agregado correctamente con toda su estructura.');
     }
 }

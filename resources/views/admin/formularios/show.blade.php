@@ -9,13 +9,14 @@
                     class="px-3 py-1 bg-green-600 text-white rounded shadow hover:bg-green-500 text-sm">
                     <i class="fas fa-plus"></i> Nuevo Formulario
                 </button>
-                <button onclick="document.getElementById('modalCrear').classList.remove('hidden')"
-                    class="px-3 py-1 bg-green-600 text-white rounded shadow hover:bg-green-500 text-sm">
-                    <i class="fas fa-plus"></i> Usar Otro formulario
+                <button onclick="document.getElementById('modalUsar').classList.remove('hidden')"
+                    class="px-3 py-1 bg-indigo-600 text-white rounded shadow hover:bg-indigo-500 text-sm">
+                    <i class="fas fa-copy"></i> Usar Otro Formulario
                 </button>
             </div>
         </div>
 
+        {{-- Tabla de formularios --}}
         <div class="overflow-x-auto bg-white rounded-lg shadow">
             <table class="min-w-full text-sm text-gray-800">
                 <thead class="bg-gray-100 text-xs uppercase">
@@ -61,21 +62,16 @@
                                 @endif
                             </td>
                             <td class="px-3 py-2 text-center space-x-2">
-
                                 <a href="{{ route('admin.formularios.edit', $formulario->id) }}"
                                     class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-1 rounded shadow-sm"
                                     data-tippy-content="Ver / Editar">
                                     <i class="fas fa-eye"></i>
                                 </a>
-
-                                <!-- Editar: aquí pasamos todo el objeto como JSON en data-formulario -->
                                 <button type="button"
                                     class="edit-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
                                     data-formulario='@json($formulario)' data-tippy-content="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
-
-                                <!-- Eliminar -->
                                 <form action="{{ route('admin.formularios.destroy', $formulario->id) }}" method="POST"
                                     class="inline-block"
                                     onsubmit="return confirm('¿Seguro de eliminar este formulario?')">
@@ -91,7 +87,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-4 py-4 text-center text-gray-500">
+                            <td colspan="8" class="px-4 py-4 text-center text-gray-500">
                                 No hay formularios registrados.
                             </td>
                         </tr>
@@ -171,8 +167,53 @@
             </form>
         </div>
     </div>
+    <div id="modalUsar" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
+            <h2 class="text-lg font-bold mb-4">Usar Formulario Existente</h2>
 
-    {{-- Modal Edit (único) --}}
+            <input type="text" id="buscarFormulario"
+                class="w-full border border-gray-300 rounded px-3 py-2 mb-4 text-sm"
+                placeholder="Buscar por nombre o código...">
+
+            <div class="overflow-x-auto max-h-64 border rounded">
+                <table class="min-w-full text-sm text-gray-800" id="tablaFormulariosDisponibles">
+                    <thead class="bg-gray-100 text-xs uppercase">
+                        <tr>
+                            <th class="px-3 py-2">Nombre</th>
+                            <th class="px-3 py-2">Código</th>
+                            <th class="px-3 py-2 text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($formulariosDisponibles as $f)
+                            <tr class="border-b">
+                                <td class="px-3 py-2">{{ $f->nombre }}</td>
+                                <td class="px-3 py-2">{{ $f->codigo ?? '-' }}</td>
+                                <td class="px-3 py-2 text-center">
+                                    <form method="POST" action="{{ route('admin.formularios.usar', $ensayo->id) }}">
+                                        @csrf
+                                        <input type="hidden" name="formulario_id" value="{{ $f->id }}">
+                                        <button type="submit"
+                                            class="px-3 py-1 bg-indigo-600 text-white rounded shadow hover:bg-indigo-500 text-sm">
+                                            Usar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-end mt-4">
+                <button type="button" onclick="document.getElementById('modalUsar').classList.add('hidden')"
+                    class="px-3 py-1 bg-gray-300 text-gray-800 rounded shadow hover:bg-gray-400">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+        {{-- Modal Edit (único) --}}
     <div id="modalEdit" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
             <h2 class="text-lg font-bold mb-4">Editar Formulario</h2>
@@ -238,27 +279,35 @@
         </div>
     </div>
 
-    {{-- JS: abre modal de edición y llena inputs --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
 
-            const editModal = document.getElementById('modalEdit');
-            const editForm = document.getElementById('formEdit');
-            const baseUpdateUrl = "{{ route('admin.formularios.update', ['id' => '__ID__']) }}";
+        {{-- JS para filtro del buscador --}}
+        <script>
+            document.getElementById('buscarFormulario').addEventListener('keyup', function() {
+                const filtro = this.value.toLowerCase();
+                document.querySelectorAll('#tablaFormulariosDisponibles tbody tr').forEach(tr => {
+                    const texto = tr.textContent.toLowerCase();
+                    tr.style.display = texto.includes(filtro) ? '' : 'none';
+                });
+            });
 
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const data = JSON.parse(btn.dataset.formulario);
-                    editForm.action = baseUpdateUrl.replace('__ID__', data.id);
-                    editForm.querySelector('input[name="nombre"]').value = data.nombre ?? '';
-                    editForm.querySelector('input[name="codigo"]').value = data.codigo ?? '';
-                    editForm.querySelector('textarea[name="nota"]').value = data.nota ?? '';
-                    editForm.querySelector('input[name="color_primario"]').value = data
-                        .color_primario ?? '#272AF5';
-                    editForm.querySelector('input[name="color_secundario"]').value = data
-                        .color_secundario ?? '#E9E9F2';
+            document.addEventListener('DOMContentLoaded', function() {
+                const editModal = document.getElementById('modalEdit');
+                const editForm = document.getElementById('formEdit');
+                const baseUpdateUrl = "{{ route('admin.formularios.update', ['id' => '__ID__']) }}";
 
-                    // estado: puede venir booleano
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        console.log(editModal)
+                        const data = JSON.parse(btn.dataset.formulario);
+                        editForm.action = baseUpdateUrl.replace('__ID__', data.id);
+                        editForm.querySelector('input[name="nombre"]').value = data.nombre ?? '';
+                        editForm.querySelector('input[name="codigo"]').value = data.codigo ?? '';
+                        editForm.querySelector('textarea[name="nota"]').value = data.nota ?? '';
+                        editForm.querySelector('input[name="color_primario"]').value = data
+                            .color_primario ?? '#272AF5';
+                        editForm.querySelector('input[name="color_secundario"]').value = data
+                            .color_secundario ?? '#E9E9F2';
+                       // estado: puede venir booleano
                     const chk = editForm.querySelector('input[type="checkbox"][name="estado"]');
                     chk.checked = Boolean(data.estado);
                     editForm.querySelector('input[type="checkbox"][name="editable_por_encargado"]')
@@ -266,19 +315,18 @@
                         Boolean(data.editable_por_encargado);
                     // mostrar modal
                     editModal.classList.remove('hidden');
+                    });
                 });
-            });
 
-            // cerrar modal
-            document.querySelectorAll('.close-modal').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    editModal.classList.add('hidden');
+                document.querySelectorAll('.close-modal').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        editModal.classList.add('hidden');
+                    });
+                });
+
+                editModal.addEventListener('click', function(e) {
+                    if (e.target === editModal) editModal.classList.add('hidden');
                 });
             });
-            // cerrar si clickeas fuera del modal content
-            editModal.addEventListener('click', function(e) {
-                if (e.target === editModal) editModal.classList.add('hidden');
-            });
-        });
-    </script>
+        </script>
 </x-app-layout>
