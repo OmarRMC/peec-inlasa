@@ -10,7 +10,7 @@ class Seccion extends Model
     use HasFactory;
 
     protected $table = 'secciones';
-    protected $fillable = ['formulario_id', 'nombre', 'descripcion', 'posicion', 'cantidad_parametros'];
+    protected $fillable = ['formulario_id', 'nombre', 'descripcion', 'posicion', 'cantidad_parametros', 'headers'];
 
     protected $casts = [
         'headers' => 'array',

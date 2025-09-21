@@ -36,7 +36,12 @@ class Parametro extends Model
     //     return $this->belongsTo(GrupoSelector::class, 'id_grupo_selector');
     // }
 
-    public function resultados()
+    // public function resultados()
+    // {
+    //     return $this->hasMany(ParametroCampo::class, 'id_parametro');
+    // }
+
+    public function campos()
     {
         return $this->hasMany(ParametroCampo::class, 'id_parametro');
     }

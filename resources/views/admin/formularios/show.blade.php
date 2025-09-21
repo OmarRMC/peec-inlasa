@@ -62,7 +62,7 @@
                                 @endif
                             </td>
                             <td class="px-3 py-2 text-center space-x-2">
-                                <a href="{{ route('admin.formularios.edit', $formulario->id) }}"
+                                <a href="{{ route('admin.formularios.edit', ['id'=>$formulario->id,'idEa'=>$ensayo->id]) }}"
                                     class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-1 rounded shadow-sm"
                                     data-tippy-content="Ver / Editar">
                                     <i class="fas fa-eye"></i>

@@ -10,7 +10,7 @@ class GrupoSelector extends Model
     use HasFactory;
 
     protected $table = 'grupos_selectores';
-    protected $fillable = ['nombre', 'descripcion'];
+    protected $fillable = ['nombre', 'descripcion', 'ensayo_id'];
 
     // public function parametros()
     // {
@@ -25,5 +25,10 @@ class GrupoSelector extends Model
     public function campo()
     {
         return $this->hasOne(ParametroCampo::class, 'id_grupo_selector');
+    }
+
+    public function ensayo()
+    {
+        return $this->belongsTo(EnsayoAptitud::class, 'ensayo_id');
     }
 }

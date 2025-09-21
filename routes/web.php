@@ -31,6 +31,7 @@ use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
 use App\Http\Controllers\Lab\RegistroResultadosController;
+use App\Http\Controllers\OpcionSelectorController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
 use App\Http\Controllers\VerificarController;
 use App\Models\FormularioEnsayo;
@@ -79,7 +80,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/formularios-ea/{idEA}/show', [FormularioEnsayoController::class, 'formulariosByEa'])->name('admin.formularios.show');
     Route::put('/formularios-ea/update/{id}', [FormularioEnsayoController::class, 'update'])->name('admin.formularios.update');
     Route::delete('/formularios-ea/{formulario}', [FormularioEnsayoController::class, 'destroy'])->name('admin.formularios.destroy');
-    Route::get('/formularios-ea/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('admin.formularios.edit');
+    Route::get('/formularios-ea/{id}/{idEa}/edit', [FormularioEnsayoController::class, 'edit'])->name('admin.formularios.edit');
     Route::post('/formularios-ea', [FormularioEnsayoController::class, 'store'])->name('admin.formularios.store');
     Route::put('/formularios-ea/{id}', [FormularioEnsayoController::class, 'updateEstructura'])->name('admin.formularios.updateEstructura');
     Route::post('/formularios/usar/{id}', [FormularioEnsayoController::class, 'usar'])
@@ -92,13 +93,26 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::delete('/ciclos/{id}', [CicloController::class, 'destroy'])->name('admin.ciclos.destroy');
 
     Route::prefix('/formularios')->name('admin.formularios.')->group(function () {
-        Route::get('/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('edit');
+        // Route::get('/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('edit');
         Route::put('/{id}', [FormularioEnsayoController::class, 'update'])->name('update');
     });
     Route::prefix('/grupos-selectores')->name('admin.grupos-selectores.')->group(function () {
         Route::get('/buscar', [GrupoSelectorController::class, 'buscar'])->name('buscar');
         Route::post('/guardar', [GrupoSelectorController::class, 'guardar'])->name('guardar');
         Route::delete('/eliminar/{id}', [GrupoSelectorController::class, 'eliminar'])->name('eliminar');
+    });
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('ensayos/{ensayo}/grupos', [GrupoSelectorController::class, 'index'])
+            ->name('grupos.index');
+        Route::post('ensayos/{ensayo}/grupos', [GrupoSelectorController::class, 'store'])->name('grupos.store');
+        Route::get('/json/ensayos/{ensayoId}/grupos', [GrupoSelectorController::class, 'gruposSelectoresJson'])->name('grupos.selectores.json');
+        Route::put('grupos/{grupo}', [GrupoSelectorController::class, 'update'])->name('grupos.update');
+        Route::delete('grupos/{grupo}', [GrupoSelectorController::class, 'destroy'])->name('grupos.destroy');
+
+        Route::post('grupos/{grupo}/opciones', [OpcionSelectorController::class, 'store'])->name('opciones.store');
+        Route::put('opciones/{opcion}', [OpcionSelectorController::class, 'update'])->name('opciones.update');
+        Route::delete('opciones/{opcion}', [OpcionSelectorController::class, 'destroy'])->name('opciones.destroy');
     });
 
     Route::prefix('inscripcion')->group(function () {
