@@ -14,22 +14,11 @@ return new class extends Migration
         Schema::create('parametros', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_seccion');
-            $table->unsignedBigInteger('id_grupo_selector')->nullable();
             $table->string('nombre', 255);
-            $table->enum('tipo', ['text', 'number', 'date', 'select', 'checkbox', 'textarea']);
-            $table->string('unidad', 50)->nullable();
-            $table->json('validacion')->nullable();
-            $table->boolean('requerido')->default(false);
-            $table->integer('posicion')->default(0);
             $table->foreign('id_seccion')
                 ->references('id')
                 ->on('secciones')
                 ->onDelete('cascade');
-
-            $table->foreign('id_grupo_selector')
-                ->references('id')
-                ->on('grupos_selectores')
-                ->nullOnDelete();
             $table->timestamps();
         });
     }

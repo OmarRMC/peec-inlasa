@@ -36,7 +36,12 @@ class FormularioEnsayoController extends Controller
         if (!$ensayo) {
             return redirect()->route('admin.formularios.ea')->with('error', 'Ensayo de Aptitud no encontrado.');
         }
+        Log::info('$ensayo');
+        Log::info($ensayo);
         $formularios = $ensayo->formularios;
+        Log::info('$formularios');
+        Log::info($formularios);
+
         $formulariosDisponibles = FormularioEnsayo::where('id_ensayo', '!=', $ensayo->id)->activo()->get();
 
         return view('admin.formularios.show', compact('ensayo', 'formularios', 'formulariosDisponibles'));
@@ -74,8 +79,9 @@ class FormularioEnsayoController extends Controller
             return redirect()->back()->with('error', 'Ensayo de Aptitud no encontrado.');
         }
 
+
         $formulario = new FormularioEnsayo();
-        $formulario->id_ensayo = $request->id_ensayo;
+        $formulario->id_ensayo = $ensayo->id;
         $formulario->nombre = $request->nombre;
         $formulario->codigo = $request->codigo;
         $formulario->nota = $request->nota;
@@ -84,9 +90,9 @@ class FormularioEnsayoController extends Controller
         $formulario->estado = $request->estado ?? false;
         $formulario->editable_por_encargado = $request->editable_por_encargado ?? false;
         $formulario->save();
-
+        $formulario->ensayos()->attach($request->id_ensayo);
         return redirect()
-            ->route('admin.formularios.show', ['idEA' => $ensayo->id])
+            ->back()
             ->with('success', 'Formulario creado exitosamente.');
     }
 

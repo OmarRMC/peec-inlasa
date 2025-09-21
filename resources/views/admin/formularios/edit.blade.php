@@ -64,16 +64,11 @@
                             </div>
 
                             <!-- Tabla de parámetros -->
+                            <!-- Tabla de parámetros -->
                             <table class="w-full text-xs border parametros-table">
                                 <thead>
                                     <tr class="border-b bg-gray-50">
-                                        <th class="px-2 py-1 border-r">Nombre</th>
-                                        <th class="px-2 py-1 border-r">Tipo</th>
-                                        <th class="px-2 py-1 border-r">Unidad</th>
-                                        <th class="px-2 py-1 border-r">Validación</th>
-                                        <th class="px-2 py-1 border-r">Requerido</th>
-                                        <th class="px-2 py-1 border-r">Posicion</th>
-                                        <th class="px-2 py-1">Grupo Selector</th>
+                                        <th class="px-2 py-1">Nombre parámetro</th>
                                         <th class="px-2 py-1">Acciones</th>
                                     </tr>
                                 </thead>
@@ -87,55 +82,71 @@
                                                     class="w-full border border-gray-300 rounded text-xs px-1">
                                             </td>
                                             <td>
-                                                <select
-                                                    name="secciones[{{ $i }}][parametros][{{ $j }}][tipo]"
-                                                    class="w-full border border-gray-300 rounded text-xs">
-                                                    <option value="text" @selected($parametro->tipo === 'text')>Texto</option>
-                                                    <option value="number" @selected($parametro->tipo === 'number')>Número</option>
-                                                    {{-- <option value="date" @selected($parametro->tipo === 'date')>Fecha</option> --}}
-                                                    {{-- <option value="select" @selected($parametro->tipo === 'select')>Selector --}}
-                                                    {{-- </option> --}}
-                                                    {{-- <option value="checkbox" @selected($parametro->tipo === 'checkbox')>Checkbox --}}
-                                                    {{-- </option> --}}
-                                                    {{-- <option value="textarea" @selected($parametro->tipo === 'textarea')>Área texto
-                                                    </option> --}}
-                                                </select>
+                                                <button type="button"
+                                                    class="delete-button eliminar-parametro">🗑</button>
                                             </td>
-                                            <td>
-                                                <input type="text"
-                                                    name="secciones[{{ $i }}][parametros][{{ $j }}][unidad]"
-                                                    value="{{ $parametro->unidad }}"
-                                                    class="w-full border border-gray-300 rounded text-xs px-1">
-                                            </td>
-                                            <td>
-                                                <input type="text"
-                                                    name="secciones[{{ $i }}][parametros][{{ $j }}][validacion]"
-                                                    value="{{ $parametro->validacion }}"
-                                                    class="w-full border border-gray-300 rounded text-xs px-1">
-                                            </td>
-                                            <td class="text-center">
-                                                <input type="checkbox"
-                                                    name="secciones[{{ $i }}][parametros][{{ $j }}][requerido]"
-                                                    value="1" @checked($parametro->requerido)>
-                                            </td>
-                                            <td>
-                                                <input type="number"
-                                                    name="secciones[{{ $i }}][parametros][{{ $j }}][posicion]"
-                                                    value="{{ $parametro->posicion }}"
-                                                    class="w-full border border-gray-300 rounded text-xs px-1">
-                                            </td>
-                                            <td>
-                                                <select
-                                                    name="secciones[{{ $i }}][parametros][{{ $j }}][grupo_selector_id]"
-                                                    class="w-full border border-gray-300 rounded text-xs grupo-selector-select"
-                                                    data-selected="{{ $parametro->grupoSelector?->id }}">
-                                                    <option value="">Seleccione un grupo</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <button type="button" data-tippy-content="Eliminar"
-                                                    class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm eliminar-parametro">
-                                                    <i class="fas fa-trash-alt"></i>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <!-- Subtabla de resultados -->
+                                                <table class="w-full text-xs border resultados-table">
+                                                    <thead>
+                                                        <tr class="bg-gray-100 border-b">
+                                                            <th>Tipo</th>
+                                                            <th>Unidad</th>
+                                                            <th>Validación</th>
+                                                            <th>Requerido</th>
+                                                            <th>Posición</th>
+                                                            <th>Grupo Selector</th>
+                                                            <th>Acciones</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($parametro->resultados as $k => $resultado)
+                                                            <tr>
+                                                                <td>
+                                                                    <select
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][tipo]">
+                                                                        <option value="text"
+                                                                            @selected($resultado->tipo === 'text')>Texto</option>
+                                                                        <option value="number"
+                                                                            @selected($resultado->tipo === 'number')>Número</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td><input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][unidad]"
+                                                                        value="{{ $resultado->unidad }}"></td>
+                                                                <td><input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][validacion]"
+                                                                        value="{{ $resultado->validacion }}"></td>
+                                                                <td><input type="checkbox"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][requerido]"
+                                                                        value="1" @checked($resultado->requerido)>
+                                                                </td>
+                                                                <td><input type="number"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][posicion]"
+                                                                        value="{{ $resultado->posicion }}"></td>
+                                                                <td>
+                                                                    <select
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][grupo_selector_id]"
+                                                                        class="grupo-selector-select"
+                                                                        data-selected="{{ $resultado->grupoSelector?->id }}">
+                                                                        <option value="">Seleccione un grupo
+                                                                        </option>
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <button type="button"
+                                                                        class="eliminar-resultado">🗑</button>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                                <button type="button" class="add-resultado"
+                                                    data-seccion-idx="{{ $i }}"
+                                                    data-parametro-idx="{{ $j }}">
+                                                    + Resultado
                                                 </button>
                                             </td>
                                         </tr>
@@ -219,7 +230,7 @@
                     if (selectedId && parseInt(selectedId) === g.id) {
                         option.selected = true;
                     }
-                    selectEl.appendChild(option);
+                    // selectEl.appendChild(option);
                 });
             }
 
@@ -314,52 +325,53 @@
             }
 
             function crearFilaParametro(seccionIdx, parametroIdx) {
+                const trParam = document.createElement('tr');
+                trParam.innerHTML = `
+                    <td><input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][nombre]" class="w-full border rounded text-xs px-1"></td>
+                    <td><button type="button" class="eliminar-parametro">🗑</button></td>
+                `;
+
+                const trResultados = document.createElement('tr');
+                trResultados.innerHTML = `
+                <td colspan="2">
+                <table class="w-full text-xs border resultados-table">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th><th>Unidad</th><th>Validación</th>
+                                    <th>Requerido</th><th>Posición</th><th>Grupo</th><th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                <button type="button" class="add-resultado" data-seccion-idx="${seccionIdx}" data-parametro-idx="${parametroIdx}">+ Resultado</button>
+                </td>
+                `;
+
+                return [trParam, trResultados];
+            }
+
+            function crearFilaResultado(seccionIdx, parametroIdx, resultadoIdx) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><input type="text" 
-                        name="secciones[${seccionIdx}][parametros][${parametroIdx}][nombre]"
-                        class="w-full border border-gray-300 rounded text-xs px-1"></td>
-                    <td>
-                        <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][tipo]"
-                            class="w-full border border-gray-300 rounded text-xs">
-                            <option value="text">Texto</option>
-                            <option value="number">Número</option>
-                        </select>
-                    </td>
+        <td>
+            <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][tipo]">
+                <option value="text">Texto</option>
+                <option value="number">Número</option>
+            </select>
+        </td>
+        <td><input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][unidad]"></td>
+        <td><input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][validacion]"></td>
+        <td><input type="checkbox" name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][requerido]" value="1"></td>
+        <td><input type="number" name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][posicion]"></td>
+        <td>
+            <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][grupo_selector_id]" class="grupo-selector-select">
+                <option value="">Seleccione un grupo</option>
+            </select>
+        </td>
+        <td><button type="button" class="eliminar-resultado">🗑</button></td>
+    `;
 
-                    <td><input type="text" 
-                        name="secciones[${seccionIdx}][parametros][${parametroIdx}][unidad]"
-                        class="w-full border border-gray-300 rounded text-xs px-1"></td>
-
-                    <td><input type="text" 
-                        name="secciones[${seccionIdx}][parametros][${parametroIdx}][validacion]"
-                        class="w-full border border-gray-300 rounded text-xs px-1"></td>
-
-                    <td class="text-center">
-                        <input type="checkbox" 
-                        name="secciones[${seccionIdx}][parametros][${parametroIdx}][requerido]"
-                        value="1">
-                    </td>
-
-                    <td><input type="number" 
-                        name="secciones[${seccionIdx}][parametros][${parametroIdx}][posicion]"
-                        class="w-full border border-gray-300 rounded text-xs px-1"></td>
-
-                    <td>
-                        <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][grupo_selector_id]"
-                            class="w-full border border-gray-300 rounded text-xs grupo-selector-select">
-                            <option value="">Seleccione un grupo</option>
-                        </select>
-                    </td>
-                     <td>
-                            <button type="button" data-tippy-content="Eliminar"
-                                                    class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm eliminar-parametro">
-                                                    <i class="fas fa-trash-alt"></i>
-                            </button>
-                    </td>
-                `;
-                const selectEl = tr.querySelector('.grupo-selector-select');
-                renderGrupoSelect(selectEl);
+                renderGrupoSelect(tr.querySelector('.grupo-selector-select'));
 
                 return tr;
             }
@@ -397,21 +409,6 @@
                             class="w-full border border-gray-300 rounded text-xs px-2 py-1"></textarea>
                     </div>
 
-                    <!-- Tabla -->
-                    <table class="w-full text-xs border parametros-table">
-                        <thead>
-                            <tr class="border-b bg-gray-50">
-                                <th class="px-2 py-1 border-r">Nombre</th>
-                                <th class="px-2 py-1 border-r">Tipo</th>
-                                <th class="px-2 py-1 border-r">Unidad</th>
-                                <th class="px-2 py-1 border-r">Validación</th>
-                                <th class="px-2 py-1 border-r">Requerido</th>
-                                <th class="px-2 py-1 border-r">Posicion</th>
-                                <th class="px-2 py-1">Grupo Selector</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
 
                     <button type="button" class="mt-2 text-xs text-blue-600 add-parametro" 
                         data-seccion-idx="${seccionIdx}">+ Parámetro
@@ -456,8 +453,11 @@
                     if (e.target && e.target.classList.contains('add-parametro')) {
                         const seccionIdx = e.target.dataset.seccionIdx;
                         const tbody = e.target.closest('.seccion').querySelector('tbody');
-                        const parametroIdx = tbody.querySelectorAll('tr').length;
+                        const parametroIdx = tbody.querySelectorAll('tr')?.length??0;
                         tbody.appendChild(crearFilaParametro(seccionIdx, parametroIdx));
+                        const [trParam, trResultados] = crearFilaParametro(seccionIdx, parametroIdx);
+                        tbody.appendChild(trParam);
+                        tbody.appendChild(trResultados);
                     }
                     const btn = e.target.closest('.eliminar-seccion');
                     if (btn) {
@@ -471,6 +471,10 @@
                         const fila = btnParam.closest('tr');
                         if (fila) {
                             fila.remove();
+                        }
+                        const filaResultados = fila.nextElementSibling;
+                        if (filaResultados && filaResultados.querySelector('.resultados-table')) {
+                            filaResultados.remove();
                         }
                     }
                     if (e.target.closest('.eliminar-grupo')) {
@@ -494,7 +498,27 @@
                             alert("Error al eliminar grupo");
                         }
                     }
+                    if (e.target && e.target.classList.contains('add-resultado')) {
+                        const btn = e.target;
+                        const seccionIdx = btn.dataset.seccionIdx;
+                        const parametroIdx = btn.dataset.parametroIdx;
 
+                        // Encuentra el tbody de resultados correspondiente
+                        const resultadosTbody = btn.closest('tr').querySelector('tbody');
+
+                        // Calcula el índice correcto de resultado
+                        const resultadoIdx = resultadosTbody.querySelectorAll('tr').length;
+
+                        const nuevaFila = crearFilaResultado(seccionIdx, parametroIdx, resultadoIdx);
+                        resultadosTbody.appendChild(nuevaFila);
+                    }
+                    const btnResultado = e.target.closest('.eliminar-resultado');
+                    if (btnResultado) {
+                        const filaResultado = btnResultado.closest('tr');
+                        if (filaResultado) {
+                            filaResultado.remove();
+                        }
+                    }
                 });
             });
         </script>
