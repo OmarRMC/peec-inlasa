@@ -12,13 +12,18 @@ class GrupoSelector extends Model
     protected $table = 'grupos_selectores';
     protected $fillable = ['nombre', 'descripcion'];
 
-    public function parametros()
-    {
-        return $this->hasMany(Parametro::class, 'id_grupo_selector');
-    }
+    // public function parametros()
+    // {
+    //     return $this->hasMany(Parametro::class, 'id_grupo_selector');
+    // }
 
     public function opciones()
     {
         return $this->hasMany(OpcionSelector::class, 'id_grupo_selector');
+    }
+
+    public function campo()
+    {
+        return $this->hasOne(ParametroCampo::class, 'id_grupo_selector');
     }
 }

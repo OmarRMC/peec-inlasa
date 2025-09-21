@@ -28,4 +28,9 @@ class Formulario extends Model
     {
         return formatDate($value, false);
     }
+
+    public function ensayos()
+    {
+        return $this->belongsToMany(EnsayoAptitud::class, 'ensayo_formulario', 'formulario_id', 'ensayo_id');
+    }
 }

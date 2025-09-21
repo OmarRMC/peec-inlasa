@@ -17,10 +17,11 @@ class FormularioEnsayo extends Model
         return $this->hasMany(Seccion::class, 'id_formulario');
     }
 
-    public function ensayo()
+    public function ensayos()
     {
-        return $this->belongsTo(EnsayoAptitud::class, 'id_ensayo');
+        return $this->belongsToMany(EnsayoAptitud::class, 'ensayo_formulario', 'formulario_id', 'ensayo_id');
     }
+    
     public function scopeActivo($query)
     {
         return $query->where('estado', true);

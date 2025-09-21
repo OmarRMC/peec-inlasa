@@ -31,8 +31,13 @@ class Parametro extends Model
         return $this->belongsTo(Seccion::class, 'seccion_id');
     }
 
-    public function grupoSelector()
+    // public function grupoSelector()
+    // {
+    //     return $this->belongsTo(GrupoSelector::class, 'id_grupo_selector');
+    // }
+
+    public function resultados()
     {
-        return $this->belongsTo(GrupoSelector::class, 'id_grupo_selector');
+        return $this->hasMany(ParametroCampo::class, 'id_parametro');
     }
 }
