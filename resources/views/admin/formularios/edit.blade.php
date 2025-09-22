@@ -56,21 +56,22 @@
                             </div>
                             <div class="mb-3 headers-wrapper">
                                 <label class="block text-xs font-semibold text-gray-600">Encabezado</label>
-                                <div class="headers-list flex flex-wrap">
+                                <div class="headers-list flex flex-wrap gap-2">
                                     @foreach ($seccion->headers ?? [] as $h => $header)
-                                        <div class="flex items-center gap-2 mb-1 header-item">
+                                        <div class="flex items-center gap-1 mb-1 header-item">
                                             <input type="text" name="secciones[{{ $i }}][headers][]"
                                                 value="{{ $header }}"
                                                 class="w-full border border-gray-300 rounded text-xs px-2 py-1">
-                                            <button type="button"
-                                                class="px-2 py-1 bg-red-500 text-white text-xs rounded eliminar-header">🗑</button>
+                                            <button type="button" data-tippy-content="Eliminar"
+                                                class="px-2 py-1 bg-red-500 text-white text-xs rounded eliminar-header"><i
+                                                    class="fas fa-trash-alt"></i></button>
                                         </div>
                                     @endforeach
                                 </div>
                                 <button type="button"
                                     class="mt-1 px-3 py-1 text-xs bg-blue-500 text-white rounded add-header"
                                     data-seccion-idx="{{ $i }}">
-                                    + Header
+                                    + Encabezado
                                 </button>
                             </div>
                             <!-- Tabla de parámetros -->
@@ -83,7 +84,9 @@
                                                     name="secciones[{{ $i }}][parametros][{{ $j }}][nombre]"
                                                     placeholder="Nombre del parámetro" value="{{ $parametro->nombre }}"
                                                     class="text-xs border rounded px-1 py-0.5">
-                                                <button type="button" class="eliminar-parametro">🗑</button>
+                                                <button type="button" data-tippy-content="Eliminar"
+                                                    class="eliminar-parametro px-2 py-1 bg-red-500 text-white text-xs rounded"><i
+                                                        class="fas fa-trash-alt"></i></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -97,9 +100,9 @@
                                                             <th class="px-2 py-1 border">Unidad</th>
                                                             <th class="px-2 py-1 border text-center">Requerido</th>
                                                             <th class="px-2 py-1 border">Posición</th>
-                                                            <th class="px-2 py-1 border">Mensaje</th>
-                                                            <th class="px-2 py-1 border">Step</th>
-                                                            <th class="px-2 py-1 border">Validación</th>
+                                                            {{-- <th class="px-2 py-1 border">Step</th> --}}
+                                                            <th class="px-2 py-1 border">Validación(ExpReg)</th>
+                                                            <th class="px-2 py-1 border">Nota Validacion</th>
                                                             <th class="px-2 py-1 border">Rango</th>
                                                             <th class="px-2 py-1 border">Grupo Selector</th>
                                                             <th class="px-2 py-1 border text-center">Acciones</th>
@@ -168,24 +171,22 @@
                                                                         placeholder="#"
                                                                         class="w-full text-xs border rounded px-1 py-0.5">
                                                                 </td>
-                                                                <td class="px-2 py-1 border">
-                                                                    <input type="text"
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][mensaje]"
-                                                                        value="{{ $campo->mensaje }}"
-                                                                        placeholder="Mensaje"
-                                                                        class="w-full text-xs border rounded px-1 py-0.5">
-                                                                </td>
-                                                                <td class="px-2 py-1 border">
+                                                                {{-- <td class="px-2 py-1 border">
                                                                     <input type="text"
                                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][step]"
                                                                         value="{{ $campo->step }}"
                                                                         placeholder="Step"
                                                                         class="w-full text-xs border rounded px-1 py-0.5 mt-1">
-                                                                </td>
+                                                                </td> --}}
                                                                 <td class="px-2 py-1 border">
                                                                     <textarea
                                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][pattern]"
-                                                                        placeholder="Validación" class="w-full text-xs border rounded px-1 py-0.5 mt-1">{{ $campo->pattern }}</textarea>
+                                                                        placeholder="" class="w-full text-xs border rounded px-1 py-0.5 mt-1">{{ $campo->pattern }}</textarea>
+                                                                </td>
+                                                                <td class="px-2 py-1 border">
+                                                                    <textarea
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][mensaje]"
+                                                                        placeholder="" class="w-full text-xs border rounded px-1 py-0.5 mt-1">{{ $campo->mensaje }}</textarea>
                                                                 </td>
                                                                 <td class="px-2 py-1 border">
                                                                     <input type="text"
@@ -207,12 +208,13 @@
                                                                                 {{ $grupo->nombre }}
                                                                             </option>
                                                                         @endforeach
-
                                                                     </select>
                                                                 </td>
                                                                 <td class="px-2 py-1 border text-center">
                                                                     <button type="button"
-                                                                        class="eliminar-resultado text-red-500 text-xs">🗑</button>
+                                                                        data-tippy-content="Eliminar"
+                                                                        class="eliminar-resultado text-red-500 text-xs"><i
+                                                                            class="fas fa-trash-alt"></i></button>
                                                                 </td>
                                                             </tr>
                                                         @endforeach
@@ -267,8 +269,12 @@
                         name="secciones[${seccionIdx}][headers][]" 
                         value="${valor}" 
                         class="flex-1 border border-gray-300 rounded text-xs px-2 py-1">
-                    <button type="button" class="text-red-600 eliminar-header">🗑</button>
+                    <button type="button" data-tippy-content="Eliminar" class="px-2 py-1 bg-red-500 text-white text-xs rounded  eliminar-header"><i class="fas fa-trash-alt"></i></button>
                 `;
+                const btnEliminar = div.querySelector('.eliminar-header');
+                btnEliminar.addEventListener('click', function() {
+                    div.remove();
+                });
                 return div;
             }
 
@@ -280,7 +286,7 @@
                         <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][nombre]" class="text-xs border rounded px-1 py-0.5"
                         placeholder="Nombre del parámetro" 
                         >
-                        <button type="button" class="eliminar-parametro">🗑</button>
+                        <button type="button" data-tippy-content="Eliminar" class="eliminar-parametro px-2 py-1 bg-red-500 text-white text-xs rounded"><i class="fas fa-trash-alt"></i></button>
                     </td>
                 `;
 
@@ -289,14 +295,26 @@
                 <td>
                 <table class="w-full text-xs border border-gray-300 rounded resultados-table">
                         <thead class="bg-gray-100 text-gray-600">
-
+                              <tr>
+                                    <th class="px-2 py-1 border">Label</th>
+                                    <th class="px-2 py-1 border">Tipo</th>
+                                    <th class="px-2 py-1 border">Placeholder</th>
+                                    <th class="px-2 py-1 border">Unidad</th>
+                                    <th class="px-2 py-1 border text-center">Requerido</th>
+                                    <th class="px-2 py-1 border">Posición</th>
+                                    <th class="px-2 py-1 border">Validación(ExpReg)</th>
+                                    <th class="px-2 py-1 border">Nota Validacion</th>
+                                    <th class="px-2 py-1 border">Rango</th>
+                                    <th class="px-2 py-1 border">Grupo Selector</th>
+                                    <th class="px-2 py-1 border text-center">Acciones</th>
+                               </tr>
                         </thead>
                         <tbody></tbody>
                  </table>
                  <button type="button"
                     class="add-resultado block text-center text-blue-600 my-2 w-full"
                     data-seccion-idx="${seccionIdx}" data-parametro-idx="${parametroIdx}">
-                                                       + Campo
+                    + Campo
                  </button>
                 </td>
                 `;
@@ -343,27 +361,25 @@
                         placeholder="#" class="w-full text-xs border rounded px-1 py-0.5">
                 </td>
                 <td class="px-2 py-1 border">
-                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][mensaje]"
-                        placeholder="Mensaje" class="w-full text-xs border rounded px-1 py-0.5">
-                </td>
-                <td class="px-2 py-1 border">
-                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][step]" placeholder="Step" class="w-full text-xs border rounded px-1 py-0.5 mt-1">
-                </td>
-                <td class="px-2 py-1 border">
                     <textarea name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][pattern]"
                       placeholder='Validacion' class="w-full text-xs border rounded px-1 py-0.5 mt-1"></textarea>
+                </td>
+                <td class="px-2 py-1 border">
+                    <textarea name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][mensaje]"
+                      placeholder='' class="w-full text-xs border rounded px-1 py-0.5 mt-1">
+                      </textarea>
                 </td>
                 <td class="px-2 py-1 border">
                     <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][range]"
                         placeholder="Rango" class="w-full text-xs border rounded px-1 py-0.5">
                 </td>
                 <td class="px-2 py-1 border">
-                     <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][grupo_selector_id]" class="grupo-selector-select w-full text-xs border rounded px-1 py-0.5" >
+                     <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][id_grupo_selector]" class="grupo-selector-select w-full text-xs border rounded px-1 py-0.5" >
                         <option value="">Seleccione un grupo</option>
                       </select>
                 </td>
                 <td class="px-2 py-1 border text-center">
-                    <button type="button" class="eliminar-resultado text-red-500 text-xs">🗑</button>
+                    <button type="button" data-tippy-content="Eliminar" class="eliminar-resultado text-red-500 text-xs"><i class="fas fa-trash-alt"></i></button>
                 </td>
                 `;
                 const selectGrupo = tr.querySelector('.grupo-selector-select');
@@ -398,15 +414,15 @@
                             class="w-full border border-gray-300 rounded text-xs px-2 py-1"></textarea>
                     </div>
 
-                  <div class="headers-wrapper">
+                  <div class="mb-3 headers-wrapper">
                         <label class="block text-xs font-semibold text-gray-600">Encabezado</label>
-                        <div class="headers-list flex flex-wrap">
+                        <div class="headers-list flex flex-wrap gap-2">
                             <!-- Aquí se irán agregando los inputs de headers -->
                         </div>
                         <button type="button"
                             class="mt-1 px-3 py-1 text-xs bg-blue-500 text-white rounded add-header"
                             data-seccion-idx="${seccionIdx}">
-                            + Header
+                            + Encabezado
                         </button>
                     </div>
 
@@ -445,7 +461,7 @@
 
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.grupo-selector-select').forEach(select => {
-                   asignarFocusGrupo(select);     
+                    asignarFocusGrupo(select);
                 });
 
                 document.getElementById('add-seccion').addEventListener('click', () => {
@@ -497,11 +513,11 @@
                     if (btnParam) {
                         const fila = btnParam.closest('tr');
                         if (fila) {
+                            const filaResultados = fila.nextElementSibling;
                             fila.remove();
-                        }
-                        const filaResultados = fila.nextElementSibling;
-                        if (filaResultados && filaResultados.querySelector('.resultados-table')) {
-                            filaResultados.remove();
+                            if (filaResultados && filaResultados.querySelector('.resultados-table')) {
+                                filaResultados.remove();
+                            }
                         }
                     }
                     if (e.target.closest('.eliminar-grupo')) {
@@ -516,7 +532,6 @@
                                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
                             }
                         });
-
                         if (res.ok) {
                             alert("Grupo eliminado correctamente");
                             LimpiarListaGrupos();

@@ -57,6 +57,8 @@ return new class extends Migration
             $table->json('rangeNumber')->nullable();      // valores predefinidos para numeric
             $table->json('rangeLength')->nullable();      // longitudes permitidas
 
+            $table->string('range')->nullable();
+
             // Relaciones
             $table->foreign('id_parametro')
                 ->references('id')->on('parametros')

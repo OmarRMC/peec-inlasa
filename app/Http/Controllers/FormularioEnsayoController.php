@@ -6,6 +6,7 @@ use App\Models\EnsayoAptitud;
 use App\Models\Formulario;
 use App\Models\FormularioEnsayo;
 use App\Models\Parametro;
+use App\Models\ParametroCampo;
 use App\Models\Programa;
 use App\Models\Seccion;
 use Illuminate\Http\Request;
@@ -151,9 +152,6 @@ class FormularioEnsayoController extends Controller
     public function updateEstructura(Request $request, $id)
     {
         $formulario = FormularioEnsayo::findOrFail($id);
-
-        Log::info('$request->all()');
-        Log::info($request->all());
         $data = $request->validate([
             'secciones' => 'nullable|array|min:1',
             'secciones.*.nombre' => 'required|string|max:255',
@@ -201,22 +199,33 @@ class FormularioEnsayoController extends Controller
                         'nombre' => $param['nombre'],
                     ]);
                     foreach ($param['campos'] ?? [] as $campoIdx => $campo) {
-                        Log::info('$campo');
-                        Log::info($campo);
-                        $parametro->campos()->create([
-                            'nombre' => $campo['nombre'] ?? '',
-                            'label' => $campo['label'],
-                            'tipo' => $campo['tipo'],
-                            'placeholder' => $campo['placeholder'] ?? null,
-                            'unidad' => $campo['unidad'] ?? null,
-                            'requerido' => isset($campo['requerido']) ? true : false,
-                            'posicion' => $campo['posicion'] ?? $campoIdx,
-                            'mensaje' => $campo['mensaje'] ?? null,
-                            'step' => $campo['step'] ?? null,
-                            'pattern' => $campo['pattern'] ?? null,
-                            'rangeNumber' => $campo['range'] ?? null,
-                            'id_grupo_selector' => $campo['id_grupo_selector'] ?? null,
-                        ]);
+                        $campoModel = new ParametroCampo();
+                        $campoModel->nombre = $campo['nombre'] ?? '';
+                        $campoModel->label = $campo['label'];
+                        $campoModel->tipo = $campo['tipo'];
+                        $campoModel->placeholder = $campo['placeholder'] ?? null;
+                        $campoModel->unidad = $campo['unidad'] ?? null;
+                        $campoModel->requerido = isset($campo['requerido']);
+                        $campoModel->posicion  = $campo['posicion'] ?? $campoIdx;
+                        $campoModel->mensaje = $campo['mensaje'] ?? null;
+                        $campoModel->step  = $campo['step'] ?? null;
+                        $campoModel->pattern = $campo['pattern'] ?? null;
+                        $campoModel->range = $campo['range'] ?? null;
+                        $campoModel->id_grupo_selector = $campo['id_grupo_selector'] ?? null;
+                        $campoModel->id_parametro = $parametro->id;
+
+                        if (($campo['tipo'] == 'text' || $campo['tipo'] == 'number') && isset($campo['range'])) {
+                            $clean = trim($campo['range'], '[]');
+                            [$min, $max] = explode('-', $clean);
+                            if ($campo['tipo'] === 'text') {
+                                $campoModel->minlength = $min ?? null;
+                                $campoModel->maxlength = $max ?? null;
+                            } else {
+                                $campoModel->min = $min ?? null;
+                                $campoModel->max = $max ?? null;
+                            }
+                        }
+                        $campoModel->save();
                     }
                 }
             }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -40,6 +41,7 @@ class ParametroCampo extends Model
         'dependencias',
         'rangeNumber',
         'rangeLength',
+        'range'
     ];
 
     /**
@@ -68,5 +70,12 @@ class ParametroCampo extends Model
     public function grupoSelector()
     {
         return $this->belongsTo(GrupoSelector::class, 'id_grupo_selector');
+    }
+
+    protected function notaValidacion(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, $attributes) => $attributes['mensaje'],
+        );
     }
 }
