@@ -54,7 +54,7 @@ class RegistroResultadosController extends Controller
             return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
         }
         $laboratorio = Auth::user()->laboratorio;
-        $formulario = FormularioEnsayo::with(['secciones.parametros.grupoSelector.opciones'])->find($id);
+        $formulario = FormularioEnsayo::with(['secciones.parametros.campos.grupoSelector.opciones'])->find($id);
         if (!$formulario) {
             return redirect('/')->with('error', 'Formulario no encontrado.');
         }
