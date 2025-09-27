@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\ProvinciaController;
 use App\Http\Controllers\Admin\TipoLaboratorioController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
+use App\Http\Controllers\FormularioEnsayoResultadoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
@@ -186,6 +187,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'formularioLlenar'])->name('lab.inscritos-ensayos.formularios.llenar');
     Route::post('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'guardarResultados'])->name('laboratorio.formularios.guardar');
 });
+
+Route::post('/formularios/resultados', [FormularioEnsayoResultadoController::class, 'store'])->name('lab.resultados.store');
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
     Route::get('/ea/{id}/labs', [ResponsableLaboratorioController::class, 'index'])->name('ea.lab.inscritos');

@@ -28,70 +28,80 @@
                         <td class="border px-2 py-1">{{ $parametro->nombre }}</td>
                         @foreach ($parametro->campos as $campoIdx => $campo)
                             <td class="border px-2 py-1">
+
+                                @php
+                                    $inputName = "secciones[$secIdx][parametros][$paramIdx][campos][$campoIdx][valor]";
+                                @endphp
+
                                 @if ($campo->tipo === 'text' || $campo->tipo === 'number' || $campo->tipo === 'date')
-                                    <input type="{{ $campo->tipo }}"
-                                        :name="'respuestas[' + (i - 1) +
-                                        '][{{ $parametro->id }}][{{ $campo->id }}]'"
-                                        value="{{ old('respuestas.' . $parametro->id . '.' . $campo->id, '') }}"
-                                        placeholder="{{ $campo->placeholder }}"
+                                    <input type="{{ $campo->tipo }}" name="{{ $inputName }}"
+                                        value="{{ old($inputName, '') }}" placeholder="{{ $campo->placeholder }}"
                                         @if ($campo->requerido) required @endif
                                         @if ($campo->min !== null) min="{{ $campo->min }}" @endif
                                         @if ($campo->max !== null) max="{{ $campo->max }}" @endif
-                                        @if ($campo->minlength !== null) minlength="{{ $campo->minlength }}" @endif
-                                        @if ($campo->maxlength !== null) maxlength="{{ $campo->maxlength }}" @endif
-                                        @if ($campo->pattern) pattern="{{ $campo->pattern }}" @endif
                                         step="{{ $campo->step ?? 1 }}"
-                                        class="w-full border rounded px-2 py-1 text-xs campo-entrada"
-                                        @if ($campo->label) data-tippy-content="{{ $campo->label ?? '' }}" @endif
-                                        data-mensaje-error="{{ $campo->nota_validacion ?? 'Valor inválido' }}">
+                                        class="w-full border rounded px-2 py-1 text-xs campo-entrada">
                                 @elseif ($campo->tipo === 'textarea')
-                                    <textarea @if ($campo->label) data-tippy-content="{{ $campo->label ?? '' }}" @endif
-                                        :name="'respuestas[' + (i - 1) +
-                                        '][{{ $parametro->id }}][{{ $campo->id }}]'"
-                                        class="w-full border rounded px-2 py-1 text-xs campo-entrada" placeholder="{{ $campo->placeholder }}"
-                                        data-mensaje-error="{{ $campo->nota_validacion ?? 'Valor inválido' }}"
-                                        @if ($campo->requerido) required @endif></textarea>
+                                    <textarea name="{{ $inputName }}" class="w-full border rounded px-2 py-1 text-xs campo-entrada"
+                                        placeholder="{{ $campo->placeholder }}" @if ($campo->requerido) required @endif></textarea>
                                 @elseif ($campo->tipo === 'select' && $campo->grupoSelector)
-                                    <select
-                                        @if ($campo->label) data-tippy-content="{{ $campo->label ?? '' }}" @endif
-                                        :name="'respuestas[' + (i - 1) +
-                                        '][{{ $parametro->id }}][{{ $campo->id }}]'"
+                                    <select name="{{ $inputName }}"
                                         class="w-full border rounded px-2 py-1 text-xs campo-entrada"
-                                        @if ($campo->requerido) required @endif
-                                        data-mensaje-error="{{ $campo->nota_validacion ?? 'Valor inválido' }}">
-                                        <option value="">Seleccione
-                                        </option>
+                                        @if ($campo->requerido) required @endif>
+                                        <option value="">Seleccione</option>
                                         @foreach ($campo->grupoSelector->opciones as $op)
-                                            <option value="{{ $op->valor }}">
-                                                {{ $op->valor }}
-                                            </option>
+                                            <option value="{{ $op->valor }}">{{ $op->valor }}</option>
                                         @endforeach
                                     </select>
                                 @elseif ($campo->tipo === 'datalist' && $campo->grupoSelector)
-                                    <div class="relative">
-                                        <input type="text" list="datalist_{{ $campo->id }}"
-                                            :name="'respuestas[' + (i - 1) +
-                                            '][{{ $parametro->id }}][{{ $campo->id }}]'"
-                                            class="w-full border rounded px-2 py-1 text-xs campo-entrada"
-                                            placeholder="{{ $campo->placeholder }}"
-                                            value="{{ old('respuestas.' . $parametro->id . '.' . $campo->id, '') }}"
-                                            @if ($campo->requerido) required @endif
-                                            @if ($campo->label) data-tippy-content="{{ $campo->label }}" @endif
-                                            data-mensaje-error="{{ $campo->nota_validacion ?? 'Valor inválido' }}">
-
-                                        <datalist id="datalist_{{ $campo->id }}">
-                                            @foreach ($campo->grupoSelector->opciones as $op)
-                                                <option value="{{ $op->valor }}">
-                                                </option>
-                                            @endforeach
-                                        </datalist>
-                                    </div>
+                                    <input type="text" list="datalist_{{ $campo->id }}"
+                                        name="{{ $inputName }}"
+                                        class="w-full border rounded px-2 py-1 text-xs campo-entrada"
+                                        placeholder="{{ $campo->placeholder }}"
+                                        @if ($campo->requerido) required @endif>
+                                    <datalist id="datalist_{{ $campo->id }}">
+                                        @foreach ($campo->grupoSelector->opciones as $op)
+                                            <option value="{{ $op->valor }}"></option>
+                                        @endforeach
+                                    </datalist>
                                 @elseif ($campo->tipo === 'checkbox')
-                                    <input type="checkbox" @if ($campo->requerido) required @endif
-                                        @if ($campo->label) data-tippy-content="{{ $campo->label }}" @endif
-                                        :name="'respuestas[' + (i - 1) +
-                                        '][{{ $parametro->id }}][{{ $campo->id }}]'"
-                                        value="1">
+                                    <input type="checkbox" name="{{ $inputName }}" value="1"
+                                        @if ($campo->requerido) required @endif>
+                                @endif
+
+                                {{-- @if ($campo->unidad)
+                                    <div class="text-center text-xs">{{ $campo->unidad }}</div>
+                                @endif --}}
+
+                                {{-- Campos hidden para mantener estructura JSON --}}
+                                <input type="hidden" name="secciones[{{ $secIdx }}][id]"
+                                    value="{{ $seccion->id }}">
+                                <input type="hidden" name="secciones[{{ $secIdx }}][nombre]"
+                                    value="{{ $seccion->nombre }}">
+                                <input type="hidden" name="secciones[{{ $secIdx }}][descripcion]"
+                                    value="{{ $seccion->descripcion }}">
+                                <input type="hidden"
+                                    name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][id]"
+                                    value="{{ $parametro->id }}">
+                                <input type="hidden"
+                                    name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][nombre]"
+                                    value="{{ $parametro->nombre }}">
+                                <input type="hidden"
+                                    name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][visible_nombre]"
+                                    value="{{ $parametro->visible_nombre }}">
+                                <input type="hidden"
+                                    name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][id]"
+                                    value="{{ $campo->id }}">
+                                <input type="hidden"
+                                    name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][label]"
+                                    value="{{ $campo->label }}">
+                                <input type="hidden"
+                                    name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][tipo]"
+                                    value="{{ $campo->tipo }}">
+                                @if ($campo->unidad)
+                                    <input type="hidden"
+                                        name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][unidad]"
+                                        value="{{ $campo->unidad }}">
                                 @endif
                             </td>
                             @if ($campo->unidad)
@@ -113,6 +123,6 @@
         style="background-color: {{ $primaryColor }}">
         Observación
     </h3>
-    <textarea :name="'observacion[' + (i - 1) + ']'" rows="3" placeholder="Escriba alguna observación..."
+    <textarea name="observaciones" rows="3" placeholder="Escriba alguna observación..."
         class="w-full border rounded px-2 py-1 text-sm" style="border-color: {{ $primaryColor }}"></textarea>
 </div>
