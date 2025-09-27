@@ -16,6 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('id_parametro');   // Relación al parámetro
             $table->unsignedBigInteger('id_grupo_selector')->nullable(); // Opciones select
 
+            $table->unsignedBigInteger('id_campo_padre')->nullable();
+
             $table->string('nombre');
             $table->string('label')->nullable();
             $table->enum('tipo', [
@@ -48,6 +50,7 @@ return new class extends Migration
             // Validaciones avanzadas
             $table->string('pattern')->nullable();        // Expresión regular
             $table->json('reglas')->nullable();           // Validaciones extra en JSON
+            $table->string('valor')->nullable();
             $table->boolean('modificable')->default(true);
 
             // Dependencias
@@ -66,6 +69,9 @@ return new class extends Migration
 
             $table->foreign('id_grupo_selector')
                 ->references('id')->on('grupos_selectores')
+                ->nullOnDelete();
+            $table->foreign('id_campo_padre')
+                ->references('id')->on('parametro_campos')
                 ->nullOnDelete();
 
             $table->timestamps();
