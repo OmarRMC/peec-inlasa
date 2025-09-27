@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_seccion');
             $table->string('nombre', 255);
+            $table->boolean('visible_nombre')->default(true);
+            $table->boolean('requerido')->default(true);
             $table->foreign('id_seccion')
                 ->references('id')
                 ->on('secciones')

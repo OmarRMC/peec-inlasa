@@ -41,7 +41,8 @@ class ParametroCampo extends Model
         'dependencias',
         'rangeNumber',
         'rangeLength',
-        'range'
+        'range',
+        'id_campo_padre'
     ];
 
     /**
@@ -77,5 +78,15 @@ class ParametroCampo extends Model
         return Attribute::make(
             get: fn($value, $attributes) => $attributes['mensaje'],
         );
+    }
+
+    public function campoPadre()
+    {
+        return $this->belongsTo(ParametroCampo::class, 'id_campo_padre');
+    }
+
+    public function camposHijos()
+    {
+        return $this->hasMany(ParametroCampo::class, 'id_campo_padre');
     }
 }

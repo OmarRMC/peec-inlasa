@@ -11,7 +11,14 @@
             </div>
         @endif
         <div class="border p-4 mb-6">
-            <h2 class="font-bold mb-2">Información del formulario</h2>
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="font-bold">Información del formulario</h2>
+                <a href="{{ route('admin.formularios.preview', $formulario->id) }}" target="_blank"
+                    class="text-blue-600 hover:text-blue-800" data-tippy-content="Previsualizar formulario">
+                    <i class="fas fa-eye text-xl"></i>
+                </a>
+            </div>
+
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <p><span class="font-semibold">Nombre:</span> {{ $formulario->nombre }}</p>
@@ -47,6 +54,9 @@
                                     <label class="block text-xs font-semibold text-gray-600">Nombre</label>
                                     <input type="text" name="secciones[{{ $i }}][nombre]"
                                         value="{{ $seccion->nombre }}"
+                                        class="w-full border border-gray-300 rounded text-xs px-2 py-1">
+                                    <input type="text" name="secciones[{{ $i }}][id]" hidden
+                                        value="{{ $seccion->id }}"
                                         class="w-full border border-gray-300 rounded text-xs px-2 py-1">
                                 </div>
                                 <div>
@@ -84,9 +94,35 @@
                                                     name="secciones[{{ $i }}][parametros][{{ $j }}][nombre]"
                                                     placeholder="Nombre del parámetro" value="{{ $parametro->nombre }}"
                                                     class="text-xs border rounded px-1 py-0.5">
+                                                <input type="text"
+                                                    name="secciones[{{ $i }}][parametros][{{ $j }}][id]"
+                                                    hidden value="{{ $parametro->id }}"
+                                                    class="w-full border border-gray-300 rounded text-xs px-2 py-1">
+
+                                                <button type="button"
+                                                    class="toggle-visible text-blue-500 bg-blue-100 px-2 py-1 rounded"
+                                                    data-tippy-content="{{ $parametro->visible_nombre ? 'Ocultar label en formulario' : 'Mostrar label en formulario' }}">
+                                                    @if ($parametro->visible_nombre)
+                                                        <i class="fas fa-eye"></i>
+                                                    @else
+                                                        <i class="fas fa-eye-slash"></i>
+                                                    @endif
+                                                </button>
+                                                <input type="hidden"
+                                                    name="secciones[{{ $i }}][parametros][{{ $j }}][visible_nombre]"
+                                                    value="{{ $parametro->visible_nombre ? 1 : 0 }}"
+                                                    class="visible-input">
+                                                <label class="flex items-center gap-1 text-xs">
+                                                    <input type="checkbox"
+                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][requerido_si_completa]"
+                                                        value="1" @checked($parametro->requerido_si_completa)
+                                                        class="border rounded">
+                                                    Requerido si se llena algun campo
+                                                </label>
                                                 <button type="button" data-tippy-content="Eliminar"
                                                     class="eliminar-parametro px-2 py-1 bg-red-500 text-white text-xs rounded"><i
-                                                        class="fas fa-trash-alt"></i></button>
+                                                        class="fas fa-trash-alt"></i>
+                                                </button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -104,17 +140,25 @@
                                                             <th class="px-2 py-1 border">Validación(ExpReg)</th>
                                                             <th class="px-2 py-1 border">Nota Validacion</th>
                                                             <th class="px-2 py-1 border">Rango</th>
+                                                            <th class="px-2 py-1 border">Valor</th>
+                                                            <th class="px-2 py-1 border text-center">Modificable</th>
                                                             <th class="px-2 py-1 border">Grupo Selector</th>
+                                                            <th class="px-2 py-1 border">Dependencia del campo</th>
                                                             <th class="px-2 py-1 border text-center">Acciones</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         @foreach ($parametro->campos as $k => $campo)
-                                                            <tr class="text-xs">
-                                                                <td class="px-2 py-1 border">
+                                                        <tr class="text-xs">
+                                                            <td class="px-2 py-1 border">
+                                                                    <input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][id]"
+                                                                        hidden value="{{ $campo->id }}"
+                                                                        class="w-full border border-gray-300 rounded text-xs px-2 py-1">
                                                                     <input type="text"
                                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][label]"
-                                                                        value="{{ $campo->label }}" placeholder="Label"
+                                                                        value="{{ $campo->label }}"
+                                                                        placeholder="Label"
                                                                         class="w-full text-xs border rounded px-1 py-0.5">
                                                                 </td>
                                                                 <td class="px-2 py-1 border">
@@ -196,6 +240,19 @@
                                                                         class="w-full text-xs border rounded px-1 py-0.5">
                                                                 </td>
                                                                 <td class="px-2 py-1 border">
+                                                                    <input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][valor]"
+                                                                        value="{{ $campo->valor }}"
+                                                                        placeholder="Valor"
+                                                                        class="w-full text-xs border rounded px-1 py-0.5">
+                                                                </td>
+                                                                <td class="px-2 py-1 border text-center">
+                                                                    <input type="checkbox"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][modificable]"
+                                                                        value="1" @checked($campo->modificable)
+                                                                        class="mx-auto">
+                                                                </td>
+                                                                <td class="px-2 py-1 border">
                                                                     <select
                                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][id_grupo_selector]"
                                                                         class="grupo-selector-select w-full text-xs border rounded px-1 py-0.5"
@@ -210,6 +267,24 @@
                                                                         @endforeach
                                                                     </select>
                                                                 </td>
+                                                                <td class="px-2 py-1 border">
+                                                                    <select
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][id_campo_padre]"
+                                                                        class="grupo-selector-dependencia w-full text-xs border rounded px-1 py-0.5"
+                                                                        data-selected="{{ $campo->id_campo_padre }}">
+                                                                        <option value="">Seleccione un campo
+                                                                        </option>
+                                                                        @foreach ($camposBD as $campoBD)
+                                                                            @if ($campoBD->id !== $campo->id)
+                                                                                <option value="{{ $campoBD->id }}"
+                                                                                    {{ $campo->id_campo_padre == $campoBD->id ? 'selected' : '' }}>
+                                                                                    {{ $campoBD->id . ' - ' . $campoBD->label }}
+                                                                                </option>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </select>
+                                                                </td>
+
                                                                 <td class="px-2 py-1 border text-center">
                                                                     <button type="button"
                                                                         data-tippy-content="Eliminar"
@@ -286,6 +361,22 @@
                         <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][nombre]" class="text-xs border rounded px-1 py-0.5"
                         placeholder="Nombre del parámetro" 
                         >
+                        <button type="button"
+                            class="toggle-visible text-blue-500 bg-blue-100 px-2 py-1 rounded">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <input type="hidden"
+                            name="name="secciones[${seccionIdx}][parametros][${parametroIdx}][visible_nombre]"
+                            value="1"
+                            class="visible-input">
+                        
+                        <label class="flex items-center gap-1 text-xs">
+                            <input type="checkbox"
+                              name="secciones[${seccionIdx}][parametros][${parametroIdx}][requerido_si_completa]"
+                              value="1"
+                              class="border rounded">
+                              Requerido si se llena algun campo
+                        </label>
                         <button type="button" data-tippy-content="Eliminar" class="eliminar-parametro px-2 py-1 bg-red-500 text-white text-xs rounded"><i class="fas fa-trash-alt"></i></button>
                     </td>
                 `;
@@ -556,6 +647,24 @@
                         if (filaResultado) {
                             filaResultado.remove();
                         }
+                    }
+                    const btnParamentroVisible = e.target.closest('.toggle-visible');
+                    if (btnParamentroVisible) {
+                        const td = btnParamentroVisible.closest('td');
+                        const hiddenInput = td.querySelector('.visible-input');
+                        const icon = btnParamentroVisible.querySelector('i');
+                        if (hiddenInput.value === "1") {
+                            hiddenInput.value = "0";
+                            icon.classList.remove("fa-eye");
+                            icon.classList.add("fa-eye-slash");
+                            btnParamentroVisible._tippy?.setContent("Mostrar label en formulario");
+                        } else {
+                            hiddenInput.value = "1";
+                            icon.classList.remove("fa-eye-slash");
+                            icon.classList.add("fa-eye");
+                            btnParamentroVisible._tippy?.setContent("Ocultar label en formulario");
+                        }
+
                     }
                 });
             });

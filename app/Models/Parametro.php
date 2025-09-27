@@ -18,7 +18,9 @@ class Parametro extends Model
         'validacion',
         'requerido',
         'posicion',
-        'id_grupo_selector'
+        'id_grupo_selector',
+        'requerido_si_completa',
+        'visible_nombre'
     ];
 
     protected $casts = [
