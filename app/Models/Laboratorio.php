@@ -390,4 +390,9 @@ class Laboratorio extends Model
         $response = $pdf->stream('certificados-desempeno.pdf');
         return $response;
     }
+
+    public function respuestas()
+    {
+        return $this->hasMany(FormularioEnsayoResultado::class, 'id_laboratorio');
+    }
 }

@@ -82,19 +82,21 @@
           @endif
 
           {{-- Slides de formularios --}}
-          <div class="relative" x-data="{ i: 1 }">
-              {{-- <template x-for="i in cantidad" :key="i"> --}}
-              <form action="{{ route('lab.resultados.store') }}" method="POST">
-                  @csrf
-                  <input type="text" hidden name="id_formulario" value="{{ $formulario->id }}">
-                  @include('admin.formularios.partials.preview')
-                  <div class="text-center">
-                      <button type="submit" class="px-2 py-1 text-white rounded"
-                          style="background-color: {{ $primaryColor }}">
-                          Test de validación
-                      </button>
-                  </div>
-              </form>
-          </div>
+          @php
+              $i = 1;
+          @endphp
+          {{-- <template x-for="i in cantidad" :key="i"> --}}
+          <form action="{{ route('admin.formularios.store.test') }}" method="POST">
+              @csrf
+              <input type="text" hidden name="id_formulario" value="{{ $formulario->id }}">
+              @include('admin.formularios.partials.preview')
+              <div class="text-center">
+                  <button type="submit" class="px-2 py-1 text-white rounded"
+                      style="background-color: {{ $primaryColor }}">
+                      Test de validación
+                  </button>
+              </div>
+          </form>
+
       </div>
   </x-app-layout>

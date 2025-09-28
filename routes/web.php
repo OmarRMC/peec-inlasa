@@ -100,6 +100,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::prefix('/formularios')->name('admin.formularios.')->group(function () {
         // Route::get('/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('edit');
         Route::put('/{id}', [FormularioEnsayoController::class, 'update'])->name('update');
+        Route::post('/resultados/test', [FormularioEnsayoResultadoController::class, 'testAdmin'])->name('store.test');
     });
     Route::prefix('/grupos-selectores')->name('admin.grupos-selectores.')->group(function () {
         Route::get('/buscar', [GrupoSelectorController::class, 'buscar'])->name('buscar');
@@ -185,11 +186,11 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
 
     Route::get('/inscripcion-ensayos', [RegistroResultadosController::class, 'listaEnsayosInscritos'])->name('lab.inscritos-ensayos.index');
     Route::get('/inscripcion-ensayos/{id}/formularios', [RegistroResultadosController::class, 'getFormulariosByEa'])->name('lab.inscritos-ensayos.formularios');
-    Route::get('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'formularioLlenar'])->name('lab.inscritos-ensayos.formularios.llenar');
+    Route::get('/inscripcion-ensayos/formulario/{id}/llenar/{idEA}', [RegistroResultadosController::class, 'formularioLlenar'])->name('lab.inscritos-ensayos.formularios.llenar');
     Route::post('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'guardarResultados'])->name('laboratorio.formularios.guardar');
+    
+    Route::post('/formularios/resultados', [FormularioEnsayoResultadoController::class, 'store'])->name('lab.resultados.store');
 });
-
-Route::post('/formularios/resultados', [FormularioEnsayoResultadoController::class, 'store'])->name('lab.resultados.store');
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
     Route::get('/ea/{id}/labs', [ResponsableLaboratorioController::class, 'index'])->name('ea.lab.inscritos');
