@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\FormularioEnsayoResultado;
+use App\Models\Permiso;
 use App\Models\RespuestaFormulario;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use stdClass;
 
@@ -67,40 +70,153 @@ class FormularioEnsayoResultadoController extends Controller
     //     });
     // }
 
-    public function store(Request $request)
+    // public function store(Request $request)
+    // {
+    //     if (!Gate::any([Permiso::LABORATORIO])) {
+    //         return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
+    //     }
+
+    //     $user = Auth::user();
+    //     $laboratorio = $user->laboratorio;
+    //     Log::info('$laboratorio');
+    //     Log::info($laboratorio);
+    //     $formularioResultado = FormularioEnsayoResultado::create([
+    //         'observaciones' => $request->observaciones,
+    //         'estado' => 1,
+    //         'id_ciclo' => 1,
+    //         'id_laboratorio' => $laboratorio->id,
+    //         'id_formulario' => $request->id_formulario,
+    //         'gestion' => now()->year,
+    //         'nombre_lab' => $laboratorio->nombre_lab,
+    //         'departamento' => $laboratorio->departamento->nombre_dep
+    //     ]);
+    //     $secciones = [];
+    //     foreach ($request->secciones as $seccionData) {
+    //         $sec = new stdClass();
+    //         $sec->nombre = $seccionData['nombre'];
+    //         $sec->id = $seccionData['id'];
+    //         $secciones['secciones'][] = $sec;
+    //         foreach ($seccionData['parametros'] as $parametroData) {
+    //             RespuestaFormulario::create([
+    //                 'id_formulario_resultado' => $formularioResultado->id,
+    //                 'id_parametro' => $parametroData['id'],
+    //                 'nombre' => $parametroData['nombre'],
+    //                 'visible_nombre' => $parametroData['visible_nombre'] ?? false,
+    //                 'respuestas' => $parametroData['campos']
+    //             ]);
+    //         }
+    //     }
+    //     $formularioResultado->estructura = $secciones;
+    //     $formularioResultado->save();
+    //     return response()->json([
+    //         'message' => 'Formulario guardado correctamente',
+    //         'id' => $formularioResultado->id
+    //     ]);
+    // }
+
+
+    public function testAdmin(Request $request)
     {
-        Log::info($request->all());
-        $formularioResultado = FormularioEnsayoResultado::create([
-            'observaciones' => $request->observaciones,
+        $user = Auth::user();
+        // Simulación de "FormularioEnsayoResultado"
+        $formularioResultado = [
+            'id' => 0, // como es test, no se guarda en DB
+            'observaciones' => $request->observaciones ?? '',
             'estado' => 1,
             'id_ciclo' => 1,
             'id_laboratorio' => 1,
             'id_formulario' => $request->id_formulario,
-            'gestion' => 234,
-            'nombre_lab' => 'testLabo',
-            'departamento' => 'deaf'
-        ]);
+            'gestion' => now()->year,
+            'nombre_lab' => '$laboratorio->nombre_lab',
+            'departamento' => '$laboratorio->departamento->nombre_dep',
+            'estructura' => []
+        ];
+
         $secciones = [];
         foreach ($request->secciones as $seccionData) {
-            $sec = new stdClass();
+            $sec = [
+                'id' => $seccionData['id'],
+                'nombre' => $seccionData['nombre'],
+                'parametros' => []
+            ];
+
+            foreach ($seccionData['parametros'] as $parametroData) {
+                $param = [
+                    'id' => $parametroData['id'],
+                    'nombre' => $parametroData['nombre'],
+                    'visible_nombre' => $parametroData['visible_nombre'] ?? false,
+                    'respuestas' => $parametroData['campos'] ?? []
+                ];
+                $sec['parametros'][] = $param;
+            }
+
+            $secciones[] = $sec;
+        }
+
+        $formularioResultado['estructura'] = $secciones;
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => 'Test Admin: datos simulados generados correctamente.',
+            'data' => $formularioResultado
+        ]);
+    }
+
+
+    public function store(Request $request)
+    {
+        if (!Gate::any([Permiso::LABORATORIO])) {
+            return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
+        }
+        $user = Auth::user();
+        $laboratorio = $user->laboratorio;
+        $formularioResultado = FormularioEnsayoResultado::find($request->id_formulario_ensayos_resultados);
+        $esActualizacion = false;
+
+        if (!$formularioResultado) {
+            $formularioResultado = FormularioEnsayoResultado::create([
+                'observaciones' => $request->observaciones,
+                'estado' => 1,
+                'id_ciclo' => 1,
+                'id_laboratorio' => $laboratorio->id,
+                'id_formulario' => $request->id_formulario,
+                'gestion' => now()->year,
+                'nombre_lab' => $laboratorio->nombre_lab,
+                'departamento' => $laboratorio->departamento->nombre_dep
+            ]);
+        } else {
+            $formularioResultado->observaciones = $request->observaciones;
+            $formularioResultado->save();
+            $esActualizacion = true;
+        }
+
+        $secciones = [];
+        foreach ($request->secciones as $seccionData) {
+            $sec = new \stdClass();
             $sec->nombre = $seccionData['nombre'];
             $sec->id = $seccionData['id'];
             $secciones['secciones'][] = $sec;
             foreach ($seccionData['parametros'] as $parametroData) {
-                RespuestaFormulario::create([
-                    'id_formulario_resultado' => $formularioResultado->id,
-                    'id_parametro' => $parametroData['id'],
-                    'nombre' => $parametroData['nombre'],
-                    'visible_nombre' => $parametroData['visible_nombre'] ?? false,
-                    'respuestas' => $parametroData['campos']
-                ]);
+                RespuestaFormulario::updateOrCreate(
+                    [
+                        'id_formulario_resultado' => $formularioResultado->id,
+                        'id_parametro' => $parametroData['id'],
+                    ],
+                    [
+                        'nombre' => $parametroData['nombre'],
+                        'visible_nombre' => $parametroData['visible_nombre'] ?? false,
+                        'respuestas' => $parametroData['campos']
+                    ]
+                );
             }
         }
+
         $formularioResultado->estructura = $secciones;
         $formularioResultado->save();
-        return response()->json([
-            'message' => 'Formulario guardado correctamente',
-            'id' => $formularioResultado->id
-        ]);
+        $mensaje = $esActualizacion
+            ? 'Formulario actualizado correctamente.'
+            : 'Formulario registrado correctamente.';
+
+        return redirect()->back()->with('success', $mensaje);
     }
 }

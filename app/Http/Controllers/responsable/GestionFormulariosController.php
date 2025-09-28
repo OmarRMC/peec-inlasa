@@ -60,7 +60,7 @@ class GestionFormulariosController extends Controller
     {
         $responsable = Auth::user();
         $ensayo = $responsable->responsablesEA->findOrFail($idEa);
-        $query = InscripcionEA::with(['inscripcion', 'inscripcion.laboratorio.departamento', 'inscripcion.laboratorio.usuario', 'ensayoAptitud.formularios'])
+        $query = InscripcionEA::with(['inscripcion.laboratorio.usuario', 'ensayoAptitud.formularios'])
             ->where('id_ea', $idEa)
             ->whereHas('inscripcion', function ($q) {
                 $q->where('gestion', now()->year);
@@ -82,7 +82,6 @@ class GestionFormulariosController extends Controller
                     $registro = InscripcionEAFormulario::where('formulario_id', $formulario->id)
                         ->where('inscripcion_ea_id', $ins->id)
                         ->first();
-
                     if (!$registro) {
                         $ins->formularios()->attach($formulario->id, ['cantidad' => 1]);
                         $cantidad = 1;

@@ -26,4 +26,9 @@ class FormularioEnsayo extends Model
     {
         return $query->where('estado', true);
     }
+
+    public function resultados()
+    {
+        return $this->hasMany(FormularioEnsayoResultado::class, 'id_formulario');
+    }
 }

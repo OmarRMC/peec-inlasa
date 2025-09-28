@@ -21,7 +21,7 @@
                             <td>{{ $formulario->codigo ?? '-' }}</td>
                             <td>{{ $formulario->nombre ?? '-' }}</td>
                             <td>
-                                <a href="{{ route('lab.inscritos-ensayos.formularios.llenar', $formulario->id) }}"
+                                <a href="{{ route('lab.inscritos-ensayos.formularios.llenar', ['id'=>$formulario->id, 'idEA'=>$ensayo->id]) }}"
                                     class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm"
                                     data-tippy-content="Llenar formulario">
                                     <i class="fas fa-pen"></i>

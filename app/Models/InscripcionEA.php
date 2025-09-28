@@ -32,7 +32,7 @@ class InscripcionEA extends Model
 
     public function formularios()
     {
-        return $this->belongsToMany(Formulario::class, 'inscripcion_ea_formulario', 'inscripcion_ea_id', 'formulario_id')
+        return $this->belongsToMany(InscripcionEAFormulario::class, 'inscripcion_ea_formulario', 'inscripcion_ea_id', 'formulario_id')
             ->withPivot('cantidad')
             ->withTimestamps();
     }

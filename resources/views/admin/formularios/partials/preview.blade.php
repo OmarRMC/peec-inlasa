@@ -1,3 +1,13 @@
+@php
+    $fromRes = $respuestas[$i - 1] ?? null;
+    $observaciones = $respuestas[$i - 1]['observaciones'] ?? '';
+    $res = $respuestas[$i - 1]['respuestas'] ?? [];
+    $respuestas = collect($res);
+    dump($fromRes['id'] ?? '');
+@endphp
+@if ($fromRes)
+    <input type="hidden" name="id_formulario_ensayos_resultados" value="{{ $fromRes['id'] }}">
+@endif
 {{-- Secciones --}}
 @foreach ($formulario->secciones as $secIdx => $seccion)
     <div class="border p-4 rounded mb-4">
@@ -5,7 +15,6 @@
             style="background-color: {{ $primaryColor }}">
             {{ $seccion->nombre }}
         </h3>
-
         @if ($seccion->descripcion)
             <p class="text-xs mb-3" style="color: {{ $secondaryColor }}">
                 {{ $seccion->descripcion }}
@@ -24,6 +33,9 @@
             </thead>
             <tbody>
                 @foreach ($seccion->parametros as $paramIdx => $parametro)
+                    @php
+                        $valorParametro = $respuestas->firstWhere('id_parametro', $parametro->id);
+                    @endphp
                     <tr data-parametro-id="{{ $parametro->id }}"
                         data-requerido-si-completa="{{ $parametro->requerido_si_completa ? '1' : '0' }}">
                         @if ($parametro->visible_nombre)
@@ -34,11 +46,14 @@
                             <td class="border px-2 py-1">
                                 @php
                                     $inputName = "secciones[$secIdx][parametros][$paramIdx][campos][$campoIdx][valor]";
+                                    $parametroRespuestas = collect($valorParametro->respuestas ?? []);
+                                    $valorCampos = $parametroRespuestas->firstWhere('id', $campo->id);
+                                    $valorCampo = $valorCampos['valor'] ?? null;
                                 @endphp
 
                                 @if ($campo->tipo === 'text' || $campo->tipo === 'number' || $campo->tipo === 'date')
                                     <input type="{{ $campo->tipo }}" name="{{ $inputName }}"
-                                        value="{{ old($inputName, $campo->valor ?? '') }}"
+                                        value="{{ old($inputName, $campo->valor ?? $valorCampo) }}"
                                         placeholder="{{ $campo->placeholder }}"
                                         @if ($campo->requerido) required @endif
                                         @if ($campo->min !== null) min="{{ $campo->min }}" @endif
@@ -52,14 +67,22 @@
                                 @elseif ($campo->tipo === 'select' && ($campo->grupoSelector || $campo->id_campo_padre))
                                     <select name="{{ $inputName }}"
                                         class="w-full border rounded px-2 py-1 text-xs campo-entrada select-dependiente"
-                                        @if ($campo->id_campo_padre) disabled @endif data-id="{{ $campo->id }}"
+                                        @if ($campo->id_campo_padre) disabled @endif
+                                        data-id="{{ $campo->id }}"
                                         data-id-padre="{{ $campo->id_campo_padre ?? '' }}">
-                                        <option value="">Seleccione</option>
+                                        @if ($campo->id_campo_padre && $valorCampo)
+                                            <option value="{{ $valorCampo }}" selected>{{ $valorCampo }}</option>
+                                        @else
+                                            <option value="">Seleccione</option>
+                                        @endif
                                         @if ($campo->grupoSelector)
                                             @foreach ($campo->grupoSelector->opciones as $op)
-                                                <option value="{{ $op->id }}">{{ $op->valor }}</option>
+                                                <option value="{{ $op->id }}"
+                                                    @if ($op->id == $valorCampo) selected @endif>
+                                                    {{ $op->valor }}</option>
                                             @endforeach
                                         @endif
+
                                     </select>
                                 @elseif ($campo->tipo === 'datalist' && $campo->grupoSelector)
                                     <input type="text" list="datalist_{{ $campo->id }}"
@@ -76,11 +99,6 @@
                                     <input type="checkbox" name="{{ $inputName }}" value="1"
                                         @if ($campo->requerido) required @endif>
                                 @endif
-
-                                {{-- @if ($campo->unidad)
-                                    <div class="text-center text-xs">{{ $campo->unidad }}</div>
-                                @endif --}}
-
                                 {{-- Campos hidden para mantener estructura JSON --}}
                                 <input type="hidden" name="secciones[{{ $secIdx }}][id]"
                                     value="{{ $seccion->id }}">
@@ -132,7 +150,7 @@
         Observación
     </h3>
     <textarea name="observaciones" rows="3" placeholder="Escriba alguna observación..."
-        class="w-full border rounded px-2 py-1 text-sm" style="border-color: {{ $primaryColor }}"></textarea>
+        class="w-full border rounded px-2 py-1 text-sm" style="border-color: {{ $primaryColor }}">{{ $observaciones }}</textarea>
 </div>
 @push('scripts')
     <script>
