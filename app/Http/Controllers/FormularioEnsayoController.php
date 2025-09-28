@@ -187,10 +187,12 @@ class FormularioEnsayoController extends Controller
             'secciones.*.parametros.*.campos' => 'nullable|array',
             'secciones.*.parametros.*.campos.*.id' => 'nullable|exists:parametro_campos,id',
             'secciones.*.parametros.*.campos.*.label' => 'required|string|max:255',
+            'secciones.*.parametros.*.campos.*.valor' => 'nullable|string|max:255',
             'secciones.*.parametros.*.campos.*.tipo' => 'required|string|in:text,number,date,select,checkbox,textarea,datalist',
             'secciones.*.parametros.*.campos.*.placeholder' => 'nullable|string|max:255',
             'secciones.*.parametros.*.campos.*.unidad' => 'nullable|string|max:50',
             'secciones.*.parametros.*.campos.*.requerido' => 'nullable',
+            'secciones.*.parametros.*.campos.*.modificable' => 'nullable',
             'secciones.*.parametros.*.campos.*.posicion' => 'nullable|integer|min:0',
             'secciones.*.parametros.*.campos.*.mensaje' => 'nullable|string|max:500',
             'secciones.*.parametros.*.campos.*.step' => 'nullable|string|max:50',
@@ -227,12 +229,14 @@ class FormularioEnsayoController extends Controller
                 Parametro::destroy($parametrosToDelete);
 
                 foreach ($sec['parametros'] ?? [] as $paramIdx => $param) {
+                    // Log::info('$param[visible_nombre]');
+                    // Log::info($param['requerido_si_completa']);
                     $parametro = $seccion->parametros()->updateOrCreate(
                         ['id' => $param['id'] ?? null],
                         [
                             'nombre' => $param['nombre'],
-                            'visible_nombre' => $param['visible_nombre']??false,
-                            'requerido_si_completa' => $param['requerido_si_completa']??false
+                            'visible_nombre' => $param['visible_nombre'] ?? false,
+                            'requerido_si_completa' => $param['requerido_si_completa'] ?? false
                         ]
                     );
 
@@ -255,6 +259,8 @@ class FormularioEnsayoController extends Controller
                                 'label' => $campo['label'],
                                 'tipo' => $campo['tipo'],
                                 'placeholder' => $campo['placeholder'] ?? null,
+                                'valor' => $campo['valor'] ?? null,
+                                'modificable' => $campo['modificable'] ?? false,
                                 'unidad' => $campo['unidad'] ?? null,
                                 'requerido' => isset($campo['requerido']),
                                 'posicion' => $campo['posicion'] ?? $campoIdx,

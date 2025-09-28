@@ -24,34 +24,42 @@
             </thead>
             <tbody>
                 @foreach ($seccion->parametros as $paramIdx => $parametro)
-                    <tr>
-                        <td class="border px-2 py-1">{{ $parametro->nombre }}</td>
+                    <tr data-parametro-id="{{ $parametro->id }}"
+                        data-requerido-si-completa="{{ $parametro->requerido_si_completa ? '1' : '0' }}">
+                        @if ($parametro->visible_nombre)
+                            <td class="border px-2 py-1">{{ $parametro->nombre }}
+                        @endif
+                        </td>
                         @foreach ($parametro->campos as $campoIdx => $campo)
                             <td class="border px-2 py-1">
-
                                 @php
                                     $inputName = "secciones[$secIdx][parametros][$paramIdx][campos][$campoIdx][valor]";
                                 @endphp
 
                                 @if ($campo->tipo === 'text' || $campo->tipo === 'number' || $campo->tipo === 'date')
                                     <input type="{{ $campo->tipo }}" name="{{ $inputName }}"
-                                        value="{{ old($inputName, '') }}" placeholder="{{ $campo->placeholder }}"
+                                        value="{{ old($inputName, $campo->valor ?? '') }}"
+                                        placeholder="{{ $campo->placeholder }}"
                                         @if ($campo->requerido) required @endif
                                         @if ($campo->min !== null) min="{{ $campo->min }}" @endif
                                         @if ($campo->max !== null) max="{{ $campo->max }}" @endif
-                                        step="{{ $campo->step ?? 1 }}"
-                                        class="w-full border rounded px-2 py-1 text-xs campo-entrada">
+                                        step="{{ $campo->step ?? 1 }}" @readonly(!$campo->modificable)
+                                        class="w-full px-2 py-1 text-xs campo-entrada 
+                                        {{ !$campo->modificable ? 'border-0 bg-transparent text-gray-700 focus:ring-0 cursor-default' : 'border rounded' }}">
                                 @elseif ($campo->tipo === 'textarea')
                                     <textarea name="{{ $inputName }}" class="w-full border rounded px-2 py-1 text-xs campo-entrada"
-                                        placeholder="{{ $campo->placeholder }}" @if ($campo->requerido) required @endif></textarea>
-                                @elseif ($campo->tipo === 'select' && $campo->grupoSelector)
+                                        placeholder="{{ $campo->placeholder }}" @if ($campo->requerido) required @endif @readonly(!$campo->modificable)></textarea>
+                                @elseif ($campo->tipo === 'select' && ($campo->grupoSelector || $campo->id_campo_padre))
                                     <select name="{{ $inputName }}"
-                                        class="w-full border rounded px-2 py-1 text-xs campo-entrada"
-                                        @if ($campo->requerido) required @endif>
+                                        class="w-full border rounded px-2 py-1 text-xs campo-entrada select-dependiente"
+                                        @if ($campo->id_campo_padre) disabled @endif data-id="{{ $campo->id }}"
+                                        data-id-padre="{{ $campo->id_campo_padre ?? '' }}">
                                         <option value="">Seleccione</option>
-                                        @foreach ($campo->grupoSelector->opciones as $op)
-                                            <option value="{{ $op->valor }}">{{ $op->valor }}</option>
-                                        @endforeach
+                                        @if ($campo->grupoSelector)
+                                            @foreach ($campo->grupoSelector->opciones as $op)
+                                                <option value="{{ $op->id }}">{{ $op->valor }}</option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                 @elseif ($campo->tipo === 'datalist' && $campo->grupoSelector)
                                     <input type="text" list="datalist_{{ $campo->id }}"
@@ -126,3 +134,64 @@
     <textarea name="observaciones" rows="3" placeholder="Escriba alguna observación..."
         class="w-full border rounded px-2 py-1 text-sm" style="border-color: {{ $primaryColor }}"></textarea>
 </div>
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('tr[data-requerido-si-completa="1"]').forEach(function(row) {
+                const inputs = row.querySelectorAll('.campo-entrada');
+
+                inputs.forEach(input => {
+                    input.addEventListener('input', () => {
+                        // Verificar si alguno de los campos tiene valor
+                        const algunoLleno = Array.from(inputs).some(i => i.value.trim() !==
+                            "");
+
+                        if (algunoLleno) {
+                            // Si alguno tiene valor → todos required
+                            inputs.forEach(i => i.setAttribute('required', 'required'));
+                        } else {
+                            // Si ninguno tiene valor → todos opcionales
+                            inputs.forEach(i => i.removeAttribute('required'));
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('.select-dependiente').forEach(function(select) {
+                const idPadre = select.dataset.idPadre;
+
+                if (idPadre) {
+                    const padre = document.querySelector(`.select-dependiente[data-id="${idPadre}"]`);
+                    if (padre) {
+                        padre.addEventListener('change', async function() {
+                            const valorPadre = padre.value;
+
+                            if (!valorPadre) {
+                                select.innerHTML = '<option value="">Seleccione</option>';
+                                select.disabled = true;
+                                return;
+                            }
+                            try {
+                                const routeOpciones = @json(route('admin.grupos-selectores.opciones', ['id' => ':id']));
+                                let url = routeOpciones.replace(':id', valorPadre);
+                                const response = await fetch(url);
+                                const res = await response.json();
+                                const data = res.data;
+                                select.innerHTML = '<option value="">Seleccione</option>';
+                                data?.forEach(op => {
+                                    const option = document.createElement('option');
+                                    option.value = op.id;
+                                    option.textContent = op.valor ?? op.id;
+                                    select.appendChild(option);
+                                });
+                                select.disabled = false;
+                            } catch (error) {
+                                console.error("Error cargando opciones:", error);
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+@endpush
