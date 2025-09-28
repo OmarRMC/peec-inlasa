@@ -33,4 +33,11 @@ class Formulario extends Model
     {
         return $this->belongsToMany(EnsayoAptitud::class, 'ensayo_formulario', 'formulario_id', 'ensayo_id');
     }
+
+    public function inscripcionesEA()
+    {
+        return $this->belongsToMany(InscripcionEA::class, 'inscripcion_ea_formulario','formulario_id','inscripcion_ea_id')
+            ->withPivot('cantidad')
+            ->withTimestamps();
+    }
 }

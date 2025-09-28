@@ -1,0 +1,353 @@
+<?php
+
+namespace App\Http\Controllers\responsable;
+
+use App\Http\Controllers\Controller;
+use App\Models\CategoriaLaboratorio;
+use App\Models\Certificado;
+use App\Models\Configuracion;
+use App\Models\DetalleCertificado;
+use App\Models\Inscripcion;
+use App\Models\InscripcionEA;
+use App\Models\InscripcionEAFormulario;
+use App\Models\NivelLaboratorio;
+use App\Models\Pais;
+use App\Models\Permiso;
+use App\Models\Programa;
+use App\Models\TipoLaboratorio;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use Normalizer;
+
+class GestionFormulariosController extends Controller
+{
+
+    public function __construct()
+    {
+        $this->middleware('can:' . Permiso::RESPONSABLE)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+    }
+
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $ensayoIds = $user->responsablesEA->pluck('id')->unique();
+        $programas = Programa::with(['areas.paquetes.ensayosAptitud' => function ($q) use ($ensayoIds) {
+            $q->whereIn('id', $ensayoIds)
+                ->orderBy('descripcion', 'asc');
+        }])
+            ->whereHas('areas.paquetes.ensayosAptitud', function ($q) use ($ensayoIds) {
+                $q->whereIn('id', $ensayoIds);
+            })
+            ->get();
+
+        return view('responsable.formularios.index', compact('programas'));
+    }
+
+    public function labs(Request $request, $idEa)
+    {
+        $responsable = Auth::user();
+        $ensayosAptitud = $responsable->responsablesEA->findOrFail($idEa);
+        $paises = Pais::active()->get();
+        $tipos = TipoLaboratorio::active()->get();
+        $categorias = CategoriaLaboratorio::active()->get();
+        $niveles = NivelLaboratorio::active()->get();
+        return view('responsable.formularios.cantidad_lab', compact('paises', 'tipos', 'categorias', 'niveles', 'idEa', 'ensayosAptitud'));
+    }
+
+    public function getData(Request $request, $idEa)
+    {
+        $responsable = Auth::user();
+        $ensayo = $responsable->responsablesEA->findOrFail($idEa);
+        $query = InscripcionEA::with(['inscripcion', 'inscripcion.laboratorio.departamento', 'inscripcion.laboratorio.usuario', 'ensayoAptitud.formularios'])
+            ->where('id_ea', $idEa)
+            ->whereHas('inscripcion', function ($q) {
+                $q->where('gestion', now()->year);
+                $q->Aprobado();
+            });
+
+        return datatables()
+            ->of($query)
+            ->addColumn('fecha_inscripcion', fn($ins) => $ins->inscripcion->fecha_inscripcion)
+            ->addColumn('nombre_lab', fn($ins) => $ins->inscripcion->laboratorio->nombre_lab)
+            ->addColumn('mail_lab', fn($ins) => $ins->inscripcion->laboratorio->mail_lab)
+            ->addColumn('wapp_lab', fn($ins) => $ins->inscripcion->laboratorio->wapp_lab)
+            ->addColumn('codigo', fn($ins) => $ins->inscripcion->laboratorio->cod_lab)
+            ->addColumn('email', fn($ins) => $ins->inscripcion->laboratorio->usuario->email ?? '-')
+            ->addColumn('formularios_inputs', function ($ins) use ($ensayo) {
+                $formularios = $ensayo->formularios()->activo()->get() ?? [];
+                $html = '<div class="flex gap-1" style="width: fit-content;">';
+                foreach ($formularios as $formulario) {
+                    $registro = InscripcionEAFormulario::where('formulario_id', $formulario->id)
+                        ->where('inscripcion_ea_id', $ins->id)
+                        ->first();
+
+                    if (!$registro) {
+                        $ins->formularios()->attach($formulario->id, ['cantidad' => 1]);
+                        $cantidad = 1;
+                    } else {
+                        $cantidad = $registro->cantidad;
+                    }
+
+                    $html .= '
+                        <div class="flex align-items-center" style="flex-direction: column;">
+                            <small class="text-muted" style="min-width:50px;">' . e($formulario->nombre) . '</small>
+                            <input type="number" 
+                                step="1" min="1" max="10"
+                                name="formulario_' . $formulario->id . '" 
+                                value="' . $cantidad . '"
+                                class="form-control form-control-sm" 
+                                style="width: 40px; padding: 1px 1px; font-size: 12px; border-radius:5px" />
+                        </div>';
+                }
+
+                $html .= '</div>';
+                return $html;
+            })
+            ->rawColumns(['status_label', 'formularios_inputs'])
+            ->toJson();
+    }
+
+    // public function showUploadCertificado($id)
+    // {
+    //     if (!Configuracion::estaHabilitadoCargarCertificado()) {
+    //         return redirect('/')->with('error', 'El periodo para la carga de desempeño no está habilitado actualmente.');
+    //     }
+    //     $responsable = Auth::user();
+    //     $ensayosAptitud = $responsable->responsablesEA->findOrFail($id);
+    //     $paquete = $ensayosAptitud->paquete;
+    //     $idEA = $ensayosAptitud->id;
+
+    //     $eaDesc = mb_strtolower(
+    //         trim(Normalizer::normalize($ensayosAptitud->descripcion, Normalizer::FORM_C)),
+    //         'UTF-8',
+    //     );
+    //     $paqueteDesc = mb_strtolower(
+    //         trim(Normalizer::normalize($paquete->descripcion, Normalizer::FORM_C)),
+    //         'UTF-8',
+    //     );
+    //     $descripcion = $ensayosAptitud->descripcion;
+    //     if ($eaDesc != $paqueteDesc) {
+    //         $descripcion = "</br>  $paquete->descripcion / $ensayosAptitud->descripcion";
+    //     }
+
+    //     $gestion = configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year;
+    //     return view('responsable.upload_certificados', compact('ensayosAptitud', 'idEA', 'gestion', 'descripcion'));
+    // }
+    // public function uploadCertificadoData(Request $request, $id)
+    // {
+    //     if (!Configuracion::estaHabilitadoCargarCertificado()) {
+    //         return response()->json([
+    //             'error' => 'El periodo para la carga de desempeño no está habilitado actualmente.'
+    //         ], 422);
+    //     }
+    //     $responsable = Auth::user();
+
+    //     $request->validate([
+    //         'archivo' => 'required|mimes:csv,txt|max:2048',
+    //     ]);
+
+    //     $path = $request->file('archivo')->getRealPath();
+
+    //     $rows = collect();
+    //     if (($handle = fopen($path, 'r')) !== false) {
+    //         $header = fgetcsv($handle, 1000, ','); // cabecera
+    //         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+    //             $rows->push([
+    //                 'codigoLab' => $data[0] ?? null,
+    //                 'nombreLab' => $data[1] ?? null,
+    //                 'desempeno' => $data[2] ?? null,
+    //             ]);
+    //         }
+    //         fclose($handle);
+    //     }
+    //     $inscripciones = InscripcionEA::with([
+    //         'inscripcion',
+    //         'ensayoAptitud.paquete.area',
+    //         'inscripcion.laboratorio.departamento',
+    //         'inscripcion.laboratorio.usuario'
+    //     ])
+    //         ->where('id_ea', $id)
+    //         ->whereHas('inscripcion', function ($q) {
+    //             $q->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
+    //                 ->Aprobado();
+    //         })
+    //         ->get();
+
+    //     $configDirGen = configuracion(Configuracion::CARGO_DIRECTORA_GENERAL);
+    //     $configCoordRed = configuracion(Configuracion::CARGO_COORDINADORA_RED);
+    //     $configEvalExt = configuracion(Configuracion::CARGO_EVALUACION_EXTERNA);
+
+    //     foreach ($inscripciones as $inscripcionEA) {
+    //         $inscripcion = $inscripcionEA->inscripcion;
+    //         $lab = $inscripcion->laboratorio;
+
+    //         $fila = $rows->first(function ($row) use ($lab) {
+    //             return $row['codigoLab'] == $lab->cod_lab;
+    //         });
+
+    //         if (!$fila) {
+    //             Log::info('No se encontró fila para el laboratorio: ', [
+    //                 'codigo' => $lab->cod_lab,
+    //                 'nombre' => $lab->nombre_lab,
+    //                 'id' => $lab->id,
+    //                 'inscripcion_id' => $inscripcion->id,
+    //             ]);
+    //             continue;
+    //         }
+
+    //         $certificado = Certificado::firstOrCreate(
+    //             ['id_inscripcion' => $inscripcion->id],
+    //             [
+    //                 'gestion_certificado' => $inscripcion->gestion,
+    //                 'nombre_coordinador' => $configCoordRed->nombre,
+    //                 'nombre_jefe' => $configEvalExt->nombre,
+    //                 'nombre_director' => $configDirGen->nombre,
+    //                 'firma_coordinador' => $configCoordRed->imagen,
+    //                 'firma_jefe' => $configEvalExt->imagen,
+    //                 'firma_director' => $configDirGen->imagen,
+    //                 'nombre_laboratorio' => $lab->nombre_lab,
+    //                 'cod_lab' => $lab->cod_lab,
+    //                 'codigo_certificado' => null,
+    //                 'tipo_certificado' => 1,
+    //                 'status_certificado' => 0,
+    //                 'cargo_coordinador' => $configCoordRed->cargo,
+    //                 'cargo_jefe' => $configEvalExt->cargo,
+    //                 'cargo_director' => $configDirGen->cargo
+    //             ]
+    //         );
+    //         DetalleCertificado::updateOrCreate(
+    //             [
+    //                 'id_certificado' => $certificado->id,
+    //                 'id_ea'          => $id,
+    //             ],
+    //             [
+    //                 'detalle_ea' => $inscripcionEA->descripcion_ea,
+    //                 'detalle_area' => $inscripcionEA->ensayoAptitud->paquete->area->descripcion ?? null,
+    //                 'calificacion_certificado' => $fila['desempeno'] != 'NULL' ? $fila['desempeno'] : null,
+    //                 'updated_by' => $responsable->id,
+    //                 'temporal' => true,
+    //             ]
+    //         );
+    //     }
+    //     return back()->with('success', 'Archivo procesado correctamente, Puedes revisar en al sección de Revision');
+    // }
+
+    // public function getLaboratoriosDesempenoTemporal($idEa)
+    // {
+    //     $responsable = Auth::user();
+    //     $responsable->responsablesEA->findOrFail($idEa);
+
+    //     $query = Inscripcion::with([
+    //         'laboratorio',
+    //         'certificado',
+    //         'certificado.detalles' => function ($q) use ($idEa) {
+    //             $q->where('temporal', true)
+    //                 ->where('id_ea', $idEa);
+    //         }
+    //     ])
+    //         ->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
+    //         ->Aprobado()
+    //         ->whereHas('ensayos', function ($q) use ($idEa) {
+    //             $q->where('id_ea', $idEa);
+    //         })
+    //         ->whereHas('certificado.detalles', function ($q) use ($idEa) {
+    //             $q->where('temporal', true)
+    //                 ->where('id_ea', $idEa);
+    //         })->get();
+
+    //     return datatables()
+    //         ->of($query)
+    //         ->addColumn('created_at', fn($insc) => $insc->certificado->detalles->first()?->created_at ?? '-')
+    //         ->addColumn('nombre_lab', fn($insc) => $insc->laboratorio->nombre_lab)
+    //         ->addColumn('cod_lab', fn($insc) => $insc->laboratorio->cod_lab)
+    //         ->addColumn('wapp_lab', fn($insc) => $insc->laboratorio->wapp_lab)
+    //         ->addColumn('mail_lab', fn($insc) => $insc->laboratorio->mail_lab ?? '-')
+    //         ->addColumn('actions', function ($insc) {
+    //             return view('responsable.certificados.action-buttons', [
+    //                 'updateUrl' => route('detalle-certificado.update', $insc->certificado->detalles->first()?->id),
+    //                 'desempeno' => $insc->certificado->detalles->first()?->calificacion_certificado ?? '',
+    //             ])->render();
+    //         })
+    //         ->rawColumns(['actions'])
+    //         ->toJson();
+    // }
+
+    // public function confirmarDatosCertificados(Request $request, $idEa)
+    // {
+    //     if (!Gate::any([Permiso::RESPONSABLE])) {
+    //         return redirect('/')->withErrors(['error' => 'No tienes permiso para realizar esta acción.']);
+    //     }
+    //     $responsable = Auth::user();
+    //     $responsable->responsablesEA->findOrFail($idEa);
+
+    //     $query = Inscripcion::with([
+    //         'laboratorio',
+    //         'certificado',
+    //         'certificado.detalles' => function ($q) use ($idEa) {
+    //             $q->where('temporal', true)
+    //                 ->where('id_ea', $idEa);
+    //         }
+    //     ])
+    //         ->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
+    //         ->Aprobado()
+    //         ->whereHas('ensayos', function ($q) use ($idEa) {
+    //             $q->where('id_ea', $idEa);
+    //         })
+    //         ->whereHas('certificado.detalles', function ($q) use ($idEa) {
+    //             $q->where('temporal', true)
+    //                 ->where('id_ea', $idEa);
+    //         })->get();
+    //     try {
+    //         foreach ($query as $inscripcion) {
+    //             $certificado = $inscripcion->certificado;
+    //             $detalle = $certificado->detalles->first();
+
+    //             if ($detalle) {
+    //                 $detalle->temporal = false;
+    //                 $detalle->updated_by = $responsable->id;
+    //                 $detalle->save();
+    //                 $certificado->status_certificado = 1;
+    //                 $certificado->save();
+    //             }
+    //         }
+    //     } catch (\Exception $e) {
+    //         Log::error('Error al confirmar datos de certificados: ' . $e->getMessage());
+    //         return redirect()->back()->withErrors(['error' => 'Ocurrió un error al confirmar los datos de los certificados. Por favor, inténtalo de nuevo.']);
+    //     }
+    //     return redirect()->back()->with('success', 'Datos de certificados confirmados correctamente.');
+    // }
+
+    // public function getLaboratoriosDesempenoConfirmados($idEa)
+    // {
+    //     $responsable = Auth::user();
+    //     $responsable->responsablesEA->findOrFail($idEa);
+    //     $query = Inscripcion::with([
+    //         'laboratorio',
+    //         'certificado',
+    //         'certificado.detalles' => function ($q) use ($idEa) {
+    //             $q->where('temporal', false)
+    //                 ->where('id_ea', $idEa);
+    //         }
+    //     ])
+    //         ->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
+    //         ->Aprobado()
+    //         ->whereHas('ensayos', function ($q) use ($idEa) {
+    //             $q->where('id_ea', $idEa);
+    //         })
+    //         ->whereHas('certificado.detalles', function ($q) use ($idEa) {
+    //             $q->where('temporal', false)
+    //                 ->where('id_ea', $idEa);
+    //         })->get();
+    //     return datatables()
+    //         ->of($query)
+    //         ->addColumn('created_at', fn($ins) => $ins->certificado->detalles->first()?->created_at ?? '-')
+    //         ->addColumn('nombre_lab', fn($ins) => $ins->laboratorio->nombre_lab)
+    //         ->addColumn('cod_lab', fn($ins) => $ins->laboratorio->cod_lab)
+    //         ->addColumn('wapp_lab', fn($ins) => $ins->laboratorio->wapp_lab)
+    //         ->addColumn('mail_lab', fn($ins) => $ins->laboratorio->mail_lab ?? '-')
+    //         ->addColumn('desempeno', fn($ins) => $ins->certificado->detalles->first()?->calificacion_certificado ?? '')
+    //         ->toJson();
+    // }
+}

@@ -19,7 +19,7 @@ class FormularioEnsayo extends Model
 
     public function ensayos()
     {
-        return $this->belongsToMany(EnsayoAptitud::class, 'ensayo_formulario', 'formulario_id', 'ensayo_id');
+        return $this->belongsToMany(EnsayoAptitud::class, 'ensayo_formulario', 'formulario_id', 'ensayo_id')->withTimestamps();
     }
 
     public function scopeActivo($query)

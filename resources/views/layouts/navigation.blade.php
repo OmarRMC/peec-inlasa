@@ -189,6 +189,11 @@
                     @endforeach
                 </div>
             @endif
+            <a href="{{ route('ea.formulario.index') }}"
+                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                <i class="fas fa-clipboard-list w-5 text-indigo-500"></i>
+                <span>Gestion de formularios</span>
+            </a>
         </div>
     @endif
 

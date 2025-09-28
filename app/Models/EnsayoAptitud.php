@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\General;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,7 +27,7 @@ class EnsayoAptitud extends Model
 
     public function formularios()
     {
-        return $this->belongsToMany(FormularioEnsayo::class, 'ensayo_formulario', 'ensayo_id', 'formulario_id');
+        return $this->belongsToMany(FormularioEnsayo::class, 'ensayo_formulario', 'ensayo_id', 'formulario_id')->withTimestamps();
     }
 
 
