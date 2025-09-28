@@ -365,15 +365,16 @@
                             class="toggle-visible text-blue-500 bg-blue-100 px-2 py-1 rounded">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <input type="hidden"
-                            name="name="secciones[${seccionIdx}][parametros][${parametroIdx}][visible_nombre]"
-                            value="1"
+                        <input 
+                            type="hidden"
+                            name="secciones[${seccionIdx}][parametros][${parametroIdx}][visible_nombre]"
+                            value="1" 
                             class="visible-input">
                         
                         <label class="flex items-center gap-1 text-xs">
                             <input type="checkbox"
                               name="secciones[${seccionIdx}][parametros][${parametroIdx}][requerido_si_completa]"
-                              value="1"
+                              value="1" checked
                               class="border rounded">
                               Requerido si se llena algun campo
                         </label>
@@ -445,7 +446,8 @@
                         placeholder="Unidad" class="w-full text-xs border rounded px-1 py-0.5">
                 </td>
                 <td class="px-2 py-1 border text-center">
-                    <input type="checkbox" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][requerido]" class="mx-auto">
+                    <input type="checkbox" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][requerido]"
+                    class="mx-auto">
                 </td>
                 <td class="px-2 py-1 border">
                     <input type="number" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][posicion]"
@@ -465,9 +467,23 @@
                         placeholder="Rango" class="w-full text-xs border rounded px-1 py-0.5">
                 </td>
                 <td class="px-2 py-1 border">
+                <input type="text"
+                    name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][valor]"
+                    placeholder="Valor"
+                    class="w-full text-xs border rounded px-1 py-0.5">
+                </td>
+                <td class="px-2 py-1 border text-center">
+                    <input type="checkbox"
+                    name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][modificable]"
+                    value="1" checked
+                    class="mx-auto">
+                 </td>
+                <td class="px-2 py-1 border">
                      <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][id_grupo_selector]" class="grupo-selector-select w-full text-xs border rounded px-1 py-0.5" >
                         <option value="">Seleccione un grupo</option>
                       </select>
+                </td>
+                <td class="px-2 py-1 border">
                 </td>
                 <td class="px-2 py-1 border text-center">
                     <button type="button" data-tippy-content="Eliminar" class="eliminar-resultado text-red-500 text-xs"><i class="fas fa-trash-alt"></i></button>

@@ -113,5 +113,27 @@ class GrupoSelectorController extends Controller
         return response()->json($grupos);
     }
 
+    public function getOpciones(Request $request, $id)
+    {
+        $opcion = OpcionSelector::find($id);
 
+        if (!$opcion) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Grupo no encontrado',
+                'data' => []
+            ], 404);
+        }
+
+        $opciones = [];
+        if ($opcion->grupoHijo) {
+            $opciones = $opcion->grupoHijo?->opciones()
+                ->get(['id', 'valor']) ?? [];
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $opciones
+        ]);
+    }
 }

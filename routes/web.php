@@ -84,7 +84,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::delete('/formularios-ea/{formulario}', [FormularioEnsayoController::class, 'destroy'])->name('admin.formularios.destroy');
     Route::get('/formularios-ea/{id}/{idEa}/edit', [FormularioEnsayoController::class, 'edit'])->name('admin.formularios.edit');
     Route::get('/formularios-ea/{id}/preview', [FormularioEnsayoController::class, 'preview'])->name('admin.formularios.preview');
-    Route::post('/formularios-ea', [FormularioEnsayoController::class, 'store'])->name( 'admin.formularios.store');
+    Route::post('/formularios-ea', [FormularioEnsayoController::class, 'store'])->name('admin.formularios.store');
     Route::put('/formularios-ea/{id}', [FormularioEnsayoController::class, 'updateEstructura'])->name('admin.formularios.updateEstructura');
     Route::post('/formularios/usar/{id}', [FormularioEnsayoController::class, 'usar'])
         ->name('admin.formularios.usar');
@@ -105,6 +105,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
         Route::get('/buscar', [GrupoSelectorController::class, 'buscar'])->name('buscar');
         Route::post('/guardar', [GrupoSelectorController::class, 'guardar'])->name('guardar');
         Route::delete('/eliminar/{id}', [GrupoSelectorController::class, 'eliminar'])->name('eliminar');
+        Route::get('/opciones/{id}', [GrupoSelectorController::class, 'getOpciones'])->name('opciones');
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {

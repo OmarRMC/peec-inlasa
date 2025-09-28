@@ -42,6 +42,8 @@ class ParametroCampo extends Model
         'rangeNumber',
         'rangeLength',
         'range',
+        'valor',
+        'modificable',
         'id_campo_padre'
     ];
 
