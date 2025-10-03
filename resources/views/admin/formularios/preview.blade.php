@@ -97,6 +97,9 @@
                   </button>
               </div>
           </form>
+          <a href="{{ route('formularios.resultados.export', $formulario->id) }}">
+              Test de export
+          </a>
 
       </div>
   </x-app-layout>

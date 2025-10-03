@@ -35,6 +35,7 @@ use App\Http\Controllers\Lab\RegistroResultadosController;
 use App\Http\Controllers\OpcionSelectorController;
 use App\Http\Controllers\responsable\GestionFormulariosController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
+use App\Http\Controllers\ResultadoController;
 use App\Http\Controllers\VerificarController;
 use App\Models\FormularioEnsayo;
 use App\Models\Permiso;
@@ -188,7 +189,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/inscripcion-ensayos/{id}/formularios', [RegistroResultadosController::class, 'getFormulariosByEa'])->name('lab.inscritos-ensayos.formularios');
     Route::get('/inscripcion-ensayos/formulario/{id}/llenar/{idEA}', [RegistroResultadosController::class, 'formularioLlenar'])->name('lab.inscritos-ensayos.formularios.llenar');
     Route::post('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'guardarResultados'])->name('laboratorio.formularios.guardar');
-    
+
     Route::post('/formularios/resultados', [FormularioEnsayoResultadoController::class, 'store'])->name('lab.resultados.store');
 });
 
@@ -205,5 +206,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
     Route::get('/ea/{id}/gestion-formularios/labs', [GestionFormulariosController::class, 'labs'])->name('ea.formulario.lab.inscritos');
     Route::get('/ea/{id}/gestion-formularios/labs/data', [GestionFormulariosController::class, 'getData'])->name('ea.formulario.lab.inscritos.getData');
 });
+Route::get('/exportar-resultados/{id}', [ResultadoController::class, 'export'])->name('formularios.resultados.export');
+
 
 require __DIR__ . '/auth.php';
