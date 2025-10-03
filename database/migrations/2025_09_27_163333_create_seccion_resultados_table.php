@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('seccion_resultados', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_formulario_resultado');
-            $table->unsignedBigInteger('id_seccion')->nullable();
-            $table->string('nombre');
-            $table->json('headers')->nullable();
+            // $table->unsignedBigInteger('id_formulario_resultado');
+            // $table->unsignedBigInteger('id_seccion')->nullable();
+            // $table->string('nombre');
+            // $table->json('headers')->nullable();
 
-            $table->foreign('id_formulario_resultado')
-                ->references('id')->on('formulario_ensayos_resultados')
-                ->onDelete('cascade');
-            $table->foreign('id_seccion')
-                ->references('id')->on('secciones')
-                ->onDelete('cascade');
+            // $table->foreign('id_formulario_resultado')
+            //     ->references('id')->on('formulario_ensayos_resultados')
+            //     ->onDelete('cascade');
+            // $table->foreign('id_seccion')
+            //     ->references('id')->on('secciones')
+            //     ->onDelete('cascade');
             $table->timestamps();
         });
     }

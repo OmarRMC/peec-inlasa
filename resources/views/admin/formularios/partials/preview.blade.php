@@ -59,6 +59,7 @@
                                         @if ($campo->min !== null) min="{{ $campo->min }}" @endif
                                         @if ($campo->max !== null) max="{{ $campo->max }}" @endif
                                         step="{{ $campo->step ?? 1 }}" @readonly(!$campo->modificable)
+                                        pattern="{{$campo->pattern}}"
                                         class="w-full px-2 py-1 text-xs campo-entrada 
                                         {{ !$campo->modificable ? 'border-0 bg-transparent text-gray-700 focus:ring-0 cursor-default' : 'border rounded' }}">
                                 @elseif ($campo->tipo === 'textarea')
