@@ -292,7 +292,6 @@ class LabController extends Controller
             'id_prov' => 'required|exists:provincia,id',
             'id_municipio' => 'required|exists:municipio,id',
             'zona_lab' => 'required|string|max:50',
-            'direccion_lab' => 'required|string|max:150',
             'wapp_lab' => 'required|numeric',
             'wapp2_lab' => 'nullable|numeric',
             'mail_lab' => 'required|email|unique:users,email',
@@ -300,7 +299,7 @@ class LabController extends Controller
             'telefono' => 'nullable|string|max:50',
             'password' => 'required|string|min:8|confirmed',
         ], $this->messages());
-
+        $direccion = $request->calle_lab . '||' . $request->numero_lab . '||' . $request->referencia;
         $laboratorio = LaboratorioTem::create([
             'numsedes_lab' => $request->numsedes_lab,
             'nit_lab' => $request->nit_lab,
@@ -318,7 +317,7 @@ class LabController extends Controller
             'id_prov' => $request->id_prov,
             'id_municipio' => $request->id_municipio,
             'zona_lab' => $request->zona_lab,
-            'direccion_lab' => $request->direccion_lab,
+            'direccion_lab' => $direccion,
             'wapp_lab' => $request->wapp_lab,
             'wapp2_lab' => $request->wapp2_lab,
             'mail_lab' => $request->mail_lab,
@@ -333,7 +332,6 @@ class LabController extends Controller
         $categoria = CategoriaLaboratorio::find($request->id_categoria)?->descripcion ?? 'Desconocido';
         $tipo = TipoLaboratorio::find($request->id_tipo)?->descripcion ?? 'Desconocido';
         $nivel = NivelLaboratorio::find($request->id_nivel)?->descripcion_nivel ?? 'Desconocido';
-
         try {
             Mail::to($laboratorio->mail_lab)->send(
                 new LaboratorioVerificacionDatos(

@@ -37,6 +37,7 @@ Route::get('/', function () {
 })->middleware(['auth', 'verified', 'usuario.activo'])->name('dashboard');
 
 Route::get('/verificar/{code}/certificado/{type}', [VerificarController::class, 'verificarCertificado'])->name('verificar.certificado');
+Route::get('/vistas/validar_cert.php', [VerificarController::class, 'validarAntiguo']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

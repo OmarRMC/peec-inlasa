@@ -1575,7 +1575,7 @@
                                                                                 style="padding:0;Margin:0;font-size:20px">
                                                                                 <p class="h"
                                                                                     style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:30px;letter-spacing:0;color:#333333;font-size:20px">
-                                                                                    {{ $laboratorio->direccion_lab }}
+                                                                                    {{ $laboratorio->direccion_lab_tem }}
                                                                                 </p>
                                                                             </td>
                                                                         </tr>

@@ -390,4 +390,32 @@ class Laboratorio extends Model
         $response = $pdf->stream('certificados-desempeno.pdf');
         return $response;
     }
+
+    public function getCalleAttribute()
+    {
+        $partes = explode('||', $this->attributes['direccion_lab']);
+        return $partes[0] ?? null;
+    }
+
+    public function getNumeroAttribute()
+    {
+        $partes = explode('||', $this->attributes['direccion_lab']);
+        return $partes[1] ?? null;
+    }
+
+    public function getReferenciaAttribute()
+    {
+        $partes = explode('||', $this->attributes['direccion_lab']);
+        return $partes[2] ?? null;
+    }
+
+    public function getDireccionLabAttribute()
+    {
+        $valor = $this->attributes['direccion_lab'] ?? '';
+        $partes = explode('||', $valor);
+
+        return ($partes[0] ?? '')
+            .  (isset($partes[1]) ? ' Nº' . $partes[1] :  '')
+            . ' ' . ($partes[2] ?? '');
+    }
 }

@@ -36,4 +36,14 @@ class LaboratorioTem extends Model
         'telefono',
         'password',
     ];
+
+    public function getDireccionLabTemAttribute()
+    {
+        $valor = $this->attributes['direccion_lab'] ?? '';
+        $partes = explode('||', $valor);
+
+        return ($partes[0] ?? '')
+            .  (isset($partes[1]) ? ' Nro:' . $partes[1] :  '')
+            . ' ' . ($partes[2] ?? '');
+    }
 }

@@ -25,10 +25,11 @@
 
         {{-- Num. Registro Sedes --}}
         <div>
-            <label for="numsedes_lab" class="label">Num. Registro Sedes</label>
+            <label for="numsedes_lab" class="label">Su Numero de Registro Sedes</label>
             <input type="text" name="numsedes_lab" id="numsedes_lab" maxlength="20"
                 value="{{ old('numsedes_lab', $laboratorio->numsedes_lab ?? '') }}"
-                class="input-standard w-full @error('numsedes_lab') border-red-500 @enderror" placeholder="0000">
+                class="input-standard w-full @error('numsedes_lab') border-red-500 @enderror"
+                placeholder="0000">
             @error('numsedes_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -40,7 +41,7 @@
                 <label for="antcod_peec" class="label">Código PEEC</label>
                 <input type="text" name="antcod_peec" id="antcod_peec" maxlength="20"
                     value="{{ old('antcod_peec', $laboratorio->antcod_peec ?? '') }}"
-                    class="input-standard w-full @error('antcod_peec') border-red-500 @enderror"
+                    class="input-standard  uppercase-input w-full @error('antcod_peec') border-red-500 @enderror"
                     placeholder="Si dispone de un código PEEC, ingréselo aquí">
                 @error('antcod_peec')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -62,9 +63,7 @@
         <div>
             <label for="nit_lab" class="label required-label">NIT</label>
             <input type="number" name="nit_lab" id="nit_lab"
-                value="{{ old('nit_lab', $laboratorio->nit_lab ?? '') }}"
-                min="0"
-                minlength="5"
+                value="{{ old('nit_lab', $laboratorio->nit_lab ?? '') }}" min="0" minlength="5"
                 class="input-standard w-full @error('nit_lab') border-red-500 @enderror" required>
             @error('nit_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -153,7 +152,7 @@
 {{-- Ubicación --}}
 <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
     <legend class="flex items-center gap-2 text-lg font-semibold mb-2">
-        <i class="fas fa-map-marker-alt text-primary"></i> Ubicación
+        <i class="fas fa-map-marker-alt text-primary"></i> Datos de referencia
     </legend>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -229,7 +228,7 @@
         </div>
 
         <div>
-            <label for="zona_lab" class="label required-label">Zona</label>
+            <label for="zona_lab" class="label required-label">Zona/Barrio</label>
             <input type="text" name="zona_lab" id="zona_lab" maxlength="50"
                 value="{{ old('zona_lab', $laboratorio->zona_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('zona_lab') border-red-500 @enderror"
@@ -240,14 +239,34 @@
             @enderror
         </div>
 
+        {{-- Calle/Avenida --}}
         <div>
-            <label for="direccion_lab" class="label required-label">Dirección</label>
-            <input type="text" name="direccion_lab" id="direccion_lab" maxlength="150"
-                value="{{ old('direccion_lab', $laboratorio->direccion_lab ?? '') }}"
-                class="input-standard max-w-md w-full @error('direccion_lab') border-red-500 @enderror"
-                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ][\s\S]*[^\s]$"
-                title="Debe comenzar con una letra, no puede ser solo números ni solo espacios." required>
-            @error('direccion_lab')
+            <label for="calle_lab" class="label required-label">Calle/Avenida</label>
+            <input type="text" name="calle_lab" id="calle_lab" maxlength="100"
+                value="{{ old('calle_lab', $laboratorio->calle ?? '') }}"
+                class="input-standard max-w-md w-full @error('calle_lab') border-red-500 @enderror" required>
+            @error('calle_lab')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label for="numero_lab" class="label required-label">Número/Lote</label>
+            <input type="text" name="numero_lab" id="numero_lab" maxlength="10"
+                value="{{ old('numero_lab', $laboratorio->numero ?? '') }}"
+                class="input-standard max-w-md w-full @error('numero_lab') border-red-500 @enderror"
+                pattern="^[0-9]+$" title="Solo se permiten números." required>
+            @error('numero_lab')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+        <div class="md:col-span-2">
+            <label for="referencia" class="label">Referencia/Detalle adicional</label>
+            <input type="text" name="referencia" id="referencia" maxlength="150"
+                value="{{ old('referencia', $laboratorio->referencia ?? '') }}"
+                class="input-standard w-full @error('referencia') border-red-500 @enderror"
+                placeholder="Ejemplo: Frente a la plaza principal, cerca del hospital...">
+            @error('referencia')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
@@ -266,8 +285,8 @@
             <input type="tel" name="wapp_lab" id="wapp_lab"
                 value="{{ old('wapp_lab', $laboratorio->wapp_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('wapp_lab') border-red-500 @enderror" required
-                maxlength="8"
-                pattern="^(6|7)\d{7}$" title="Debe ser un número válido de Bolivia (8 dígitos y comenzar con 6 o 7)">
+                maxlength="8" pattern="^(6|7)\d{7}$"
+                title="Debe ser un número válido de Bolivia (8 dígitos y comenzar con 6 o 7)">
             @error('wapp_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -277,8 +296,7 @@
             <label for="wapp2_lab" class="label">WhatsApp Secundario</label>
             <input type="tel" name="wapp2_lab" id="wapp2_lab"
                 value="{{ old('wapp2_lab', $laboratorio->wapp2_lab ?? '') }}"
-                class="input-standard max-w-md w-full @error('wapp2_lab') border-red-500 @enderror"
-                maxlength="8"
+                class="input-standard max-w-md w-full @error('wapp2_lab') border-red-500 @enderror" maxlength="8"
                 pattern="^(6|7)\d{7}$" title="Debe ser un número válido de Bolivia (8 dígitos y comenzar con 6 o 7)">
             @error('wapp2_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -308,8 +326,8 @@
         </div>
 
         <div>
-            <label for="telefono" class="label">Telefono</label>
-            <input type="number" name="telefono" id="telefono" min="1000" maxlength="50"
+            <label for="telefono" class="label">Telefono fijo</label>
+            <input type="number" name="telefono" id="telefono" min="1000" maxlength="15"
                 value="{{ old('telefono', $laboratorio->telefono ?? '') }}"
                 class="input-standard max-w-md w-full @error('telefono') border-red-500 @enderror">
             @error('telefono')
@@ -322,7 +340,7 @@
 {{-- Clasificaciones --}}
 <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
     <legend class="flex items-center gap-2 text-lg font-semibold mb-2">
-        <i class="fas fa-tags text-primary"></i> Clasificaciones
+        <i class="fas fa-tags text-primary"></i> Caracterizacion
     </legend>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -344,7 +362,7 @@
         </div>
 
         <div>
-            <label for="id_tipo" class="label required-label">Tipo Laboratorio</label>
+            <label for="id_tipo" class="label required-label">Tipo de Servicio</label>
             <select name="id_tipo" id="id_tipo"
                 class="input-standard max-w-md w-full @error('id_tipo') border-red-500 @enderror" required>
                 <option value="">Seleccione un tipo</option>
@@ -390,8 +408,8 @@
         <div>
             <label for="password" class="label  {{ !$edit ? 'required-label' : '' }}">Contraseña</label>
             <div class="relative">
-                <input type="password" name="password" id="password" autocomplete="off"
-                    @unless ($edit) required @endunless
+                <input type="password" name="password" id="password" autocomplete="off" maxlength="15"
+                    minlength="5" @unless ($edit) required @endunless
                     class="input-standard pr-10 w-full @error('password') border-red-500 @enderror"
                     placeholder="Mínimo 8 caracteres">
                 <span onclick="togglePassword('password')"
@@ -410,7 +428,7 @@
                 Contraseña</label>
             <div class="relative">
                 <input type="password" name="password_confirmation" id="password_confirmation" autocomplete="off"
-                    @unless ($edit) required @endunless
+                    @unless ($edit) required @endunless maxlength="15" minlength="5"
                     class="input-standard pr-10 w-full @error('password_confirmation') border-red-500 @enderror"
                     placeholder="Repetir contraseña">
 
@@ -605,4 +623,73 @@
     function limpiarMunicipios() {
         document.getElementById('id_municipio').innerHTML = '<option value="">Seleccione un municipio</option>';
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const reglas = {
+            numsedes_lab: /^[0-9]{1,20}$/, // solo números
+            sigla_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.-]{2,20}$/, // letras, números, guiones, puntos
+            nit_lab: /^[0-9]{5,20}$/, // NIT: solo números, mínimo 5
+            nombre_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s1-9\.]{4,20}$/, // solo letras y espacios
+            respo_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/, // nombre responsable
+            ci_respo_lab: /^[0-9]{5,15}[A-Za-z0-9\-]*$/, // empieza con número, puede tener letra o guion
+            repreleg_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/,
+            ci_repreleg_lab: /^[0-9]{5,15}[A-Za-z0-9\-]*$/,
+            zona_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,50}$/,
+            calle_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]{3,100}$/,
+            numero_lab: /^[0-9]{1,10}$/,
+            referencia: /^.{0,150}$/,
+            wapp_lab: /^(6|7)[0-9]{7}$/,
+            wapp2_lab: /^(6|7)[0-9]{7}$/,
+            mail_lab: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+            mail2_lab: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+            telefono: /^[0-9]{6,20}$/
+        };
+
+        function validarCampo(input) {
+            const regla = reglas[input.name];
+            if (!regla) return;
+            console.log(regla);
+            const valido = regla.test(input.value.trim());
+            input.classList.remove("border-red-500", "border-green-500");
+            if (valido || input.value === "") {
+                if (valido) input.style.border = "1px solid #22c55e"
+            } else {
+                input.style.border = "1px solid #ef4444";
+            }
+        }
+
+        function manejarCampo(input) {
+            if(input.type !='email'){
+                input.value = input.value.toUpperCase();
+            }
+            validarCampo(input);
+        }   
+
+        Object.keys(reglas).forEach(nombre => {
+            const input = document.querySelector(`[name="${nombre}"]`);
+            if (input) {
+                ["input", "blur"].forEach(evento => {
+                    input.addEventListener(evento, () => manejarCampo(input));
+                });
+            }
+        });
+
+        // Validación global al enviar el form
+        const form = document.querySelector("form");
+        form.addEventListener("submit", (e) => {
+            let valido = true;
+            Object.keys(reglas).forEach(nombre => {
+                const input = document.querySelector(`[name="${nombre}"]`);
+                if (input && !reglas[nombre].test(input.value.trim()) && input.hasAttribute(
+                        "required")) {
+                    valido = false;
+                    input.classList.add("border-red-500");
+                }
+            });
+            if (!valido) {
+                e.preventDefault();
+                alert("Por favor, complete todos los campos correctamente antes de enviar.");
+            }
+        });
+    });
 </script>

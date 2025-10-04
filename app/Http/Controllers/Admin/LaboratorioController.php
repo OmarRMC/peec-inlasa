@@ -77,7 +77,6 @@ class LaboratorioController extends Controller
             'id_prov' => 'required|exists:provincia,id',
             'id_municipio' => 'required|exists:municipio,id',
             'zona_lab' => 'required|string|max:50',
-            'direccion_lab' => 'required|string|max:150',
             'wapp_lab' => 'required|numeric',
             'wapp2_lab' => 'nullable|numeric',
             'mail_lab' => 'required|email|unique:users,email',
@@ -85,8 +84,7 @@ class LaboratorioController extends Controller
             'telefono' => 'nullable|string|max:50',
             'password' => 'required|string|min:8|confirmed',
         ], $this->messages());
-
-        // Obtener sigla del país
+        $direccion = $request->calle_lab . '||' . $request->numero_lab . '||' . $request->referencia;
         $pais = Pais::find($request->id_pais);
         $sigla = strtoupper($pais->sigla_pais); // Ej: BOL
 
@@ -142,7 +140,7 @@ class LaboratorioController extends Controller
                 'id_prov' => $request->id_prov,
                 'id_municipio' => $request->id_municipio,
                 'zona_lab' => $request->zona_lab,
-                'direccion_lab' => $request->direccion_lab,
+                'direccion_lab' => $direccion,
                 'wapp_lab' => $request->wapp_lab,
                 'wapp2_lab' => $request->wapp2_lab,
                 'mail_lab' => $request->mail_lab,
@@ -230,7 +228,6 @@ class LaboratorioController extends Controller
             'id_prov' => 'required|exists:provincia,id',
             'id_municipio' => 'required|exists:municipio,id',
             'zona_lab' => 'required|string|max:50',
-            'direccion_lab' => 'required|string|max:150',
             'wapp_lab' => 'required|numeric',
             'wapp2_lab' => 'nullable|numeric',
             'mail_lab' => 'required|email|unique:users,email,' . $user->id,
@@ -242,6 +239,7 @@ class LaboratorioController extends Controller
         $user->nombre = $request->nombre_lab;
         $user->telefono = $request->telefono;
         $user->ci = $request->ci_respo_lab ?: '00000000';
+        $direccion = $request->calle_lab . '||' . $request->numero_lab . '||' . $request->referencia;
 
         if ($request->password) {
             $user->password = $request->password;
@@ -279,7 +277,7 @@ class LaboratorioController extends Controller
         $laboratorio->id_prov          = $request->id_prov;
         $laboratorio->id_municipio     = $request->id_municipio;
         $laboratorio->zona_lab         = $request->zona_lab;
-        $laboratorio->direccion_lab    = $request->direccion_lab;
+        $laboratorio->direccion_lab    = $direccion;
         $laboratorio->wapp_lab         = $request->wapp_lab;
         $laboratorio->wapp2_lab        = $request->wapp2_lab;
         $laboratorio->mail2_lab        = $request->mail2_lab;
