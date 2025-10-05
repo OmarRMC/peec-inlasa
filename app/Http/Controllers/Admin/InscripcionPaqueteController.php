@@ -81,7 +81,7 @@ class InscripcionPaqueteController extends Controller
                 $q->whereIn('id_paquete', $paquetesIds);
             });
         }
-        if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
+        if (!$request->filled('gestion') && $request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
             $query->whereBetween('fecha_inscripcion', [
                 Carbon::parse($request->fecha_inicio)->startOfDay(),
                 Carbon::parse($request->fecha_fin)->endOfDay()
