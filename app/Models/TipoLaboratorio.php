@@ -20,10 +20,6 @@ class TipoLaboratorio extends Model
     {
         return $this->hasMany(Laboratorio::class, 'id_tipo');
     }
-    public function programas()
-    {
-        return $this->belongsToMany(Programa::class, 'tipo_laboratorio_programa', 'id_tipo', 'id_programa');
-    }
 
     public function paquetes()
     {
