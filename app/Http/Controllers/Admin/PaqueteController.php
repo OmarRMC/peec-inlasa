@@ -40,7 +40,15 @@ class PaqueteController extends Controller
 
     public function index()
     {
-        $paquetes = Paquete::with(['area', 'area.programa', 'tiposLaboratorios'])->orderByDesc('created_at')
+        $paquetes = Paquete::with(['area.programa', 'tiposLaboratorios'])
+            ->orderBy(
+                Area::select('id_programa')
+                    ->whereColumn('area.id', 'paquete.id_area')
+            )
+            ->orderBy(
+                'id_area'
+            )
+            ->orderBy('descripcion')
             ->paginate(20);
         return view('paquete.index', compact('paquetes'));
     }

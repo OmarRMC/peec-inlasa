@@ -16,7 +16,6 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Programa</th>
                         <th>Área</th>
                         <th>Paquete</th>
@@ -28,54 +27,76 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($paquetes as $paquete)
-                        <tr>
-                            <td>{{ $paquete->id }}</td>
-                            <td>{{ $paquete->area->programa->descripcion ?? 'N/D' }}</td>
-                            <td>{{ $paquete->area->descripcion ?? 'N/D' }}</td>
-                            <td>{{ $paquete->descripcion }}</td>
-                            <td>{{ $paquete->costo_paquete }} Bs</td>
-                            <td>{{ $paquete->max_participantes }}</td>
-                            <td>{{ $paquete->tiposLaboratorios->pluck('descripcion')->implode(', ') }}</td>
-                            <td>
-                                @if ($paquete->status)
-                                    <span class="badge badge-success">Activo</span>
-                                @else
-                                    <span class="badge badge-danger">Inactivo</span>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="flex space-x-1">
-                                    <a href="{{ route('paquete.edit', $paquete->id) }}"
-                                        class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"
-                                        data-tippy-content="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    @if (Gate::any(Permiso::DELETE_GESTION_PROGRAMAS))
-                                        <form method="POST" action="{{ route('paquete.destroy', $paquete->id) }}"
-                                            class="delete-form inline" data-nombre="{{ $paquete->descripcion }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" data-tippy-content="Eliminar"
-                                                class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </form>
+                    @php
+                        $paquetesAgrupados = $paquetes->groupBy(function ($item) {
+                            return $item->area->programa->descripcion ?? 'N/D';
+                        });
+                    @endphp
+
+                    @forelse ($paquetesAgrupados as $programa => $paquetesPorPrograma)
+                        @php
+                            $areasAgrupadas = $paquetesPorPrograma->groupBy(function ($item) {
+                                return $item->area->descripcion ?? 'N/D';
+                            });
+                        @endphp
+
+                        @foreach ($areasAgrupadas as $area => $paquetesPorArea)
+                            @foreach ($paquetesPorArea as $index => $paquete)
+                                <tr>
+                                    @if ($index === 0 && $loop->parent->first)
+                                        <td rowspan="{{ $paquetesPorPrograma->count() }}">{{ $programa }}</td>
                                     @endif
-                                </div>
-                            </td>
-                        </tr>
+
+                                    @if ($index === 0)
+                                        <td rowspan="{{ $paquetesPorArea->count() }}">{{ $area }}</td>
+                                    @endif
+                                    <td>{{ $paquete->descripcion }}</td>
+                                    <td>{{ $paquete->costo_paquete }} Bs</td>
+                                    <td>{{ $paquete->max_participantes }}</td>
+                                    <td>{{ $paquete->tiposLaboratorios->pluck('descripcion')->implode(', ') }}</td>
+                                    <td>
+                                        @if ($paquete->status)
+                                            <span class="badge badge-success">Activo</span>
+                                        @else
+                                            <span class="badge badge-danger">Inactivo</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="flex space-x-1">
+                                            <a href="{{ route('paquete.edit', $paquete->id) }}"
+                                                class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"
+                                                data-tippy-content="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            @if (Gate::any(Permiso::DELETE_GESTION_PROGRAMAS))
+                                                <form method="POST"
+                                                    action="{{ route('paquete.destroy', $paquete->id) }}"
+                                                    class="delete-form inline"
+                                                    data-nombre="{{ $paquete->descripcion }}">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" data-tippy-content="Eliminar"
+                                                        class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endforeach
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-4 text-center text-muted">No hay paquetes registrados.
-                            </td>
+                           <td colspan="6" class="px-4 py-4 text-center text-muted">No hay paquetes registrados.
+                           </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4">
+                {{ $paquetes->links() }}
+            </div>
         </div>
-        <div class="mt-4">
-            {{ $paquetes->links() }}
-        </div>
-    </div>
-</x-app-layout>
+    </x-app-layout>
