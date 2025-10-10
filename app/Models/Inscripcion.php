@@ -10,14 +10,14 @@ class Inscripcion extends Model
     protected $table = 'inscripcion';
 
     const STATUS_EN_REVISION = 1;
-
-    const STATUS_APROBADO = 2;
-
-    const STATUS_VENCIDO = 3;
-
-    const STATUS_ANULADO = 4;
+    const STATUS_VENCIDO = 2;
+    const STATUS_ANULADO = 3;
+    const STATUS_APROBADO = 4;
     const STATUS_EN_OBSERVACION = 5;
-
+    // 4 -> Aprobado 
+    // 1 -> En revision
+    // 3 -> Anulado
+    // 2 -> Vencido
     const STATUS_PAGADO = 1;
 
     const STATUS_DEUDOR = 2;

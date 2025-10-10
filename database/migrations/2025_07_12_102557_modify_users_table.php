@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->unsignedBigInteger('id_cargo')->nullable();
             $table->string('username', 50);
-            $table->string('nombre', 50);
-            $table->string('ap_paterno', 50);
+            $table->string('nombre', 100);
+            $table->string('ap_paterno', 50)->nullable();
             $table->string('ap_materno', 50)->nullable();
             $table->string('ci', 15);
             $table->string('telefono', 20)->nullable(); // Se asume que 'talefono' es un error de tipeo de 'telefono'

@@ -51,6 +51,10 @@ class LoginRequest extends FormRequest
                 RateLimiter::clear($this->throttleKey());
                 return;
             }
+            if ($this->attemptLoginSha256()) {
+                RateLimiter::clear($this->throttleKey());
+                return;
+            }
             if ($this->isBcryptOrArgon($this->user->password) && Auth::attempt($this->only('username', 'password'), $this->boolean('remember'))) {
                 RateLimiter::clear($this->throttleKey());
                 return;
@@ -111,6 +115,27 @@ class LoginRequest extends FormRequest
 
         return false;
     }
+
+    protected function attemptLoginSha256()
+    {
+        $username = (string) $this->string('username');
+        $plain    = (string) $this->string('password');
+        $user     = $this->user;
+        $stored   = (string) $user->password;
+
+        $looksLikeSha256 = strlen($stored) === 64 && ctype_xdigit($stored);
+
+        if ($looksLikeSha256 && hash_equals(hash('sha256', $plain), $stored)) {
+            $user->forceFill([
+                'password' => Hash::make($plain),
+            ])->save();
+
+            Auth::login($user, $this->boolean('remember'));
+            return true;
+        }
+        return false;
+    }
+
 
     /**
      * Devuelve true si el hash tiene pinta de bcrypt/argon2
