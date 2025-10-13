@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 
 class Inscripcion extends Model
@@ -47,7 +48,8 @@ class Inscripcion extends Model
         'created_by',
         'updated_by',
         'fecha_limite_pago',
-        'gestion'
+        'gestion',
+        'ulid'
     ];
 
     public function estaEnRevision(): bool
@@ -235,5 +237,13 @@ class Inscripcion extends Model
     public function getPaquetesDescripcionAttribute(): string
     {
         return $this->detalleInscripciones->pluck('descripcion_paquete')->implode(', ');
+    }
+
+    public function scopeAprobadoOrVencido($query)
+    {
+        return $query->whereIn('status_inscripcion', [
+            self::STATUS_APROBADO,
+            self::STATUS_VENCIDO,
+        ]);
     }
 }

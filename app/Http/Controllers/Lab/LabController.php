@@ -178,7 +178,7 @@ class LabController extends Controller
         $user = Auth::user();
         $laboratorio = $user->laboratorio;
         $inscripciones = $laboratorio->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', function ($query) {
                 $query->Publicado();
             })
@@ -593,7 +593,7 @@ class LabController extends Controller
         $user = Auth::user();
         $laboratorio = $user->laboratorio;
         $inscripciones = $laboratorio->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion)
             ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
@@ -625,7 +625,7 @@ class LabController extends Controller
                     'ensayo' => $detalle->detalle_ea,
                     'ponderacion' => $detalle->calificacion_certificado,
                 ];
-                $codigoCertificado = $inscripcion->id;
+                $codigoCertificado = $ins->ulid ?? $inscripcion->id;
             }
         }
         $url = route('verificar.certificado', ['code' => $codigoCertificado, 'type' => Certificado::TYPE_DESEMP]);
@@ -648,16 +648,20 @@ class LabController extends Controller
         $laboratorio = $user->laboratorio;
 
         $query = $laboratorio->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion);
 
         $ins = $query->with('certificado')
             ->first();
+        if (!$ins) {
+            return redirect('/')
+                ->with('info', '⚠️ No se encontraron certificados registrados para la gestión seleccionada.');
+        }
         $certificado = $ins->certificado;
-        $codigoCertificado = $ins->id;
+        $codigoCertificado = $ins->ulid ??  $ins->id;
         $query = $laboratorio->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion);
         $ensayosA = $query

@@ -4,6 +4,7 @@
 @extends('certificados.pdf.layout')
 @section('contenido')
 
+    {{-- <body style="background-image: url('{{ public_path('certificados/fondo.png') }}');"> --}}
     <body>
         <div class="page">
 
@@ -35,7 +36,7 @@
                     Instituto Nacional de Laboratorios de Salud - PEEC INLASA, en
                 </p>
                 <div class='evaluaciones'>
-                    <div class="area">{{ mb_strtoupper($ensayosA) }}</div>
+                    <div class="ensayos">{{ mb_strtoupper($ensayosA) }}</div>
                 </div>
 
             </div>

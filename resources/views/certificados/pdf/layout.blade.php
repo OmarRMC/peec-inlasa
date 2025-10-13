@@ -22,6 +22,12 @@
             font-family: "Times New Roman", Times, serif;
             font-size: 12pt;
             color: #000;
+            /* background-image: url('{{ asset('certificados/fondo.png') }}');
+             */
+            /* o 'contain', depende del diseño */
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover
         }
 
         .page {
@@ -111,7 +117,7 @@
         }
 
         .labname {
-            font-size: 27pt;
+            font-size: 25pt;
             font-weight: bold;
             text-transform: uppercase;
         }
@@ -131,7 +137,14 @@
 
         .area {
             margin-top: 2mm;
-            font-size: 16pt;
+            font-size: 15pt;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .ensayos {
+            margin-top: 2mm;
+            font-size: 14pt;
             font-weight: bold;
             text-align: center;
         }
@@ -154,7 +167,7 @@
         .signatures {
             display: table;
             width: 100%;
-            margin-top: 18mm;
+            margin-top: 14mm;
             table-layout: fixed;
             font-size: 8px;
         }

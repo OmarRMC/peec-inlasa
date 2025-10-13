@@ -178,7 +178,7 @@ class Laboratorio extends Model
     public function getDataCertificadoDesemp(string $gestion)
     {
         $inscripciones = $this->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion)
             ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
@@ -215,7 +215,7 @@ class Laboratorio extends Model
     {
         $gestion = configuracion(Configuracion::GESTION_INSCRIPCION);
         $inscripciones = $this->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             // ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', '<', $gestion)
             // ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
@@ -251,11 +251,11 @@ class Laboratorio extends Model
     public function getDataCertificadoParticipacion(string $gestion)
     {
         $query = $this->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion);
         $query = $this->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion);
         $ensayosA = $query
@@ -301,7 +301,7 @@ class Laboratorio extends Model
         $gestion = configuracion(Configuracion::GESTION_INSCRIPCION);
 
         return $this->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->Pendiente()
             ->where('gestion', '<', $gestion)
             ->with(['detalleInscripciones', 'pagos'])
@@ -311,16 +311,20 @@ class Laboratorio extends Model
     public function descargarCertificadoParticipacion($gestion)
     {
         $query = $this->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion);
 
         $ins = $query->with('certificado')
             ->first();
+        if (!$ins) {
+            return redirect('/')
+                ->with('info', '⚠️ No se encontraron certificados registrados para la gestión seleccionada.');
+        }
         $certificado = $ins->certificado;
-        $codigoCertificado = $ins->id;
+        $codigoCertificado = $ins->ulid ?? $ins->id;
         $query = $this->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion);
         $ensayosA = $query
@@ -335,6 +339,7 @@ class Laboratorio extends Model
         $qr = base64_encode(
             QrCode::format('png')->size(220)->margin(1)->generate($url)
         );
+        // return view('certificados.pdf.participacion', ['ensayosA' => $ensayosA, 'certificado' => $certificado, 'qr' => $qr]);
         $pdf = Pdf::loadView('certificados.pdf.participacion', ['ensayosA' => $ensayosA, 'certificado' => $certificado, 'qr' => $qr])
             ->setPaper('A4', 'portrait');
         $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
@@ -344,7 +349,7 @@ class Laboratorio extends Model
     public function descargarCertificadoDesemp($gestion)
     {
         $inscripciones = $this->inscripciones()
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion)
             ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
@@ -376,7 +381,7 @@ class Laboratorio extends Model
                     'ensayo' => $detalle->detalle_ea,
                     'ponderacion' => $detalle->calificacion_certificado,
                 ];
-                $codigoCertificado = $inscripcion->id;
+                $codigoCertificado = $inscripcion->ulid ?? $inscripcion->id;
             }
         }
         $url = route('verificar.certificado', ['code' => $codigoCertificado, 'type' => Certificado::TYPE_DESEMP]);

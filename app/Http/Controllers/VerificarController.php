@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Certificado;
 use App\Models\Inscripcion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class VerificarController extends Controller
 {
@@ -12,7 +13,14 @@ class VerificarController extends Controller
     {
         $code = $request->code;
         $type = $request->type;
-        $ins = Inscripcion::with('laboratorio')->findOrFail($code);
+        $ins = Inscripcion::with('laboratorio')
+            ->where('ulid', $code)
+            ->first();
+        if (!$ins) {
+            return redirect()
+                ->route('login')
+                ->with('error', 'El código ingresado no corresponde a ningún certificado.');
+        }
         $gestion = $ins->gestion;
         $laboratorio = $ins->laboratorio;
         $data = [];

@@ -32,7 +32,7 @@ class CertificadoController extends Controller
             ->whereHas('certificado', function ($q2) {
                 $q2->Publicado()->conDetalles();
             })
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->orderByDesc('gestion');
 
         if ($request->filled('gestion')) {
@@ -169,7 +169,7 @@ class CertificadoController extends Controller
         }
         $total = Certificado::where('gestion_certificado', $gestion)
             ->noPublicado()
-            ->whereHas('inscripcion', fn($q) => $q->Aprobado())
+            ->whereHas('inscripcion', fn($q) => $q->aprobadoOrVencido())
             ->whereHas('detalles', fn($q) => $q->where('temporal', false))
             ->update(['publicado' => 1]);
 

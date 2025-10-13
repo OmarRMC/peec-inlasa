@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use PhpParser\Node\Stmt\TryCatch;
 
 class InscripcionPaqueteController extends Controller
@@ -201,6 +202,7 @@ class InscripcionPaqueteController extends Controller
                 'status_inscripcion' => true,
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
+                'ulid' => (string) Str::ulid(),
                 'gestion' => configuracion(Configuracion::GESTION_INSCRIPCION) ?? $request->gestion,
                 'status_cuenta' => Inscripcion::STATUS_DEUDOR,
                 'fecha_limite_pago' => configuracion(Configuracion::FECHA_FIN_PAGO)
