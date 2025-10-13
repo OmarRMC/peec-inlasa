@@ -631,9 +631,9 @@
             nit_lab: /^[0-9]{5,20}$/, // NIT: solo números, mínimo 5
             nombre_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s1-9\.]{4,20}$/, // solo letras y espacios
             respo_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/, // nombre responsable
-            ci_respo_lab: /^[0-9]{5,15}[A-Za-z0-9\-]*$/, // empieza con número, puede tener letra o guion
+            ci_respo_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2})?|\s[A-Za-z]{2})?$/, // empieza con número, puede tener letra o guion
             repreleg_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/,
-            ci_repreleg_lab: /^[0-9]{5,15}[A-Za-z0-9\-]*$/,
+            ci_repreleg_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2})?|\s[A-Za-z]{2})?$/,
             zona_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,50}$/,
             calle_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]{3,100}$/,
             numero_lab: /^[0-9]{1,10}$/,

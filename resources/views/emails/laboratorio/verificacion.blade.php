@@ -396,6 +396,9 @@
             }
         }
 
+        .tabla_datos{
+            font-size: 12px !important;
+        }
         @media screen and (max-width:384px) {
             .mail-message-content {
                 width: 414px !important
@@ -550,7 +553,7 @@
                             </td>
                         </tr>
                     </table>
-                    <table cellspacing="0" cellpadding="0" align="center" class="bp" role="none"
+                    <table  cellspacing="0" cellpadding="0" align="center" class="bp tabla_datos" role="none"
                         style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:100%;table-layout:fixed !important">
                         <tr>
                             <td align="center" style="padding:0;Margin:0">

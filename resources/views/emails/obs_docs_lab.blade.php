@@ -501,25 +501,11 @@
                                                                                     <li
                                                                                         style="color:#333333;margin:0px 0px 15px;font-size:12px;line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif">
                                                                                         <span
-                                                                                            style="line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:12px"></span>
+                                                                                            style="line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:12px">{{ $obs }}</span>
                                                                                     </li>
                                                                                 </ul>
                                                                             </li>
-                                                                            <li class="b"
-                                                                                style="color:#333333;margin:0px 0px 15px;font-size:12px;line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif">
-                                                                                <p
-                                                                                    style="Margin:0;mso-line-height-rule:exactly;mso-margin-bottom-alt:15px;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px">
-                                                                                    <strong>Contrato</strong>:
-                                                                                </p>
-                                                                                <ul
-                                                                                    style="font-family:arial, 'helvetica neue', helvetica, sans-serif;padding:0px 0px 0px 40px;margin-top:15px;margin-bottom:15px">
-                                                                                    <li
-                                                                                        style="color:#333333;margin:0px 0px 15px;font-size:12px;line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif">
-                                                                                        <span
-                                                                                            style="line-height:12px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:12px">Descripción</span>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </li>
+                                                                         @endforeach
                                                                     </ol>
                                                                     <p class="b"
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px">
