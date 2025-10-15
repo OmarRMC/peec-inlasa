@@ -259,16 +259,16 @@
             <div x-show="openMenu === 3" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
                 {{-- <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                         class="fas fa-file-contract"></i> Contrato 2025</a> --}}
-                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                <a href="https://drive.google.com/file/d/1dXps5OmC_iOXUZAsR1kxAGFyP6vJytUm/view?usp=sharing" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded" target="_blank"><i
                         class="fas fa-bullhorn"></i> Convocatoria</a>
-                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                <a href="https://drive.google.com/file/d/1iY9cjaeMwUp9OBr7gNIRjGQUBSrlKFDp/view?usp=sharing" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded" target="_blank"><i
                         class="fas fa-gavel"></i> Resolución</a>
-                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
+                {{-- <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                         class="fas fa-file-alt"></i> Protocolos</a>
                 <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
                         class="fas fa-exclamation-triangle"></i> Quejas</a>
                 <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                        class="fas fa-clipboard"></i> Formularios de Queja</a>
+                        class="fas fa-clipboard"></i> Formularios de Queja</a> --}}
             </div>
         </div>
     @endif
@@ -407,7 +407,7 @@
             </div>
         </div>
     @endif
-    @if (Gate::any([Permiso::ADMIN]))
+    @if (false && Gate::any([Permiso::ADMIN]))
         {{-- <a href="#" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
                     <i class="fas fa-database w-5 text-indigo-500"></i>
                     <span>Datos Laboratorio</span>

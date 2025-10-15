@@ -32,10 +32,9 @@
 
         .page {
             position: relative;
-            height: 275mm;
-            /* deja espacio al borde superior @page */
-            border: 1.5px solid #aa9900;
-            padding: 4mm 4mm 4mm 4mm;
+            height: 284mm;
+            padding: 1mm 1mm 1mm 1mm;
+            border: 1.5px solid #e6cf86;
         }
 
         /* Cinta superior izquierda (dos franjas como en la imagen) */
@@ -45,6 +44,7 @@
             left: 0;
             width: 0;
             height: 0;
+            z-index: -100;
         }
 
         .ribbon .gold {
@@ -54,7 +54,22 @@
             width: 120mm;
             height: 18mm;
             background: #d1a229;
-            transform: rotate(-30deg);
+            /* transform: rotate(-30deg); */
+        }
+
+        .ribbon .img {
+            position: absolute;
+            top: -10mm;
+            left: -10mm;
+            width: 100mm;
+            /* height: 10mm; */
+            /* background: #d1a229; */
+        }
+
+        .ribbon .img img {
+            width: 100mm;
+            object-fit: contain;
+            display: block;
         }
 
         .ribbon .navy {
@@ -204,7 +219,7 @@
 
         .firma {
             position: relative;
-            height: 50px;
+            height: 32px;
             text-align: center;
             vertical-align: middle;
         }
@@ -216,7 +231,7 @@
             left: 50%;
             transform: translateX(-50%);
             height: 18mm;
-            margin-bottom: 2mm;
+            /* margin-bottom: 2mm; */
             object-fit: contain;
         }
 

@@ -255,7 +255,7 @@
             <input type="text" name="numero_lab" id="numero_lab" maxlength="10"
                 value="{{ old('numero_lab', $laboratorio->numero ?? '') }}"
                 class="input-standard max-w-md w-full @error('numero_lab') border-red-500 @enderror"
-                pattern="^[0-9]+$" title="Solo se permiten números." required>
+               title="Solo se permiten números." required>
             @error('numero_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -631,12 +631,12 @@
             nit_lab: /^[0-9]{5,20}$/, // NIT: solo números, mínimo 5
             nombre_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s1-9\.]{4,20}$/, // solo letras y espacios
             respo_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/, // nombre responsable
-            ci_respo_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2})?|\s[A-Za-z]{2})?$/, // empieza con número, puede tener letra o guion
+            ci_respo_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2,4})?|\s[A-Za-z]{2,4})?$/, // empieza con número, puede tener letra o guion
             repreleg_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/,
-            ci_repreleg_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2})?|\s[A-Za-z]{2})?$/,
+            ci_repreleg_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2,4})?|\s[A-Za-z]{2,4})?$/,
             zona_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,50}$/,
             calle_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]{3,100}$/,
-            numero_lab: /^[0-9]{1,10}$/,
+            numero_lab: /^[0-9A-Za-z\s\/]{1,8}$/,
             referencia: /^.{0,150}$/,
             wapp_lab: /^(6|7)[0-9]{7}$/,
             wapp2_lab: /^(6|7)[0-9]{7}$/,
@@ -648,7 +648,6 @@
         function validarCampo(input) {
             const regla = reglas[input.name];
             if (!regla) return;
-            console.log(regla);
             const valido = regla.test(input.value.trim());
             input.classList.remove("border-red-500", "border-green-500");
             if (valido || input.value === "") {

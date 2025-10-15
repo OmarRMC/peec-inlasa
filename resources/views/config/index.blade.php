@@ -15,7 +15,7 @@
                 </div>
             @endif
             {{-- , ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'] --}}
-            @foreach ([['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.informacion', 'title' => 'Información personalizada para email'], ['id' => 'gestion.filter', 'title' => 'Gestiones para filtros'], ['id' => 'habilitar.docs.inscripcion', 'title' => 'Habilitar la subida de documentos de inscripción'], ['id' => 'habilitar.docs.pagos', 'title' => 'Habilitar la subida de comprobantes de pagos']] as $item)
+            @foreach ([['id' => 'registro', 'title' => 'Periodo de registro de nuevos laboratorios'], ['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.informacion', 'title' => 'Información personalizada para email'], ['id' => 'gestion.filter', 'title' => 'Gestiones para filtros'], ['id' => 'habilitar.docs.inscripcion', 'title' => 'Habilitar la subida de documentos de inscripción'], ['id' => 'habilitar.docs.pagos', 'title' => 'Habilitar la subida de comprobantes de pagos']] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -33,6 +33,36 @@
                             @php $config = 'configuracion.update'; @endphp
 
                             @switch($item['id'])
+                                @case('registro')
+                                    <form action="{{ route($config, 'periodo-registro') }}" method="POST">
+                                        @csrf @method('PUT')
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label for="{{ Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB }}"
+                                                    class="block text-sm font-medium">Fecha Inicio</label>
+                                                <input type="date" name="{{ Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB }}"
+                                                    id="{{ Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB }}"
+                                                    value="{{ old(Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB, configuracion(Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB) ?? '') }}"
+                                                    class="mt-1 input-standard" required>
+                                            </div>
+                                            <div>
+                                                <label for="{{ Configuracion::FECHA_FIN_REGISTRO_NUEVO_LAB }}"
+                                                    class="block text-sm font-medium">Fecha Fin</label>
+                                                <input type="date" name="{{ Configuracion::FECHA_FIN_REGISTRO_NUEVO_LAB }}"
+                                                    id="{{ Configuracion::FECHA_FIN_REGISTRO_NUEVO_LAB }}"
+                                                    value="{{ old(Configuracion::FECHA_FIN_REGISTRO_NUEVO_LAB, configuracion(Configuracion::FECHA_FIN_REGISTRO_NUEVO_LAB) ?? '') }}"
+                                                    class="mt-1 input-standard" required>
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-2">La fecha fin debe ser posterior a la fecha inicio.
+                                        </p>
+                                        <div class="text-right mt-4">
+                                            <button type="submit" class="btn-primary"><i
+                                                    class="fas fa-save mr-1"></i>Guardar</button>
+                                        </div>
+                                    </form>
+                                @break
+
                                 @case('inscripcion')
                                     <form action="{{ route($config, 'periodo-inscripcion') }}" method="POST">
                                         @csrf @method('PUT')

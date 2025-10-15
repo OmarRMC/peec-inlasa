@@ -27,10 +27,13 @@ class CustomResetPassword extends Notification
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
-        return (new MailMessage)->view('emails.reset-password', [
-            'url' => $url,
-            'usuario' => $notifiable,
-            'laboratorio' => $notifiable->laboratorio ?? null,
-        ]);
+        return (new MailMessage)
+            ->from(config('mail.from.address'), 'PEEC-INLASA')
+            ->subject('Recuperación de contraseña - PEEC INLASA')
+            ->view('emails.reset-password', [
+                'url' => $url,
+                'usuario' => $notifiable,
+                'laboratorio' => $notifiable->laboratorio ?? null,
+            ]);
     }
 }

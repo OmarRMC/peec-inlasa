@@ -5,15 +5,16 @@
             $cert = $detalles['certificado'];
         @endphp
 
-        {{-- <body style="page-break-after: always;background-image: url('{{ public_path('certificados/fondo.png') }}');"> --}}
+        {{-- <body style="padding: 0px; margin: 0px; page-break-after: always;background-image: url('{{ public_path('certificados/gestion2024.png') }}');"> --}}
         <body style="page-break-after: always;">
+            <div class="ribbon">
+                <div class="img">
+                    <img src="{{ public_path('certificados/gestion2024_dis-ok.png') }}" alt="">
+                </div>
+            </div>
             <div class="page">
 
-                <!-- Cinta superior izquierda -->
-                {{-- <div class="ribbon">
-                <div class="gold"></div>
-                <div class="navy"></div>
-            </div> --}}
+
                 @include('certificados.pdf.header')
 
                 <!-- Títulos -->

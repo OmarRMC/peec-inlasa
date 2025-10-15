@@ -25,6 +25,9 @@ class Configuracion extends Model
     public const FECHA_INICIO_INSCRIPCION = 'fecha_inicio_inscripcion';
     public const FECHA_FIN_INSCRIPCION = 'fecha_fin_inscripcion';
 
+    public const FECHA_INICIO_REGISTRO_NUEVO_LAB = 'fecha_inicio_registro_lab';
+    public const FECHA_FIN_REGISTRO_NUEVO_LAB = 'fecha_fin_registro_lab';
+
     public const FECHA_INICIO_PAGO = 'fecha_inicio_pago';
     public const FECHA_FIN_PAGO = 'fecha_fin_pago';
 
@@ -48,6 +51,14 @@ class Configuracion extends Model
     public const FECHA_FIN_REGISTRO_CERTIFICADOS    = 'fecha_fin_registro_certificados';
     public const HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION = 'habilitar_subida_documentos_inscripcion';
     public const HABILITAR_SUBIDA_DOCUMENTOS_PAGOS = 'habilitar_subida_documentos_pagos';
+
+     public static function esPeriodoRegistro()
+    {
+        $fechaInicio = Configuracion::where('key', Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB)->value('valor');
+        $fechaFin = Configuracion::where('key', Configuracion::FECHA_FIN_REGISTRO_NUEVO_LAB)->value('valor');
+        $hoy = Carbon::now()->toDateString();
+        return $fechaInicio <= $hoy && $hoy <= $fechaFin;
+    }
 
     public static function esPeriodoInscripcion()
     {

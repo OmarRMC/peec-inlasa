@@ -12,6 +12,9 @@ class ConfiguracionSeeder extends Seeder
   {
     $now = now();
     $datos = [
+      Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB => $now->copy()->format('Y-m-d'),
+      Configuracion::FECHA_FIN_REGISTRO_NUEVO_LAB    => $now->copy()->addDays(15)->format('Y-m-d'),
+
       Configuracion::FECHA_INICIO_INSCRIPCION => $now->copy()->format('Y-m-d'),
       Configuracion::FECHA_FIN_INSCRIPCION    => $now->copy()->addDays(15)->format('Y-m-d'),
 

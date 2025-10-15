@@ -222,14 +222,21 @@ class LabController extends Controller
      */
     public function create()
     {
+        if (!Configuracion::esPeriodoRegistro()) {
+            return redirect()->route('login')->with('notice', [
+                'title' => 'Registro deshabilitado',
+                'message' => 'El registro de nuevos laboratorios está deshabilitado en este momento.',
+                'type' => 'warning',
+            ]);
+        }
         return view('lab_tem.create', [
             'paises' => Pais::active()->get(),
-            'niveles' => NivelLaboratorio::all(),
-            'tipos' => TipoLaboratorio::all(),
+            'niveles' => NivelLaboratorio::active()->get(),
+            'tipos' => TipoLaboratorio::active()->get(),
             'departamentos' => [],
             'provincias' => [],
             'municipios' => [],
-            'categorias' => CategoriaLaboratorio::all(),
+            'categorias' => CategoriaLaboratorio::active()->get(),
         ]);
     }
 
@@ -275,6 +282,13 @@ class LabController extends Controller
 
     public function registrar(Request $request)
     {
+        if (!Configuracion::esPeriodoRegistro()) {
+            return redirect()->route('login')->with('notice', [
+                'title' => 'Registro deshabilitado',
+                'message' => 'El registro de nuevos laboratorios está deshabilitado en este momento.',
+                'type' => 'warning',
+            ]);
+        }
         $request->validate([
             'numsedes_lab' => 'nullable|string|max:15',
             'nombre_lab' => 'required|string|max:100',
@@ -386,6 +400,30 @@ class LabController extends Controller
     }
 
 
+    public function testCorreo()
+    {
+        $laboratorio = Laboratorio::find(1150);
+        $pais = Pais::find($laboratorio->id_pais)?->nombre ?? 'Desconocido';
+        $departamento = Departamento::find($laboratorio->id_dep)?->nombre_dep ?? 'Desconocido';
+        $provincia = Provincia::find($laboratorio->id_prov)?->nombre_prov ?? 'Desconocido';
+        $municipio = Municipio::find($laboratorio->id_municipio)?->nombre_municipio ?? 'Desconocido';
+        $categoria = CategoriaLaboratorio::find($laboratorio->id_categoria)?->descripcion ?? 'Desconocido';
+        $tipo = TipoLaboratorio::find($laboratorio->id_tipo)?->descripcion ?? 'Desconocido';
+        $nivel = NivelLaboratorio::find($laboratorio->id_nivel)?->descripcion_nivel ?? 'Desconocido';
+
+
+        return view('emails.laboratorio.verificacion', [
+            'laboratorio' => $laboratorio,
+            'pais' => $pais,
+            'departamento' => $departamento,
+            'provincia' => $provincia,
+            'municipio' => $municipio,
+            'categoria' => $categoria,
+            'tipo' => $tipo,
+            'nivel' => $nivel
+        ]);
+    }
+
     private function messages()
     {
         return [
@@ -459,6 +497,36 @@ class LabController extends Controller
 
         $pais = Pais::find($labTem->id_pais);
         $sigla = strtoupper($pais->sigla_pais); // Ej: BOL
+
+        $existingUser = User::where('email', $labTem->mail_lab)->first();
+        if ($existingUser) {
+            return redirect('login')->with('notice', [
+                'title' => 'Error en la confirmación del laboratorio',
+                'message' => <<<HTML
+                <div style="text-align: left; font-size: 14px; line-height: 1.6;">
+                    ❌ No se puede completar la confirmación del laboratorio, ya que el correo electrónico ingresado
+                    ya está registrado en el sistema.
+                    <br/><br/>
+                    📧 <b>Correo:</b> 
+                    <span style="display:inline-block; font-weight:bold; color:#dc2626; font-size:15px;">
+                        {$existingUser->email}
+                    </span>
+                    <br/>
+                    👤 <b>Usuario:</b>
+                    <span style="display:inline-block; font-weight:bold; color:#dc2626; font-size:15px;">
+                        {$existingUser->username}
+                    </span>
+                    <br/><br/>
+                    ⚠️ Si este correo te pertenece, por favor <b>inicia sesión</b> con tus credenciales.
+                    <br/>
+                    En caso de haber olvidado tu contraseña, utiliza la opción de <b>recuperación de contraseña</b>.
+                    <br/><br/>
+                    Si no reconoces este correo o consideras que se trata de un error, contacta al <b>administrador del sistema</b> para recibir asistencia.
+                </div>
+                HTML,
+                'type' => 'error',
+            ]);
+        }
 
         // Generar username incremental
         $count = User::where('username', 'LIKE', "$sigla%")->count() + 1;

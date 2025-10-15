@@ -3,16 +3,17 @@
 @endphp
 @extends('certificados.pdf.layout')
 @section('contenido')
-
     {{-- <body style="background-image: url('{{ public_path('certificados/fondo.png') }}');"> --}}
-    <body>
-        <div class="page">
 
-            <!-- Cinta superior izquierda -->
-            {{-- <div class="ribbon">
-                <div class="gold"></div>
-                <div class="navy"></div>
-            </div> --}}
+    <body>
+        <div class="ribbon">
+            <div class="img">
+                <img src="{{ public_path('certificados/gestion2024_dis-ok.png') }}" alt="">
+            </div>
+            {{-- <div class="gold"></div>
+                <div class="navy"></div> --}}
+        </div>
+        <div class="page">
 
             <!-- Encabezado -->
             @include('certificados.pdf.header')

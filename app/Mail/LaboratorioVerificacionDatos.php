@@ -42,7 +42,7 @@ class LaboratorioVerificacionDatos extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Laboratorio Verificacion  de los Datos',
+            subject: 'Laboratorio Verificación  de los Datos',
         );
     }
 

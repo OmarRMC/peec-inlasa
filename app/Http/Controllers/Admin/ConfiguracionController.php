@@ -50,7 +50,20 @@ class ConfiguracionController extends Controller
                 configuracion(Configuracion::FECHA_INICIO_INSCRIPCION, $request->fecha_inicio_inscripcion);
                 configuracion(Configuracion::FECHA_FIN_INSCRIPCION, $request->fecha_fin_inscripcion);
                 break;
-
+            case 'periodo-registro':
+                $request->validate([
+                    'fecha_inicio_registro_lab' => 'required|date',
+                    'fecha_fin_registro_lab' => 'required|date|after_or_equal:fecha_inicio_registro_lab',
+                ], [
+                    'fecha_inicio_registro_lab.required' => 'La fecha de inicio es obligatoria.',
+                    'fecha_inicio_registro_lab.date' => 'La fecha de inicio debe ser una fecha válida.',
+                    'fecha_fin_registro_lab.required' => 'La fecha de fin es obligatoria.',
+                    'fecha_fin_registro_lab.date' => 'La fecha de fin debe ser una fecha válida.',
+                    'fecha_fin_registro_lab.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
+                ]);
+                configuracion(Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB, $request->fecha_inicio_registro_lab);
+                configuracion(Configuracion::FECHA_FIN_REGISTRO_NUEVO_LAB, $request->fecha_fin_registro_lab);
+                break;
             case 'periodo-pago':
                 $request->validate([
                     'fecha_inicio_pago' => 'required|date',

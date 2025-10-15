@@ -68,7 +68,7 @@
                 </button>
             </div>
 
-            @if (Configuracion::esPeriodoInscripcion())
+            @if (Configuracion::esPeriodoRegistro())
                 <!-- Enlace a registro -->
                 <div class="text-center text-sm">
                     ¿No tienes una cuenta?

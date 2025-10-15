@@ -22,6 +22,8 @@ Route::middleware('guest')->group(function () {
     Route::get('lab/register', [LabController::class, 'create'])->name('form.registro.tem.lab');
     Route::post('lab/register', [LabController::class, 'registrar'])->name('registro.tem.lab');
 
+    // Route::get('lab/test', [LabController::class, 'testCorreo']);
+
     Route::get('/confirmar-datos/{id}', [LabController::class, 'confirmarDatos'])->name('confirmar.datos.lab');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])

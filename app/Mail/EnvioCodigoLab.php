@@ -15,6 +15,8 @@ class EnvioCodigoLab extends Mailable
 
     protected $usuario;
     protected $laboratorio;
+
+    protected $loginUrl;
     /**
      * Create a new message instance.
      */
@@ -22,6 +24,7 @@ class EnvioCodigoLab extends Mailable
     {
         $this->usuario = $usuario;
         $this->laboratorio = $laboratorio;
+        $this->loginUrl = route('login');
     }
     /**
      * Get the message envelope.
@@ -29,7 +32,7 @@ class EnvioCodigoLab extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Su inscripción fue aceptada',
+            subject: 'Bienvenido al sistema PEEC - INLASA',
         );
     }
 
@@ -43,6 +46,7 @@ class EnvioCodigoLab extends Mailable
             with: [
                 'usuario' => $this->usuario,
                 'laboratorio' => $this->laboratorio,
+                'loginUrl' => $this->loginUrl,
             ],
         );
     }
