@@ -138,6 +138,7 @@
 
             const seleccionados = [];
             let paquetesDisponibles = [];
+            const baseUrl = `{{ url('/admin/paquetes/programa') }}`;
 
             const LAB_ID = {{ $laboratorio->id }};
 
@@ -165,7 +166,7 @@
                     tablaPaquetesDT = $('#tablaPaquetes').DataTable({
                         processing: true,
                         serverSide: true,
-                        ajax: `/admin/paquetes/programa?programa_id=${programaId}&lab_id=${LAB_ID}`,
+                        ajax: `${baseUrl}?programa_id=${programaId}&lab_id=${LAB_ID}`,
                         columns: [{
                                 data: 'acciones',
                                 orderable: false,
@@ -183,7 +184,7 @@
                             }
                         ],
                         language: {
-                            url:  "{{ asset('translation/es.json') }}"
+                            url: "{{ asset('translation/es.json') }}"
                         },
                         dom: 'rt',
                         lengthChange: false,
@@ -276,7 +277,7 @@
                     }))
                 };
 
-                fetch('/admin/inscripcion/paquetes', {
+                fetch(`{{ url('/admin/inscripcion/paquetes') }}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -313,11 +314,11 @@
                                 <div class="max-h-64 overflow-y-auto pr-2">
                                     <ul class="divide-y divide-gray-200">
                                         ${seleccionados.map(pkt => `
-                                                                                                                                                        <li class="py-0 flex justify-between">
-                                                                                                                                                            <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
-                                                                                                                                                            <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
-                                                                                                                                                        </li>
-                                                                                                                                                        `).join('')}
+                                                                                                                                                            <li class="py-0 flex justify-between">
+                                                                                                                                                                <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
+                                                                                                                                                                <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
+                                                                                                                                                            </li>
+                                                                                                                                                            `).join('')}
                                     </ul>
                                 </div>
                                 <!-- Total fijo -->

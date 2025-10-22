@@ -33,11 +33,11 @@ Route::prefix('admin')->group(function () {
     // Route::resource('/paquete', PaqueteController::class)->except(['show']);
     // Route::resource('/ensayo_aptitud', EnsayoAptitudController::class)->except(['show']);
 
-    Route::get('/departamento/{pais}', [DepartamentoController::class, 'getDataAjax']);
-    Route::get('/provincia/{departamento}', [ProvinciaController::class, 'getDataAjax']);
-    Route::get('/municipio/{provincia}', [MunicipioController::class, 'getDataAjax']);
-    Route::get('/area/{id}/paquetes', [PaqueteController::class, 'getPaquetePorAreaAjax']);
-    Route::get('/area/{id}/paquetes/ensayos', [EnsayoAptitudController::class, 'getEnsayoPorAreaAjax']);
+    Route::get('/departamento/{pais}', [DepartamentoController::class, 'getDataAjax'])->name('departamento');
+    Route::get('/provincia/{departamento}', [ProvinciaController::class, 'getDataAjax'])->name('provincia');
+    Route::get('/municipio/{provincia}', [MunicipioController::class, 'getDataAjax'])->name('municipio');
+    Route::get('/area/{id}/paquetes', [PaqueteController::class, 'getPaquetePorAreaAjax'])->name('area.paquetes');
+    Route::get('/area/{id}/paquetes/ensayos', [EnsayoAptitudController::class, 'getEnsayoPorAreaAjax'])->name('area.paquetes.ensayos');
 
     // Route::resource('nivel_laboratorio', NivelLaboratorioController::class);
     // Route::resource('tipo_laboratorio', TipoLaboratorioController::class);

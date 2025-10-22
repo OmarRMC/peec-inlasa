@@ -28,8 +28,7 @@
             <label for="numsedes_lab" class="label">Su Numero de Registro Sedes</label>
             <input type="text" name="numsedes_lab" id="numsedes_lab" maxlength="20"
                 value="{{ old('numsedes_lab', $laboratorio->numsedes_lab ?? '') }}"
-                class="input-standard w-full @error('numsedes_lab') border-red-500 @enderror"
-                placeholder="0000">
+                class="input-standard w-full @error('numsedes_lab') border-red-500 @enderror" placeholder="0000">
             @error('numsedes_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -255,7 +254,7 @@
             <input type="text" name="numero_lab" id="numero_lab" maxlength="10"
                 value="{{ old('numero_lab', $laboratorio->numero ?? '') }}"
                 class="input-standard max-w-md w-full @error('numero_lab') border-red-500 @enderror"
-               title="Solo se permiten números." required>
+                title="Solo se permiten números." required>
             @error('numero_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -491,7 +490,11 @@
 
 {{-- JavaScript para cargar selects dinámicos --}}
 <script>
-    const url = '/api/admin';
+    const routes = {
+        departamento: "{{ route('departamento', ['pais' => 'PAIS_ID']) }}",
+        provincia: "{{ route('provincia', ['departamento' => 'DEP_ID']) }}",
+        municipio: "{{ route('municipio', ['provincia' => 'PROV_ID']) }}",
+    };
 
     function togglePassword(inputId) {
         const input = document.getElementById(inputId);
@@ -524,7 +527,8 @@
         }
 
         try {
-            const response = await fetch(`${url}/departamento/${paisId}`);
+            const url = routes.departamento.replace('PAIS_ID', paisId);
+            const response = await fetch(`${url}`);
             if (!response.ok) throw new Error('Error cargando departamentos');
             const departamentos = await response.json();
 
@@ -562,7 +566,8 @@
         }
 
         try {
-            const response = await fetch(`${url}/provincia/${depId}`);
+            const urlProvincia = routes.provincia.replace('DEP_ID', depId);
+            const response = await fetch(`${urlProvincia}`);
             if (!response.ok) throw new Error('Error cargando provincias');
             const provincias = await response.json();
 
@@ -599,7 +604,8 @@
         }
 
         try {
-            const response = await fetch(`${url}/municipio/${provId}`);
+            const urlMunicipio = routes.municipio.replace('PROV_ID', provId);
+            const response = await fetch(`${urlMunicipio}`);
             if (!response.ok) throw new Error('Error cargando municipios');
             const municipios = await response.json();
 
@@ -658,11 +664,11 @@
         }
 
         function manejarCampo(input) {
-            if(input.type !='email'){
+            if (input.type != 'email') {
                 input.value = input.value.toUpperCase();
             }
             validarCampo(input);
-        }   
+        }
 
         Object.keys(reglas).forEach(nombre => {
             const input = document.querySelector(`[name="${nombre}"]`);
