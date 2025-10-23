@@ -194,10 +194,10 @@ class LaboratorioController extends Controller
             'paises' => Pais::active()->get(),
             'niveles' => NivelLaboratorio::all(),
             'tipos' => TipoLaboratorio::all(),
-            'departamentos' => $laboratorio->pais->departamentos()->orderBy('nombre_dep')->get(),
-            'provincias' => $laboratorio->departamento->provincias()->orderBy('nombre_prov')->get(),
-            'municipios' => $laboratorio->provincia->municipios()->orderBy('nombre_municipio')->get(),
-            'categorias' => CategoriaLaboratorio::all(),
+            'departamentos' => $laboratorio->pais?->departamentos()->orderBy('nombre_dep')->get() ?? collect(),
+            'provincias' => $laboratorio->departamento?->provincias()->orderBy('nombre_prov')->get() ?? collect(),
+            'municipios' => $laboratorio->provincia?->municipios()->orderBy('nombre_municipio')->get() ?? collect(),
+            'categorias' => CategoriaLaboratorio::active()->get(),
         ]);
     }
 
