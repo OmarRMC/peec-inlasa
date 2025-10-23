@@ -192,8 +192,8 @@ class LaboratorioController extends Controller
         return view('laboratorio.edit', [
             'laboratorio' => $laboratorio,
             'paises' => Pais::active()->get(),
-            'niveles' => NivelLaboratorio::all(),
-            'tipos' => TipoLaboratorio::all(),
+            'niveles' => NivelLaboratorio::active()->get(),
+            'tipos' => TipoLaboratorio::active()->get(),
             'departamentos' => $laboratorio->pais?->departamentos()->orderBy('nombre_dep')->get() ?? collect(),
             'provincias' => $laboratorio->departamento?->provincias()->orderBy('nombre_prov')->get() ?? collect(),
             'municipios' => $laboratorio->provincia?->municipios()->orderBy('nombre_municipio')->get() ?? collect(),

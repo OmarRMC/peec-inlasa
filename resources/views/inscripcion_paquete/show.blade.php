@@ -367,7 +367,7 @@
             <div id="campo_transaccion" style="display: none;">
                 <label id="label_transaccion" class="text-sm font-semibold">N° Transacción</label>
                 <input type="text" id="nro_transaccion" name="nro_tranferencia"
-                    class="w-full border rounded px-2 text-sm" pattern="^[A-Za-z0-9\-]{4,30}$" maxlength="30"
+                    class="w-full border rounded px-2 text-sm" pattern="^[A-Za-z0-9\-\/*][A-Za-z0-9\-\/*\s.]{4,30}$" maxlength="30"
                     title="Entre 4 y 30 caracteres. Letras, números o guiones.">
             </div>
 

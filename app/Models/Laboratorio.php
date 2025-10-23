@@ -398,19 +398,30 @@ class Laboratorio extends Model
 
     public function getCalleAttribute()
     {
-        $partes = explode('||', $this->attributes['direccion_lab']);
+        $direccion = $this->attributes['direccion_lab'] ?? '';
+        if (!str_contains($direccion, '||')) {
+            return null;
+        }
+        $partes = explode('||', $direccion);
         return $partes[0] ?? null;
     }
-
     public function getNumeroAttribute()
     {
-        $partes = explode('||', $this->attributes['direccion_lab']);
+        $direccion = $this->attributes['direccion_lab'] ?? '';
+        if (!str_contains($direccion, '||')) {
+            return null;
+        }
+        $partes = explode('||', $direccion);
         return $partes[1] ?? null;
     }
 
     public function getReferenciaAttribute()
     {
-        $partes = explode('||', $this->attributes['direccion_lab']);
+        $direccion = $this->attributes['direccion_lab'] ?? '';
+        if (!str_contains($direccion, '||')) {
+            return $direccion;
+        }
+        $partes = explode('||', $direccion);
         return $partes[2] ?? null;
     }
 

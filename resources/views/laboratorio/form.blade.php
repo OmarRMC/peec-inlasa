@@ -632,15 +632,15 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         const reglas = {
-            numsedes_lab: /^[0-9]{1,20}$/, // solo números
+            numsedes_lab: /^[0-9AZa-z-*.\/]{1,20}$/, // solo números
             sigla_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.-]{2,20}$/, // letras, números, guiones, puntos
             nit_lab: /^[0-9]{5,20}$/, // NIT: solo números, mínimo 5
-            nombre_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s1-9\.]{4,20}$/, // solo letras y espacios
+            nombre_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ][A-Za-zÁÉÍÓÚáéíóúÑñ\s.\-]{3,19}$/,
             respo_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/, // nombre responsable
             ci_respo_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2,4})?|\s[A-Za-z]{2,4})?$/, // empieza con número, puede tener letra o guion
             repreleg_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/,
             ci_repreleg_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2,4})?|\s[A-Za-z]{2,4})?$/,
-            zona_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,50}$/,
+            zona_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]{3,50}$/,
             calle_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]{3,100}$/,
             numero_lab: /^[0-9A-Za-z\s\/]{1,8}$/,
             referencia: /^.{0,150}$/,
@@ -672,6 +672,7 @@
 
         Object.keys(reglas).forEach(nombre => {
             const input = document.querySelector(`[name="${nombre}"]`);
+            input.setAttribute("pattern", reglas[nombre].source);
             if (input) {
                 ["input", "blur"].forEach(evento => {
                     input.addEventListener(evento, () => manejarCampo(input));
