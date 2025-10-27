@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-[75%_25%] gap-2">
+        <div class="grid grid-cols-[100%] gap-2">
             <!-- Secciones -->
             <form method="POST" action="{{ route('admin.formularios.updateEstructura', $formulario->id) }}">
                 @csrf
@@ -50,103 +50,179 @@
                                         class="w-full border border-gray-300 rounded text-xs px-2 py-1">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-600">Cantidad de
-                                        parámetros</label>
-                                    <input type="number" name="secciones[{{ $i }}][cantidad_parametros]"
-                                        min="0" value="{{ $seccion->cantidad_parametros }}"
-                                        class="w-full border border-gray-300 rounded text-xs px-2 py-1" />
+                                    <label class="block text-xs font-semibold text-gray-600">Descripción</label>
+                                    <textarea name="secciones[{{ $i }}][descripcion]" class=" border border-gray-300 rounded text-xs px-2 py-1">{{ $seccion->descripcion }}</textarea>
                                 </div>
                             </div>
-                            <div class="mb-2">
-                                <label class="block text-xs font-semibold text-gray-600">Descripción</label>
-                                <textarea name="secciones[{{ $i }}][descripcion]"
-                                    class="w-full border border-gray-300 rounded text-xs px-2 py-1">{{ $seccion->descripcion }}</textarea>
+                            <div class="mb-3 headers-wrapper">
+                                <label class="block text-xs font-semibold text-gray-600">Encabezado</label>
+                                <div class="headers-list flex flex-wrap">
+                                    @foreach ($seccion->headers ?? [] as $h => $header)
+                                        <div class="flex items-center gap-2 mb-1 header-item">
+                                            <input type="text" name="secciones[{{ $i }}][headers][]"
+                                                value="{{ $header }}"
+                                                class="w-full border border-gray-300 rounded text-xs px-2 py-1">
+                                            <button type="button"
+                                                class="px-2 py-1 bg-red-500 text-white text-xs rounded eliminar-header">🗑</button>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <button type="button"
+                                    class="mt-1 px-3 py-1 text-xs bg-blue-500 text-white rounded add-header"
+                                    data-seccion-idx="{{ $i }}">
+                                    + Header
+                                </button>
                             </div>
-
                             <!-- Tabla de parámetros -->
-                            <!-- Tabla de parámetros -->
-                            <table class="w-full text-xs border parametros-table">
-                                <thead>
-                                    <tr class="border-b bg-gray-50">
-                                        <th class="px-2 py-1">Nombre parámetro</th>
-                                        <th class="px-2 py-1">Acciones</th>
-                                    </tr>
-                                </thead>
+                            <table class="text-xs parametros-table">
                                 <tbody>
                                     @foreach ($seccion->parametros as $j => $parametro)
                                         <tr>
-                                            <td>
+                                            <td class="flex gap-2">
                                                 <input type="text"
                                                     name="secciones[{{ $i }}][parametros][{{ $j }}][nombre]"
-                                                    value="{{ $parametro->nombre }}"
-                                                    class="w-full border border-gray-300 rounded text-xs px-1">
-                                            </td>
-                                            <td>
-                                                <button type="button"
-                                                    class="delete-button eliminar-parametro">🗑</button>
+                                                    placeholder="Nombre del parámetro" value="{{ $parametro->nombre }}"
+                                                    class="text-xs border rounded px-1 py-0.5">
+                                                <button type="button" class="eliminar-parametro">🗑</button>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">
-                                                <!-- Subtabla de resultados -->
-                                                <table class="w-full text-xs border resultados-table">
-                                                    <thead>
-                                                        <tr class="bg-gray-100 border-b">
-                                                            <th>Tipo</th>
-                                                            <th>Unidad</th>
-                                                            <th>Validación</th>
-                                                            <th>Requerido</th>
-                                                            <th>Posición</th>
-                                                            <th>Grupo Selector</th>
-                                                            <th>Acciones</th>
+                                                <table class="text-xs border border-gray-300 rounded resultados-table">
+                                                    <thead class="bg-gray-100 text-gray-600">
+                                                        <tr>
+                                                            <th class="px-2 py-1 border">Label</th>
+                                                            <th class="px-2 py-1 border">Tipo</th>
+                                                            <th class="px-2 py-1 border">Placeholder</th>
+                                                            <th class="px-2 py-1 border">Unidad</th>
+                                                            <th class="px-2 py-1 border text-center">Requerido</th>
+                                                            <th class="px-2 py-1 border">Posición</th>
+                                                            <th class="px-2 py-1 border">Mensaje</th>
+                                                            <th class="px-2 py-1 border">Step</th>
+                                                            <th class="px-2 py-1 border">Validación</th>
+                                                            <th class="px-2 py-1 border">Rango</th>
+                                                            <th class="px-2 py-1 border">Grupo Selector</th>
+                                                            <th class="px-2 py-1 border text-center">Acciones</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @foreach ($parametro->resultados as $k => $resultado)
-                                                            <tr>
-                                                                <td>
+                                                        @foreach ($parametro->campos as $k => $campo)
+                                                            <tr class="text-xs">
+                                                                <td class="px-2 py-1 border">
+                                                                    <input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][label]"
+                                                                        value="{{ $campo->label }}" placeholder="Label"
+                                                                        class="w-full text-xs border rounded px-1 py-0.5">
+                                                                </td>
+                                                                <td class="px-2 py-1 border">
                                                                     <select
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][tipo]">
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][tipo]"
+                                                                        class="w-full text-xs border rounded px-1 py-0.5">
                                                                         <option value="text"
-                                                                            @selected($resultado->tipo === 'text')>Texto</option>
+                                                                            @selected($campo->tipo === 'text')>Texto</option>
                                                                         <option value="number"
-                                                                            @selected($resultado->tipo === 'number')>Número</option>
+                                                                            @selected($campo->tipo === 'number')>Número</option>
+                                                                        <option value="date"
+                                                                            @selected($campo->tipo === 'date')>Fecha</option>
+                                                                        <option value="select"
+                                                                            @selected($campo->tipo === 'select')>Select</option>
+                                                                        <option value="checkbox"
+                                                                            @selected($campo->tipo === 'checkbox')>Checkbox
+                                                                        </option>
+                                                                        <option value="textarea"
+                                                                            @selected($campo->tipo === 'textarea')>Textarea
+                                                                        </option>
+                                                                        <option value="email"
+                                                                            @selected($campo->tipo === 'email')>Email</option>
+                                                                        <option value="datalist"
+                                                                            @selected($campo->tipo === 'datalist')>Datalist
+                                                                        </option>
+                                                                        <option value="radio"
+                                                                            @selected($campo->tipo === 'radio')>Radio</option>
                                                                     </select>
                                                                 </td>
-                                                                <td><input type="text"
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][unidad]"
-                                                                        value="{{ $resultado->unidad }}"></td>
-                                                                <td><input type="text"
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][validacion]"
-                                                                        value="{{ $resultado->validacion }}"></td>
-                                                                <td><input type="checkbox"
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][requerido]"
-                                                                        value="1" @checked($resultado->requerido)>
+                                                                <td class="px-2 py-1 border">
+                                                                    <input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][placeholder]"
+                                                                        value="{{ $campo->placeholder }}"
+                                                                        placeholder="Placeholder"
+                                                                        class="w-full text-xs border rounded px-1 py-0.5">
                                                                 </td>
-                                                                <td><input type="number"
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][posicion]"
-                                                                        value="{{ $resultado->posicion }}"></td>
-                                                                <td>
+                                                                <td class="px-2 py-1 border">
+                                                                    <input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][unidad]"
+                                                                        value="{{ $campo->unidad }}"
+                                                                        placeholder="Unidad"
+                                                                        class="w-full text-xs border rounded px-1 py-0.5">
+                                                                </td>
+                                                                <td class="px-2 py-1 border text-center">
+                                                                    <input type="checkbox"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][requerido]"
+                                                                        value="1" @checked($campo->requerido)
+                                                                        class="mx-auto">
+                                                                </td>
+                                                                <td class="px-2 py-1 border">
+                                                                    <input type="number"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][posicion]"
+                                                                        value="{{ $campo->posicion }}"
+                                                                        placeholder="#"
+                                                                        class="w-full text-xs border rounded px-1 py-0.5">
+                                                                </td>
+                                                                <td class="px-2 py-1 border">
+                                                                    <input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][mensaje]"
+                                                                        value="{{ $campo->mensaje }}"
+                                                                        placeholder="Mensaje"
+                                                                        class="w-full text-xs border rounded px-1 py-0.5">
+                                                                </td>
+                                                                <td class="px-2 py-1 border">
+                                                                    <input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][step]"
+                                                                        value="{{ $campo->step }}"
+                                                                        placeholder="Step"
+                                                                        class="w-full text-xs border rounded px-1 py-0.5 mt-1">
+                                                                </td>
+                                                                <td class="px-2 py-1 border">
+                                                                    <textarea
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][pattern]"
+                                                                        placeholder="Validación" class="w-full text-xs border rounded px-1 py-0.5 mt-1">{{ $campo->pattern }}</textarea>
+                                                                </td>
+                                                                <td class="px-2 py-1 border">
+                                                                    <input type="text"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][range]"
+                                                                        value="{{ $campo->range }}"
+                                                                        placeholder="Rango"
+                                                                        class="w-full text-xs border rounded px-1 py-0.5">
+                                                                </td>
+                                                                <td class="px-2 py-1 border">
                                                                     <select
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][resultados][{{ $k }}][grupo_selector_id]"
-                                                                        class="grupo-selector-select"
-                                                                        data-selected="{{ $resultado->grupoSelector?->id }}">
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][id_grupo_selector]"
+                                                                        class="grupo-selector-select w-full text-xs border rounded px-1 py-0.5"
+                                                                        data-selected="{{ $campo->grupoSelector?->id }}">
                                                                         <option value="">Seleccione un grupo
                                                                         </option>
+                                                                        @foreach ($grupos as $grupo)
+                                                                            <option value="{{ $grupo->id }}"
+                                                                                {{ $campo->grupoSelector?->id == $grupo->id ? 'selected' : '' }}>
+                                                                                {{ $grupo->nombre }}
+                                                                            </option>
+                                                                        @endforeach
+
                                                                     </select>
                                                                 </td>
-                                                                <td>
+                                                                <td class="px-2 py-1 border text-center">
                                                                     <button type="button"
-                                                                        class="eliminar-resultado">🗑</button>
+                                                                        class="eliminar-resultado text-red-500 text-xs">🗑</button>
                                                                 </td>
                                                             </tr>
                                                         @endforeach
                                                     </tbody>
                                                 </table>
-                                                <button type="button" class="add-resultado"
+                                                <button type="button"
+                                                    class="add-resultado block text-center text-blue-600 my-2 w-full"
                                                     data-seccion-idx="{{ $i }}"
                                                     data-parametro-idx="{{ $j }}">
-                                                    + Resultado
+                                                    + Campo
                                                 </button>
                                             </td>
                                         </tr>
@@ -168,49 +244,14 @@
                     </button>
                 </div>
             </form>
-
-            <!-- Grupos de Selectores -->
-            <div class="border p-4">
-                <h2 class="font-bold mb-3">Grupos de selectores</h2>
-
-                <!-- Buscar -->
-                <div class="flex gap-2 mb-3">
-                    <input type="text" id="busqueda-grupo" placeholder="Buscar..."
-                        class="flex-1 border border-gray-300 rounded text-sm px-2 py-1">
-
-                    <button id="btn-buscar-grupo"
-                        class="px-3 py-1 bg-gray-800 text-white text-sm rounded flex items-center justify-center hover:bg-gray-700 transition">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-                <!-- Lista de grupos -->
-                <div id="lista-grupos" class="border p-2 mb-3 h-40 overflow-y-auto text-sm">
-                    {{-- @foreach ($formulario->secciones->flatMap->parametros->pluck('grupoSelector')->filter()->unique('id') as $grupo)
-                        <div class="border-b py-2">
-                            <strong>{{ $grupo->nombre }}</strong>
-                            @foreach ($grupo->opciones as $opcion)
-                                <div class="ml-2 text-xs">{{ $opcion->etiqueta }}</div>
-                            @endforeach
-                        </div>
-                    @endforeach --}}
-                </div>
-
-                <!-- Crear grupo nuevo -->
-                <div class="border p-2">
-                    <h3 class="text-sm font-bold mb-2">Crear un nuevo grupo</h3>
-                    <input type="text" id="nuevo-nombre-grupo" placeholder="Nombre del grupo"
-                        class="w-full border border-gray-300 rounded text-sm mb-2">
-                    <textarea id="nuevas-opciones" placeholder="Opciones separadas por coma"
-                        class="w-full border border-gray-300 rounded text-sm"></textarea>
-                    <button id="btn-guardar-grupo" class="mt-2 px-3 py-1 bg-green-600 text-white text-sm">Guardar
-                        Grupo</button>
-                </div>
-            </div>
         </div>
     </div>
     @push('scripts')
         <script>
             var seccionIndex = document.querySelectorAll('#secciones-wrapper .seccion').length ?? 0;
+            const urlGrupos = @json(route('admin.grupos.selectores.json', ['ensayoId' => $ensayo->id]));
+            let firstLoad = true;
+
             // --- API: Buscar grupos ---
             async function fetchGrupos(query = "") {
                 const url = "{{ route('admin.grupos-selectores.buscar') }}?q=" + encodeURIComponent(query);
@@ -218,132 +259,45 @@
                 return await res.json();
             }
 
-            // --- Renderizar <select> con grupos ---
-            async function renderGrupoSelect(selectEl, selectedId = null) {
-                const grupos = await fetchGrupos();
-                selectEl.innerHTML = `<option value="">Seleccione un grupo</option>`;
-                grupos.forEach(g => {
-                    const option = document.createElement('option');
-                    option.value = g.id;
-                    option.textContent = g.nombre;
-
-                    if (selectedId && parseInt(selectedId) === g.id) {
-                        option.selected = true;
-                    }
-                    // selectEl.appendChild(option);
-                });
+            function crearHeaderInput(seccionIdx, valor = "") {
+                const div = document.createElement('div');
+                div.classList.add('flex', 'items-center', 'gap-2', 'mb-1', 'header-item');
+                div.innerHTML = `
+                <input type="text" 
+                        name="secciones[${seccionIdx}][headers][]" 
+                        value="${valor}" 
+                        class="flex-1 border border-gray-300 rounded text-xs px-2 py-1">
+                    <button type="button" class="text-red-600 eliminar-header">🗑</button>
+                `;
+                return div;
             }
 
             // --- Renderizar lista de grupos en panel derecho ---
-            function renderListaGrupos(container, grupos) {
-                container.innerHTML = "";
-                if (!grupos || grupos.length === 0) {
-                    container.innerHTML = "<p class='text-gray-500 text-sm'>No se encontraron grupos.</p>";
-                    return;
-                }
-
-                grupos.forEach(g => {
-                    const div = document.createElement('div');
-                    div.classList.add('border-b', 'py-2');
-                    let html = `<strong>${g.nombre}</strong>`;
-                    html += `
-                    <button type="button" 
-                        class="delete-button text-red-600 px-2 py-1 rounded shadow-sm eliminar-grupo" 
-                        data-id="${g.id}" 
-                        data-tippy-content="Eliminar grupo">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    `;
-                    if (g.opciones && g.opciones.length > 0) {
-                        html += `<ul class="ml-4 mt-1 text-xs list-disc text-gray-700">`;
-                        g.opciones.forEach(op => {
-                            html += `<li>${op.etiqueta} (${op.valor})</li>`;
-                        });
-                        html += `</ul>`;
-                    } else {
-                        html += `<p class="ml-4 text-xs text-gray-400">Sin opciones</p>`;
-                    }
-
-                    div.innerHTML = html;
-                    container.appendChild(div);
-                });
-            }
-
-            // --- Guardar nuevo grupo ---
-            async function guardarGrupo() {
-                const nombre = document.getElementById('nuevo-nombre-grupo').value.trim();
-                const opciones = document.getElementById('nuevas-opciones').value
-                    .split(',')
-                    .map(o => o.trim())
-                    .filter(o => o);
-
-                if (!nombre) {
-                    alert("El nombre del grupo es obligatorio.");
-                    return;
-                }
-
-                const res = await fetch("{{ route('admin.grupos-selectores.guardar') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        nombre,
-                        opciones
-                    })
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    alert("Grupo creado: " + data.grupo.nombre);
-                    document.getElementById('nuevo-nombre-grupo').value = "";
-                    document.getElementById('nuevas-opciones').value = "";
-                    refrescarSelects();
-                } else {
-                    const error = await res.json();
-                    alert("Error: " + error.message);
-                }
-            }
-
-            function refrescarSelects() {
-                document.querySelectorAll('.grupo-selector-select').forEach(selectEl => {
-                    renderGrupoSelect(selectEl, selectEl.dataset.selected);
-                });
-            }
-
-            async function cargarListaGrupos(query = "") {
-                const lista = document.getElementById('lista-grupos');
-                lista.innerHTML = "Cargando...";
-                const grupos = await fetchGrupos(query);
-                renderListaGrupos(lista, grupos);
-            }
-
-            function LimpiarListaGrupos() {
-                const lista = document.getElementById('lista-grupos');
-                lista.innerHTML = "";
-            }
-
             function crearFilaParametro(seccionIdx, parametroIdx) {
                 const trParam = document.createElement('tr');
                 trParam.innerHTML = `
-                    <td><input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][nombre]" class="w-full border rounded text-xs px-1"></td>
-                    <td><button type="button" class="eliminar-parametro">🗑</button></td>
+                    <td class='flex gap-2'>
+                        <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][nombre]" class="text-xs border rounded px-1 py-0.5"
+                        placeholder="Nombre del parámetro" 
+                        >
+                        <button type="button" class="eliminar-parametro">🗑</button>
+                    </td>
                 `;
 
                 const trResultados = document.createElement('tr');
                 trResultados.innerHTML = `
-                <td colspan="2">
-                <table class="w-full text-xs border resultados-table">
-                            <thead>
-                                <tr>
-                                    <th>Tipo</th><th>Unidad</th><th>Validación</th>
-                                    <th>Requerido</th><th>Posición</th><th>Grupo</th><th></th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                <button type="button" class="add-resultado" data-seccion-idx="${seccionIdx}" data-parametro-idx="${parametroIdx}">+ Resultado</button>
+                <td>
+                <table class="w-full text-xs border border-gray-300 rounded resultados-table">
+                        <thead class="bg-gray-100 text-gray-600">
+
+                        </thead>
+                        <tbody></tbody>
+                 </table>
+                 <button type="button"
+                    class="add-resultado block text-center text-blue-600 my-2 w-full"
+                    data-seccion-idx="${seccionIdx}" data-parametro-idx="${parametroIdx}">
+                                                       + Campo
+                 </button>
                 </td>
                 `;
 
@@ -352,27 +306,68 @@
 
             function crearFilaResultado(seccionIdx, parametroIdx, resultadoIdx) {
                 const tr = document.createElement('tr');
+                tr.classList.add('text-xs');
+
                 tr.innerHTML = `
-        <td>
-            <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][tipo]">
-                <option value="text">Texto</option>
-                <option value="number">Número</option>
-            </select>
-        </td>
-        <td><input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][unidad]"></td>
-        <td><input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][validacion]"></td>
-        <td><input type="checkbox" name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][requerido]" value="1"></td>
-        <td><input type="number" name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][posicion]"></td>
-        <td>
-            <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][resultados][${resultadoIdx}][grupo_selector_id]" class="grupo-selector-select">
-                <option value="">Seleccione un grupo</option>
-            </select>
-        </td>
-        <td><button type="button" class="eliminar-resultado">🗑</button></td>
-    `;
-
-                renderGrupoSelect(tr.querySelector('.grupo-selector-select'));
-
+                <td class="px-2 py-1 border">
+                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][label]"
+                        placeholder="Label" class="w-full text-xs border rounded px-1 py-0.5">
+                </td>
+                <td class="px-2 py-1 border">
+                    <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][tipo]"
+                            class="w-full text-xs border rounded px-1 py-0.5">
+                        <option value="text">Texto</option>
+                        <option value="number">Número</option>
+                        <option value="date">Fecha</option>
+                        <option value="select">Select</option>
+                        <option value="checkbox">Checkbox</option>
+                        <option value="textarea">Textarea</option>
+                        <option value="email">Email</option>
+                        <option value="datalist">Datalist</option>
+                        <option value="radio">Radio</option>
+                    </select>
+                </td>
+                <td class="px-2 py-1 border">
+                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][placeholder]"
+                        placeholder="Placeholder" class="w-full text-xs border rounded px-1 py-0.5">
+                </td>
+                <td class="px-2 py-1 border">
+                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][unidad]"
+                        placeholder="Unidad" class="w-full text-xs border rounded px-1 py-0.5">
+                </td>
+                <td class="px-2 py-1 border text-center">
+                    <input type="checkbox" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][requerido]" class="mx-auto">
+                </td>
+                <td class="px-2 py-1 border">
+                    <input type="number" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][posicion]"
+                        placeholder="#" class="w-full text-xs border rounded px-1 py-0.5">
+                </td>
+                <td class="px-2 py-1 border">
+                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][mensaje]"
+                        placeholder="Mensaje" class="w-full text-xs border rounded px-1 py-0.5">
+                </td>
+                <td class="px-2 py-1 border">
+                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][step]" placeholder="Step" class="w-full text-xs border rounded px-1 py-0.5 mt-1">
+                </td>
+                <td class="px-2 py-1 border">
+                    <textarea name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][pattern]"
+                      placeholder='Validacion' class="w-full text-xs border rounded px-1 py-0.5 mt-1"></textarea>
+                </td>
+                <td class="px-2 py-1 border">
+                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][range]"
+                        placeholder="Rango" class="w-full text-xs border rounded px-1 py-0.5">
+                </td>
+                <td class="px-2 py-1 border">
+                     <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][grupo_selector_id]" class="grupo-selector-select w-full text-xs border rounded px-1 py-0.5" >
+                        <option value="">Seleccione un grupo</option>
+                      </select>
+                </td>
+                <td class="px-2 py-1 border text-center">
+                    <button type="button" class="eliminar-resultado text-red-500 text-xs">🗑</button>
+                </td>
+                `;
+                const selectGrupo = tr.querySelector('.grupo-selector-select');
+                asignarFocusGrupo(selectGrupo);
                 return tr;
             }
 
@@ -394,21 +389,30 @@
                                     <input type="text" name="secciones[${seccionIdx}][nombre]"
                                         class="w-full border border-gray-300 rounded text-xs px-2 py-1">
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-gray-600">Cantidad de
-                                        parámetros</label>
-                                    <input type="number" name="secciones[${seccionIdx}][cantidad_parametros]" min="0"
-                                        class="w-full border border-gray-300 rounded text-xs px-2 py-1" />
-                                </div>
                             </div>
 
                     <!-- Descripción -->
-                    <div class="mb-3">
+                    <div class="">
                         <label class="block text-xs font-semibold text-gray-600">Descripción</label>
                         <textarea name="secciones[${seccionIdx}][descripcion]"
                             class="w-full border border-gray-300 rounded text-xs px-2 py-1"></textarea>
                     </div>
 
+                  <div class="headers-wrapper">
+                        <label class="block text-xs font-semibold text-gray-600">Encabezado</label>
+                        <div class="headers-list flex flex-wrap">
+                            <!-- Aquí se irán agregando los inputs de headers -->
+                        </div>
+                        <button type="button"
+                            class="mt-1 px-3 py-1 text-xs bg-blue-500 text-white rounded add-header"
+                            data-seccion-idx="${seccionIdx}">
+                            + Header
+                        </button>
+                    </div>
+
+                    <table>
+                        <tbody class="parametros-table"></tbody>
+                    </table>
 
                     <button type="button" class="mt-2 text-xs text-blue-600 add-parametro" 
                         data-seccion-idx="${seccionIdx}">+ Parámetro
@@ -417,25 +421,33 @@
                 return div;
             }
 
+            function asignarFocusGrupo(selectElement) {
+                selectElement.addEventListener('focus', function() {
+                    const selectedId = this.dataset.selected;
+                    fetch(urlGrupos)
+                        .then(res => res.json())
+                        .then(data => {
+                            this.querySelectorAll('option:not(:first-child)').forEach(o => o
+                                .remove());
+
+                            data.forEach(grupo => {
+                                const option = document.createElement('option');
+                                option.value = grupo.id;
+                                option.textContent = grupo.nombre;
+                                if (grupo.id == selectedId) option.selected = true;
+                                this.appendChild(option);
+                            });
+                        })
+                        .catch(err => console.error(err));
+                });
+            }
+
+
             document.addEventListener('DOMContentLoaded', () => {
-                document.querySelectorAll('.grupo-selector-select').forEach(selectEl => {
-                    const selectedId = selectEl.dataset.selected;
-                    renderGrupoSelect(selectEl, selectedId);
+                document.querySelectorAll('.grupo-selector-select').forEach(select => {
+                   asignarFocusGrupo(select);     
                 });
 
-                document.getElementById('btn-buscar-grupo').addEventListener('click', () => {
-                    const query = document.getElementById('busqueda-grupo').value;
-                    cargarListaGrupos(query);
-                });
-
-                // Guardar grupo
-                document.getElementById('btn-guardar-grupo').addEventListener('click', guardarGrupo);
-                // Agregar secciones
-                // document.getElementById('add-seccion').addEventListener('click', () => {
-                //     const wrapper = document.getElementById('secciones-wrapper');
-                //     const nuevaSeccion = crearSeccion();
-                //     wrapper.insertBefore(nuevaSeccion, document.getElementById('add-seccion'));
-                // });
                 document.getElementById('add-seccion').addEventListener('click', () => {
                     const wrapper = document.getElementById('secciones-wrapper');
                     const nuevaSeccion = crearSeccion();
@@ -449,12 +461,27 @@
                 //         tbody.appendChild(crearFilaParametro());
                 //     }
                 // });
+
                 document.addEventListener('click', async (e) => {
+
+                    if (e.target && e.target.classList.contains('add-header')) {
+                        const seccionIdx = e.target.dataset.seccionIdx;
+                        const headersList = e.target.closest('.headers-wrapper').querySelector(
+                            '.headers-list');
+                        headersList.appendChild(crearHeaderInput(seccionIdx));
+                    }
+
+                    // Eliminar header
+                    if (e.target && e.target.classList.contains('eliminar-header')) {
+                        const item = e.target.closest('.header-item');
+                        if (item) item.remove();
+                    }
+
                     if (e.target && e.target.classList.contains('add-parametro')) {
                         const seccionIdx = e.target.dataset.seccionIdx;
                         const tbody = e.target.closest('.seccion').querySelector('tbody');
-                        const parametroIdx = tbody.querySelectorAll('tr')?.length??0;
-                        tbody.appendChild(crearFilaParametro(seccionIdx, parametroIdx));
+                        const parametroIdx = tbody ? (tbody.querySelectorAll('tr')?.length ?? 0) : 0;
+                        // tbody.appendChild(crearFilaParametro(seccionIdx, parametroIdx));
                         const [trParam, trResultados] = crearFilaParametro(seccionIdx, parametroIdx);
                         tbody.appendChild(trParam);
                         tbody.appendChild(trResultados);
@@ -493,7 +520,6 @@
                         if (res.ok) {
                             alert("Grupo eliminado correctamente");
                             LimpiarListaGrupos();
-                            refrescarSelects();
                         } else {
                             alert("Error al eliminar grupo");
                         }
@@ -503,10 +529,7 @@
                         const seccionIdx = btn.dataset.seccionIdx;
                         const parametroIdx = btn.dataset.parametroIdx;
 
-                        // Encuentra el tbody de resultados correspondiente
                         const resultadosTbody = btn.closest('tr').querySelector('tbody');
-
-                        // Calcula el índice correcto de resultado
                         const resultadoIdx = resultadosTbody.querySelectorAll('tr').length;
 
                         const nuevaFila = crearFilaResultado(seccionIdx, parametroIdx, resultadoIdx);

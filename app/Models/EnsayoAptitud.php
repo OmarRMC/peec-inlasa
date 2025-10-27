@@ -34,4 +34,9 @@ class EnsayoAptitud extends Model
     {
         return $this->hasMany(Ciclo::class, 'id_ensayo');
     }
+
+    public function gruposSelectores()
+    {
+        return $this->hasMany(GrupoSelector::class, 'ensayo_id');
+    }
 }

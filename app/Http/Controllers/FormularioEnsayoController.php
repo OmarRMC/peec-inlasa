@@ -9,6 +9,7 @@ use App\Models\Parametro;
 use App\Models\Programa;
 use App\Models\Seccion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class FormularioEnsayoController extends Controller
@@ -131,65 +132,96 @@ class FormularioEnsayoController extends Controller
         return redirect()->back()->with('success', 'Formulario eliminado correctamente.');
     }
 
-    public function edit($id)
+    public function edit($id, $idEa)
     {
         $formulario = FormularioEnsayo::with([
-            'secciones.parametros.grupoSelector.opciones'
+            'secciones.parametros.campos.grupoSelector.opciones'
         ])->find($id);
         if (!$formulario) {
             return redirect()->route('admin.formularios.ea')->with('error', 'Formulario no encontrado.');
         }
-        $grupos = [];
-        return view('admin.formularios.edit', compact('formulario', 'grupos'));
+        $ensayo = $formulario->ensayos->firstWhere('id', $idEa);
+        if (!$ensayo) {
+            return redirect()->route('admin.formularios.ea')->with('error', 'Ensayo de Aptitud no asociado al formulario.');
+        }
+        $grupos = $ensayo->gruposSelectores()->get();
+        return view('admin.formularios.edit', compact('formulario', 'grupos', 'ensayo'));
     }
 
     public function updateEstructura(Request $request, $id)
     {
         $formulario = FormularioEnsayo::findOrFail($id);
 
+        Log::info('$request->all()');
+        Log::info($request->all());
         $data = $request->validate([
-            'secciones' => 'required|array',
+            'secciones' => 'nullable|array|min:1',
             'secciones.*.nombre' => 'required|string|max:255',
-            'secciones.*.descripcion' => 'nullable|string',
-            'secciones.*.cantidad_parametros' => 'nullable|integer',
-            'secciones.*.parametros' => 'array',
+            'secciones.*.descripcion' => 'nullable|string|max:1000',
+            'secciones.*.cantidad_parametros' => 'nullable|integer|min:0',
+            'secciones.*.headers' => 'nullable|array',
+            'secciones.*.headers.*' => 'string|max:255',
+
+            'secciones.*.parametros' => 'required|array',
             'secciones.*.parametros.*.nombre' => 'required|string|max:255',
-            'secciones.*.parametros.*.tipo' => 'required|string|in:text,number,date,select,checkbox,textarea',
-            'secciones.*.parametros.*.unidad' => 'nullable|string|max:50',
-            'secciones.*.parametros.*.validacion' => 'nullable|string',
-            'secciones.*.parametros.*.requerido' => 'nullable|boolean',
-            'secciones.*.parametros.*.posicion' => 'nullable|integer',
-            'secciones.*.parametros.*.grupo_selector_id' => 'nullable|exists:grupos_selectores,id',
+            'secciones.*.parametros.*.campos' => 'nullable|array',
+            'secciones.*.parametros.*.campos.*.label' => 'required|string|max:255',
+            'secciones.*.parametros.*.campos.*.tipo' => 'required|string|in:text,number,date,select,checkbox,textarea,datalist',
+            'secciones.*.parametros.*.campos.*.placeholder' => 'nullable|string|max:255',
+            'secciones.*.parametros.*.campos.*.unidad' => 'nullable|string|max:50',
+            'secciones.*.parametros.*.campos.*.requerido' => 'nullable',
+            'secciones.*.parametros.*.campos.*.posicion' => 'nullable|integer|min:0',
+            'secciones.*.parametros.*.campos.*.mensaje' => 'nullable|string|max:500',
+            'secciones.*.parametros.*.campos.*.step' => 'nullable|string|max:50',
+            'secciones.*.parametros.*.campos.*.pattern' => 'nullable|string|max:255',
+            'secciones.*.parametros.*.campos.*.range' => 'nullable|string|max:255',
+            'secciones.*.parametros.*.campos.*.id_grupo_selector' => 'nullable|exists:grupos_selectores,id',
         ]);
 
-        Log::info('Guardando estructura del formulario', $data);
-
-        $formulario->secciones()->delete();
-
-        foreach ($data['secciones'] as $sec) {
-            $seccion = $formulario->secciones()->create([
-                'nombre' => $sec['nombre'],
-                'descripcion' => $sec['descripcion'] ?? null,
-                'cantidad_parametros' => max(
-                    (int) ($sec['cantidad_parametros'] ?? 0),
-                    count($sec['parametros'] ?? [])
-                ),
-            ]);
-
-            foreach ($sec['parametros'] ?? [] as $param) {
-                $seccion->parametros()->create([
-                    'nombre' => $param['nombre'],
-                    'tipo' => $param['tipo'],
-                    'unidad' => $param['unidad'] ?? null,
-                    'validacion' => $param['validacion'] ?? null,
-                    'requerido' => isset($param['requerido']) ? 1 : 0,
-                    'posicion' => $param['posicion'] ?? 0,
-                    'id_grupo_selector' => $param['grupo_selector_id'] ?? null,
+        DB::transaction(function () use ($formulario, $data) {
+            $formulario->secciones()->each(function ($seccion) {
+                $seccion->parametros()->each(function ($param) {
+                    $param->campos()->delete();
+                });
+                $seccion->parametros()->delete();
+                $seccion->delete();
+            });
+            $data['secciones'] = $data['secciones'] ?? [];
+            foreach ($data['secciones'] as $secIdx => $sec) {
+                $seccion = $formulario->secciones()->create([
+                    'nombre' => $sec['nombre'],
+                    'descripcion' => $sec['descripcion'] ?? null,
+                    'cantidad_parametros' => max((int)($sec['cantidad_parametros'] ?? 0), count($sec['parametros'])),
+                    'posicion' => $secIdx,
+                    'headers' => isset($sec['headers']) ? $sec['headers'] : [],
                 ]);
-            }
-        }
 
-        return redirect()->route('admin.formularios.edit', $id)
+                foreach ($sec['parametros'] as $paramIdx => $param) {
+                    $parametro = $seccion->parametros()->create([
+                        'nombre' => $param['nombre'],
+                    ]);
+                    foreach ($param['campos'] ?? [] as $campoIdx => $campo) {
+                        Log::info('$campo');
+                        Log::info($campo);
+                        $parametro->campos()->create([
+                            'nombre' => $campo['nombre'] ?? '',
+                            'label' => $campo['label'],
+                            'tipo' => $campo['tipo'],
+                            'placeholder' => $campo['placeholder'] ?? null,
+                            'unidad' => $campo['unidad'] ?? null,
+                            'requerido' => isset($campo['requerido']) ? true : false,
+                            'posicion' => $campo['posicion'] ?? $campoIdx,
+                            'mensaje' => $campo['mensaje'] ?? null,
+                            'step' => $campo['step'] ?? null,
+                            'pattern' => $campo['pattern'] ?? null,
+                            'rangeNumber' => $campo['range'] ?? null,
+                            'id_grupo_selector' => $campo['id_grupo_selector'] ?? null,
+                        ]);
+                    }
+                }
+            }
+        });
+        return redirect()->back()
             ->with('success', 'Formulario actualizado correctamente ✅');
     }
 

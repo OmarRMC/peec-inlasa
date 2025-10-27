@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EnsayoAptitud;
 use App\Models\GrupoSelector;
 use App\Models\OpcionSelector;
 use Illuminate\Http\Request;
@@ -9,6 +10,44 @@ use Illuminate\Support\Facades\Log;
 
 class GrupoSelectorController extends Controller
 {
+    public function index($ensayoId)
+    {
+        $ensayo = EnsayoAptitud::with('gruposSelectores.opciones')->findOrFail($ensayoId);
+
+        return view('admin.grupos.index', compact('ensayo'));
+    }
+
+    public function store(Request $request, $ensayoId)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+        ]);
+
+        EnsayoAptitud::findOrFail($ensayoId)
+            ->gruposSelectores()
+            ->create($request->only('nombre', 'descripcion'));
+
+        return back()->with('success', 'Grupo creado correctamente.');
+    }
+
+    public function update(Request $request, GrupoSelector $grupo)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+        ]);
+
+        $grupo->update($request->only('nombre', 'descripcion'));
+
+        return back()->with('success', 'Grupo actualizado correctamente.');
+    }
+
+    public function destroy(GrupoSelector $grupo)
+    {
+        $grupo->delete();
+        return back()->with('success', 'Grupo eliminado correctamente.');
+    }
     public function buscar(Request $request)
     {
         $search = $request->get('q', '');
@@ -67,4 +106,12 @@ class GrupoSelectorController extends Controller
             return response()->json(['success' => false, 'message' => 'Error al eliminar el grupo'], 500);
         }
     }
+
+    public function gruposSelectoresJson($ensayoId)
+    {
+        $grupos = GrupoSelector::where('ensayo_id', $ensayoId)->with('opciones')->get();
+        return response()->json($grupos);
+    }
+
+
 }

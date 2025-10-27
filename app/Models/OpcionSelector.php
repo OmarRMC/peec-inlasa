@@ -15,7 +15,7 @@ class OpcionSelector extends Model
         'valor',
         'etiqueta',
         'posicion',
-        'grupo_hijo_id'
+        'id_grupo_hijo'
     ];
 
     public function grupo()
@@ -25,6 +25,6 @@ class OpcionSelector extends Model
 
     public function grupoHijo()
     {
-        return $this->belongsTo(GrupoSelector::class, 'grupo_hijo_id');
+        return $this->belongsTo(GrupoSelector::class, 'id_grupo_hijo');
     }
 }

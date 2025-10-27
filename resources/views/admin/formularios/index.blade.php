@@ -82,6 +82,11 @@
                                                 class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm">
                                                 <i class="fas fa-calendar-alt"></i>
                                             </a>
+                                            <a href="{{ route('admin.grupos.index', $ensayo->id) }}" 
+                                                data-tippy-content="Configurar Grupos de Selectores"
+                                                class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-2 py-1 rounded shadow-sm">
+                                                <i class="fas fa-layer-group"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach
