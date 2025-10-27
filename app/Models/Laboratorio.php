@@ -433,6 +433,8 @@ class Laboratorio extends Model
         return ($partes[0] ?? '')
             .  (isset($partes[1]) ? ' Nº' . $partes[1] :  '')
             . ' ' . ($partes[2] ?? '');
+    }
+
     public function respuestas()
     {
         return $this->hasMany(FormularioEnsayoResultado::class, 'id_laboratorio');
