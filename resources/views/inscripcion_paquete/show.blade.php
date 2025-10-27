@@ -214,12 +214,11 @@
                                     </button>
                                 @endif
                             @endif
-                            @if (
-                                !$inscripcion->estaAprobado() &&
+                            @if (!$inscripcion->estaAprobado() &&
                                     Gate::any([Permiso::LABORATORIO]) &&
-                                    configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION) &&
-                                    Configuracion::esPeriodoInscripcion())
-                                <button onclick="document.getElementById('modalSubirDocumentos').showModal()"
+                                    configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION))
+                                    <a  class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200" href="https://forms.gle/PbGcRxwtBxCceV9FA" target="_blank" >Subir documentos</a>
+                                {{-- <button onclick="document.getElementById('modalSubirDocumentos').showModal()"
                                     class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
                                     aria-label="Subir documentos" title="Subir documentos">
                                     @if ($actualizarDocumentos)
@@ -227,7 +226,7 @@
                                     @else
                                         Subir documentos
                                     @endif
-                                </button>
+                                </button> --}}
                             @endif
                         </div>
                     @endif

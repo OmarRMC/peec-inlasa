@@ -178,16 +178,18 @@
                             {
                                 data: 'nombre_area'
                             },
-                            {
-                                data: 'costo',
-                                render: data => `${data} Bs.`
+                            { 
+                                data: 'costo', 
+                                render: data => `${data} Bs.` 
                             }
                         ],
                         language: {
                             url: "{{ asset('translation/es.json') }}"
                         },
-                        dom: 'rt',
-                        lengthChange: false,
+                        dom: 'frtp',
+                        lengthChange: false, 
+                        paging: true,
+                        pageLength: 10,
                         drawCallback: function() {
                             tippy('[data-tippy-content]');
                             $(document).on('click', '.agregar-paquete', function() {
