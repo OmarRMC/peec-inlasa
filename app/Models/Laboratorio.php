@@ -441,4 +441,20 @@ class Laboratorio extends Model
     {
         return $query->where('status', self::ACTIVE_STATUS);
     }
+
+    public function paquetesPendientes($gestion)
+    {
+        $idsPaquetes = $this->inscripciones()
+            ->enEspera()
+            ->where('gestion', $gestion)
+            ->whereHas('detalleInscripciones')
+            ->with('detalleInscripciones:id,id_inscripcion,id_paquete')
+            ->get()
+            ->pluck('detalleInscripciones.*.id_paquete')
+            ->flatten()
+            ->unique()
+            ->values()
+            ->toArray();
+        return $idsPaquetes;
+    }
 }

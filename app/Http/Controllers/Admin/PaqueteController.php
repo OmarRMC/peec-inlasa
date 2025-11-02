@@ -169,16 +169,27 @@ class PaqueteController extends Controller
     {
         $programaId = $request->query('programa_id');
         $labId = $request->lab_id;
-        $laboratorio = Laboratorio::findOrFail($labId);
+        $user = Auth::user();
+        if ($user->isLaboratorio()) {
+            $laboratorio = $user->laboratorio;
+            if (!Configuracion::esPeriodoInscripcion()) {
+                return datatables()->of(collect())->toJson();
+            }
+        } else {
+            $laboratorio = Laboratorio::findOrFail($labId);
+        }
         $tipoLabId = $laboratorio->id_tipo;
 
         if (!$programaId) {
             return datatables()->of(collect())->toJson();
         }
 
+        $gestion = configuracion(Configuracion::GESTION_INSCRIPCION);
+        $idsPaquetes = $laboratorio->paquetesPendientes($gestion);
         $paquetes = collect();
 
         $paquetesDB = Paquete::with(['area', 'detalleInscripciones.inscripcion'])->active()
+            ->whereNotIn('id', $idsPaquetes)
             ->whereHas('area', function ($query) use ($request) {
                 $query->where('id_programa', $request->programa_id);
             })

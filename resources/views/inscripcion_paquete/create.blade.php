@@ -123,16 +123,18 @@
                 rows="1"></textarea>
         </div>
         <div id="paquetesSeleccionados"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-2 sm:p-6 rounded-lg shadow-lg max-h-[100vh] overflow-y-auto">
-            <div class="relative bg-white rounded-lg shadow-lg w-full max-w-3xl overflow-y-auto p-2">
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-2 sm:p-6">
+            <div
+                class="relative bg-white rounded-lg shadow-lg w-full max-w-3xl p-2 
+               max-h-[90vh] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 <!-- Contenedor donde se clonará la lista -->
+                <button id="btn-ocultar-seleccionados"
+                    class="px-3 text-white rounded btn-primary transition shadow text-sm">
+                    <i class="fas fa-eye-slash"></i>Seguir Inscribiéndose
+                </button>
                 <div id="modal-selecionados">
                     <!-- Aquí se insertará el contenido clonado -->
                 </div>
-                <button id="btn-ocultar-seleccionados"
-                    class="px-3 text-white rounded btn-primary  transition shadow text-sm">
-                    <i class="fas fa-eye"></i> Seguir Inscribiéndose
-                </button>
             </div>
         </div>
         <!-- Tabla de paquetes seleccionados (fuera del modal) -->
@@ -394,40 +396,40 @@
                         alert('Debe seleccionar al menos un paquete.');
                         return;
                     }
+
                     confirmAsyncHandle({
                         html: `
-                        <div class="text-left text-gray-700 space-y-4">
-                            <p class="text-base">¿Está seguro de que desea registrar la inscripción con los siguientes paquetes?</p>
-                            <div class="bg-gray-50 p-4 rounded-md shadow-sm border border-gray-200">
-                                <!-- Contenedor con scroll solo para la lista -->
-                                <div class="max-h-64 overflow-y-auto pr-2">
-                                    <ul class="divide-y divide-gray-200">
-                                        ${seleccionados.map(pkt => `
-                                                                                                                                                                                                                                                                                                    <li class="py-0 flex justify-between">
-                                                                                                                                                                                                                                                                                                        <span class="font-medium text-sm">${pkt.nombre_paquete}</span>
-                                                                                                                                                                                                                                                                                                        <span class="text-sm text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
-                                                                                                                                                                                                                                                                                                    </li>
-                                                                                                                                                                                                                                                                                                    `).join('')}
-                                    </ul>
-                                </div>
-                                <!-- Total fijo -->
-                                <div class="border-t pt-3 mt-3 text-sm flex justify-between font-semibold text-gray-800  sticky bottom-0">
-                                    <span>Total</span>
-                                    <span>
-                                        ${seleccionados.reduce((total, pkt) => total + parseFloat(pkt.costo), 0).toFixed(2)} Bs.
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    `,
+        <div class="text-left text-gray-700 text-sm space-y-2">
+            <p class="text-[13px] leading-snug">
+                ¿Está seguro de registrar la inscripción con los siguientes paquetes?
+            </p>
+            <div class="bg-gray-50 p-2 rounded-md border border-gray-200 shadow-inner">
+                <!-- Contenedor scrollable -->
+                <div class="max-h-40 overflow-y-auto pr-1">
+                    <ul class="divide-y divide-gray-200">
+                        ${seleccionados.map(pkt => `
+                                                    <li class="py-1 flex justify-between items-center">
+                                                        <span class="font-medium text-[12px]">${pkt.nombre_paquete}</span>
+                                                        <span class="text-[12px] text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
+                                                    </li>
+                                                `).join('')}
+                    </ul>
+                </div>
+                <!-- Total fijo -->
+                <div class="border-t border-gray-300 pt-2 mt-2 flex justify-between font-semibold text-gray-800 text-[13px]">
+                    <span>Total</span>
+                    <span>
+                        ${seleccionados.reduce((total, pkt) => total + parseFloat(pkt.costo), 0).toFixed(2)} Bs.
+                    </span>
+                </div>
+            </div>
+        </div>
+        `,
                         title: 'Confirmar Inscripción',
                         csrfToken: '{{ csrf_token() }}',
                         icon: 'warning',
                         handle: registrarInscription
                     });
-
-
-
                 });
             });
         </script>

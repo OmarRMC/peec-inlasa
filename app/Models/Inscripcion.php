@@ -318,4 +318,14 @@ class Inscripcion extends Model
 
         return collect($groups);
     }
+
+    public function scopeEnEspera($query)
+    {
+        return $query->whereIn('status_inscripcion', [
+            self::STATUS_APROBADO,
+            self::STATUS_VENCIDO,
+            self::STATUS_EN_REVISION,
+            self::STATUS_EN_OBSERVACION,
+        ]);
+    }
 }
