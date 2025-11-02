@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class Inscripcion extends Model
 {
@@ -245,5 +246,76 @@ class Inscripcion extends Model
             self::STATUS_APROBADO,
             self::STATUS_VENCIDO,
         ]);
+    }
+
+    public function getPaquetesAttribute(): array
+    {
+        $detalles = $this->detalleInscripciones()->select('id_paquete', 'descripcion_paquete')->get();
+
+        return $detalles
+            ->map(function ($detalle) {
+                return [
+                    'id_paquete' => $detalle->id_paquete,
+                    'descripcion_paquete' => $detalle->descripcion_paquete,
+                ];
+            })
+            ->filter(function ($p) {
+                return !is_null($p['id_paquete']);
+            })
+            ->values()
+            ->all();
+    }
+
+
+    public static function agruparPorLaboratorio(Collection $inscripciones): Collection
+    {
+        $groups = [];
+
+        foreach ($inscripciones as $inscripcion) {
+            $key = $inscripcion->id_lab;
+
+            $saldoInscripcion = max(0, (float) ($inscripcion->saldo ?? 0));
+            $paquetesActuales = $inscripcion->paquetes ?? [];
+
+            if (!isset($groups[$key])) {
+                $groups[$key] = [
+                    'gestion' => $inscripcion->gestion,
+                    'id_lab' => $inscripcion->id_lab,
+                    'laboratorio' => $inscripcion->laboratorio ?? null,
+                    'inscripciones_count' => 1,
+                    'costo_total' => (float) $inscripcion->costo_total,
+                    'saldo_total' => (float) $saldoInscripcion,
+                    'paquetes' => $paquetesActuales,
+                    'ultima_fecha_inscripcion' => $inscripcion->created_at,
+                    'inscripciones_ids' => [$inscripcion->id],
+                    'deuda_pendiente' => $saldoInscripcion > 0,
+                ];
+            } else {
+                $groups[$key]['inscripciones_count']++;
+                $groups[$key]['costo_total'] += (float) $inscripcion->costo_total;
+                $groups[$key]['saldo_total'] += (float) $saldoInscripcion;
+                $merged = collect($groups[$key]['paquetes'])
+                    ->merge($paquetesActuales)
+                    ->reject(fn($p) => empty($p['id_paquete']))
+                    ->unique('id_paquete')
+                    ->values()
+                    ->toArray();
+
+                $groups[$key]['paquetes'] = $merged;
+                $groups[$key]['inscripciones_ids'][] = $inscripcion->id;
+
+                $timestampNueva = Carbon::createFromFormat(getFormat(), $inscripcion->created_at)->getTimestampMs();
+                $timestampUltima = Carbon::createFromFormat(getFormat(), $groups[$key]['ultima_fecha_inscripcion'])->getTimestampMs();
+
+                if ($timestampNueva > $timestampUltima) {
+                    $groups[$key]['ultima_fecha_inscripcion'] = $inscripcion->created_at;
+                }
+
+                $groups[$key]['deuda_pendiente'] =
+                    $groups[$key]['deuda_pendiente'] || ($saldoInscripcion > 0);
+            }
+        }
+
+        return collect($groups);
     }
 }

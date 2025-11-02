@@ -19,10 +19,17 @@ if (!function_exists('configuracion')) {
     }
 }
 
+if (!function_exists('getFormat')) {
+    function getFormat($time = true)
+    {
+        return $format = $time ? 'd/m/Y H:i' : 'd/m/Y';
+    }
+}
+
 if (!function_exists('formatDate')) {
     function formatDate(string $date, $time = true)
     {
-        $format = $time ? 'd/m/Y H:i' : 'd/m/Y';
+        $format = getFormat($time);
         return Carbon::parse($date)
             ->timezone('America/La_Paz')
             ->format($format);

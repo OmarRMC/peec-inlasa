@@ -18,14 +18,14 @@
 <fieldset class="form-fieldset border p-4 mb-8 rounded-md max-w-3xl mx-auto">
     {{-- <fieldset class="border p-6 mb-8 rounded-md max-w-5xl mx-auto shadow-sm"> --}}
     <legend class="flex items-center gap-2 text-lg font-semibold mb-2 text-gray-700">
-        <i class="fas fa-flask text-primary"></i> Datos Básicos
+        <i class="fas fa-flask text-primary"></i> Datos básicos
     </legend>
 
     <div class="container-inputs grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         {{-- Num. Registro Sedes --}}
         <div>
-            <label for="numsedes_lab" class="label">Su Numero de Registro Sedes</label>
+            <label for="numsedes_lab" class="label">Su número de registro de sedes</label>
             <input type="text" name="numsedes_lab" id="numsedes_lab" maxlength="20"
                 value="{{ old('numsedes_lab', $laboratorio->numsedes_lab ?? '') }}"
                 class="input-standard w-full @error('numsedes_lab') border-red-500 @enderror" placeholder="0000">
@@ -49,7 +49,7 @@
         @endif
         {{-- Sigla Laboratorio --}}
         <div>
-            <label for="sigla_lab" class="label">Sigla Laboratorio</label>
+            <label for="sigla_lab" class="label">Sigla del laboratorio</label>
             <input type="text" name="sigla_lab" id="sigla_lab" maxlength="20"
                 value="{{ old('sigla_lab', $laboratorio->sigla_lab ?? '') }}"
                 class="input-standard w-full @error('sigla_lab') border-red-500 @enderror">
@@ -71,12 +71,12 @@
 
         {{-- Nombre Laboratorio --}}
         <div class="md:col-span-2 lg:col-span-3">
-            <label for="nombre_lab" class="label required-label">Nombre Laboratorio</label>
+            <label for="nombre_lab" class="label required-label">Nombre del laboratorio</label>
             <input type="text" name="nombre_lab" id="nombre_lab" maxlength="100"
                 value="{{ old('nombre_lab', $laboratorio->nombre_lab ?? '') }}"
                 class="input-standard w-full @error('nombre_lab') border-red-500 @enderror"
                 pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ][\s\S]*[^\s]$"
-                title="Debe comenzar con una letra, no puede ser solo números ni solo espacios." required>
+                title="Debe comenzar con una letra; no puede ser solo números ni únicamente espacios." required>
             @error('nombre_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -88,12 +88,12 @@
 {{-- Información Responsable --}}
 <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
     <legend class="flex items-center gap-2 text-lg font-semibold mb-2">
-        <i class="fas fa-user-check text-primary"></i> Responsable del Laboratorio
+        <i class="fas fa-user-check text-primary"></i> Responsable del laboratorio
     </legend>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-            <label for="respo_lab" class="label required-label">Nombre Responsable</label>
+            <label for="respo_lab" class="label required-label">Nombre del responsable</label>
             <input type="text" name="respo_lab" id="respo_lab" maxlength="50"
                 value="{{ old('respo_lab', $laboratorio->respo_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('respo_lab') border-red-500 @enderror"
@@ -105,7 +105,7 @@
         </div>
 
         <div>
-            <label for="ci_respo_lab" class="label required-label">CI Responsable</label>
+            <label for="ci_respo_lab" class="label required-label">CI del responsable</label>
             <input type="text" name="ci_respo_lab" id="ci_respo_lab" maxlength="15"
                 value="{{ old('ci_respo_lab', $laboratorio->ci_respo_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('ci_respo_lab') border-red-500 @enderror"
@@ -118,12 +118,12 @@
 {{-- Representante Legal --}}
 <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
     <legend class="flex items-center gap-2 text-lg font-semibold mb-2">
-        <i class="fas fa-user-tie text-primary"></i> Representante Legal
+        <i class="fas fa-user-tie text-primary"></i> Representante legal
     </legend>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-            <label for="repreleg_lab" class="label required-label">Nombre Representante Legal</label>
+            <label for="repreleg_lab" class="label required-label">Nombre del representante legal</label>
             <input type="text" name="repreleg_lab" id="repreleg_lab" maxlength="50"
                 value="{{ old('repreleg_lab', $laboratorio->repreleg_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('repreleg_lab') border-red-500 @enderror"
@@ -135,7 +135,7 @@
         </div>
 
         <div>
-            <label for="ci_repreleg_lab" class="label required-label">CI Representante Legal</label>
+            <label for="ci_repreleg_lab" class="label required-label">CI del representante legal</label>
             <input type="text" name="ci_repreleg_lab" id="ci_repreleg_lab" maxlength="15"
                 value="{{ old('ci_repreleg_lab', $laboratorio->ci_repreleg_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('ci_repreleg_lab') border-red-500 @enderror"
@@ -227,7 +227,7 @@
         </div>
 
         <div>
-            <label for="zona_lab" class="label required-label">Zona/Barrio</label>
+            <label for="zona_lab" class="label required-label">Zona / barrio</label>
             <input type="text" name="zona_lab" id="zona_lab" maxlength="50"
                 value="{{ old('zona_lab', $laboratorio->zona_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('zona_lab') border-red-500 @enderror"
@@ -240,7 +240,7 @@
 
         {{-- Calle/Avenida --}}
         <div>
-            <label for="calle_lab" class="label required-label">Calle/Avenida</label>
+            <label for="calle_lab" class="label required-label">Calle / avenida</label>
             <input type="text" name="calle_lab" id="calle_lab" maxlength="100"
                 value="{{ old('calle_lab', $laboratorio->calle ?? '') }}"
                 class="input-standard max-w-md w-full @error('calle_lab') border-red-500 @enderror" required>
@@ -250,7 +250,7 @@
         </div>
 
         <div>
-            <label for="numero_lab" class="label required-label">Número/Lote</label>
+            <label for="numero_lab" class="label required-label">Número / lote</label>
             <input type="text" name="numero_lab" id="numero_lab" maxlength="10"
                 value="{{ old('numero_lab', $laboratorio->numero ?? '') }}"
                 class="input-standard max-w-md w-full @error('numero_lab') border-red-500 @enderror"
@@ -260,7 +260,7 @@
             @enderror
         </div>
         <div class="md:col-span-2">
-            <label for="referencia" class="label">Referencia/Detalle adicional</label>
+            <label for="referencia" class="label">Referencia / detalle adicional</label>
             <input type="text" name="referencia" id="referencia" maxlength="150"
                 value="{{ old('referencia', $laboratorio->referencia ?? '') }}"
                 class="input-standard w-full @error('referencia') border-red-500 @enderror"
@@ -280,7 +280,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-            <label for="wapp_lab" class="label required-label">WhatsApp Principal</label>
+            <label for="wapp_lab" class="label required-label">WhatsApp principal</label>
             <input type="tel" name="wapp_lab" id="wapp_lab"
                 value="{{ old('wapp_lab', $laboratorio->wapp_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('wapp_lab') border-red-500 @enderror" required
@@ -292,7 +292,7 @@
         </div>
 
         <div>
-            <label for="wapp2_lab" class="label">WhatsApp Secundario</label>
+            <label for="wapp2_lab" class="label">WhatsApp secundario</label>
             <input type="tel" name="wapp2_lab" id="wapp2_lab"
                 value="{{ old('wapp2_lab', $laboratorio->wapp2_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('wapp2_lab') border-red-500 @enderror" maxlength="8"
@@ -303,7 +303,7 @@
         </div>
 
         <div>
-            <label for="mail_lab" class="label required-label">Correo Principal</label>
+            <label for="mail_lab" class="label required-label">Correo principal</label>
             <input type="email" name="mail_lab" id="mail_lab" maxlength="50"
                 value="{{ old('mail_lab', $laboratorio->mail_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('mail_lab') border-red-500 @enderror {{ $esSoloLectura ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}"
@@ -315,7 +315,7 @@
         </div>
 
         <div>
-            <label for="mail2_lab" class="label">Correo Secundario</label>
+            <label for="mail2_lab" class="label">Correo secundario</label>
             <input type="email" name="mail2_lab" id="mail2_lab" maxlength="50"
                 value="{{ old('mail2_lab', $laboratorio->mail2_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('mail2_lab') border-red-500 @enderror">
@@ -325,7 +325,7 @@
         </div>
 
         <div>
-            <label for="telefono" class="label">Telefono fijo</label>
+            <label for="telefono" class="label">Teléfono fijo</label>
             <input type="number" name="telefono" id="telefono" min="1000" maxlength="15"
                 value="{{ old('telefono', $laboratorio->telefono ?? '') }}"
                 class="input-standard max-w-md w-full @error('telefono') border-red-500 @enderror">
@@ -339,12 +339,12 @@
 {{-- Clasificaciones --}}
 <fieldset class="border p-4 mb-8 rounded-md max-w-3xl mx-auto">
     <legend class="flex items-center gap-2 text-lg font-semibold mb-2">
-        <i class="fas fa-tags text-primary"></i> Caracterizacion
+        <i class="fas fa-tags text-primary"></i> Caracterización
     </legend>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
-            <label for="id_nivel" class="label required-label">Nivel Laboratorio</label>
+            <label for="id_nivel" class="label required-label">Nivel del laboratorio</label>
             <select name="id_nivel" id="id_nivel"
                 class="input-standard max-w-md w-full @error('id_nivel') border-red-500 @enderror" required>
                 <option value="">Seleccione un nivel</option>
@@ -361,7 +361,7 @@
         </div>
 
         <div>
-            <label for="id_tipo" class="label required-label">Tipo de Servicio</label>
+            <label for="id_tipo" class="label required-label">Tipo de servicio</label>
             <select name="id_tipo" id="id_tipo"
                 class="input-standard max-w-md w-full @error('id_tipo') border-red-500 @enderror" required>
                 <option value="">Seleccione un tipo</option>
@@ -378,7 +378,7 @@
         </div>
 
         <div>
-            <label for="id_categoria" class="label required-label">Categoría Laboratorio</label>
+            <label for="id_categoria" class="label required-label">Categoría del laboratorio</label>
             <select name="id_categoria" id="id_categoria"
                 class="input-standard max-w-md w-full @error('id_categoria') border-red-500 @enderror" required>
                 <option value="">Seleccione una categoría</option>
@@ -472,7 +472,7 @@
                             {{ $laboratorio->usuario->email_verified_at ? 'checked disabled' : '' }}
                             class="rounded text-blue-600 border-gray-300 focus:ring-blue-500">
                         <span class="text-sm text-gray-700">
-                            {{ $laboratorio->usuario->email_verified_at ? 'Correo verificado' : 'Verficar el correo principal del Laboratorio' }}
+                            {{ $laboratorio->usuario->email_verified_at ? 'Correo verificado' : 'Verificar el correo principal del laboratorio' }}
                         </span>
                     </label>
 
@@ -529,7 +529,7 @@
         try {
             const url = routes.departamento.replace('PAIS_ID', paisId);
             const response = await fetch(`${url}`);
-            if (!response.ok) throw new Error('Error cargando departamentos');
+            if (!response.ok) throw new Error('Error al cargar departamentos');
             const departamentos = await response.json();
 
             let options = '<option value="">Seleccione un departamento</option>';
@@ -568,7 +568,7 @@
         try {
             const urlProvincia = routes.provincia.replace('DEP_ID', depId);
             const response = await fetch(`${urlProvincia}`);
-            if (!response.ok) throw new Error('Error cargando provincias');
+            if (!response.ok) throw new Error('Error al cargar provincias');
             const provincias = await response.json();
 
             let options = '<option value="">Seleccione una provincia</option>';
@@ -606,7 +606,7 @@
         try {
             const urlMunicipio = routes.municipio.replace('PROV_ID', provId);
             const response = await fetch(`${urlMunicipio}`);
-            if (!response.ok) throw new Error('Error cargando municipios');
+            if (!response.ok) throw new Error('Error al cargar municipios');
             const municipios = await response.json();
 
             let options = '<option value="">Seleccione un municipio</option>';
@@ -635,7 +635,7 @@
             numsedes_lab: /^[0-9AZa-z-*.\/]{1,20}$/, // solo números
             sigla_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.-]{2,20}$/, // letras, números, guiones, puntos
             nit_lab: /^[0-9]{5,20}$/, // NIT: solo números, mínimo 5
-            nombre_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ][A-Za-zÁÉÍÓÚáéíóúÑñ\s.\-]{3,19}$/,
+            nombre_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ][A-Za-zÁÉÍÓÚáéíóúÑñ\s.\-]{3,255}$/,
             respo_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/, // nombre responsable
             ci_respo_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2,4})?|\s[A-Za-z]{2,4})?$/, // empieza con número, puede tener letra o guion
             repreleg_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/,

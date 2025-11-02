@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\PaisController;
 use App\Http\Controllers\Admin\PaqueteController;
 use App\Http\Controllers\Admin\ProgramaController;
 use App\Http\Controllers\Admin\ProvinciaController;
+use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\TipoLaboratorioController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
@@ -102,6 +103,12 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/certificados/desempeno-participacion', [CertificadoController::class,  'certificadoDesempenoParticionListLabs'])->name('list.cert.participacion.desemp');
 
     Route::post('/certificados/publicar/{gestion}', [CertificadoController::class,  'publicarCertificado'])->name('certificados.publicar');
+    Route::prefix('inscripcion')->group(function () {
+        Route::get('reportes/inscripciones', [ReporteController::class, 'inscripciones'])
+            ->name('reportes.inscripciones.index');
+        Route::get('reportes/inscripciones/export', [ReporteController::class, 'exportInscripcionesExcel'])
+            ->name('reportes.inscripciones.export');
+    });
 });
 Route::middleware(['auth', 'usuario.activo', 'canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_INSCRIPCIONES])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');
