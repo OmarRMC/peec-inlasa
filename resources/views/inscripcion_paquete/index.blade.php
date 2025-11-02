@@ -462,7 +462,7 @@
                         },
                         dom: 'rt',
                         lengthChange: false,
-                        pageLength: 10,
+                        pageLength: 5,
                         drawCallback: function() {
                             tippy('[data-tippy-content]');
                         }

@@ -12,10 +12,12 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class Laboratorio extends Model
 {
     use HasFactory;
+    const ACTIVE_STATUS = 1;
+    const INACTIVE_STATUS = 0;
 
     const STATUS = [
-        1 => 'Activo',
-        0 => 'Inactivo'
+        self::ACTIVE_STATUS => 'Activo',
+        self::INACTIVE_STATUS => 'Inactivo'
     ];
     protected $table = 'laboratorio';
 
@@ -433,5 +435,10 @@ class Laboratorio extends Model
         return ($partes[0] ?? '')
             .  (isset($partes[1]) ? ' Nº' . $partes[1] :  '')
             . ' ' . ($partes[2] ?? '');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', self::ACTIVE_STATUS);
     }
 }

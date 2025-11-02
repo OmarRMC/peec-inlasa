@@ -411,7 +411,8 @@ class LaboratorioController extends Controller
         if (!Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])) {
             return redirect('/')->with('error', 'No tienes permiso para acceder a esta sección.');
         }
-        $query = Laboratorio::query();
+        // $query = Laboratorio::query();
+        $query = Laboratorio::orderBy('created_at', 'desc')->active();
 
         return datatables()
             ->of($query)
