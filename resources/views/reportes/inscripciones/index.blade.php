@@ -32,7 +32,7 @@
         <form method="GET" id="filtrosForm" class="mb-4 bg-white rounded-lg p-4 shadow">
             <div class="flex flex-wrap gap-3 items-end text-sm">
                 <!-- Mostrar registros -->
-                <div class="flex items-center gap-2 flex-wrap">
+                {{-- <div class="flex items-center gap-2 flex-wrap">
                     <label for="per_page" class="whitespace-nowrap">Mostrar</label>
                     <select id="per_page" name="per_page"
                         class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[80px]">
@@ -41,7 +41,7 @@
                         <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50</option>
                     </select>
                     <span class="whitespace-nowrap">registros</span>
-                </div>
+                </div> --}}
                 <div>
                     <label class="block text-sm whitespace-nowrap">Gestión</label>
                     <select name="gestion" id="filter-gestion"
