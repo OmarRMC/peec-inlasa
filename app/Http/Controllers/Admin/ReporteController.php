@@ -6,9 +6,11 @@ use App\Exports\InscripcionesExport;
 use App\Http\Controllers\Controller;
 use App\Models\Configuracion;
 use App\Models\Inscripcion;
+use App\Models\Permiso;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -20,6 +22,12 @@ class ReporteController extends Controller
 
     public function inscripciones(Request $request)
     {
+
+        if (
+            !Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])
+        ) {
+            return redirect()->back()->with('error', 'No tienes permisos para realizar esta acción.');
+        }
         $query = Inscripcion::query()
             ->aprobadoOrVencido()
             ->with(['detalleInscripciones', 'laboratorio', 'pagos', 'laboratorio.departamento']);
@@ -73,7 +81,11 @@ class ReporteController extends Controller
      */
     public function exportInscripcionesExcel(Request $request)
     {
-
+        if (
+           !Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])
+        ) {
+            return redirect()->back()->with('error', 'No tienes permisos para realizar esta acción.');
+        }
         $filters = $request->only(['gestion', 'fecha_desde', 'fecha_hasta', 'search']);
         $format = $request->query('format', 'xlsx');
         $fileName = 'inscripciones_' . now()->format('Y-m-d_H:i:s') . '.' . $format;

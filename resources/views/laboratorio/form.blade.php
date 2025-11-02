@@ -51,6 +51,8 @@
         <div>
             <label for="sigla_lab" class="label">Sigla del laboratorio</label>
             <input type="text" name="sigla_lab" id="sigla_lab" maxlength="20"
+                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 .\-]{2,20}$"
+                title="Sigla válida (2-20 caracteres, letras, números, espacio, punto o guion)"
                 value="{{ old('sigla_lab', $laboratorio->sigla_lab ?? '') }}"
                 class="input-standard w-full @error('sigla_lab') border-red-500 @enderror">
             @error('sigla_lab')
@@ -75,8 +77,8 @@
             <input type="text" name="nombre_lab" id="nombre_lab" maxlength="100"
                 value="{{ old('nombre_lab', $laboratorio->nombre_lab ?? '') }}"
                 class="input-standard w-full @error('nombre_lab') border-red-500 @enderror"
-                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ][\s\S]*[^\s]$"
-                title="Debe comenzar con una letra; no puede ser solo números ni únicamente espacios." required>
+                pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ0-9°º .\-\(\)&quot;']{3,100}"
+                title="Nombre válido (3-100 caracteres, letras, números y algunos símbolos)" required>
             @error('nombre_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -231,45 +233,45 @@
             <input type="text" name="zona_lab" id="zona_lab" maxlength="50"
                 value="{{ old('zona_lab', $laboratorio->zona_lab ?? '') }}"
                 class="input-standard max-w-md w-full @error('zona_lab') border-red-500 @enderror"
-                pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ][\s\S]*[^\s]$"
-                title="Debe comenzar con una letra, no puede ser solo números ni solo espacios." required>
-            @error('zona_lab')
+                attern="[\u00C0-\u017FA-Za-z0-9 .,-]{3,50}"
+                title="Zona válida (3-50 caracteres, letras, números, espacios, coma o guion)"
+                @error('zona_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
-        </div>
+                </div>
 
-        {{-- Calle/Avenida --}}
-        <div>
-            <label for="calle_lab" class="label required-label">Calle / avenida</label>
-            <input type="text" name="calle_lab" id="calle_lab" maxlength="100"
-                value="{{ old('calle_lab', $laboratorio->calle ?? '') }}"
-                class="input-standard max-w-md w-full @error('calle_lab') border-red-500 @enderror" required>
-            @error('calle_lab')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
+            {{-- Calle/Avenida --}}
+            <div>
+                <label for="calle_lab" class="label required-label">Calle / avenida</label>
+                <input type="text" name="calle_lab" id="calle_lab" maxlength="100"
+                    value="{{ old('calle_lab', $laboratorio->calle ?? '') }}"
+                    class="input-standard max-w-md w-full @error('calle_lab') border-red-500 @enderror" required>
+                @error('calle_lab')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
 
-        <div>
-            <label for="numero_lab" class="label required-label">Número / lote</label>
-            <input type="text" name="numero_lab" id="numero_lab" maxlength="10"
-                value="{{ old('numero_lab', $laboratorio->numero ?? '') }}"
-                class="input-standard max-w-md w-full @error('numero_lab') border-red-500 @enderror"
-                title="Solo se permiten números." required>
-            @error('numero_lab')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+            <div>
+                <label for="numero_lab" class="label required-label">Número / lote</label>
+                <input type="text" name="numero_lab" id="numero_lab" maxlength="10"
+                    value="{{ old('numero_lab', $laboratorio->numero ?? '') }}"
+                    class="input-standard max-w-md w-full @error('numero_lab') border-red-500 @enderror"
+                    title="Solo se permiten números." required>
+                @error('numero_lab')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="md:col-span-2">
+                <label for="referencia" class="label">Referencia / detalle adicional</label>
+                <input type="text" name="referencia" id="referencia" maxlength="150"
+                    value="{{ old('referencia', $laboratorio->referencia ?? '') }}"
+                    class="input-standard w-full @error('referencia') border-red-500 @enderror"
+                    placeholder="Ejemplo: Frente a la plaza principal, cerca del hospital...">
+                @error('referencia')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
-        <div class="md:col-span-2">
-            <label for="referencia" class="label">Referencia / detalle adicional</label>
-            <input type="text" name="referencia" id="referencia" maxlength="150"
-                value="{{ old('referencia', $laboratorio->referencia ?? '') }}"
-                class="input-standard w-full @error('referencia') border-red-500 @enderror"
-                placeholder="Ejemplo: Frente a la plaza principal, cerca del hospital...">
-            @error('referencia')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-    </div>
 </fieldset>
 
 {{-- Contacto --}}
@@ -632,15 +634,15 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         const reglas = {
-            numsedes_lab: /^[0-9AZa-z-*.\/]{1,20}$/, // solo números
+            numsedes_lab: /^[A-Za-z0-9.,\/ -]{1,15}$/,
             sigla_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.-]{2,20}$/, // letras, números, guiones, puntos
             nit_lab: /^[0-9]{5,20}$/, // NIT: solo números, mínimo 5
-            nombre_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ][A-Za-zÁÉÍÓÚáéíóúÑñ\s.\-]{3,255}$/,
+            nombre_lab: /^(?!\s*$)(?![0-9°º\s]+$)(?![()'.,\-\s]+$)[A-Za-zÁÉÍÓÚáéíóúÑñ0-9°º\s.\-()"']{3,100}$/,
             respo_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/, // nombre responsable
-            ci_respo_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2,4})?|\s[A-Za-z]{2,4})?$/, // empieza con número, puede tener letra o guion
+            ci_respo_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s{0,1}[A-Za-z]{2,4})?|\s{0,1}[A-Za-z]{2,4})?$/,
             repreleg_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/,
-            ci_repreleg_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s[A-Za-z]{2,4})?|\s[A-Za-z]{2,4})?$/,
-            zona_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]{3,50}$/,
+            ci_repreleg_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s{0,1}[A-Za-z]{2,4})?|\s{0,1}[A-Za-z]{2,4})?$/,
+            zona_lab: /^(?!\s*$)(?![0-9\s.,-]+$)[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]{3,50}$/,
             calle_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,-]{3,100}$/,
             numero_lab: /^[0-9A-Za-z\s\/]{1,8}$/,
             referencia: /^.{0,150}$/,
@@ -672,7 +674,12 @@
 
         Object.keys(reglas).forEach(nombre => {
             const input = document.querySelector(`[name="${nombre}"]`);
-            input.setAttribute("pattern", reglas[nombre].source);
+            const regexSource = reglas[nombre].source;
+            const noHtmlPattern = ['nombre_lab', 'sigla_lab', 'zona_lab'];
+
+            if (!noHtmlPattern.includes(nombre)) {
+                input.setAttribute("pattern", regexSource);
+            }
             if (input) {
                 ["input", "blur"].forEach(evento => {
                     input.addEventListener(evento, () => manejarCampo(input));

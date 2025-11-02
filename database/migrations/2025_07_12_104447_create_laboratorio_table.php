@@ -24,9 +24,9 @@ return new class extends Migration
             $table->unsignedBigInteger('id_tipo');
             $table->unsignedBigInteger('id_categoria');
             $table->string('respo_lab', 50);
-            $table->string('ci_respo_lab', 12)->nullable();
+            $table->string('ci_respo_lab', 15)->nullable();
             $table->string('repreleg_lab', 50);
-            $table->string('ci_repreleg_lab', 12)->nullable();
+            $table->string('ci_repreleg_lab', 15)->nullable();
             $table->unsignedBigInteger('id_pais');
             $table->unsignedBigInteger('id_dep');
             $table->unsignedBigInteger('id_prov');
