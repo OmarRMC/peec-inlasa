@@ -12,7 +12,7 @@ import { setupPagination } from './components/datatable-pagination.js';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/js/utils/pdf.worker.min.mjs';
 window.pdfjsLib = pdfjsLib;
-window.setupPagination = setupPagination;
+window.setupPagination = setupPagination;   
 // DataTables se inicializa usando jQuery
 window.$ = window.jQuery = jquery;
 import 'datatables.net';

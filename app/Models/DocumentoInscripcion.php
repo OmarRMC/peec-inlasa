@@ -38,4 +38,9 @@ class DocumentoInscripcion extends Model
     {
         return $query->where('tipo', self::TYPE_DOCUMENTO_PAGO);
     }
+    
+    public function detallePago()
+    {
+        return $this->hasOne(DetallePagoDocumento::class, 'documento_inscripcion_id');
+    }
 }

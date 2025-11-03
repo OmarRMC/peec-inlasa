@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Configuracion;
+use App\Models\DetallePagoDocumento;
 use App\Models\DocumentoInscripcion;
 use App\Models\Inscripcion;
 use App\Models\Pago;
@@ -85,10 +86,16 @@ class DocumentosController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'comprobante' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'nit' => 'required|numeric',
+            'razon_social' => 'required|string|max:150',
         ], [
             'comprobante.required' => 'Debe subir al menos un documento.',
             'comprobante.mimes' => 'Solo se permiten archivos PDF, JPG, JPEG o PNG.',
             'comprobante.max' => 'El archivo no debe superar los 5 MB.',
+            'nit.required' => 'El NIT es obligatorio.',
+            'nit.numeric' => 'El NIT debe ser un número válido.',
+            'razon_social.required' => 'La razón social es obligatoria.',
+            'razon_social.max' => 'La razón social no debe superar los 150 caracteres.',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->with('notice', [
@@ -116,6 +123,12 @@ class DocumentosController extends Controller
         $documento->id_inscripcion = $inscripcion->id;
         $documento->tipo = DocumentoInscripcion::TYPE_DOCUMENTO_PAGO;
         $documento->save();
+
+        $detalle = new DetallePagoDocumento();
+        $detalle->documento_inscripcion_id = $documento->id;
+        $detalle->nit = $request->input('nit');
+        $detalle->razon_social = $request->input('razon_social');
+        $detalle->save();
         return back()->with('success', 'Comprobante subido correctamente.');
     }
 
@@ -131,13 +144,13 @@ class DocumentosController extends Controller
         if (Gate::allows(Permiso::LABORATORIO)) {
             $lab = Auth::user()->laboratorio;
             $inscripcion = $lab->inscripciones()
-                ->with('documentosPago')
+                ->with('documentosPago.detallePago')
                 ->find($id);
         } else {
             $inscripcion = Inscripcion::with(['documentosPago', 'laboratorio'])->find($id);
         }
         if (!$inscripcion) {
-            return redirect('/')->with('error', 'No se encontró la inscripción solicitada.');
+            return redirect('/')->with('error', 'No se encontró el registro solicitado.');
         }
         $codigo = $inscripcion->laboratorio->cod_lab;
         $gestion = $inscripcion->gestion;

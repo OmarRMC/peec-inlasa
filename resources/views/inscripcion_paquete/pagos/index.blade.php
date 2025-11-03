@@ -8,19 +8,56 @@
         </div>
         <div class="flex flex-wrap gap-4">
             @forelse ($documentos as $doc)
-                <div class="border rounded p-3 bg-gray-50 text-gray-700 flex flex-col items-center w-40">
+                <div
+                    class="border rounded-lg shadow-md p-4 bg-white w-48 flex flex-col items-center space-y-3 hover:shadow-lg transition-shadow justify-between">
 
-                    <div class="text-center mb-2">
-                        <strong class="text-sm">Documento:</strong>
-                        <p class="text-sm truncate" title="{{ $doc->nombre_doc }}">{{ $doc->nombre_doc }}</p>
+                    <!-- Encabezado del documento -->
+                    <div class="flex items-center space-x-2">
+                        <h3 class="text-sm font-semibold text-gray-800 truncate" title="{{ $doc->nombre_doc }}">
+                            {{ $doc->nombre_doc }}
+                        </h3>
                     </div>
 
-                    <div class="mt-2 flex items-center justify-center w-40 max-h-[100px] border rounded bg-gray-50 text-gray-500 text-xs overflow-hidden"
-                        id="preview-db-{{ $doc->id }}">
+                    <!-- Información de pago -->
+                    <div class="bg-gray-50 rounded p-2 w-full text-xs text-gray-700 flex flex-col space-y-1">
+                        <div class="flex justify-between">
+                            <span class="font-semibold">NIT:</span>
+                            <span class="truncate" title="{{ $doc->detallePago->nit ?? 'N/A' }}">
+                                {{ $doc->detallePago->nit ?? 'N/A' }}
+                            </span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-semibold">Razón Social:</span>
+                            <span class="break-words whitespace-normal  w-full"
+                                title="{{ $doc->detallePago->razon_social ?? 'N/A' }}">
+                                {{ $doc->detallePago->razon_social ?? 'N/A' }}
+                            </span>
+                        </div>
                     </div>
+
+                    <!-- Preview del documento -->
+                    <div class="w-full h-24 border rounded bg-gray-50 flex items-center justify-center overflow-hidden">
+                        @php
+                            $extension = pathinfo($doc->ruta_doc, PATHINFO_EXTENSION);
+                            $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        @endphp
+
+                        @if (in_array(strtolower($extension), $imageExtensions))
+                            <!-- Mostrar imagen -->
+                            <img src="{{ asset($doc->ruta_doc) }}" alt="{{ $doc->nombre_doc }}"
+                                class="object-contain w-full h-full">
+                        @else
+                            <!-- Mostrar ícono PDF u otro tipo -->
+                            <i class="fas fa-file-pdf text-red-400 text-2xl" title="Archivo PDF"></i>
+                            {{-- <div class="mt-2 flex items-center justify-center w-40 max-h-[100px] border rounded bg-gray-50 text-gray-500 text-xs overflow-hidden hidden"
+                                id="preview-db-{{ $doc->id }}"> --}}
+                        @endif
+                    </div>
+
+                    <!-- Botón de acción -->
                     <a href="{{ asset($doc->ruta_doc) }}" target="_blank"
-                        class="text-blue-600 text-xs px-2 py-1 border rounded hover:bg-blue-50">
-                        Ver en nueva pestaña
+                        class="w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-xs py-1 rounded transition-colors">
+                        Ver Documento
                     </a>
                 </div>
             @empty
@@ -32,7 +69,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             @foreach ($documentos as $doc)
                 (function() {
-                    const container = document.getElementById('preview-db-{{ $doc->id }}');
+                    // Se quito por que por momento no se va user el previewizador 
+                    const container = document.getElementById('preview-db-{{ $doc->id }}') ?? null;
+                    if (!container) return null;
                     const url = "{{ asset($doc->ruta_doc) }}";
                     const ext = url.split('.').pop().toLowerCase();
 

@@ -123,7 +123,8 @@
                                 </button>
                             @endif
                             @if (Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN, Permiso::LABORATORIO]) &&
-                                    configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS) && $inscripcion->documentosPago->isNotEmpty())
+                                    configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS) &&
+                                    $inscripcion->documentosPago->isNotEmpty())
                                 <a href="{{ route('documentos.pagos.index', $inscripcion->id) }}" target="_blank"
                                     class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition duration-200">
                                     Ver comprobantes
@@ -214,10 +215,12 @@
                                     </button>
                                 @endif
                             @endif
-                            @if (!$inscripcion->estaAprobado() &&
+                            @if (
+                                !$inscripcion->estaAprobado() &&
                                     Gate::any([Permiso::LABORATORIO]) &&
                                     configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION))
-                                    <a  class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200" href="https://forms.gle/PbGcRxwtBxCceV9FA" target="_blank" >Subir documentos</a>
+                                <a class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
+                                    href="https://forms.gle/PbGcRxwtBxCceV9FA" target="_blank">Subir documentos</a>
                                 {{-- <button onclick="document.getElementById('modalSubirDocumentos').showModal()"
                                     class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
                                     aria-label="Subir documentos" title="Subir documentos">
@@ -366,8 +369,8 @@
             <div id="campo_transaccion" style="display: none;">
                 <label id="label_transaccion" class="text-sm font-semibold">N° Transacción</label>
                 <input type="text" id="nro_transaccion" name="nro_tranferencia"
-                    class="w-full border rounded px-2 text-sm" pattern="^[A-Za-z0-9\-\/*][A-Za-z0-9\-\/*\s.]{4,30}$" maxlength="30"
-                    title="Entre 4 y 30 caracteres. Letras, números o guiones.">
+                    class="w-full border rounded px-2 text-sm" pattern="^[A-Za-z0-9\-\/*][A-Za-z0-9\-\/*\s.]{4,30}$"
+                    maxlength="30" title="Entre 4 y 30 caracteres. Letras, números o guiones.">
             </div>
 
             <div id="nro_factura">
@@ -468,6 +471,22 @@
                     Tamaño máximo permitido: 5MB
                 </span>
             </h2>
+            <div>
+                <label class="text-sm font-semibold text-gray-700">NIT</label>
+                <input type="text" name="nit" id="nit" maxlength="20"
+                    value="{{ old('nit', $inscripcion->laboratorio->nit_lab ?? '') }}"
+                    class="input-standard w-full @error('nit') border-red-500 @enderror" placeholder="Ej: 1234567-8"
+                    required>
+                <span id="error-nit" class="text-red-500 text-sm hidden">NIT inválido</span>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-700">Razon social</label>
+                <input type="text" name="razon_social" id="razon_social" maxlength="100"
+                    value="{{ old('razon_social', '') }}"
+                    class="input-standard w-full @error('razon_social') border-red-500 @enderror"
+                    placeholder="Ej: Laboratorios ABC S.R.L." required>
+                <span id="error-razon" class="text-red-500 text-sm hidden">Razón Social inválida</span>
+            </div>
 
             <p class="text-sm text-gray-600">
                 Solo se admite <b>PDF o imágen</b>.
@@ -503,201 +522,231 @@
             </div>
         </form>
     </dialog>
-
-    <script>
-        document.getElementById('formPago').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-
-            const response = await fetch("{{ route('pago.store') }}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: formData
-            });
-
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                alert('Error al registrar el pago.');
-            }
-        });
-
-        function cambiarLabelYValidacion() {
-            const tipo = document.getElementById('tipo_transaccion').value;
-            const label = document.getElementById('label_transaccion');
-            const input = document.getElementById('nro_transaccion');
-            const contenedor = document.getElementById('campo_transaccion');
-
-            if (tipo === 'Depósito' || tipo === 'Transferencia' || tipo === 'Sigep') {
-                contenedor.style.display = 'block';
-                label.textContent = 'N° Transacción';
-                input.required = true;
-            } else {
-                contenedor.style.display = 'none';
-                input.required = false;
-                input.value = '';
-            }
-            // if (tipo === 'Efectivo') {
-            //     // contenedor.style.display = 'none';
-            //     // label.textContent = 'N° de Factura';
-            //     // input.required = true;
-            //     // input.placeholder = 'Ingrese el número de factura';
-            // } else if (tipo === 'Depósito' || tipo === 'Transferencia' || tipo === 'Sigep') {
-            //     contenedor.style.display = 'block';
-            //     label.textContent = 'N° Transacción';
-            //     input.required = true;
-            //     // input.placeholder = 'Ingrese el número de transacción';
-            // } else {
-
-            // }
-        }
-        // Función genérica para mostrar alertas
-        // function mostrarAlertaConfirmacion(titulo, texto, icono, textoConfirmacion, callback) {
-        // }
-
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('en-revision-inscripcion')?.addEventListener('submit', function(e) {
+    @push('scripts')
+        <script>
+            document.getElementById('formPago').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                mostrarAlertaConfirmacion(
-                    '¿Pasar a Revisión?',
-                    'La inscripción se pondrá en estado de revisión.',
-                    'warning',
-                    'Sí, en revisión',
-                    () => this.submit()
-                );
-            });
+                const form = e.target;
+                const formData = new FormData(form);
 
-            document.getElementById('anular-inscripcion')?.addEventListener('submit', function(e) {
-                e.preventDefault();
-                mostrarAlertaConfirmacion(
-                    '¿Anular Inscripción?',
-                    'Esta acción no se puede deshacer.',
-                    'error',
-                    'Sí, anular',
-                    () => this.submit()
-                );
-            });
-
-            document.getElementById('aprobar-inscripcion')?.addEventListener('submit', function(e) {
-                e.preventDefault();
-                mostrarAlertaConfirmacion(
-                    '¿Aprobar Inscripción?',
-                    'La inscripción quedará aprobada.',
-                    'success',
-                    'Aprobar',
-                    () => this.submit()
-                );
-            });
-
-            document.getElementById('anular-pago')?.addEventListener('submit', function(e) {
-                e.preventDefault();
-                mostrarAlertaConfirmacion(
-                    '¿Anular Pago?',
-                    'Este pago se marcará como anulado.',
-                    'error',
-                    'Sí, anular',
-                    () => this.submit()
-                );
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            @foreach ($inscripcion->documentosInscripcion as $doc)
-                (function() {
-                    const container = document.getElementById('preview-db-{{ $doc->id }}');
-                    const url = "{{ asset($doc->ruta_doc) }}";
-                    const ext = url.split('.').pop().toLowerCase();
-
-                    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
-                        const img = document.createElement('img');
-                        img.src = url;
-                        img.classList.add('max-h-40', 'rounded', 'shadow');
-                        container.appendChild(img);
-                    } else if (ext === 'pdf') {
-                        fetch(url).then(res => res.arrayBuffer()).then(async function(data) {
-                            const pdf = await window.pdfjsLib.getDocument(new Uint8Array(data))
-                                .promise;
-                            const page = await pdf.getPage(1);
-                            const scale = 0.6;
-                            const viewport = page.getViewport({
-                                scale
-                            });
-
-                            const canvas = document.createElement('canvas');
-                            const context = canvas.getContext('2d');
-                            canvas.height = viewport.height;
-                            canvas.width = viewport.width;
-
-                            await page.render({
-                                canvasContext: context,
-                                viewport
-                            }).promise;
-                            container.appendChild(canvas);
-                        });
-                    } else {
-                        container.textContent = "Formato no soportado";
-                    }
-                })();
-            @endforeach
-            document.querySelectorAll('.preview-input').forEach(input => {
-                input.addEventListener('change', async function(event) {
-                    const file = event.target.files[0];
-                    const previewContainer = document.getElementById(event.target.dataset
-                        .preview);
-                    const linkBtn = document.getElementById(event.target.dataset.link);
-
-                    previewContainer.innerHTML = "";
-                    linkBtn.classList.add("hidden");
-
-                    if (!file) {
-                        previewContainer.textContent = "No seleccionado";
-                        return;
-                    }
-
-                    const fileURL = URL.createObjectURL(file);
-                    linkBtn.dataset.url = fileURL;
-                    linkBtn.classList.remove("hidden");
-
-                    if (file.type.startsWith("image/")) {
-                        const img = document.createElement("img");
-                        img.src = fileURL;
-                        img.classList.add("max-h-[100px]", "rounded", "shadow", "mx-auto",
-                            "bg-cover");
-                        previewContainer.appendChild(img);
-                    } else if (file.type === "application/pdf") {
-                        const fileReader = new FileReader();
-                        fileReader.onload = async function() {
-                            const typedArray = new Uint8Array(this.result);
-                            const pdf = await window.pdfjsLib.getDocument(typedArray)
-                                .promise;
-                            const page = await pdf.getPage(1);
-
-                            const scale = 0.5;
-                            const viewport = page.getViewport({
-                                scale
-                            });
-                            const canvas = document.createElement("canvas");
-                            const context = canvas.getContext("2d");
-                            canvas.height = viewport.height;
-                            canvas.width = viewport.width;
-
-                            await page.render({
-                                canvasContext: context,
-                                viewport
-                            }).promise;
-                            previewContainer.appendChild(canvas);
-                        };
-                        fileReader.readAsArrayBuffer(file);
-                    } else {
-                        previewContainer.textContent = "Formato no soportado";
-                    }
+                const response = await fetch("{{ route('pago.store') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
                 });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error al registrar el pago.');
+                }
+            });
+
+            const nitInput = document.getElementById('nit');
+            const razonInput = document.getElementById('razon_social');
+            const errorNit = document.getElementById('error-nit');
+            const errorRazon = document.getElementById('error-razon');
+            const nitPattern = /^\d{1,20}(-\d{1,2})?$/;
+            const razonPattern = /^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ&.\- ]{3,100}$/;
+            nitInput.addEventListener('input', () => {
+                if (nitPattern.test(nitInput.value.trim())) {
+                    nitInput.classList.remove('border-red-500');
+                    nitInput.classList.add('border-green-500');
+                    errorNit.classList.add('hidden');
+                } else {
+                    nitInput.classList.remove('border-green-500');
+                    nitInput.classList.add('border-red-500');
+                    errorNit.classList.remove('hidden');
+                }
+            });
+
+            razonInput.addEventListener('input', () => {
+                if (razonPattern.test(razonInput.value.trim())) {
+                    razonInput.classList.remove('border-red-500');
+                    razonInput.classList.add('border-green-500');
+                    errorRazon.classList.add('hidden');
+                } else {
+                    razonInput.classList.remove('border-green-500');
+                    razonInput.classList.add('border-red-500');
+                    errorRazon.classList.remove('hidden');
+                }
+            });
+
+            function cambiarLabelYValidacion() {
+                const tipo = document.getElementById('tipo_transaccion').value;
+                const label = document.getElementById('label_transaccion');
+                const input = document.getElementById('nro_transaccion');
+                const contenedor = document.getElementById('campo_transaccion');
+
+                if (tipo === 'Depósito' || tipo === 'Transferencia' || tipo === 'Sigep') {
+                    contenedor.style.display = 'block';
+                    label.textContent = 'N° Transacción';
+                    input.required = true;
+                } else {
+                    contenedor.style.display = 'none';
+                    input.required = false;
+                    input.value = '';
+                }
+                // if (tipo === 'Efectivo') {
+                //     // contenedor.style.display = 'none';
+                //     // label.textContent = 'N° de Factura';
+                //     // input.required = true;
+                //     // input.placeholder = 'Ingrese el número de factura';
+                // } else if (tipo === 'Depósito' || tipo === 'Transferencia' || tipo === 'Sigep') {
+                //     contenedor.style.display = 'block';
+                //     label.textContent = 'N° Transacción';
+                //     input.required = true;
+                //     // input.placeholder = 'Ingrese el número de transacción';
+                // } else {
+
+                // }
             }
-        );
-        });
-    </script>
+            // Función genérica para mostrar alertas
+            // function mostrarAlertaConfirmacion(titulo, texto, icono, textoConfirmacion, callback) {
+            // }
+
+
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('en-revision-inscripcion')?.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    mostrarAlertaConfirmacion(
+                        '¿Pasar a Revisión?',
+                        'La inscripción se pondrá en estado de revisión.',
+                        'warning',
+                        'Sí, en revisión',
+                        () => this.submit()
+                    );
+                });
+
+                document.getElementById('anular-inscripcion')?.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    mostrarAlertaConfirmacion(
+                        '¿Anular Inscripción?',
+                        'Esta acción no se puede deshacer.',
+                        'error',
+                        'Sí, anular',
+                        () => this.submit()
+                    );
+                });
+
+                document.getElementById('aprobar-inscripcion')?.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    mostrarAlertaConfirmacion(
+                        '¿Aprobar Inscripción?',
+                        'La inscripción quedará aprobada.',
+                        'success',
+                        'Aprobar',
+                        () => this.submit()
+                    );
+                });
+
+                document.getElementById('anular-pago')?.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    mostrarAlertaConfirmacion(
+                        '¿Anular Pago?',
+                        'Este pago se marcará como anulado.',
+                        'error',
+                        'Sí, anular',
+                        () => this.submit()
+                    );
+                });
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                @foreach ($inscripcion->documentosInscripcion as $doc)
+                    (function() {
+                        const container = document.getElementById('preview-db-{{ $doc->id }}');
+                        const url = "{{ asset($doc->ruta_doc) }}";
+                        const ext = url.split('.').pop().toLowerCase();
+
+                        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
+                            const img = document.createElement('img');
+                            img.src = url;
+                            img.classList.add('max-h-40', 'rounded', 'shadow');
+                            container.appendChild(img);
+                        } else if (ext === 'pdf') {
+                            fetch(url).then(res => res.arrayBuffer()).then(async function(data) {
+                                const pdf = await window.pdfjsLib.getDocument(new Uint8Array(data))
+                                    .promise;
+                                const page = await pdf.getPage(1);
+                                const scale = 0.6;
+                                const viewport = page.getViewport({
+                                    scale
+                                });
+
+                                const canvas = document.createElement('canvas');
+                                const context = canvas.getContext('2d');
+                                canvas.height = viewport.height;
+                                canvas.width = viewport.width;
+
+                                await page.render({
+                                    canvasContext: context,
+                                    viewport
+                                }).promise;
+                                container.appendChild(canvas);
+                            });
+                        } else {
+                            container.textContent = "Formato no soportado";
+                        }
+                    })();
+                @endforeach
+                document.querySelectorAll('.preview-input').forEach(input => {
+                    input.addEventListener('change', async function(event) {
+                        const file = event.target.files[0];
+                        const previewContainer = document.getElementById(event.target.dataset
+                            .preview);
+                        const linkBtn = document.getElementById(event.target.dataset.link);
+
+                        previewContainer.innerHTML = "";
+                        linkBtn.classList.add("hidden");
+
+                        if (!file) {
+                            previewContainer.textContent = "No seleccionado";
+                            return;
+                        }
+
+                        const fileURL = URL.createObjectURL(file);
+                        linkBtn.dataset.url = fileURL;
+                        linkBtn.classList.remove("hidden");
+
+                        if (file.type.startsWith("image/")) {
+                            const img = document.createElement("img");
+                            img.src = fileURL;
+                            img.classList.add("max-h-[100px]", "rounded", "shadow", "mx-auto",
+                                "bg-cover");
+                            previewContainer.appendChild(img);
+                        } else if (file.type === "application/pdf") {
+                            const fileReader = new FileReader();
+                            fileReader.onload = async function() {
+                                const typedArray = new Uint8Array(this.result);
+                                const pdf = await window.pdfjsLib.getDocument(typedArray)
+                                    .promise;
+                                const page = await pdf.getPage(1);
+
+                                const scale = 0.5;
+                                const viewport = page.getViewport({
+                                    scale
+                                });
+                                const canvas = document.createElement("canvas");
+                                const context = canvas.getContext("2d");
+                                canvas.height = viewport.height;
+                                canvas.width = viewport.width;
+
+                                await page.render({
+                                    canvasContext: context,
+                                    viewport
+                                }).promise;
+                                previewContainer.appendChild(canvas);
+                            };
+                            fileReader.readAsArrayBuffer(file);
+                        } else {
+                            previewContainer.textContent = "Formato no soportado";
+                        }
+                    });
+                });
+            });
+        </script>
+    @endpush
 </x-app-layout>
