@@ -457,4 +457,8 @@ class Laboratorio extends Model
             ->toArray();
         return $idsPaquetes;
     }
+    public function respuestas()
+    {
+        return $this->hasMany(FormularioEnsayoResultado::class, 'id_laboratorio');
+    }
 }
