@@ -30,7 +30,6 @@ class RegistroResultadosController extends Controller
                     ->Aprobado()
                     ->where('gestion', now()->year);
             })
-            ->orderBy('descripcion_ea', 'asc')
             ->get();
         return view('laboratorio.inscripcion.ensayos', compact('ensayos'));
     }
@@ -45,8 +44,11 @@ class RegistroResultadosController extends Controller
             return redirect('/')->with('error', 'Ensayo no encontrado.');
         }
         $formularios = $ensayo->formularios()->activo()->get();
-
-        return view('laboratorio.resultados.formularios', compact('formularios', 'ensayo'));
+        $ciclos = $ensayo->getEstadoCiclosYResultados();
+        $cicloActivo = $ciclos['cicloActivo'];
+        $cicloSiguiente = $ciclos['siguienteCiclo'];
+        $estado = $ciclos['estado'];
+        return view('laboratorio.resultados.formularios', compact('formularios', 'ensayo', 'cicloActivo', 'cicloSiguiente', 'estado'));
     }
 
     function formularioLlenar($id, $idEA)
@@ -57,22 +59,24 @@ class RegistroResultadosController extends Controller
         $laboratorio = Auth::user()->laboratorio;
         $inscripciones = $laboratorio->inscripciones()
             ->where('gestion', now()->year)
+            ->aprobado()
             ->get();
         $ensayos = $inscripciones->flatMap(function ($inscripcion) use ($idEA) {
             return $inscripcion->ensayos()->where('id_ea', $idEA)->get();
         });
         $ensayo = $ensayos->first();
+        $formulario = FormularioEnsayo::with(['secciones.parametros.campos.grupoSelector.opciones'])->find($id);
+        if (!$formulario) {
+            return redirect('/')->with('error', 'No se tiene el registro del formulario activo');
+        }
         $registro = InscripcionEAFormulario::where('formulario_id', $id)
             ->where('inscripcion_ea_id', $ensayo->id)
             ->first();
         $cantidad = $registro->cantidad ?? 1;
-        $formulario = FormularioEnsayo::with(['secciones.parametros.campos.grupoSelector.opciones'])->find($id);
 
         $cicloId = 1;
         $respuestas = $laboratorio->respuestas()->where('id_ciclo', $cicloId)->where('gestion', now()->year)->where('id_formulario', $formulario->id)->get();
         $respuestas->load(['respuestas']);
-        Log::info('$respuestas'); 
-        Log::info($respuestas); 
         if (!$formulario) {
             return redirect('/')->with('error', 'Formulario no encontrado.');
         }

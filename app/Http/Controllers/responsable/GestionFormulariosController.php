@@ -66,9 +66,10 @@ class GestionFormulariosController extends Controller
                 $q->where('gestion', now()->year);
                 $q->Aprobado();
             });
+        $data =$query->get();
 
         return datatables()
-            ->of($query)
+            ->of( $data)
             ->addColumn('fecha_inscripcion', fn($ins) => $ins->inscripcion->fecha_inscripcion)
             ->addColumn('nombre_lab', fn($ins) => $ins->inscripcion->laboratorio->nombre_lab)
             ->addColumn('mail_lab', fn($ins) => $ins->inscripcion->laboratorio->mail_lab)

@@ -10,7 +10,7 @@ class FormularioEnsayo extends Model
     use HasFactory;
 
     protected $table = 'formularios';
-    protected $fillable = ['nombre', 'codigo', 'nota'];
+    protected $fillable = ['nombre', 'codigo', 'nota', 'estado'];
 
     public function secciones()
     {

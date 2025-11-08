@@ -48,6 +48,7 @@
                     <h2 class="font-bold text-lg mb-2" style="color: {{ $primaryColor }}">
                         Formulario {{ $i }} / {{ $cantidad }}
                     </h2>
+                    <input type="hidden" name="id_ensayo" value="{{ $idEA }}">
 
                     {{-- Secciones --}}
                     @include('admin.formularios.partials.preview')

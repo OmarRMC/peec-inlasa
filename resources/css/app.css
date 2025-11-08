@@ -263,3 +263,8 @@
     background-color: #6c757d;
     color: white;
 }
+
+/* Es para los campos de preview de formulario*/
+.campo-entrada {
+    width: auto;
+}

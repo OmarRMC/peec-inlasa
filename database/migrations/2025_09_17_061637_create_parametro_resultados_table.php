@@ -35,7 +35,6 @@ return new class extends Migration
 
             // Configuración UI
             $table->string('placeholder')->nullable();
-            $table->string('unidad', 50)->nullable();     // Ej: kg, m, °C
             $table->integer('posicion')->default(0);      // Orden
             $table->string('mensaje')->nullable();
 

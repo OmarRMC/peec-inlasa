@@ -55,8 +55,8 @@ class FormularioEnsayoController extends Controller
         Log::info('$formularios');
         Log::info($formularios);
 
-        $formulariosDisponibles = FormularioEnsayo::where('id_ensayo', '!=', $ensayo->id)->activo()->get();
-
+        // $formulariosDisponibles = FormularioEnsayo::where('id_ensayo', '!=', $ensayo->id)->activo()->get();
+        $formulariosDisponibles = null;
         return view('admin.formularios.show', compact('ensayo', 'formularios', 'formulariosDisponibles'));
     }
 
@@ -94,7 +94,6 @@ class FormularioEnsayoController extends Controller
 
 
         $formulario = new FormularioEnsayo();
-        $formulario->id_ensayo = $ensayo->id;
         $formulario->nombre = $request->nombre;
         $formulario->codigo = $request->codigo;
         $formulario->nota = $request->nota;
@@ -124,7 +123,6 @@ class FormularioEnsayoController extends Controller
             return redirect()->back()->with('error', 'Formulario no encontrado.');
         }
 
-        $formulario->id_ensayo = $request->id_ensayo;
         $formulario->nombre = $request->nombre;
         $formulario->codigo = $request->codigo;
         $formulario->nota = $request->nota;

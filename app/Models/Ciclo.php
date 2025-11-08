@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,7 +22,10 @@ class Ciclo extends Model
         'id_ensayo',
         'estado',
     ];
-
+    public function scopeActivo($query)
+    {
+        return $query->where('estado', 1);
+    }
     public function ensayoAptitud()
     {
         return $this->belongsTo(EnsayoAptitud::class, 'id_ensayo');
@@ -48,6 +52,10 @@ class Ciclo extends Model
         return formatDate($this->fecha_fin_envio_resultados, false);
     }
 
+    public function scopeGestion($query, $gestion)
+    {
+        return $query->whereYear('fecha_fin_envio_resultados', $gestion);
+    }
     public function getFechaInicioEnvioReporteShowAttribute()
     {
         return formatDate($this->fecha_inicio_envio_reporte, false);
@@ -56,5 +64,14 @@ class Ciclo extends Model
     public function getFechaFinEnvioReporteShowAttribute()
     {
         return formatDate($this->fecha_fin_envio_reporte, false);
+    }
+
+    public function enPeriodoEnvioResultados(): bool
+    {
+        $hoy = Carbon::today();
+
+        return $this->fecha_inicio_envio_resultados &&
+            $this->fecha_fin_envio_resultados &&
+            $hoy->between($this->fecha_inicio_envio_resultados, $this->fecha_fin_envio_resultados);
     }
 }

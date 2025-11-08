@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EnsayoAptitud;
 use App\Models\FormularioEnsayoResultado;
+use App\Models\InscripcionEA;
 use App\Models\Permiso;
 use App\Models\RespuestaFormulario;
 use Illuminate\Support\Facades\Auth;
@@ -166,26 +168,45 @@ class FormularioEnsayoResultadoController extends Controller
     public function store(Request $request)
     {
         if (!Gate::any([Permiso::LABORATORIO])) {
-            return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
+            return redirect('/')->with('error', 'Acceso restringido. No dispones de los permisos requeridos para realizar esta operación.');
         }
         $user = Auth::user();
         $laboratorio = $user->laboratorio;
         $formularioResultado = FormularioEnsayoResultado::find($request->id_formulario_ensayos_resultados);
         $esActualizacion = false;
 
+        $gestionActual = date('Y');
+
+        $InscripcionEnsayo = InscripcionEA::whereHas('inscripcion', function ($q) use ($laboratorio, $gestionActual) {
+            $q->where('id_lab', $laboratorio->id)
+                ->where('gestion', $gestionActual);
+        })
+            ->where('id_ea', $request->id_ensayo)
+            ->with('ensayoAptitud')
+            ->first();
+        $ensayo  = $InscripcionEnsayo->ensayoAptitud;
+        if (!$ensayo) {
+            return redirect()->back()->with('error', 'No se encontró ningún registro de inscripción correspondiente a la gestión actual.');
+        }
+        $ciclo = $ensayo->getCicloEnPeriodoEnvioResultados();
+        if (!$ciclo) {
+            return redirect()->back()->with('error', 'No  se tiene un ciclo activo');
+        }
         if (!$formularioResultado) {
             $formularioResultado = FormularioEnsayoResultado::create([
-                'observaciones' => $request->observaciones,
                 'estado' => 1,
-                'id_ciclo' => 1,
+                'id_ciclo' => $ciclo->id,
+                'id_ensayo' => $ensayo->id,
                 'id_laboratorio' => $laboratorio->id,
                 'id_formulario' => $request->id_formulario,
                 'gestion' => now()->year,
                 'nombre_lab' => $laboratorio->nombre_lab,
-                'departamento' => $laboratorio->departamento->nombre_dep
+                'departamento' => $laboratorio->departamento->nombre_dep,
+                'fecha_envio' => now(),
+                'cod_lab' => $laboratorio->cod_lab
             ]);
         } else {
-            $formularioResultado->observaciones = $request->observaciones;
+            $formularioResultado->fecha_envio = now();
             $formularioResultado->save();
             $esActualizacion = true;
         }

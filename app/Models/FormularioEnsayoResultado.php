@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FormularioEnsayoResultado extends Model
 {
@@ -20,7 +21,10 @@ class FormularioEnsayoResultado extends Model
         'gestion',
         'nombre_lab',
         'departamento',
-        'id_ciclo'
+        'id_ciclo',
+        'id_ensayo', 
+        'cod_lab', 
+        'fecha_envio', 
     ];
     protected $casts = [
         'estructura' => 'array'
@@ -39,5 +43,10 @@ class FormularioEnsayoResultado extends Model
     public function respuestas()
     {
         return $this->hasMany(RespuestaFormulario::class, 'id_formulario_resultado');
+    }
+
+    public function ensayo(): BelongsTo
+    {
+        return $this->belongsTo(EnsayoAptitud::class, 'id_ensayo');
     }
 }

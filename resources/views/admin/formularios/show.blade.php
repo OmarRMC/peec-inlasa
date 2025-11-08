@@ -185,7 +185,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($formulariosDisponibles as $f)
+                        {{-- @foreach ($formulariosDisponibles as $f)
                             <tr class="border-b">
                                 <td class="px-3 py-2">{{ $f->nombre }}</td>
                                 <td class="px-3 py-2">{{ $f->codigo ?? '-' }}</td>
@@ -200,7 +200,7 @@
                                     </form>
                                 </td>
                             </tr>
-                        @endforeach
+                        @endforeach --}}
                     </tbody>
                 </table>
             </div>

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('formularios', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_ensayo');
+            // $table->unsignedBigInteger('id_ensayo');
             $table->string('color_primario', 10)->default('#ffffff');
             $table->string('color_secundario', 10)->default('#000000');
             $table->boolean('editable_por_encargado')->default(false);
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('nombre', 255);
             $table->string('codigo', 80)->nullable();
             $table->text('nota')->nullable();
-            $table->foreign('id_ensayo')->references('id')->on('ensayo_aptitud')->onDelete('cascade');
+            // $table->foreign('id_ensayo')->references('id')->on('ensayo_aptitud')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\ResultadosEvaluacionLabExport;
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\ConfiguracionController;
@@ -34,8 +35,10 @@ use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
 use App\Http\Controllers\Lab\RegistroResultadosController;
 use App\Http\Controllers\OpcionSelectorController;
+use App\Http\Controllers\ReporteResultadosEvaluacioneController;
 use App\Http\Controllers\responsable\GestionFormulariosController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
+use App\Http\Controllers\responsable\ReporteResultadosController;
 use App\Http\Controllers\ResultadoController;
 use App\Http\Controllers\VerificarController;
 use App\Models\FormularioEnsayo;
@@ -213,6 +216,12 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
     Route::get('/ea/gestion-formularios', [GestionFormulariosController::class, 'index'])->name('ea.formulario.index');
     Route::get('/ea/{id}/gestion-formularios/labs', [GestionFormulariosController::class, 'labs'])->name('ea.formulario.lab.inscritos');
     Route::get('/ea/{id}/gestion-formularios/labs/data', [GestionFormulariosController::class, 'getData'])->name('ea.formulario.lab.inscritos.getData');
+    Route::get('reportes/ensayos', [ReporteResultadosController::class, 'reporteEnsayos'])
+        ->name('reportes.resultados.ensayos');
+    Route::get('reportes/resultados/{idEA}/registrados', [ReporteResultadosController::class, 'resultadosRegistradosPorLab'])
+        ->name('reportes.resultados.registrados');
+    Route::get('reportes/ensayo/{idEA}/export/{ciclo}', [ReporteResultadosEvaluacioneController::class, 'exportEnsayoResultados'])
+        ->name('reportes.resultados.ensayos.export');
 });
 Route::get('/exportar-resultados/{id}', [ResultadoController::class, 'export'])->name('formularios.resultados.export');
 

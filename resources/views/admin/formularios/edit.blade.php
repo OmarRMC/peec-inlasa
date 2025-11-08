@@ -117,7 +117,7 @@
                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][requerido_si_completa]"
                                                         value="1" @checked($parametro->requerido_si_completa)
                                                         class="border rounded">
-                                                    Requerido si se llena algun campo
+                                                    Los campos marcados como requeridos deben completarse si se llena al menos uno.
                                                 </label>
                                                 <button type="button" data-tippy-content="Eliminar"
                                                     class="eliminar-parametro px-2 py-1 bg-red-500 text-white text-xs rounded"><i
@@ -130,10 +130,9 @@
                                                 <table class="text-xs border border-gray-300 rounded resultados-table">
                                                     <thead class="bg-gray-100 text-gray-600">
                                                         <tr>
-                                                            <th class="px-2 py-1 border">Label</th>
+                                                            <th class="px-2 py-1 border">Clave</th>
                                                             <th class="px-2 py-1 border">Tipo</th>
                                                             <th class="px-2 py-1 border">Placeholder</th>
-                                                            <th class="px-2 py-1 border">Unidad</th>
                                                             <th class="px-2 py-1 border text-center">Requerido</th>
                                                             <th class="px-2 py-1 border">Posición</th>
                                                             {{-- <th class="px-2 py-1 border">Step</th> --}}
@@ -193,13 +192,6 @@
                                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][placeholder]"
                                                                         value="{{ $campo->placeholder }}"
                                                                         placeholder="Placeholder"
-                                                                        class="w-full text-xs border rounded px-1 py-0.5">
-                                                                </td>
-                                                                <td class="px-2 py-1 border">
-                                                                    <input type="text"
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][unidad]"
-                                                                        value="{{ $campo->unidad }}"
-                                                                        placeholder="Unidad"
                                                                         class="w-full text-xs border rounded px-1 py-0.5">
                                                                 </td>
                                                                 <td class="px-2 py-1 border text-center">
@@ -376,7 +368,7 @@
                               name="secciones[${seccionIdx}][parametros][${parametroIdx}][requerido_si_completa]"
                               value="1" checked
                               class="border rounded">
-                              Requerido si se llena algun campo
+                              Los campos marcados como requeridos deben completarse si se llena al menos uno.
                         </label>
                         <button type="button" data-tippy-content="Eliminar" class="eliminar-parametro px-2 py-1 bg-red-500 text-white text-xs rounded"><i class="fas fa-trash-alt"></i></button>
                     </td>
@@ -388,10 +380,9 @@
                 <table class="w-full text-xs border border-gray-300 rounded resultados-table">
                         <thead class="bg-gray-100 text-gray-600">
                               <tr>
-                                    <th class="px-2 py-1 border">Label</th>
+                                    <th class="px-2 py-1 border">Clave</th>
                                     <th class="px-2 py-1 border">Tipo</th>
                                     <th class="px-2 py-1 border">Placeholder</th>
-                                    <th class="px-2 py-1 border">Unidad</th>
                                     <th class="px-2 py-1 border text-center">Requerido</th>
                                     <th class="px-2 py-1 border">Posición</th>
                                     <th class="px-2 py-1 border">Validación(ExpReg)</th>
@@ -442,10 +433,6 @@
                 <td class="px-2 py-1 border">
                     <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][placeholder]"
                         placeholder="Placeholder" class="w-full text-xs border rounded px-1 py-0.5">
-                </td>
-                <td class="px-2 py-1 border">
-                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][unidad]"
-                        placeholder="Unidad" class="w-full text-xs border rounded px-1 py-0.5">
                 </td>
                 <td class="px-2 py-1 border text-center">
                     <input type="checkbox" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][requerido]"

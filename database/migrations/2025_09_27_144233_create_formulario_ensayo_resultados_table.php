@@ -12,16 +12,17 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_formulario');
             $table->unsignedBigInteger('id_laboratorio');
+            $table->unsignedBigInteger('id_ensayo');
             $table->unsignedBigInteger('id_ciclo');
-            $table->date('fecha_inicio_envio_resultados')->nullable();
-            $table->date('fecha_fin_envio_resultados')->nullable();
-            $table->text('observaciones')->nullable();
+            // $table->date('fecha_inicio_envio_resultados')->nullable();
+            // $table->date('fecha_fin_envio_resultados')->nullable();
+            // $table->text('observaciones')->nullable();
             $table->tinyInteger('estado')->unsigned();
             $table->string('gestion', 6);
             $table->string('cod_lab', 20)->nullable();
             $table->string('nombre_lab', 100);
             $table->string('departamento');
-            $table->date('fecha_envio')->nullable();
+            $table->dateTime('fecha_envio')->nullable();
             $table->json('estructura')->nullable();
             $table->timestamps();
 
@@ -31,6 +32,8 @@ return new class extends Migration
                 ->references('id')->on('laboratorio')->onDelete('cascade');
             $table->foreign('id_ciclo')
                 ->references('id')->on('ciclos')->onDelete('cascade');
+            $table->foreign('id_ensayo')
+                ->references('id')->on('ensayo_aptitud')->onDelete('set null');
         });
     }
 
