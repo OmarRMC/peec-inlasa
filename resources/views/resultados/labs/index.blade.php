@@ -70,12 +70,9 @@
             <table class="min-w-full text-sm text-gray-800">
                 <thead class="bg-gray-100 text-xs uppercase">
                     <tr>
-                        <th class="px-3 py-2">Código</th>
-                        <th class="px-3 py-2">Laboratorio</th>
-                        {{-- <th class="px-3 py-2">Departamento / Ciudad</th> --}}
-                        {{-- <th class="px-3 py-2 text-center"># Resultados</th> --}}
-                        {{-- <th class="px-3 py-2 text-center">Estado</th> --}}
-                        <th class="px-3 py-2 text-center">Acciones</th>
+                        <th class="px-3 py-2 text-left">Código</th>
+                        <th class="px-3 py-2 text-left">Laboratorio</th>
+                        <th class="px-3 py-2 text-center ">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,21 +97,22 @@
                                 @endif
                             </td> --}}
                             <td class="px-3 py-2 text-center gap-2 flex justify-center">
-                                <a href="#" data-lab-id="{{ $lab->id }}"
+                                {{-- <a href="#" data-lab-id="{{ $lab->id }}"
                                     class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm text-xs"
                                     title="Ver resultados">
                                     <i class="fas fa-file-alt"></i>
-                                </a>
-                                <a href="#" data-lab-id="{{ $lab->id }}"
+                                </a> --}}
+                                <a href="{{ route('resultados.enviados.index', ['idEA' => $ensayo, 'idCiclo' => $cicloId, 'idLab' => $lab->id]) }}"
+                                    data-lab-id="{{ $lab->id }}"
                                     class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm text-xs"
                                     data-tippy-content="Ver respuestas">
                                     <i class="fas fa-list"></i>
                                 </a>
-                                <a href="#" data-lab-id="{{ $lab->id }}"
+                                {{-- <a href="#" data-lab-id="{{ $lab->id }}"
                                     class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm text-xs"
                                     title="Notificar">
                                     <i class="fas fa-bell"></i>
-                                </a>
+                                </a> --}}
                             </td>
                         </tr>
                     @empty

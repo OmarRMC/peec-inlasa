@@ -39,6 +39,7 @@ use App\Http\Controllers\ReporteResultadosEvaluacioneController;
 use App\Http\Controllers\responsable\GestionFormulariosController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
 use App\Http\Controllers\responsable\ReporteResultadosController;
+use App\Http\Controllers\responsable\ResultadosEnviadosLabController;
 use App\Http\Controllers\ResultadoController;
 use App\Http\Controllers\VerificarController;
 use App\Models\FormularioEnsayo;
@@ -222,6 +223,10 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
         ->name('reportes.resultados.registrados');
     Route::get('reportes/ensayo/{idEA}/export/{ciclo}', [ReporteResultadosEvaluacioneController::class, 'exportEnsayoResultados'])
         ->name('reportes.resultados.ensayos.export');
+    Route::get('reportes/ensayo/{idEA}/ciclo/{idCiclo}/lab/{idLab}', [ResultadosEnviadosLabController::class, 'listadoRespuestasEnviados'])
+        ->name('resultados.enviados.index');
+    Route::get('resultado/preview/{id}', [ResultadosEnviadosLabController::class, 'previewResultado'])
+        ->name('responsable.resultados.preview');
 });
 Route::get('/exportar-resultados/{id}', [ResultadoController::class, 'export'])->name('formularios.resultados.export');
 

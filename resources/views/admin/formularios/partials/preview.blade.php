@@ -4,6 +4,7 @@
     $res = $respuestas[$i - 1]['respuestas'] ?? [];
     $respuestas = collect($res);
     dump($fromRes['id'] ?? '');
+    $readonly = $readonly ?? false;
 @endphp
 @if ($fromRes)
     <input type="hidden" name="id_formulario_ensayos_resultados" value="{{ $fromRes['id'] }}">
@@ -59,7 +60,11 @@
                                 $inputNameText = "secciones[$secIdx][parametros][$paramIdx][campos][$campoIdx][valorTexto]";
                                 $parametroRespuestas = collect($valorParametro->respuestas ?? []);
                                 $valorCampos = $parametroRespuestas->firstWhere('id', $campo->id);
-                                $valorCampo = $valorCampos['valor'] ?? null;
+                                if( $readonly &&  $campo->tipo == 'select'){
+                                    $valorCampo = $valorCampos['valorTexto'] ?? null;
+                                }else {
+                                    $valorCampo = $valorCampos['valor'] ?? null;
+                                }
                                 $valorCampoText = '';
                                 if ($campo->grupoSelector) {
                                     foreach ($campo->grupoSelector->opciones as $op) {
@@ -69,7 +74,14 @@
                                         }
                                     }
                                 }
+                                if ($readonly) {
+                                    $campo->modificable = false;
+                                }
                             @endphp
+                            
+                            @if($readonly)
+                                <span>{{$valorCampo}}</span>
+                            @else
 
                             @if ($campo->tipo === 'text' || $campo->tipo === 'number' || $campo->tipo === 'date')
                                 <input type="{{ $campo->tipo }}" name="{{ $inputName }}"
@@ -93,16 +105,16 @@
                                     data-mensaje-validacion="{{ $campo->mensaje }}"
                                 @endif>
                             @elseif ($campo->tipo === 'textarea')
-                                <textarea name="{{ $inputName }}" class="w-full border rounded px-2 py-1 text-xs campo-entrada"
+                                <textarea name="{{ $inputName }}"
+                                    class="w-full {{ !$campo->modificable ? 'border-0 bg-transparent cursor-default pointer-events-none' : 'border rounded px-2 py-1' }} text-xs campo-entrada"
                                     placeholder="{{ $campo->placeholder }}"
-                                    @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif @endif 
-                                    @readonly(!$campo->modificable) 
-                                    @if ($campo->mensaje) title="{{ $campo->mensaje }}" data-mensaje-validacion="{{ $campo->mensaje }}"@endif
-                                    >{{ $campo->valor ?? $valorCampo }}</textarea>
+                                    @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif @endif @readonly(!$campo->modificable) 
+                                    @if ($campo->mensaje) title="{{ $campo->mensaje }}"
+                                    data-mensaje-validacion="{{ $campo->mensaje }}"@endif>{{ $valorCampo??'' }}</textarea>
                             @elseif ($campo->tipo === 'select' && ($campo->grupoSelector || $campo->id_campo_padre))
                                 <select name="{{ $inputName }}"
                                     class="w-full border rounded px-2 py-1 text-xs campo-entrada select-dependiente"
-                                    @if ($campo->id_campo_padre) disabled @endif data-id="{{ $campo->id }}"
+                                    @if ($campo->id_campo_padre || !$campo->modificable) disabled @endif data-id="{{ $campo->id }}"
                                     data-id-padre="{{ $campo->id_campo_padre ?? '' }}"
                                     @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif
                                     @endif
@@ -122,8 +134,10 @@
                                         @endforeach
                                     @endif
                                 </select>
+                                @if (!$readonly)
                                 <input type="hidden" name="{{ $inputNameText }}" id="inputTexto{{ $campo->id }}"
                                     value="{{ $valorCampoText }}">
+                                @endif
                             @elseif ($campo->tipo === 'datalist' && $campo->grupoSelector)
                                 <input type="text" list="datalist_{{ $campo->id }}"
                                     @if ($campo->mensaje) title="{{ $campo->mensaje }}"
@@ -144,8 +158,7 @@
                                 <input type="hidden" name="{{ $inputName }}" value="0">
                                 <input type="checkbox" name="{{ $inputName }}" value="1"
                                     @if ($campo->mensaje) title="{{ $campo->mensaje }}"
-                                        data-mensaje-validacion="{{ $campo->mensaje }}" 
-                                    @endif
+                                        data-mensaje-validacion="{{ $campo->mensaje }}" @endif
                                     @if ($valorCampo) checked @endif
                                     @if (!$parametro->requerido_si_completa && $campo->requerido) required @endif>
                             @endif
@@ -182,6 +195,7 @@
                             @if ($campoAnterior != $campo->label)
     </div>
     </td>
+@endif
 @endif
 @endforeach
 </tr>

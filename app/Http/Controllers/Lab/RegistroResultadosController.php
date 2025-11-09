@@ -86,10 +86,7 @@ class RegistroResultadosController extends Controller
         }
         $respuestas = $laboratorio->respuestas()->where('id_ciclo', $cicloId)->where('gestion', now()->year)->where('id_formulario', $formulario->id)->get();
         $respuestas->load(['respuestas']);
-        if (!$formulario) {
-            return redirect('/')->with('error', 'Formulario no encontrado.');
-        }
-
+        // return $respuestas;
         return view('laboratorio.resultados.llenar', compact('formulario', 'laboratorio', 'cantidad', 'idEA', 'respuestas'));
     }
 
