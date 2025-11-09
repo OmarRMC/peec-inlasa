@@ -1,5 +1,8 @@
 <x-app-layout>
     <div class="max-w-6xl mx-auto p-6 bg-white rounded shadow">
+        <div class="mb-2">
+            <x-shared.btn-volver :url="route('admin.formularios.show',$ensayo->id )" />
+        </div>
         @if ($errors->any())
             <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
                 <strong>Se encontraron errores en el formulario:</strong>
@@ -117,7 +120,8 @@
                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][requerido_si_completa]"
                                                         value="1" @checked($parametro->requerido_si_completa)
                                                         class="border rounded">
-                                                    Los campos marcados como requeridos deben completarse si se llena al menos uno.
+                                                    Los campos marcados como requeridos deben completarse si se llena al
+                                                    menos uno.
                                                 </label>
                                                 <button type="button" data-tippy-content="Eliminar"
                                                     class="eliminar-parametro px-2 py-1 bg-red-500 text-white text-xs rounded"><i
@@ -148,8 +152,8 @@
                                                     </thead>
                                                     <tbody>
                                                         @foreach ($parametro->campos as $k => $campo)
-                                                        <tr class="text-xs">
-                                                            <td class="px-2 py-1 border">
+                                                            <tr class="text-xs">
+                                                                <td class="px-2 py-1 border">
                                                                     <input type="text"
                                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][id]"
                                                                         hidden value="{{ $campo->id }}"

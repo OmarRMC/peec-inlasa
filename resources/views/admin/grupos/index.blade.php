@@ -1,5 +1,6 @@
 <x-app-layout>
     <div class="max-w-4xl mx-auto p-6 bg-white rounded shadow text-xs">
+        <x-shared.btn-volver :url="route('admin.formularios.ea')" />
         <h2 class="text-sm font-semibold mb-4">
             Grupos de Selectores <span class="text-gray-500">{{ $ensayo->descripcion }}</span>
         </h2>
@@ -67,7 +68,8 @@
                     <tbody>
                         @forelse ($grupo->opciones as $opcion)
                             <tr>
-                                <form method="POST" action="{{ route('admin.opciones.update', $opcion->id) }}" class="contents">
+                                <form method="POST" action="{{ route('admin.opciones.update', $opcion->id) }}"
+                                    class="contents">
                                     @csrf @method('PUT')
                                     <td class="border px-2 py-1">
                                         <input type="text" name="valor" value="{{ $opcion->valor }}"
@@ -99,7 +101,7 @@
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>
-                                    </td>
+                                </td>
                             </tr>
                         @empty
                             <tr>

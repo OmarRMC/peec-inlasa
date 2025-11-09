@@ -1,8 +1,13 @@
 <x-app-layout>
     <div class="px-4 max-w-7xl mx-auto">
-        <div class="flex justify-between items-center mb-3">
-            <h1 class="text-xl font-bold text-gray-800">Resultados registrados por laboratorio</h1>
 
+        <x-shared.btn-volver :url="route('reportes.resultados.ensayos')" />
+
+        <h1 class="text-xl font-bold text-gray-800">Ensayo de aptitud : {{ $ensayo->descripcion }}</h1>
+        <div class="flex justify-between items-center mb-3">
+
+            <h1 class="text-xl font-bold text-gray-800">Resultados registrados por laboratorio
+            </h1>
             <form method="GET" action="{{ route('reportes.resultados.registrados', $idEA) }}"
                 class="flex items-center gap-2">
                 <input type="hidden" name="idEA" value="{{ request('idEA') ?? '' }}">

@@ -137,6 +137,9 @@ class FormularioEnsayoController extends Controller
 
     public function destroy(FormularioEnsayo $formulario)
     {
+        if ($formulario->resultados()->exists()) {
+            return redirect()->back()->with('error', 'No se pudo eliminar: existen resultados asociados al formulario.');
+        }
         $formulario->delete();
 
         return redirect()->back()->with('success', 'Formulario eliminado correctamente.');

@@ -73,6 +73,6 @@ class ReporteResultadosController extends Controller
 
         $labs = $labsQuery->orderBy('cod_lab', 'desc')->paginate(10);
 
-        return view('resultados.labs.index', compact('labs', 'ciclos', 'cicloId', 'gestion', 'search', 'idEA'));
+        return view('resultados.labs.index', compact('labs', 'ciclos', 'cicloId', 'gestion', 'search', 'idEA', 'ensayo'));
     }
 }

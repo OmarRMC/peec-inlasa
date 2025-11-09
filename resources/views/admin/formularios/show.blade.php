@@ -1,5 +1,6 @@
 <x-app-layout>
     <div class="px-4 max-w-7xl mx-auto">
+        <x-shared.btn-volver :url="route('admin.formularios.ea')" />
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-bold text-gray-800">
                 Formularios del Ensayo: {{ $ensayo->descripcion }}
@@ -61,17 +62,22 @@
                                     <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">No</span>
                                 @endif
                             </td>
-                            <td class="px-3 py-2 text-center space-x-2">
-                                <a href="{{ route('admin.formularios.edit', ['id'=>$formulario->id,'idEa'=>$ensayo->id]) }}"
+                            <td class="px-3 py-2 text-center flex gap-2 ">
+                                <a href="{{ route('admin.formularios.edit', ['id' => $formulario->id, 'idEa' => $ensayo->id]) }}"
                                     class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-1 rounded shadow-sm"
-                                    data-tippy-content="Ver / Editar">
-                                    <i class="fas fa-eye"></i>
+                                    data-tippy-content="Editar la estructura">
+                                    <i class="fas fa-diagram-project"></i>
                                 </a>
                                 <button type="button"
                                     class="edit-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
                                     data-formulario='@json($formulario)' data-tippy-content="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <a href="{{ route('admin.formularios.preview', $formulario->id) }}" target="_blank"
+                                    class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-1 rounded shadow-sm"
+                                    data-tippy-content="Previsualizar formulario">
+                                    <i class="fas fa-eye"></i>
+                                </a>
                                 <form action="{{ route('admin.formularios.destroy', $formulario->id) }}" method="POST"
                                     class="inline-block"
                                     onsubmit="return confirm('¿Seguro de eliminar este formulario?')">
@@ -213,7 +219,7 @@
             </div>
         </div>
     </div>
-        {{-- Modal Edit (único) --}}
+    {{-- Modal Edit (único) --}}
     <div id="modalEdit" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
             <h2 class="text-lg font-bold mb-4">Editar Formulario</h2>
@@ -280,34 +286,34 @@
     </div>
 
 
-        {{-- JS para filtro del buscador --}}
-        <script>
-            document.getElementById('buscarFormulario').addEventListener('keyup', function() {
-                const filtro = this.value.toLowerCase();
-                document.querySelectorAll('#tablaFormulariosDisponibles tbody tr').forEach(tr => {
-                    const texto = tr.textContent.toLowerCase();
-                    tr.style.display = texto.includes(filtro) ? '' : 'none';
-                });
+    {{-- JS para filtro del buscador --}}
+    <script>
+        document.getElementById('buscarFormulario').addEventListener('keyup', function() {
+            const filtro = this.value.toLowerCase();
+            document.querySelectorAll('#tablaFormulariosDisponibles tbody tr').forEach(tr => {
+                const texto = tr.textContent.toLowerCase();
+                tr.style.display = texto.includes(filtro) ? '' : 'none';
             });
+        });
 
-            document.addEventListener('DOMContentLoaded', function() {
-                const editModal = document.getElementById('modalEdit');
-                const editForm = document.getElementById('formEdit');
-                const baseUpdateUrl = "{{ route('admin.formularios.update', ['id' => '__ID__']) }}";
+        document.addEventListener('DOMContentLoaded', function() {
+            const editModal = document.getElementById('modalEdit');
+            const editForm = document.getElementById('formEdit');
+            const baseUpdateUrl = "{{ route('admin.formularios.update', ['id' => '__ID__']) }}";
 
-                document.querySelectorAll('.edit-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        console.log(editModal)
-                        const data = JSON.parse(btn.dataset.formulario);
-                        editForm.action = baseUpdateUrl.replace('__ID__', data.id);
-                        editForm.querySelector('input[name="nombre"]').value = data.nombre ?? '';
-                        editForm.querySelector('input[name="codigo"]').value = data.codigo ?? '';
-                        editForm.querySelector('textarea[name="nota"]').value = data.nota ?? '';
-                        editForm.querySelector('input[name="color_primario"]').value = data
-                            .color_primario ?? '#272AF5';
-                        editForm.querySelector('input[name="color_secundario"]').value = data
-                            .color_secundario ?? '#E9E9F2';
-                       // estado: puede venir booleano
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    console.log(editModal)
+                    const data = JSON.parse(btn.dataset.formulario);
+                    editForm.action = baseUpdateUrl.replace('__ID__', data.id);
+                    editForm.querySelector('input[name="nombre"]').value = data.nombre ?? '';
+                    editForm.querySelector('input[name="codigo"]').value = data.codigo ?? '';
+                    editForm.querySelector('textarea[name="nota"]').value = data.nota ?? '';
+                    editForm.querySelector('input[name="color_primario"]').value = data
+                        .color_primario ?? '#272AF5';
+                    editForm.querySelector('input[name="color_secundario"]').value = data
+                        .color_secundario ?? '#E9E9F2';
+                    // estado: puede venir booleano
                     const chk = editForm.querySelector('input[type="checkbox"][name="estado"]');
                     chk.checked = Boolean(data.estado);
                     editForm.querySelector('input[type="checkbox"][name="editable_por_encargado"]')
@@ -315,18 +321,18 @@
                         Boolean(data.editable_por_encargado);
                     // mostrar modal
                     editModal.classList.remove('hidden');
-                    });
-                });
-
-                document.querySelectorAll('.close-modal').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        editModal.classList.add('hidden');
-                    });
-                });
-
-                editModal.addEventListener('click', function(e) {
-                    if (e.target === editModal) editModal.classList.add('hidden');
                 });
             });
-        </script>
+
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    editModal.classList.add('hidden');
+                });
+            });
+
+            editModal.addEventListener('click', function(e) {
+                if (e.target === editModal) editModal.classList.add('hidden');
+            });
+        });
+    </script>
 </x-app-layout>

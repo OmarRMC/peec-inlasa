@@ -1,7 +1,8 @@
 <x-app-layout>
     <div class="container py-6 max-w-5xl">
+        <x-shared.btn-volver :url="route('lab.inscritos-ensayos.index')" />
         <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
-            <h1 class="text-xl font-bold text-primary">Formularios del Ensayo1: {{ $ensayo->descripcion }}</h1>
+            <h1 class="text-xl font-bold text-primary">Formularios del Ensayo: {{ $ensayo->descripcion }}</h1>
         </div>
         @php
             dump($ensayo->id);

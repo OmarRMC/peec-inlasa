@@ -1,5 +1,6 @@
 <x-app-layout>
     <div class="px-4 max-w-6xl mx-auto" x-data="{ openModal: false, ciclo: null, isEdit: false }">
+        <x-shared.btn-volver :url="route('admin.formularios.ea')" />
         <div class="flex justify-between items-center mb-3">
             <h1 class="text-xl font-bold text-gray-800">
                 Ciclos del Ensayo: {{ $ensayo->descripcion }}
