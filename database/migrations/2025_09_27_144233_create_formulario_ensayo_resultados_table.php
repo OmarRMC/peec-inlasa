@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_formulario');
             $table->unsignedBigInteger('id_laboratorio');
-            $table->unsignedBigInteger('id_ensayo');
+            $table->unsignedBigInteger('id_ensayo')->nullable();
             $table->unsignedBigInteger('id_ciclo');
             // $table->date('fecha_inicio_envio_resultados')->nullable();
             // $table->date('fecha_fin_envio_resultados')->nullable();

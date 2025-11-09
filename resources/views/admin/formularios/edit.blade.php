@@ -393,6 +393,7 @@
                                     <th class="px-2 py-1 border">Valor</th>
                                     <th class="px-2 py-1 border text-center">Modificable</th>
                                     <th class="px-2 py-1 border">Grupo Selector</th>
+                                    <th class="px-2 py-1 border">Dependencia del campo</th>
                                     <th class="px-2 py-1 border text-center">Acciones</th>
                                </tr>
                         </thead>

@@ -191,7 +191,6 @@ class FormularioEnsayoController extends Controller
             'secciones.*.parametros.*.campos.*.valor' => 'nullable|string|max:255',
             'secciones.*.parametros.*.campos.*.tipo' => 'required|string|in:text,number,date,select,checkbox,textarea,datalist',
             'secciones.*.parametros.*.campos.*.placeholder' => 'nullable|string|max:255',
-            'secciones.*.parametros.*.campos.*.unidad' => 'nullable|string|max:50',
             'secciones.*.parametros.*.campos.*.requerido' => 'nullable',
             'secciones.*.parametros.*.campos.*.modificable' => 'nullable',
             'secciones.*.parametros.*.campos.*.posicion' => 'nullable|integer|min:0',
@@ -261,8 +260,7 @@ class FormularioEnsayoController extends Controller
                                 'tipo' => $campo['tipo'],
                                 'placeholder' => $campo['placeholder'] ?? null,
                                 'valor' => $campo['valor'] ?? null,
-                                'modificable' => $campo['modificable'] ?? false,
-                                'unidad' => $campo['unidad'] ?? null,
+                                'modificable' => $campo['modificable'] ?? false,                                
                                 'requerido' => isset($campo['requerido']),
                                 'posicion' => $campo['posicion'] ?? $campoIdx,
                                 'mensaje' => $campo['mensaje'] ?? null,
@@ -419,7 +417,6 @@ class FormularioEnsayoController extends Controller
                 $nuevoParametro->id_seccion = $nuevaSeccion->id;
                 $nuevoParametro->nombre = $paramBase->nombre;
                 $nuevoParametro->tipo = $paramBase->tipo;
-                $nuevoParametro->unidad = $paramBase->unidad;
                 $nuevoParametro->validacion = $paramBase->validacion;
                 $nuevoParametro->requerido = $paramBase->requerido;
                 $nuevoParametro->posicion = $paramBase->posicion;

@@ -40,15 +40,15 @@ return new class extends Migration
 
             // Validaciones básicas
             $table->boolean('requerido')->default(false);
-            $table->integer('min')->nullable();           // Para number/date/length
-            $table->integer('max')->nullable();
-            $table->integer('minlength')->nullable();
-            $table->integer('maxlength')->nullable();
+            // $table->integer('min')->nullable();           // Para number/date/length
+            // $table->integer('max')->nullable();
+            // $table->integer('minlength')->nullable();
+            // $table->integer('maxlength')->nullable();
             $table->string('step')->nullable();           // Para number/decimal
 
             // Validaciones avanzadas
             $table->string('pattern')->nullable();        // Expresión regular
-            $table->json('reglas')->nullable();           // Validaciones extra en JSON
+            // $table->json('reglas')->nullable();           // Validaciones extra en JSON
             $table->string('valor')->nullable();
             $table->boolean('modificable')->default(true);
 
@@ -56,8 +56,8 @@ return new class extends Migration
             $table->json('dependencias')->nullable();     // Ej: mostrar si otro input = X
 
             // Rango específico
-            $table->json('rangeNumber')->nullable();      // valores predefinidos para numeric
-            $table->json('rangeLength')->nullable();      // longitudes permitidas
+            // $table->json('rangeNumber')->nullable();      // valores predefinidos para numeric
+            // $table->json('rangeLength')->nullable();      // longitudes permitidas
 
             $table->string('range')->nullable();
 
