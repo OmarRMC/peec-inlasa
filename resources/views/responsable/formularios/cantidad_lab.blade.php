@@ -1,12 +1,17 @@
 <x-app-layout>
     <div class="px-4 py-6 max-w-6xl mx-auto">
 
-        <!-- Encabezado -->
-        <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
-            <h1 class="text-xl font-bold text-gray-800">Lista de inscripciones a
-                {{ $ensayosAptitud->descripcion }}</h1>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap gap-4 mb-6">
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">
+                    Lista de inscripciones a
+                    <span class="text-blue-600">{{ $ensayosAptitud->descripcion }}</span>
+                </h1>
+                <p class="text-sm text-gray-500 mt-1">
+                    Puedes modificar la cantidad de formularios asignados a cada laboratorio.
+                </p>
+            </div>
         </div>
-
         <!-- Filtros y Buscador -->
         <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
             {{-- <div class="flex space-x-2 text-sm">
@@ -73,7 +78,7 @@
                         <th class="px-4 py-2 text-left">Codigo</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
                         <th class="px-4 py-2 text-left">Correo</th>
-                        <th class="px-4 py-2 text-left">WhatsApp</th>
+                        {{-- <th class="px-4 py-2 text-left">WhatsApp</th> --}}
                     </tr>
                 </thead>
             </table>
@@ -125,10 +130,10 @@
                             data: 'email',
                             name: 'inscripcion.laboratorio.mail_lab',
                         },
-                        {
-                            data: 'wapp_lab',
-                            name: 'inscripcion.laboratorio.wapp_lab',
-                        }
+                        // {
+                        //     data: 'wapp_lab',
+                        //     name: 'inscripcion.laboratorio.wapp_lab',
+                        // }
                     ],
                     language: {
                         url: "{{ asset('translation/es.json') }}"
@@ -142,6 +147,43 @@
                             table
                         });
                         setupPagination(table);
+
+                        $('#labs-table').find('input[type="number"]').off('change').on('change',
+                            function() {
+                                const input = $(this);
+                                const idRegistro = input.data('id-registro');
+                                const nuevaCantidad = input.val();
+
+                                $.ajax({
+                                    url: "{{ route('ea.formulario.actualizarCantidad') }}",
+                                    type: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}",
+                                        id_registro: idRegistro,
+                                        cantidad: nuevaCantidad
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            showToast({
+                                                title: 'Cantidad actualizada',
+                                                message: `Se actualizó a ${response.cantidad} el formulario del laboratorio ${response.codigo_lab}`
+                                            });
+                                        } else {
+                                            showError({
+                                                title: 'Error',
+                                                message: 'No se pudo actualizar la cantidad.'
+                                            });
+                                        }
+                                    },
+                                    error: function() {
+                                        showError({
+                                            title: 'Error de conexión',
+                                            message: 'No se pudo conectar con el servidor.'
+                                        });
+                                    }
+                                });
+                            });
+
                     }
                 });
                 $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());

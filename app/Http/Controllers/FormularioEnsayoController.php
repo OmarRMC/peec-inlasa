@@ -275,18 +275,18 @@ class FormularioEnsayoController extends Controller
                         );
 
                         // Rango min/max
-                        if (($campo['tipo'] == 'text' || $campo['tipo'] == 'number') && isset($campo['range'])) {
-                            $clean = trim($campo['range'], '[]');
-                            [$min, $max] = explode('-', $clean);
-                            if ($campo['tipo'] === 'text') {
-                                $campoModel->minlength = $min ?? null;
-                                $campoModel->maxlength = $max ?? null;
-                            } else {
-                                $campoModel->min = $min ?? null;
-                                $campoModel->max = $max ?? null;
-                            }
-                            $campoModel->save();
-                        }
+                        // if (($campo['tipo'] == 'text' || $campo['tipo'] == 'number') && isset($campo['range'])) {
+                            // $clean = trim($campo['range'], '[]');
+                            // [$min, $max] = explode('-', $clean);
+                            // if ($campo['tipo'] === 'text') {
+                            //     $campoModel->minlength = $min ?? null;
+                            //     $campoModel->maxlength = $max ?? null;
+                            // } else {
+                            //     $campoModel->min = $min ?? null;
+                            //     $campoModel->max = $max ?? null;
+                            // }
+                            // $campoModel->save();
+                        // }
                     }
                 }
             }

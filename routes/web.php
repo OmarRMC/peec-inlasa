@@ -217,6 +217,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
     Route::get('/ea/gestion-formularios', [GestionFormulariosController::class, 'index'])->name('ea.formulario.index');
     Route::get('/ea/{id}/gestion-formularios/labs', [GestionFormulariosController::class, 'labs'])->name('ea.formulario.lab.inscritos');
     Route::get('/ea/{id}/gestion-formularios/labs/data', [GestionFormulariosController::class, 'getData'])->name('ea.formulario.lab.inscritos.getData');
+    Route::post('/ea/formulario/actualizar-cantidad', [GestionFormulariosController::class, 'actualizarCantidad'])
+        ->name('ea.formulario.actualizarCantidad');
     Route::get('reportes/ensayos', [ReporteResultadosController::class, 'reporteEnsayos'])
         ->name('reportes.resultados.ensayos');
     Route::get('reportes/resultados/{idEA}/registrados', [ReporteResultadosController::class, 'resultadosRegistradosPorLab'])

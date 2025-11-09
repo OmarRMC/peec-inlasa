@@ -58,6 +58,9 @@ class GestionFormulariosController extends Controller
 
     public function getData(Request $request, $idEa)
     {
+        if (!Gate::any([Permiso::RESPONSABLE])) {
+            return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
+        }
         $responsable = Auth::user();
         $ensayo = $responsable->responsablesEA->findOrFail($idEa);
         $query = InscripcionEA::with(['inscripcion.laboratorio.usuario', 'ensayoAptitud.formularios'])
@@ -66,10 +69,10 @@ class GestionFormulariosController extends Controller
                 $q->where('gestion', now()->year);
                 $q->Aprobado();
             });
-        $data =$query->get();
+        $data = $query->get();
 
         return datatables()
-            ->of( $data)
+            ->of($data)
             ->addColumn('fecha_inscripcion', fn($ins) => $ins->inscripcion->fecha_inscripcion)
             ->addColumn('nombre_lab', fn($ins) => $ins->inscripcion->laboratorio->nombre_lab)
             ->addColumn('mail_lab', fn($ins) => $ins->inscripcion->laboratorio->mail_lab)
@@ -78,22 +81,25 @@ class GestionFormulariosController extends Controller
             ->addColumn('email', fn($ins) => $ins->inscripcion->laboratorio->usuario->email ?? '-')
             ->addColumn('formularios_inputs', function ($ins) use ($ensayo) {
                 $formularios = $ensayo->formularios()->activo()->get() ?? [];
-                $html = '<div class="flex gap-1" style="width: fit-content;">';
+                $html = '<div class="flex gap-1 " style="width: fit-content; flex-direction: column">';
                 foreach ($formularios as $formulario) {
                     $registro = InscripcionEAFormulario::where('formulario_id', $formulario->id)
                         ->where('inscripcion_ea_id', $ins->id)
                         ->first();
                     if (!$registro) {
                         $ins->formularios()->attach($formulario->id, ['cantidad' => 1]);
-                        $cantidad = 1;
-                    } else {
-                        $cantidad = $registro->cantidad;
+                        $registro = InscripcionEAFormulario::where('formulario_id', $formulario->id)
+                            ->where('inscripcion_ea_id', $ins->id)
+                            ->first();
                     }
+                    $cantidad = $registro->cantidad;
+
 
                     $html .= '
-                        <div class="flex align-items-center" style="flex-direction: column;">
+                        <div class="flex align-items-center" style="align-items: center;  gap: 2px; justify-content: space-between">
                             <small class="text-muted" style="min-width:50px;">' . e($formulario->nombre) . '</small>
                             <input type="number" 
+                                data-id-registro="' . e($registro->id) . '"
                                 step="1" min="1" max="10"
                                 name="formulario_' . $formulario->id . '" 
                                 value="' . $cantidad . '"
@@ -107,6 +113,26 @@ class GestionFormulariosController extends Controller
             })
             ->rawColumns(['status_label', 'formularios_inputs'])
             ->toJson();
+    }
+
+    public function actualizarCantidad(Request $request)
+    {
+        if (!Gate::any([Permiso::RESPONSABLE, Permiso::ADMIN])) {
+            return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
+        }
+        $registroId = $request->input('id_registro');
+        $cantidad = (int) $request->input('cantidad') ?? 1;
+
+        $registro = InscripcionEAFormulario::findOrFail($registroId);
+        $registro->cantidad = $cantidad;
+        $registro->save();
+        $codigoLab = $registro->inscripcionEA->inscripcion->laboratorio->cod_lab ?? 'N/D';
+
+        return response()->json([
+            'success' => true,
+            'cantidad' => $registro->cantidad,
+            'codigo_lab' => $codigoLab,
+        ]);
     }
 
     // public function showUploadCertificado($id)
