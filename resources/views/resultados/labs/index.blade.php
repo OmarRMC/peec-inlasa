@@ -68,7 +68,7 @@
                         <th class="px-3 py-2">Código</th>
                         <th class="px-3 py-2">Laboratorio</th>
                         {{-- <th class="px-3 py-2">Departamento / Ciudad</th> --}}
-                        <th class="px-3 py-2 text-center"># Resultados</th>
+                        {{-- <th class="px-3 py-2 text-center"># Resultados</th> --}}
                         {{-- <th class="px-3 py-2 text-center">Estado</th> --}}
                         <th class="px-3 py-2 text-center">Acciones</th>
                     </tr>
@@ -80,7 +80,8 @@
                             <td class="px-3 py-2 align-top">{{ $lab->nombre_lab }}</td>
                             {{-- <td class="px-3 py-2 align-top text-gray-500 text-xs">
                                 {{ $lab->departamento ?? ($lab->ciudad ?? '-') }}</td> --}}
-                            <td class="px-3 py-2 text-center">{{ optional($lab->respuestas)->count() ?? '-' }}</td>
+                            {{-- <td class="px-3 py-2 text-center">{{ optional($lab->respuestas)->count() ?? '-' }} --}}
+                            {{-- </td> --}}
                             {{-- <td class="px-3 py-2 text-center">
                                 @if (optional($lab->respuestas)->count() > 0)
                                     <span
