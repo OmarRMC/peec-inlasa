@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use App\Models\FormularioEnsayo;
 use App\Models\FormularioEnsayoResultado;
 use App\Models\RespuestaFormulario;
+use Carbon\Carbon;
 
 class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, WithEvents, ShouldAutoSize
 {
@@ -25,11 +26,13 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
     protected $respuestasIndex = []; // [resultado_id => [parametro_id => respuestasArray]]
     protected $labsIndex = []; // [lab_id => ['gestion'=>..,'id_ciclo'=>..,'nombre_lab'=>..,...]]
 
+    protected $sinDato;
     /**
      * $formulariosCollection: collection de FormularioEnsayo ya cargado con ->resultados y relaciones de estructura.
      */
-    public function __construct(Collection $formulariosCollection)
+    public function __construct(Collection $formulariosCollection, $sinDato = false)
     {
+        $this->sinDato = $sinDato;
         // Esperamos que la colección venga con 'resultados' eager loaded
         $this->formularios = $formulariosCollection->map(function ($f) {
             // Si no trae estructura completa, lo cargamos:
@@ -100,6 +103,20 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
                     'fecha_envio' => $resultado->fecha_envio,
                 ];
 
+                if (isset($this->labsIndex[$labId])) {
+                    $fechaNueva = $resultado->fecha_envio ? Carbon::parse($resultado->fecha_envio) : null;
+                    $fechaGuardada = $this->labsIndex[$labId]['fecha_envio']
+                        ? Carbon::parse($this->labsIndex[$labId]['fecha_envio'])
+                        : null;
+
+                    if ($fechaNueva && (!$fechaGuardada || $fechaNueva->gt($fechaGuardada))) {
+                        $this->labsIndex[$labId]['fecha_envio'] = $fechaNueva->toDateTimeString();
+                    }
+                } else {
+                    $this->labsIndex[$labId] = [
+                        'fecha_envio' => $resultado->fecha_envio,
+                    ];
+                }
                 // contadores por laboratorio
                 if (!isset($countsByLab[$labId])) $countsByLab[$labId] = 0;
                 $countsByLab[$labId]++;
@@ -116,7 +133,9 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
     public function collection()
     {
         $rows = [];
-
+        if ($this->sinDato) {
+            return collect($rows);
+        }
         // Lista única de labs (ids)
         $labIds = array_keys($this->labsIndex);
         sort($labIds);
@@ -131,7 +150,7 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
             $row[] = $labMeta['nombre_lab'] ?? null;
             $row[] = $labMeta['departamento'] ?? null;
             $row[] = $labMeta['cod_lab'] ?? null;
-            $row[] = $labMeta['fecha_envio'] ?? null;
+            $row[] = formatDate($labMeta['fecha_envio']) ?? null;
 
             // PARA CADA FORMULARIO: traer los envíos de ese laboratorio, ordenarlos por created_at
             foreach ($this->formularios as $form) {
@@ -150,7 +169,6 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
                             $valor = $this->getValorParaCampo($resultado->id, $campoDef['parametro_id'], $campoDef['campo_id']);
                             $row[] = $valor;
                         }
-
                     } else {
                         // no existe ese envío para este lab -> agregar nulos por cada campo del formulario
                         $nCampos = count($this->ordenCamposPorForm[$form->id]);
@@ -176,8 +194,8 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
         if (!is_array($arr)) return null;
         foreach ($arr as $item) {
             // item puede tener keys 'id','valor' (según tu ejemplo)
-            if((string)($item['id'] ?? '') === (string)$campoId  && (string)($item['tipo'] ?? '') == 'select'){
-                return $item['valorTexto'] ?? $item['valor'];  
+            if ((string)($item['id'] ?? '') === (string)$campoId  && (string)($item['tipo'] ?? '') == 'select') {
+                return $item['valorTexto'] ?? $item['valor'];
             }
             if ((string)($item['id'] ?? '') === (string)$campoId) {
                 return $item['valor'] ?? null;
@@ -217,7 +235,7 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
 
         // 2) Para cada formulario: repetir su bloque N veces (N = max envios)
         foreach ($this->formularios as $form) {
-            $maxEnv = max(1, $this->maxEnviosPorForm[$form->id] ?? 1);
+            $maxEnv = ($this->sinDato) ? 1 : max(1, $this->maxEnviosPorForm[$form->id] ?? 1);
 
             // generar columnas por cada envío
             for ($env = 1; $env <= $maxEnv; $env++) {

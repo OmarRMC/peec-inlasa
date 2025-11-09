@@ -86,20 +86,25 @@
               $i = 1;
           @endphp
           {{-- <template x-for="i in cantidad" :key="i"> --}}
-          <form action="{{ route('admin.formularios.store.test') }}" method="POST">
+          <form action="{{ route('admin.formularios.store.test') }}" method="POST" class="mb-4">
               @csrf
-              <input type="text" hidden name="id_formulario" value="{{ $formulario->id }}">
+              <input type="hidden" name="id_formulario" value="{{ $formulario->id }}">
               @include('admin.formularios.partials.preview')
-              <div class="text-center">
-                  <button type="submit" class="px-2 py-1 text-white rounded"
-                      style="background-color: {{ $primaryColor }}">
-                      Test de validación
+
+              <div class="flex items-center justify-center gap-2 flex-col sm:flex-row">
+                  <button type="submit"
+                      class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-all">
+                      <i class="fas fa-vial mr-2"></i>
+                      Ejecutar test de validación
                   </button>
+                  <div class="text-center">
+                      <a href="{{ route('formularios.resultados.export', $formulario->id) }}"
+                          class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-all">
+                          <i class="fas fa-file-export mr-2"></i>
+                          Ejecutar test de exportación
+                      </a>
+                  </div>
               </div>
           </form>
-          <a href="{{ route('formularios.resultados.export', $formulario->id) }}">
-              Test de export
-          </a>
-
       </div>
   </x-app-layout>
