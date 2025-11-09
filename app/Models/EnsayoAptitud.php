@@ -75,13 +75,13 @@ class EnsayoAptitud extends Model
                     });
             })
             ->first();
-
         $siguienteCiclo = $this->ciclos()->activo()
-            ->whereDate('fecha_inicio_envio_muestras', '>', $hoy)
-            ->orWhereDate('fecha_inicio_envio_resultados', '>', $hoy)
+            ->where(function ($query) use ($hoy) {
+                $query->whereDate('fecha_inicio_envio_muestras', '>', $hoy)
+                    ->orWhereDate('fecha_inicio_envio_resultados', '>', $hoy);
+            })
             ->orderBy('fecha_inicio_envio_muestras', 'asc')
             ->first();
-
         $estado = $cicloActivo
             ? 'activo'
             : ($siguienteCiclo ? 'pendiente' : 'finalizado');
@@ -122,7 +122,7 @@ class EnsayoAptitud extends Model
                 });
         };
 
-    
+
         $cicloPorPeriodo = $this->ciclos()
             ->activo()
             ->where($periodo)

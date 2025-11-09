@@ -59,8 +59,10 @@
                     @endif
                 </div>
             @else
-                <div class="bg-gray-100 border border-gray-300 text-gray-700 px-5 py-4 rounded-xl shadow-sm">
-                    <p class="font-semibold text-lg">⚪ Todos los ciclos han finalizado</p>
+                <div class="bg-gray-100 border border-gray-300 text-gray-700 p-1 rounded-xl shadow-sm">
+                    <p class="font-semibold text-lg">
+                        ⚪ Todos los ciclos han finalizado o no hay ciclos habilitados.
+                    </p>
                 </div>
             @endif
         </div>
@@ -72,7 +74,9 @@
                     <tr>
                         <th>Código</th>
                         <th>Nombre del Formulario</th>
-                        <th>Llenar</th>
+                        @if ($cicloActivo)
+                            <th>Completar formulario</th>
+                        @endif
                         <th>Guía</th>
                         <th>Ver</th>
                     </tr>
@@ -82,13 +86,15 @@
                         <tr>
                             <td>{{ $formulario->codigo ?? '-' }}</td>
                             <td>{{ $formulario->nombre ?? '-' }}</td>
-                            <td>
-                                <a href="{{ route('lab.inscritos-ensayos.formularios.llenar', ['id' => $formulario->id, 'idEA' => $ensayo->id]) }}"
-                                    class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm"
-                                    data-tippy-content="Llenar formulario">
-                                    <i class="fas fa-pen"></i>
-                                </a>
-                            </td>
+                            @if ($cicloActivo)
+                                <td>
+                                    <a href="{{ route('lab.inscritos-ensayos.formularios.llenar', ['id' => $formulario->id, 'idEA' => $ensayo->id]) }}"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm"
+                                        data-tippy-content="Llenar formulario">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                            @endif
                             <td>
                                 <a href="#"
                                     class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"

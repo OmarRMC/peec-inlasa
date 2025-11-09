@@ -65,7 +65,14 @@ class RegistroResultadosController extends Controller
             return $inscripcion->ensayos()->where('id_ea', $idEA)->get();
         });
         $ensayo = $ensayos->first();
-        $formulario = FormularioEnsayo::with(['secciones.parametros.campos.grupoSelector.opciones'])->find($id);
+        if (!$ensayo) {
+            return redirect('/')->with('error', 'No se tiene el registro del ensayo');
+        }
+        $ensayoAptitud = EnsayoAptitud::find($idEA);
+        if (!$ensayoAptitud) {
+            return redirect('/')->with('error', 'No se tiene el registro del ensayo');
+        }        
+        $formulario = $ensayoAptitud->formularios()->with(['secciones.parametros.campos.grupoSelector.opciones'])->find($id);
         if (!$formulario) {
             return redirect('/')->with('error', 'No se tiene el registro del formulario activo');
         }
@@ -73,8 +80,10 @@ class RegistroResultadosController extends Controller
             ->where('inscripcion_ea_id', $ensayo->id)
             ->first();
         $cantidad = $registro->cantidad ?? 1;
-
-        $cicloId = 1;
+        $cicloId = $ensayoAptitud->getCicloActivo()?->id;
+        if (!$cicloId) {
+            return redirect('/')->with('error', 'No se tiene el ciclo activo');
+        }
         $respuestas = $laboratorio->respuestas()->where('id_ciclo', $cicloId)->where('gestion', now()->year)->where('id_formulario', $formulario->id)->get();
         $respuestas->load(['respuestas']);
         if (!$formulario) {
