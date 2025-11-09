@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="px-4 max-w-6xl mx-auto" x-data="{ openModal: false, ciclo: null, isEdit: false }">
         <x-shared.btn-volver :url="route('admin.formularios.ea')" />
-        <div class="flex justify-between items-center mb-3">
+        <div class="flex justify-between items-center mb-3 mt-2">
             <h1 class="text-xl font-bold text-gray-800">
                 Ciclos del Ensayo: {{ $ensayo->descripcion }}
             </h1>
@@ -16,12 +16,12 @@
             <table class="min-w-full text-sm text-gray-800">
                 <thead class="bg-gray-100 text-xs uppercase">
                     <tr>
-                        <th class="px-3 py-2">Nombre</th>
-                        <th class="px-3 py-2">Número</th>
-                        <th class="px-3 py-2">Muestras</th>
-                        <th class="px-3 py-2">Resultados</th>
-                        <th class="px-3 py-2">Reporte</th>
-                        <th class="px-3 py-2">Estado</th>
+                        <th class="px-3 py-2 text-left">Nombre</th>
+                        <th class="px-3 py-2 text-left">Número</th>
+                        <th class="px-3 py-2 text-left">Muestras</th>
+                        <th class="px-3 py-2 text-left">Resultados</th>
+                        <th class="px-3 py-2 text-left">Reporte</th>
+                        <th class="px-3 py-2 text-left">Estado</th>
                         <th class="px-3 py-2 text-center">Acciones</th>
                     </tr>
                 </thead>
