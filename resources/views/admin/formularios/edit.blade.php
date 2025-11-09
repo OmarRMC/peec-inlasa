@@ -141,7 +141,7 @@
                                                             <th class="px-2 py-1 border">Posición</th>
                                                             {{-- <th class="px-2 py-1 border">Step</th> --}}
                                                             <th class="px-2 py-1 border">Validación(ExpReg)</th>
-                                                            <th class="px-2 py-1 border">Nota Validacion</th>
+                                                            <th class="px-2 py-1 border w-[100px]">Nota</th>
                                                             <th class="px-2 py-1 border">Rango</th>
                                                             <th class="px-2 py-1 border">Valor</th>
                                                             <th class="px-2 py-1 border text-center">Modificable</th>
@@ -182,13 +182,11 @@
                                                                         <option value="textarea"
                                                                             @selected($campo->tipo === 'textarea')>Textarea
                                                                         </option>
-                                                                        <option value="email"
-                                                                            @selected($campo->tipo === 'email')>Email</option>
                                                                         <option value="datalist"
                                                                             @selected($campo->tipo === 'datalist')>Datalist
                                                                         </option>
-                                                                        <option value="radio"
-                                                                            @selected($campo->tipo === 'radio')>Radio</option>
+                                                                        {{-- <option value="radio"
+                                                                            @selected($campo->tipo === 'radio')>Radio</option> --}}
                                                                     </select>
                                                                 </td>
                                                                 <td class="px-2 py-1 border">
@@ -390,7 +388,7 @@
                                     <th class="px-2 py-1 border text-center">Requerido</th>
                                     <th class="px-2 py-1 border">Posición</th>
                                     <th class="px-2 py-1 border">Validación(ExpReg)</th>
-                                    <th class="px-2 py-1 border">Nota Validacion</th>
+                                    <th class="px-2 py-1 border  w-[50px]">Nota</th>
                                     <th class="px-2 py-1 border">Rango</th>
                                     <th class="px-2 py-1 border">Valor</th>
                                     <th class="px-2 py-1 border text-center">Modificable</th>
@@ -429,9 +427,7 @@
                         <option value="select">Select</option>
                         <option value="checkbox">Checkbox</option>
                         <option value="textarea">Textarea</option>
-                        <option value="email">Email</option>
                         <option value="datalist">Datalist</option>
-                        <option value="radio">Radio</option>
                     </select>
                 </td>
                 <td class="px-2 py-1 border">

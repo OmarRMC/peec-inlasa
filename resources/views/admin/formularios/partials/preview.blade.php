@@ -80,16 +80,25 @@
                                     @endif
                                 @if ($campo->min !== null) min="{{ $campo->min }}" @endif
                                 @if ($campo->max !== null) max="{{ $campo->max }}" @endif
+                                @if ($campo->min !== null) minlength="{{ $campo->min }}" @endif
+                                @if ($campo->max !== null) maxlength="{{ $campo->max }}" @endif
                                 @if ($campo->step) step="{{ $campo->step ?? 1 }}" @endif
                                 @readonly(!$campo->modificable) @if ($campo->pattern)
                                     pattern="{{ $campo->pattern }}"
                                 @endif
                                 class="w-full px-2 py-1 text-xs campo-entrada 
-                                        {{ !$campo->modificable ? 'border-0 bg-transparent text-gray-700 focus:ring-0 cursor-default' : 'border rounded' }}">
+                                        {{ !$campo->modificable ? 'border-0 bg-transparent text-gray-700 focus:ring-0 cursor-default' : 'border rounded' }}"
+                                @if ($campo->mensaje)
+                                    title="{{ $campo->mensaje }}"
+                                    data-mensaje-validacion="{{ $campo->mensaje }}"
+                                @endif>
                             @elseif ($campo->tipo === 'textarea')
                                 <textarea name="{{ $inputName }}" class="w-full border rounded px-2 py-1 text-xs campo-entrada"
                                     placeholder="{{ $campo->placeholder }}"
-                                    @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif @endif @readonly(!$campo->modificable)>{{ $campo->valor ?? $valorCampo }}</textarea>
+                                    @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif @endif 
+                                    @readonly(!$campo->modificable) 
+                                    @if ($campo->mensaje) title="{{ $campo->mensaje }}" data-mensaje-validacion="{{ $campo->mensaje }}"@endif
+                                    >{{ $campo->valor ?? $valorCampo }}</textarea>
                             @elseif ($campo->tipo === 'select' && ($campo->grupoSelector || $campo->id_campo_padre))
                                 <select name="{{ $inputName }}"
                                     class="w-full border rounded px-2 py-1 text-xs campo-entrada select-dependiente"
@@ -97,6 +106,8 @@
                                     data-id-padre="{{ $campo->id_campo_padre ?? '' }}"
                                     @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif
                                     @endif
+                                    @if ($campo->mensaje) title="{{ $campo->mensaje }}"
+                                        data-mensaje-validacion="{{ $campo->mensaje }}" @endif
                                     >
                                     @if ($campo->id_campo_padre && $valorCampo)
                                         <option value="{{ $valorCampo }}" selected>{{ $valorCampo }}</option>
@@ -115,6 +126,8 @@
                                     value="{{ $valorCampoText }}">
                             @elseif ($campo->tipo === 'datalist' && $campo->grupoSelector)
                                 <input type="text" list="datalist_{{ $campo->id }}"
+                                    @if ($campo->mensaje) title="{{ $campo->mensaje }}"
+                                        data-mensaje-validacion="{{ $campo->mensaje }}" @endif
                                     @if (isset($valorCampo)) value="{{ $valorCampo }}" @endif
                                     name="{{ $inputName }}"
                                     class="w-full border rounded px-2 py-1 text-xs campo-entrada"
@@ -128,13 +141,13 @@
                                     @endforeach
                                 </datalist>
                             @elseif ($campo->tipo === 'checkbox')
+                                <input type="hidden" name="{{ $inputName }}" value="0">
                                 <input type="checkbox" name="{{ $inputName }}" value="1"
-                                    @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif
-                                    @endif>
-                            @elseif ($campo->tipo === 'date')
-                                <input type="date" name="{{ $inputName }}" value="1"
-                                    @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif
-                                    @endif>
+                                    @if ($campo->mensaje) title="{{ $campo->mensaje }}"
+                                        data-mensaje-validacion="{{ $campo->mensaje }}" 
+                                    @endif
+                                    @if ($valorCampo) checked @endif
+                                    @if (!$parametro->requerido_si_completa && $campo->requerido) required @endif>
                             @endif
                             {{-- Campos hidden para mantener estructura JSON --}}
                             <input type="hidden" name="secciones[{{ $secIdx }}][id]"

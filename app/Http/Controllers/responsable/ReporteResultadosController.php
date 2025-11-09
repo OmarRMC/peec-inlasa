@@ -47,7 +47,7 @@ class ReporteResultadosController extends Controller
             return redirect('/')->with('error', 'No se tiene registrados los ciclos');
         }
         if ($gestion == date('Y')) {
-            $cicloActivo = $ensayo->getCicloActivo();
+            $cicloActivo = $ensayo->getCicloActivo() ?: $ensayo->getCicloActivo($gestion);
         } else {
             $cicloActivo = $ensayo->getCicloActivo($gestion);
         }

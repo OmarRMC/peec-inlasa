@@ -12,15 +12,15 @@
                 <div class="bg-green-100 border border-green-300 text-green-800 px-5 py-4 rounded-xl shadow-sm">
                     <p class="font-semibold text-lg">🟢 Ciclo activo</p>
                     <p class="mt-1 text-sm text-green-700">
-                        <span class="font-medium">Número:</span> {{ $cicloActivo->numero }}
+                        <span class="font-medium">Ciclo:</span> {{ $cicloActivo->numero }}
                     </p>
 
                     @if ($cicloActivo->fecha_inicio_envio_reportes && $cicloActivo->fecha_fin_envio_reportes)
                         <p class="mt-1 text-sm">
                             <span class="font-medium">Envío de Reportes:</span>
-                            {{ $cicloActivo->fecha_inicio_envio_reportes }}
+                            {{ $cicloActivo->fecha_inicio_envio_reportes_show }}
                             –
-                            {{ $cicloActivo->fecha_fin_envio_reportes }}
+                            {{ $cicloActivo->fecha_fin_envio_reportes_show}}
                         </p>
                     @endif
 
@@ -28,9 +28,9 @@
                     @if ($cicloActivo->fecha_inicio_envio_resultados && $cicloActivo->fecha_fin_envio_resultados)
                         <p class="mt-1 text-sm">
                             <span class="font-medium">Envío de Resultados:</span>
-                            {{ $cicloActivo->fecha_inicio_envio_resultados }}
+                            {{ $cicloActivo->fecha_inicio_envio_resultados_show }}
                             –
-                            {{ $cicloActivo->fecha_fin_envio_resultados }}
+                            {{ $cicloActivo->fecha_fin_envio_resultados_show }}
                         </p>
                     @endif
                 </div>
@@ -40,22 +40,22 @@
                 <div class="bg-yellow-100 border border-yellow-300 text-yellow-800 px-5 py-4 rounded-xl shadow-sm">
                     <p class="font-semibold text-lg">🟡 Próximo ciclo</p>
                     <p class="mt-1 text-sm text-yellow-700">
-                        <span class="font-medium">Número:</span> {{ $cicloSiguiente->numero }}
+                        <span class="font-medium">Ciclo:</span> {{ $cicloSiguiente->numero }}
                     </p>
                     @if ($cicloSiguiente->fecha_inicio_envio_muestras && $cicloSiguiente->fecha_fin_envio_muestras)
                         <p class="mt-1 text-sm">
                             <span class="font-medium">Envío de Muestras:</span>
-                            {{ $cicloSiguiente->fecha_inicio_envio_muestras }}
+                            {{ $cicloSiguiente->fecha_inicio_envio_muestras_show }}
                             –
-                            {{ $cicloSiguiente->fecha_fin_envio_muestras }}
+                            {{ $cicloSiguiente->fecha_fin_envio_muestras_show }}
                         </p>
                     @endif
                     @if ($cicloSiguiente->fecha_inicio_envio_resultados && $cicloSiguiente->fecha_fin_envio_resultados)
                         <p class="mt-1 text-sm">
                             <span class="font-medium">Envío de Resultados:</span>
-                            {{ $cicloSiguiente->fecha_inicio_envio_resultados }}
+                            {{ $cicloSiguiente->fecha_inicio_envio_resultados_show }}
                             –
-                            {{ $cicloSiguiente->fecha_fin_envio_resultados }}
+                            {{ $cicloSiguiente->fecha_fin_envio_resultados_show }}
                         </p>
                     @endif
                 </div>

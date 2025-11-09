@@ -91,4 +91,31 @@ class ParametroCampo extends Model
     {
         return $this->hasMany(ParametroCampo::class, 'id_campo_padre');
     }
+
+    //range => 1-2
+    protected function min(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value, $attributes) {
+                if (!empty($attributes['range'])) {
+                    [$min, $max] = explode('-', $attributes['range']);
+                    return trim($min);
+                }
+                return $value;
+            }
+        );
+    }
+
+    protected function max(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value, $attributes) {
+                if (!empty($attributes['range'])) {
+                    [$min, $max] = explode('-', $attributes['range']);
+                    return trim($max);
+                }
+                return $value;
+            }
+        );
+    }
 }
