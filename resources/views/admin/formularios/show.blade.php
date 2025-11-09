@@ -1,20 +1,30 @@
+@php
+    use App\Models\Permiso;
+@endphp
 <x-app-layout>
     <div class="px-4 max-w-7xl mx-auto">
-        <x-shared.btn-volver :url="route('admin.formularios.ea')" />
+        @if (Gate::any(Permiso::RESPONSABLE))
+            <x-shared.btn-volver :url="route('ea.formulario.index')" />
+        @endif
+        @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
+            <x-shared.btn-volver :url="route('admin.formularios.ea')" />
+        @endif
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-xl font-bold text-gray-800">
                 Formularios del Ensayo: {{ $ensayo->descripcion }}
             </h1>
-            <div class="flex space-x-2">
-                <button onclick="document.getElementById('modalCrear').classList.remove('hidden')"
-                    class="px-3 py-1 bg-green-600 text-white rounded shadow hover:bg-green-500 text-sm">
-                    <i class="fas fa-plus"></i> Nuevo Formulario
-                </button>
-                <button onclick="document.getElementById('modalUsar').classList.remove('hidden')"
-                    class="px-3 py-1 bg-indigo-600 text-white rounded shadow hover:bg-indigo-500 text-sm">
-                    <i class="fas fa-copy"></i> Usar Otro Formulario
-                </button>
-            </div>
+            @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
+                <div class="flex space-x-2">
+                    <button onclick="document.getElementById('modalCrear').classList.remove('hidden')"
+                        class="px-3 py-1 bg-green-600 text-white rounded shadow hover:bg-green-500 text-sm">
+                        <i class="fas fa-plus"></i> Nuevo Formulario
+                    </button>
+                    <button onclick="document.getElementById('modalUsar').classList.remove('hidden')"
+                        class="px-3 py-1 bg-indigo-600 text-white rounded shadow hover:bg-indigo-500 text-sm">
+                        <i class="fas fa-copy"></i> Usar Otro Formulario
+                    </button>
+                </div>
+            @endif
         </div>
 
         {{-- Tabla de formularios --}}
@@ -28,7 +38,9 @@
                         <th class="px-3 py-2">Color Primario</th>
                         <th class="px-3 py-2">Color Secundario</th>
                         <th class="px-3 py-2">Estado</th>
-                        <th class="px-3 py-2">Editable Encargado</th>
+                        @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
+                            <th class="px-3 py-2">Editable por el Encargado</th>
+                        @endif
                         <th class="px-3 py-2 text-center">Acciones</th>
                     </tr>
                 </thead>
@@ -55,40 +67,56 @@
                                     <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded">Inactivo</span>
                                 @endif
                             </td>
-                            <td class="px-3 py-2">
-                                @if ($formulario->editable_por_encargado)
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">Sí</span>
-                                @else
-                                    <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">No</span>
-                                @endif
-                            </td>
+                            @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
+                                <td class="px-3 py-2">
+                                    @if ($formulario->editable_por_encargado)
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">Sí</span>
+                                    @else
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">No</span>
+                                    @endif
+                                </td>
+                            @endif
                             <td class="px-3 py-2 text-center flex gap-2 ">
-                                <a href="{{ route('admin.formularios.edit', ['id' => $formulario->id, 'idEa' => $ensayo->id]) }}"
-                                    class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-1 rounded shadow-sm"
-                                    data-tippy-content="Editar la estructura">
-                                    <i class="fas fa-diagram-project"></i>
-                                </a>
-                                <button type="button"
-                                    class="edit-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
-                                    data-formulario='@json($formulario)' data-tippy-content="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                                @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS) ||
+                                        (Gate::any(Permiso::RESPONSABLE) && $formulario->editable_por_encargado))
+                                    <a href="{{ route('admin.formularios.edit', ['id' => $formulario->id, 'idEa' => $ensayo->id]) }}"
+                                        class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-1 rounded shadow-sm"
+                                        data-tippy-content="Editar la estructura">
+                                        <i class="fas fa-diagram-project"></i>
+                                    </a>
+                                @endif
+                                @if (Gate::any(Permiso::RESPONSABLE) && $formulario->editable_por_encargado)
+                                    <a href="{{ route('admin.grupos.index', $ensayo->id) }}" target="_blank"
+                                        data-tippy-content="Configurar Grupos de Selectores"
+                                        class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-2 py-1 rounded shadow-sm">
+                                        <i class="fas fa-layer-group"></i>
+                                    </a>
+                                @endif
+                                @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
+                                    <button type="button"
+                                        class="edit-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
+                                        data-formulario='@json($formulario)' data-tippy-content="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                @endif
                                 <a href="{{ route('admin.formularios.preview', $formulario->id) }}" target="_blank"
                                     class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-1 py-1 rounded shadow-sm"
                                     data-tippy-content="Previsualizar formulario">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <form action="{{ route('admin.formularios.destroy', $formulario->id) }}" method="POST"
-                                    class="inline-block"
-                                    onsubmit="return confirm('¿Seguro de eliminar este formulario?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm"
-                                        data-tippy-content="Eliminar">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
+                                    <form action="{{ route('admin.formularios.destroy', $formulario->id) }}"
+                                        method="POST" class="inline-block"
+                                        onsubmit="return confirm('¿Seguro de eliminar este formulario?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm"
+                                            data-tippy-content="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @empty
