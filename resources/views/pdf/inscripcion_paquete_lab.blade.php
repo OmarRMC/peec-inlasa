@@ -278,7 +278,7 @@
         <p style="font-size: 11px;"><i>Como constancia de la conformidad de lo declarado, firmamos al pie.</i></p>
 
         <p style="text-align: right; font-size: 11px; margin-top: 10px;">
-            <i>Fecha de inscripción: {{ $fecha_inscripcion }}</i>
+            {{-- <i>Fecha de inscripción: {{ $fecha_inscripcion }}</i> --}}
         </p>
 
         <table style="width: 100%; margin-top: 100px; font-size: 10px; text-align: center;">

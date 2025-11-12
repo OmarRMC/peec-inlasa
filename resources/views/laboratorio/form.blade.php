@@ -74,11 +74,11 @@
         {{-- Nombre Laboratorio --}}
         <div class="md:col-span-2 lg:col-span-3">
             <label for="nombre_lab" class="label required-label">Nombre del laboratorio</label>
-            <input type="text" name="nombre_lab" id="nombre_lab" maxlength="100"
+            <input type="text" name="nombre_lab" id="nombre_lab" maxlength="200"
                 value="{{ old('nombre_lab', $laboratorio->nombre_lab ?? '') }}"
                 class="input-standard w-full @error('nombre_lab') border-red-500 @enderror"
-                pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ0-9°º .\-\(\)&quot;']{3,100}"
-                title="Nombre válido (3-100 caracteres, letras, números y algunos símbolos)" required>
+                pattern="^(?=.*\S).{3,200}$"
+                title="Nombre válido (3-200 caracteres, letras, números y algunos símbolos)" required>
             @error('nombre_lab')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -637,7 +637,7 @@
             numsedes_lab: /^[A-Za-z0-9.,\/ -]{1,15}$/,
             sigla_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.-]{2,20}$/, // letras, números, guiones, puntos
             nit_lab: /^[0-9]{5,20}$/, // NIT: solo números, mínimo 5
-            nombre_lab: /^(?!\s*$)(?![0-9°º\s]+$)(?![()'.,\-\s]+$)[A-Za-zÁÉÍÓÚáéíóúÑñ0-9°º\s.\-()"']{3,100}$/,
+           // nombre_lab: /^(?!\s*$)(?![0-9°º\s]+$)(?![()'.,\-\s]+$)[A-Za-zÁÉÍÓÚáéíóúÑñ0-9°º\s.\-()"']{3,100}$/,
             respo_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/, // nombre responsable
             ci_respo_lab: /^[0-9]{5,15}(?:-[A-Za-z](?:\s{0,1}[A-Za-z]{2,4})?|\s{0,1}[A-Za-z]{2,4})?$/,
             repreleg_lab: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\.]{5,50}$/,
