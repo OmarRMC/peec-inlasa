@@ -434,7 +434,7 @@ class Laboratorio extends Model
 
         return ($partes[0] ?? '')
             .  (isset($partes[1]) ? ' Nº' . $partes[1] :  '')
-            . ' ' . ($partes[2] ?? '');
+            .  (isset($partes[2]) ? ', ' . $partes[2] :  '');
     }
 
     public function scopeActive($query)
