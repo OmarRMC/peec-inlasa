@@ -52,6 +52,7 @@ class Configuracion extends Model
     public const HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION = 'habilitar_subida_documentos_inscripcion';
     public const HABILITAR_SUBIDA_DOCUMENTOS_PAGOS = 'habilitar_subida_documentos_pagos';
 
+    public const CARGO_DIRECTORA_GENERAL_CONTRATO  = 'directora_general_contrato';
      public static function esPeriodoRegistro()
     {
         $fechaInicio = Configuracion::where('key', Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB)->value('valor');

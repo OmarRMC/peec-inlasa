@@ -71,7 +71,13 @@ class ConfiguracionSeeder extends Seeder
       ],
       Configuracion::KEY_GESTION_FILTER => [(int) date('Y'), (int) date('Y') - 1],
       Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION => 0,
-      Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS => 0
+      Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS => 0,
+      Configuracion::CARGO_DIRECTORA_GENERAL_CONTRATO => [
+        'nombre'      => 'Dra. Evelin Esther Fortún Fernández',
+        'cargo'       => 'DIRECTORA GENERAL EJECUTIVA',
+        'institucion' => 'INLASA',
+        'referencias' => 'EEFF/CHC </br> C.c. Archivo',
+      ],
     ];
 
     foreach ($datos as $key => $valor) {

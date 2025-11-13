@@ -5,8 +5,8 @@
         'Contrato firmado',
         'Formulario de inscripción',
         'Poder legal',
-        'Carnet Identidad',
-        'Registro de comercio',
+        'Carnet de identidad',
+        'Registro de Comercio',
         'Designación de responsable',
     ];
     $actualizarDocumentos = $inscripcion->documentosInscripcion->isNotEmpty();
@@ -25,7 +25,7 @@
             <section class="p-6 relative">
                 <h2 class="text-lg font-semibold text-blue-700 mb-4">📄 Datos de Inscripción</h2>
                 <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
-                    <div><strong>Codigo Lab:</strong> {{ $inscripcion->laboratorio->cod_lab }}</div>
+                    <div><strong>Código de Lab:</strong> {{ $inscripcion->laboratorio->cod_lab }}</div>
                     <div><strong>Laboratorio:</strong> {{ $inscripcion->laboratorio->nombre_lab }}</div>
                     <div><strong>Fecha de Inscripción:</strong> {{ $inscripcion->fecha_inscripcion }}</div>
                     <div><strong>Gestión:</strong> {{ $inscripcion->gestion }}</div>
@@ -35,7 +35,7 @@
                     <div><strong>Estado Inscripción:</strong>
                         <x-status-badge :value="$inscripcion->estado_inscripcion_texto ?? ''" />
                     </div>
-                    <div><strong>Estado Cuenta:</strong>
+                    <div><strong>Estado de Cuenta:</strong>
                         <x-status-badge :value="$inscripcion->estado_pago_texto ?? ''" />
                     </div>
                     <div><strong>Observaciones:</strong> {{ $inscripcion->obs_inscripcion ?? '-' }}</div>
@@ -172,7 +172,7 @@
                             @endif
                         </div>
                         <div><strong>Nro Factura.:</strong> {{ $pago->nro_factura ?: '/' }}</div>
-                        <div><strong>Razon Social:</strong> {{ $pago->razon_social ?: '/' }}</div>
+                        <div><strong>Razón Social:</strong> {{ $pago->razon_social ?: '/' }}</div>
                         <div><strong>Obs.:</strong> {{ $pago->obs_pago ?: 'Sin observaciones' }}</div>
 
                         {{-- Estado (opcional) --}}
@@ -381,7 +381,7 @@
             </div>
 
             <div>
-                <label class="text-sm font-semibold">Razon Social</label>
+                <label class="text-sm font-semibold">Razón Social</label>
                 <textarea name="razon_social" class="w-full border rounded px-2 text-sm" rows="1" required pattern=".{3,100}"
                     maxlength="100" title="Debe tener entre 3 y 100 caracteres."></textarea>
             </div>
@@ -406,12 +406,12 @@
             @csrf
             <h2 class="text-lg font-bold text-blue-700 mb-1 flex justify-between">📁
                 @if ($actualizarDocumentos)
-                    Actualiza los documentos de Inscripción
+                    Actualizar los documentos de inscripción
                 @else
-                    Subir Documentos de Inscripción
+                    Subir documentos de inscripción
                 @endif
                 <span class="text-sm text-gray-700 bg-yellow-100 p-1 rounded font-medium">
-                    Tamaño máximo permitido por documento: 5MB
+                    Tamaño máximo permitido por documento: 5 MB
                 </span>
             </h2>
             @if ($actualizarDocumentos)
@@ -480,7 +480,7 @@
                 <span id="error-nit" class="text-red-500 text-sm hidden">NIT inválido</span>
             </div>
             <div>
-                <label class="text-sm font-semibold text-gray-700">Razon social</label>
+                <label class="text-sm font-semibold text-gray-700">Razón Social</label>
                 <input type="text" name="razon_social" id="razon_social" maxlength="100"
                     value="{{ old('razon_social', '') }}"
                     class="input-standard w-full @error('razon_social') border-red-500 @enderror"
@@ -489,7 +489,7 @@
             </div>
 
             <p class="text-sm text-gray-600">
-                Solo se admite <b>PDF o imágen</b>.
+                Solo se admite <b>PDF o imagen</b>.
             </p>
 
             <div class="flex flex-col space-y-3">
