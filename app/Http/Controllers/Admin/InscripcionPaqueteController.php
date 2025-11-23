@@ -9,6 +9,7 @@ use App\Mail\EnvioObsLab;
 use App\Models\Area;
 use App\Models\CategoriaLaboratorio;
 use App\Models\Configuracion;
+use App\Models\Contrato;
 use App\Models\Laboratorio;
 use App\Models\Paquete;
 use App\Models\Programa;
@@ -49,7 +50,7 @@ class InscripcionPaqueteController extends Controller
             'departamentos' => [],
             'provincias' => [],
             'municipios' => [],
-            'areas' => Area::orderBy('descripcion', 'asc')->get(),
+            'areas' => Area::listarConDescripcionUnica(),
             'now' => now()->format('Y-m-d'),
             'primerDiaMes' => now()->startOfMonth()->format('Y-m-d'),
             'categorias' => CategoriaLaboratorio::all(),
@@ -190,9 +191,19 @@ class InscripcionPaqueteController extends Controller
             DB::beginTransaction();
             $total = collect($request->paquetes)->sum('costo');
             $now  = now();
+            $contrato = Contrato::activo()
+                ->whereHas('detalles', function ($query) {
+                    $query->where('estado', 1);
+                })
+                ->with(['detalles' => function ($query) {
+                    $query->where('estado', 1)->orderBy('posicion', 'asc');
+                }])
+                ->orderBy('created_at', 'desc')
+                ->first();
             $formulario = Formulario::where('proceso', Formulario::INSCRIPCION)->first();
             $ins = Inscripcion::create([
                 'id_lab' => $request->id_lab,
+                'id_contrato' => $contrato?->id ?? null,
                 'id_formulario' => optional($formulario)->id,
                 'cant_paq' => count($request->paquetes),
                 'costo_total' => $total,

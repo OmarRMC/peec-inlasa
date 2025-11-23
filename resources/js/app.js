@@ -21,6 +21,7 @@ window.Alpine = Alpine;
 window.Swal = Swal;
 window.confirmDelete = confirmDelete;
 window.confirmAsyncHandle = confirmAsyncHandle;
+window.confirmDialog = confirmDialog;
 window.mostrarAlertaConfirmacion = mostrarAlertaConfirmacion;
 window.showToast = showToast;
 window.showError = showError;

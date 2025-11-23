@@ -39,6 +39,7 @@ class Inscripcion extends Model
 
     protected $fillable = [
         'id_lab',
+        'id_contrato',
         'id_formulario',
         'cant_paq',
         'costo_total',
@@ -327,5 +328,10 @@ class Inscripcion extends Model
             self::STATUS_EN_REVISION,
             self::STATUS_EN_OBSERVACION,
         ]);
+    }
+
+    public function contrato()
+    {
+        return $this->belongsTo(Contrato::class, 'id_contrato')->with('detallesActivos');
     }
 }

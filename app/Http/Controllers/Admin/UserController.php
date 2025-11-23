@@ -112,7 +112,7 @@ class UserController extends Controller
         $cargos = Cargo::active()->get();
         $permisos = Permiso::active()->listar()->get();
         $ensayoA = EnsayoAptitud::active()->get();
-        $areas = Area::active()->active()->orderBy('descripcion')->get();
+        $areas = Area::listarConDescripcionUnica(true);
         $responsablesEA = $usuario->responsablesEA->mapWithKeys(function ($ensayo) {
             $paquete = $ensayo->paquete;
             $descPaquete = mb_strtolower(trim($paquete->descripcion), 'UTF-8');

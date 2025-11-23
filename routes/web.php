@@ -25,6 +25,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use App\Http\Controllers\CertificadoController;
 use App\Http\Controllers\DocumentosController;
+use App\Http\Controllers\GestionContratoController;
 use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
@@ -89,8 +90,10 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::post('/pago', [PagoController::class, 'store'])->name('pago.store');
     Route::delete('/pago/{pago}', [PagoController::class, 'destroy'])->name('pago.destroy');
     Route::get('/paquetes/programa', [PaqueteController::class, 'getPaquetesPorPrograma'])->name('paquetes.programa');
-
     Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+    Route::resource('contratos', GestionContratoController::class);
+    Route::post('/contrato-detalles/save-all', [GestionContratoController::class, 'saveAll'])
+        ->name('contrato_detalles.saveAll');
     Route::put('/configuracion/update/{seccion}', [ConfiguracionController::class, 'update'])->name('configuracion.update');
     Route::get('/configuracion/certificado', [ConfiguracionController::class, 'certificados'])->name('configuracion.cerfificado');
 

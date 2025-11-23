@@ -30,4 +30,25 @@ class Area extends Model
     {
         return $this->hasMany(Paquete::class, 'id_area');
     }
+
+    public static function listarConDescripcionUnica($soloActivos = false)
+    {
+        $query = self::with('programa')->orderBy('descripcion');
+        if ($soloActivos) {
+            $query->where('status', 1);
+        }
+
+        $areas = $query->get();
+        $repetidos = $areas->groupBy('descripcion')
+            ->filter(fn($g) => $g->count() > 1)
+            ->keys();
+        return $areas->map(function ($a) use ($repetidos) {
+            return (object)[
+                'id' => $a->id,
+                'descripcion' => $repetidos->contains($a->descripcion)
+                    ? "{$a->descripcion} ({$a->programa->descripcion})"
+                    : $a->descripcion
+            ];
+        });
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cargo;
+use App\Models\Contrato;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Inscripcion;
@@ -72,6 +73,15 @@ class PdfInscripcionController extends Controller
     public function generarContrato($id)
     {
         $inscripcion = Inscripcion::with('laboratorio')->findOrFail($id);
+        $contrato = $inscripcion->contrato;
+        if ($contrato) {
+            $contrato->load('detallesActivos');
+        } else {
+            $contrato = Contrato::with(['detalles' => function ($q) {
+                $q->where('estado', 1);
+            }])->Activo()->orderBy('created_at', 'desc')->first();
+        }
+
         $laboratorio = $inscripcion->laboratorio;
         $fechaContrato = Carbon::now()->locale('es')->translatedFormat('d \d\e F \d\e Y');
         $gestion = $inscripcion->gestion;
@@ -90,13 +100,26 @@ class PdfInscripcionController extends Controller
             'fecha_generacion' => now()->format('d/m/Y | H:i'),
             'fecha_contrato' => $fechaContrato,
             'gestion' => $gestion,
+            'gestionInscripcion' => $gestion,
+            'contrato' => $contrato,
             'fechaLimitePago' => $fechaLimitePago,
             'convocatoria' => "Convocatoria del PEEC INLASA Gestión {$gestion}",
             'contrato_numero' => "MSyD/INLASA/PEEC/{$numero}/{$gestion}",
             'departamento_raw' => $laboratorio->departamento->nombre_dep,
+            'laboratorioNombreLab' => $laboratorio->nombre_lab,
+            'laboratorioZonaLab' => $laboratorio->zona_lab,
+            'laboratorioDireccionLab' => $laboratorio->direccion_lab,
+            'laboratorioReprelegLab' => $laboratorio->repreleg_lab,
+            'laboratorioCiReprelegLab' => $laboratorio->ci_repreleg_lab,
             'departamento' => Str::title(strtolower($laboratorio->departamento->nombre_dep))
         ];
 
+        if ($contrato) {
+            foreach ($contrato->detalles as $detalle) {
+                $detalle->descripcion = $this->procesarTextoContrato($detalle->descripcion, $data);
+                $detalle->titulo = $this->procesarTextoContrato($detalle->titulo, $data);
+            }
+        }
         // $pdf = Pdf::loadView('pdf.contrato_inscripcion_lab', $data);
         // $pdf->setPaper('A4', 'portrait');
 
@@ -129,5 +152,17 @@ class PdfInscripcionController extends Controller
         });
         return $pdf->stream('contrato-peec.pdf');
         // return $domPdf->stream('contrato-peec.pdf');
+    }
+    private function procesarTextoContrato($texto, $data)
+    {
+        $variables = [];
+        foreach ($data as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+
+            $variables["{{ $key }}"] = $value;
+        }
+        return str_replace(array_keys($variables), array_values($variables), $texto);
     }
 }

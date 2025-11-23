@@ -68,7 +68,7 @@ class LabController extends Controller
     {
         Gate::authorize(Permiso::LABORATORIO);
         $lab = Auth::user()->laboratorio;
-        $inscripcion = $lab->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_INSCRIPCION))->firstOrFail();
+        $inscripcion = $lab->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_INSCRIPCION))->orderBy('created_at', 'desc')->firstOrFail();
         $pdfController = app(PdfInscripcionController::class);
         return $pdfController->generarContrato($inscripcion->id);
     }

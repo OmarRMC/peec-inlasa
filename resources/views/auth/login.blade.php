@@ -2,8 +2,11 @@
     use App\Models\Configuracion;
 @endphp
 <x-guest-layout>
-    <div class="w-full max-w-md bg-white bg-opacity-95 rounded-md shadow-lg px-6 py-8 card-lon">
-        <h2 class="text-center text-lg font-semibold text-gray-800 mb-6">
+    <div class="w-full max-w-md bg-white bg-opacity-95 rounded-md shadow-lg px-6 pt-4 pb-8 card-lon relative">
+        <div class="mx-auto h-16 mb-2 left-1/2">
+            <img src="{{ asset('img/logoinlasa.png') }}" width="70px" class="mx-auto" alt="INLASA Logo">
+        </div>
+        <h2 class="text-center text-lg font-semibold text-gray-800 mb-4">
             Por favor, ingrese sus credenciales de acceso
         </h2>
 
@@ -70,7 +73,7 @@
 
             @if (Configuracion::esPeriodoRegistro())
                 <!-- Enlace a registro -->
-                <div class="text-center text-sm">
+                <div class="text-center text-sm text-gray-700">
                     ¿No tienes una cuenta?
                     <a href="{{ route('form.registro.tem.lab') }}" class="text-blue-600 hover:underline font-semibold">
                         Regístrate aquí
@@ -80,7 +83,7 @@
         </form>
 
         <!-- Pie institucional -->
-        <div class="text-xs text-center text-gray-500 mt-6">
+        <div class="text-xs text-center text-gray-500 mt-3">
             © 2025 | Instituto Nacional de Laboratorios de Salud<br>
             Programa de Evaluación Externa de la Calidad
         </div>
