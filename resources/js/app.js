@@ -12,11 +12,15 @@ import { setupPagination } from './components/datatable-pagination.js';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/js/utils/pdf.worker.min.mjs';
 window.pdfjsLib = pdfjsLib;
-window.setupPagination = setupPagination;   
+window.setupPagination = setupPagination;
 // DataTables se inicializa usando jQuery
 window.$ = window.jQuery = jquery;
 import 'datatables.net';
-
+// tippy('[data-mesaje-validacion]', {
+//     content(reference) {
+//         return reference.getAttribute('data-mesaje-validacion');
+//     },
+// });
 window.Alpine = Alpine;
 window.Swal = Swal;
 window.confirmDelete = confirmDelete;
@@ -28,5 +32,15 @@ window.showError = showError;
 
 document.addEventListener('DOMContentLoaded', () => {
     tippy('[data-tippy-content]');
+    tippy('[data-mensaje-validacion]', {
+        content(reference) {
+            return reference.getAttribute('data-mensaje-validacion');
+        },
+        placement: 'top',
+        animation: 'shift-away-subtle',
+        theme: 'validacion',
+        arrow: true,
+        trigger: 'focus',
+    });
 });
 Alpine.start();

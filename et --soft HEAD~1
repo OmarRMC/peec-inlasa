@@ -1,0 +1,533 @@
+[33mcommit 1b16efd3a142610f00c06eca25cf93434c8a1068[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmodulo-registro-resultados[m[33m)[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Sep 27 22:06:32 2025 -0400
+
+    add-sub-listas-admin
+
+[33mcommit a5d6813bd13f9885766fbc6c28fe7e8896a718fb[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Sep 27 19:11:04 2025 -0400
+
+    add-tablas-resultados
+
+[33mcommit 6e2c4130243bf5836e019b40c2bea2c456a00d3f[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Sep 27 10:50:21 2025 -0400
+
+    add-feature-admin-formulario
+
+[33mcommit af20add5083da24c3deada1b4c2a2cc59b19f72b[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Sep 21 21:02:44 2025 -0400
+
+    mojorado-la-validacion-formulario
+
+[33mcommit dccc61cd360876008bd6fc25287af76a45c349e4[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Oct 26 20:58:57 2025 -0400
+
+    feature/add-edit-formularios
+
+[33mcommit 61ebdd3d9fb9d8d39ac9737402bd3165b72c577c[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Oct 26 20:58:48 2025 -0400
+
+    feature/add-edit-formularios
+
+[33mcommit 40547fb543c99465fce23483d15c2c338ccd8d2c[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Sep 21 08:46:08 2025 -0400
+
+    modificacion-structura-db
+
+[33mcommit db4be93f84ea294824e6956aa7cfb5e3f6ca9b4b[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Sep 20 12:11:13 2025 -0400
+
+    add-usar-formulario
+
+[33mcommit 79daa99a304ee23464b6604fff91d3c169194a45[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Thu Sep 18 04:56:03 2025 -0400
+
+    add-dato-editable_encargado
+
+[33mcommit a63731575743f91796525db255ca189f9d47dfc0[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Thu Sep 18 03:50:07 2025 -0400
+
+    add-color-formulario
+
+[33mcommit 913b347cef18c1d0aa811c93fdb0786b664aeef5[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Wed Sep 17 06:12:49 2025 -0400
+
+    guardar-resultados-v1
+
+[33mcommit 0e7e60562fbb1f7182389ef266727ccb733a8ae3[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Wed Sep 17 04:10:03 2025 -0400
+
+    feature/add-cliclos
+
+[33mcommit 8029a097adf0c8a55e8fe259afaf11c773f57122[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Tue Sep 16 20:58:36 2025 -0400
+
+    add-formularios
+
+[33mcommit 2c1b0b5ed4fc78279ebcb4f8c5193de558786a3b[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Sep 14 15:16:18 2025 -0400
+
+    add-formularios
+
+[33mcommit cc13a225efe9970517d9a56e5a68699e7a04c1ab[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Sep 13 18:17:41 2025 -0400
+
+    db-formularios
+
+[33mcommit 8e582ce01fde3dba42605c80b62cef7919b8fae0[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Wed Oct 22 23:17:25 2025 -0400
+
+    mejoras-validaciones
+
+[33mcommit 2107dc44a575dd6bbb4765ba543bf9798b3ba2fc[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Wed Oct 22 22:02:31 2025 -0400
+
+    modificaion-inscripcion
+
+[33mcommit 2b347c1faa97bb19ce9c0803c38a37ea936fc939[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Wed Oct 22 07:13:49 2025 -0400
+
+    modificacion-del-backup
+
+[33mcommit cf0e78893a979a156ede037ff686a1a931ebf8f4[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Wed Oct 22 06:59:40 2025 -0400
+
+    fix-routes-api
+
+[33mcommit 7d8d7d05138a77b8c9786d7341e19ffcbbedf764[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Wed Oct 15 06:43:24 2025 -0400
+
+    backup-v2
+
+[33mcommit cacba74d8545a1ac99f2951db6522c9bedda1b9a[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Wed Oct 15 06:39:28 2025 -0400
+
+    se completo el diseño de certificados
+
+[33mcommit 0481175a43d6b5ef4fa725dc3f90723c9bec1423[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Mon Oct 13 07:18:24 2025 -0400
+
+    modificacion-correos
+
+[33mcommit 80c668398eaa1205f19047ca23df40c9be5835d8[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Mon Oct 13 05:51:56 2025 -0400
+
+    add-ulid-inscripcion
+
+[33mcommit 2cd1a83710c5a5f33e5dd52ab25ab0865f2f8458[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Fri Oct 10 05:35:44 2025 -0400
+
+    update-10_10
+
+[33mcommit afe8cb870b5290a9aa9e664161370d688873203f[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Oct 5 22:38:17 2025 -0400
+
+    se-elimino-tipo_laboratorio_programa-tabla
+
+[33mcommit 413295eda31f433800e46daf3ab28b0ff563382f[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Oct 5 22:07:39 2025 -0400
+
+    formateado-listado-paquete
+
+[33mcommit 8019551a35f71162c8d9cb84135c68c6a5b838a2[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Oct 5 20:57:09 2025 -0400
+
+    app:generar-inscripcion-ensayo-aptitud
+
+[33mcommit 6b19c8ef250558c22f680b77c8950a4c04b55117[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Oct 5 19:27:15 2025 -0400
+
+    modificacion-filtro-inscripciones
+
+[33mcommit d3457b40b3b26cab885be56a5bd64a6aefe123be[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Oct 5 18:59:54 2025 -0400
+
+    add-temporalmente-cdn-fontAsome
+
+[33mcommit df3da530f05815033f856ae1ba36aba7478476f3[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Oct 4 07:07:50 2025 -0400
+
+    add-mejoras-coreeciones
+
+[33mcommit a23105e4227e6e7d1c9af0dbac2eb6df5ffb1ced[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Mon Sep 8 06:57:13 2025 -0400
+
+    integracion-asset
+
+[33mcommit 4cfba4f50e5fe6f5a9b726c0a9d35d830bc6d0d3[m
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Sun Sep 7 21:24:31 2025 -0400
+
+    feature/add-certificado-admin (#11)
+
+[33mcommit 29fe0c27ef8d5064b7f78819ab8f834bbbc557a1[m
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Sun Sep 7 09:43:13 2025 -0400
+
+    add-login-md5
+
+[33mcommit f10114628a9efc07820497eab885425bac508a8b[m
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Tue Sep 2 21:17:38 2025 -0400
+
+    feature\add-docs-pdf-pagos-inscripcion
+
+[33mcommit 6572c7bbd5def9bca03d5d9681d3f389d4d2f79f[m
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Sat Aug 30 14:08:51 2025 -0400
+
+    modificar/modal-confimacion-registro
+
+[33mcommit 187ce92f04a11970f76f6eaaacceb0715b499474[m
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Sat Aug 30 14:05:01 2025 -0400
+
+    featuras/flexibilidad-inputs
+
+[33mcommit 51e3ba5dc90f532abd6d808592a9089bf13812e2[m
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Sat Aug 30 07:40:37 2025 -0400
+
+    add-validar-pagos-inscripcion
+
+[33mcommit 7f947130f1cf11a2759108a94f47a45ea2829cd2[m
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Fri Aug 29 19:54:45 2025 -0400
+
+    update/configuracion
+
+[33mcommit e0b98aa06c80419c5bf9613161c6fba4c67cf543[m
+Merge: e9e5d38 f666833
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Fri Aug 29 19:49:28 2025 -0400
+
+    Merge pull request #4 from OmarRMC/feature/certificados
+    
+    Feature/certificados
+
+[33mcommit f66683369b44430fa5d29206efc53425df24e51a[m[33m ([m[1;31morigin/feature/certificados[m[33m, [m[1;32mfeature/certificados[m[33m)[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Mon Aug 25 07:16:30 2025 -0400
+
+    add-force-resert-password
+
+[33mcommit f0e6c57995e186424d8f6434f1b6a7228d93683d[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 24 20:28:45 2025 -0400
+
+    add-nombre-cordinadora
+
+[33mcommit 891fb86bf37efa5f741c13947157cb8d059dca00[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 24 19:20:01 2025 -0400
+
+    configuracion-role-certificado
+
+[33mcommit 49d667e88ce5fd29caf14b8f7216f3c2566a57df[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 24 13:41:20 2025 -0400
+
+    add-paquete-ea
+
+[33mcommit e48d7bb4d0563e9151626f8f8b9b934d90c11a6e[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 24 12:51:30 2025 -0400
+
+    add-exepcion-forenkey
+
+[33mcommit 461e8e842ec757d3de82a5005005c5acb39e6362[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 24 11:39:41 2025 -0400
+
+    add-btn-inscripcion-programas
+
+[33mcommit 71dcdcef2d57cdede450c4a8a31ae5f4c122f183[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 24 09:30:15 2025 -0400
+
+    add-mejoras-en-pdf-inscripcion
+
+[33mcommit 59f9401fb0431a6c6d3cedf6f3c255f3d1471980[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 24 06:01:32 2025 -0400
+
+    add-log-certificado
+
+[33mcommit abaeedbd98a568682f8ec37165cbe30cd238e3ed[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 23 21:49:44 2025 -0400
+
+    add-qr-certificados-y-verificacion
+
+[33mcommit 61bcaa2ec26033bb94b7b5a75692761cce6e6977[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 23 19:43:07 2025 -0400
+
+    update-readme
+
+[33mcommit 5968812c8f9a338ebdadfc1fcc0c6b989e3a2955[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 23 19:41:49 2025 -0400
+
+    update-readme
+
+[33mcommit 18650884d6494384c0a28722a46e40f13e49702f[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 23 11:10:47 2025 -0400
+
+    certificados-imagen-configuracion-sub-dominio-xaamp
+
+[33mcommit 21ce576ae7ffd6d8a34f88dd9f4a64f58ba891b0[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 23 05:53:08 2025 -0400
+
+    modificado-email-invitacion
+
+[33mcommit 08e736be0f955291ed7998a6b4d8c1cf1d40fa42[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Mon Aug 18 06:59:43 2025 -0400
+
+    add-publicar-certificado
+
+[33mcommit 56a9499aa1f65a7e7c1d9bb4aa45f2bf2b3d9318[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 17 22:16:07 2025 -0400
+
+    add-certificado-v1
+
+[33mcommit 853c2ddb1c159ace9b2b3a1b5866a5accc6b6da7[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 17 17:20:19 2025 -0400
+
+    add-view-certificado-lab
+
+[33mcommit 5b497671061306d97af5b103a6cf8a9ce37f0ff6[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 17 13:39:05 2025 -0400
+
+    add-list-ensayoA-labs
+
+[33mcommit 891c159175a98d66182bf01df69110d097c2aac0[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 17 04:07:04 2025 -0400
+
+    subir-csv-rol-responsable
+
+[33mcommit b934a2d735d4bc71b28ff0183b57675bde441451[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 16 02:33:44 2025 -0400
+
+    fix-permisos
+
+[33mcommit 9f76ebdd309919904dc9f9553cefabc08066352a[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 16 02:09:06 2025 -0400
+
+    Cerificados-configuracion
+
+[33mcommit e9e5d38f4a8422f773202982289458f580cf7367[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Thu Aug 14 07:11:21 2025 -0400
+
+    update-readme
+
+[33mcommit 1dfbe8b6023f200bb168acf3f1b882b9ab8e7988[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Thu Aug 14 06:56:53 2025 -0400
+
+    update-readme
+
+[33mcommit ae576fcbaa4c5e29ba101fbfe8c0d59c7eb9ad3f[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Thu Aug 14 06:52:48 2025 -0400
+
+    update-readme
+
+[33mcommit ba79b8494b8f199d5518c420e02bc0fb50d7e466[m
+Merge: 36419bb 82dc403
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Thu Aug 14 06:46:40 2025 -0400
+
+    update-readme
+    
+    update-readme
+
+[33mcommit 82dc40315fc1dc0a041d7629486909d0d060ba8f[m[33m ([m[1;31morigin/update-readme[m[33m, [m[1;32mupdate-readme[m[33m)[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Tue Aug 12 07:00:13 2025 -0400
+
+    update-readme
+
+[33mcommit 36419bb458c2a9095b57ebe2a759e466897337f0[m
+Merge: 5c0ec55 77d5dcb
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Mon Aug 11 07:03:51 2025 -0400
+
+    Merge pull request #2 from OmarRMC/feature-last-mod123
+    
+    Feature last mod123  11_08
+
+[33mcommit 77d5dcb5c5d6ef8d1aa6078f1a9dc4da6acfea5c[m[33m ([m[1;31morigin/feature-last-mod123[m[33m, [m[1;32mfeature-last-mod123[m[33m)[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Mon Aug 11 06:53:21 2025 -0400
+
+    auto-complete-off-password
+
+[33mcommit de2b07ac06574188cc079d1c9e173e970e69fde4[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 10 21:04:14 2025 -0400
+
+    modificado-obs
+
+[33mcommit 775e92cacb697066b19e94b8987a07042fd5c570[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 10 20:41:49 2025 -0400
+
+    add-estados-inscripcion
+
+[33mcommit 4631878b786bc8b2586a9dca0fc25ddc1c4e63de[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 10 19:54:04 2025 -0400
+
+    add-codigo-email
+
+[33mcommit aa586563ce5aa16713dea15171ab89b25837d16b[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 10 18:01:32 2025 -0400
+
+    add-modal-user-lab
+
+[33mcommit b86815afc12f7d130ea6362fd72a04582378bbb6[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sun Aug 10 14:40:34 2025 -0400
+
+    modifico-navbar-show-inscripciones
+
+[33mcommit eb9ed4954dda28de90f38ea8fa51e34ad44e0ae9[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 9 17:33:51 2025 -0400
+
+    ajustado-modal-eliminar
+
+[33mcommit c6adf60c7f3b4e5c3c090303e9f35fe06ff82885[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 9 17:07:16 2025 -0400
+
+    add-modal
+
+[33mcommit 5c0ec55a390d948963a03d9d2328b6f5f8452055[m
+Merge: 5996bfe bbf4602
+Author: Omar R Mamani <76457439+OmarRMC@users.noreply.github.com>
+Date:   Sat Aug 9 08:24:13 2025 -0400
+
+    #1 migraciones-login-page - 09-08-25
+    
+    v1
+
+[33mcommit bbf4602fdffed93090262ed677b84e8df6d9c0b9[m[33m ([m[1;31morigin/migraciones-login-page[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmigraciones-login-page[m[33m)[m
+Author: OmarRMC <mamani.capcha.omarrodrigo@gmail.com>
+Date:   Sat Aug 9 08:20:32 2025 -0400
+
+    modify-fecha-vigencia
+
+[33mcommit 81f923afba6d43bab354fc3dcd0c54ab9a39f523[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Thu Aug 6 07:20:22 2026 -0400
+
+    add-aprobados-listar-labs-res
+
+[33mcommit 479c5084ac8d54f18ae7e57d9c07129ce34cf02c[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Tue Aug 5 06:42:37 2025 -0400
+
+    Se add anular inscripcion en lab
+
+[33mcommit 5c6c8b513e5f0e087661b0f6e6f983a39d231338[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Tue Aug 5 06:25:18 2025 -0400
+
+    modify-pdf
+
+[33mcommit 908b5644bf6969fb649d7bf5c5362ea978558c67[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Mon Aug 4 10:25:20 2025 -0400
+
+    add-email-obs
+
+[33mcommit 59a95e090a96d7be195525809958d0464fa72863[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Mon Aug 4 09:08:46 2025 -0400
+
+    add-remove-delete
+
+[33mcommit 6da550a1a33632fcd6e8b598b7e748c8493ff9a5[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Mon Aug 4 06:53:21 2025 -0400
+
+    add-obs
+
+[33mcommit 207f7dac74efee4d23f2cadb0bdd792a8cd3f633[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Sun Aug 3 21:23:54 2025 -0400
+
+    anular-ins
+
+[33mcommit e891dbf5b4de3df0d4dc4276f334bb7be907395c[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Sun Aug 3 12:51:52 2025 -0400
+
+    modify-res
+
+[33mcommit 58bb6bc3cbb7c2f07a3157e75b308d70514afccc[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Sun Aug 3 11:42:07 2025 -0400
+
+    seeder-mun
+
+[33mcommit 909a7734f3b276431736556282af9a9eca8d2062[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Sun Aug 3 10:33:35 2025 -0400
+
+    add-orderby-geo
+
+[33mcommit d68459734cf4af2564b71be4f3bd68c26bce1a95[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Sun Aug 3 10:24:00 2025 -0400
+
+    areas-EA-filter
+
+[33mcommit 5d3ff02dd7e3fead47e68c08503227929760c255[m
+Author: mamani.capcha.omarrodrigo@gmail.com <omar.mamani.bt@gmail.com>
+Date:   Sun Aug 3 07:24:35 2025 -0400
+
+    pago-modify
