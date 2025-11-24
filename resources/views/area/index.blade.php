@@ -6,7 +6,7 @@
         <!-- Encabezado -->
         <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
             <h1 class="text-xl font-bold text-primary">Lista de Áreas</h1>
-            <a href="{{ route('area.create') }}" class="btn-primary">
+            <a href="{{ route('area.create') }}" class="btn-primary" data-tippy-content="Agregar nueva área">
                 <i class="fas fa-plus-circle"></i> Nueva Área
             </a>
         </div>
@@ -42,7 +42,8 @@
                                 <div class="flex space-x-1">
                                     <a href="{{ route('area.edit', $area->id) }}"
                                         class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"
-                                        data-tippy-content="Editar">
+                                        data-tippy-content="Editar"
+                                        >
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     @if (Gate::any(Permiso::DELETE_GESTION_PROGRAMAS))

@@ -197,6 +197,9 @@ class Permiso extends Model
     public const GESTION_CERTIFICADOS_NAME = 'Gestión Certificados';
     public const GAME = 'game';
 
+    public const GESTION_FORMULARIOS = 'gestion.formularios';
+    public const GESTION_FORMULARIOS_NAME = 'Gestión Formularios';
+
     // ------------------------------
     // PERMISOS_HABILITADOS
     // ------------------------------
@@ -214,6 +217,7 @@ class Permiso extends Model
         self::LABORATORIO => self::LABORATORIO_NAME,
         self::GESTION_CERTIFICADOS => self::GESTION_CERTIFICADOS_NAME,
         self::JEFE_PEEC => self::JEFE_PEEC_NAME,
+        self::GESTION_FORMULARIOS => self::GESTION_FORMULARIOS_NAME,
     ];
 
     protected $table = 'permiso';
