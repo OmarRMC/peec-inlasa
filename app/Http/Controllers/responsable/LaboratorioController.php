@@ -58,7 +58,7 @@ class LaboratorioController extends Controller
             ->where('id_ea', $idEa)
             ->whereHas('inscripcion', function ($q) {
                 $q->where('gestion', now()->year);
-                $q->Aprobado();
+                $q->AprobadoOrVencido();    
             });
         // Log::info($Inscripciones);
         // Consultar solo los laboratorios filtrados por ID
