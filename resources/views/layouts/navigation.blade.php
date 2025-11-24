@@ -189,6 +189,11 @@
                     @endforeach
                 </div>
             @endif
+            <a href="{{ route('ea.formulario.index') }}"
+                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                <i class="fas fa-clipboard-list w-5 text-indigo-500"></i>
+                <span>Gestion de formularios</span>
+            </a>
         </div>
     @endif
 
@@ -248,6 +253,15 @@
                         class="fas fa-medal"></i> Participación y Desempeño
                 </a>
             </div>
+        </div>
+    @endif
+    @if (Gate::any([Permiso::LABORATORIO]))
+        <div>
+            <a href="{{ route('lab.inscritos-ensayos.index') }}"
+                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                <i class="fas fa-cogs w-5 text-indigo-500"></i>
+                <span>Registrar resultados</span>
+            </a>
         </div>
     @endif
     @if (Gate::any([Permiso::ADMIN, Permiso::CONFIGURACION]))
@@ -471,4 +485,32 @@
         </div>
     @endif
 
+    @if (Gate::any([Permiso::ADMIN]))
+        <div>
+            <a href="{{ route('admin.formularios.ea') }}"
+                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+                <i class="fas fa-cogs w-5 text-indigo-500"></i>
+                <span>Formularios de EA</span>
+            </a>
+        </div>
+    @endif
+
+    @if (Gate::any([Permiso::ADMIN, Permiso::RESPONSABLE]))
+        <div>
+            <button @click="openMenu !== 600 ? openMenu = 600 : openMenu = null"
+                class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
+                <i class="fas fa-chart-line w-5 text-indigo-500"></i>
+                <span> Gestion de resultados </span>
+                <i class="fas ml-auto" :class="openMenu === 600 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </button>
+            <div x-show="openMenu === 600" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
+                @if (Gate::any([Permiso::RESPONSABLE]))
+                    <a href="{{ route('reportes.resultados.ensayos') }}"
+                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i> Reporte de resultados
+                    </a>
+                @endif
+            </div>
+        </div>
+    @endif
 </nav>
