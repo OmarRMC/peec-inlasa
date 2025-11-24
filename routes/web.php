@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\ResultadosEvaluacionLabExport;
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\ConfiguracionController;
@@ -20,17 +21,29 @@ use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\TipoLaboratorioController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
+use App\Http\Controllers\FormularioEnsayoResultadoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use App\Http\Controllers\CertificadoController;
+use App\Http\Controllers\CicloController;
 use App\Http\Controllers\DocumentosController;
 use App\Http\Controllers\GestionContratoController;
+use App\Http\Controllers\FormularioEnsayoController;
+use App\Http\Controllers\GrupoSelectorController;
 use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
+use App\Http\Controllers\Lab\RegistroResultadosController;
+use App\Http\Controllers\OpcionSelectorController;
+use App\Http\Controllers\ReporteResultadosEvaluacioneController;
+use App\Http\Controllers\responsable\GestionFormulariosController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
+use App\Http\Controllers\responsable\ReporteResultadosController;
+use App\Http\Controllers\responsable\ResultadosEnviadosLabController;
+use App\Http\Controllers\ResultadoController;
 use App\Http\Controllers\VerificarController;
+use App\Models\FormularioEnsayo;
 use App\Models\Permiso;
 use Illuminate\Support\Facades\Route;
 
@@ -72,6 +85,50 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/certificados', [CertificadoController::class, 'index'])->name('admin.certificado.index');
     Route::get('/certificados/ajax', [CertificadoController::class, 'getDataCertificado'])->name('admin.certificado.ajax.index');
     Route::get('/certificados/{idLaboratorio}/descargar/{gestion}/{type}', [CertificadoController::class, 'descargarCertificado'])->name('admin.certificado.descargar');
+
+    Route::get('/formularios-ea', [FormularioEnsayoController::class, 'formulariosIndex'])->name('admin.formularios.ea');
+    Route::get('/formularios-ea/{idEA}/show', [FormularioEnsayoController::class, 'formulariosByEa'])->name('admin.formularios.show');
+    Route::put('/formularios-ea/update/{id}', [FormularioEnsayoController::class, 'update'])->name('admin.formularios.update');
+    Route::delete('/formularios-ea/{formulario}', [FormularioEnsayoController::class, 'destroy'])->name('admin.formularios.destroy');
+    Route::get('/formularios-ea/{id}/{idEa}/edit', [FormularioEnsayoController::class, 'edit'])->name('admin.formularios.edit');
+    Route::get('/formularios-ea/{id}/preview', [FormularioEnsayoController::class, 'preview'])->name('admin.formularios.preview');
+    Route::post('/formularios-ea', [FormularioEnsayoController::class, 'store'])->name('admin.formularios.store');
+    Route::put('/formularios-ea/{id}', [FormularioEnsayoController::class, 'updateEstructura'])->name('admin.formularios.updateEstructura');
+    Route::post('/formularios/usar/{id}', [FormularioEnsayoController::class, 'usar'])
+        ->name('admin.formularios.usar');
+
+
+
+    Route::get('/ciclos/{idEa}', [CicloController::class, 'index'])->name('admin.ciclos.index');
+    Route::post('/ciclos', [CicloController::class, 'store'])->name('admin.ciclos.store');
+    Route::put('/ciclos/{id}', [CicloController::class, 'update'])->name('admin.ciclos.update');
+    Route::put('/ciclos/{id}/toggle', [CicloController::class, 'toggle'])->name('admin.ciclos.toggle');
+    Route::delete('/ciclos/{id}', [CicloController::class, 'destroy'])->name('admin.ciclos.destroy');
+
+    Route::prefix('/formularios')->name('admin.formularios.')->group(function () {
+        // Route::get('/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [FormularioEnsayoController::class, 'update'])->name('update');
+        Route::post('/resultados/test', [FormularioEnsayoResultadoController::class, 'testAdmin'])->name('store.test');
+    });
+    Route::prefix('/grupos-selectores')->name('admin.grupos-selectores.')->group(function () {
+        Route::get('/buscar', [GrupoSelectorController::class, 'buscar'])->name('buscar');
+        Route::post('/guardar', [GrupoSelectorController::class, 'guardar'])->name('guardar');
+        Route::delete('/eliminar/{id}', [GrupoSelectorController::class, 'eliminar'])->name('eliminar');
+        Route::get('/opciones/{id}', [GrupoSelectorController::class, 'getOpciones'])->name('opciones');
+    });
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('ensayos/{ensayo}/grupos', [GrupoSelectorController::class, 'index'])
+            ->name('grupos.index');
+        Route::post('ensayos/{ensayo}/grupos', [GrupoSelectorController::class, 'store'])->name('grupos.store');
+        Route::get('/json/ensayos/{ensayoId}/grupos', [GrupoSelectorController::class, 'gruposSelectoresJson'])->name('grupos.selectores.json');
+        Route::put('grupos/{grupo}', [GrupoSelectorController::class, 'update'])->name('grupos.update');
+        Route::delete('grupos/{grupo}', [GrupoSelectorController::class, 'destroy'])->name('grupos.destroy');
+
+        Route::post('grupos/{grupo}/opciones', [OpcionSelectorController::class, 'store'])->name('opciones.store');
+        Route::put('opciones/{opcion}', [OpcionSelectorController::class, 'update'])->name('opciones.update');
+        Route::delete('opciones/{opcion}', [OpcionSelectorController::class, 'destroy'])->name('opciones.destroy');
+    });
 
     Route::prefix('inscripcion')->group(function () {
         Route::get('/', [InscripcionPaqueteController::class, 'index'])->name('inscripcion_paquete.index');
@@ -142,6 +199,13 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
         ->name('pago.lab.subirComprobante');
     Route::get('/inscripciones/{id}/comprobantes', [DocumentosController::class, 'indexDocPagos'])
         ->name('documentos.pagos.index');
+
+    Route::get('/inscripcion-ensayos', [RegistroResultadosController::class, 'listaEnsayosInscritos'])->name('lab.inscritos-ensayos.index');
+    Route::get('/inscripcion-ensayos/{id}/formularios', [RegistroResultadosController::class, 'getFormulariosByEa'])->name('lab.inscritos-ensayos.formularios');
+    Route::get('/inscripcion-ensayos/formulario/{id}/llenar/{idEA}', [RegistroResultadosController::class, 'formularioLlenar'])->name('lab.inscritos-ensayos.formularios.llenar');
+    Route::post('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'guardarResultados'])->name('laboratorio.formularios.guardar');
+
+    Route::post('/formularios/resultados', [FormularioEnsayoResultadoController::class, 'store'])->name('lab.resultados.store');
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
@@ -153,6 +217,23 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
     Route::post('/detalle-certificado/{id}', [DetalleCertificadoController::class, 'update'])->name('detalle-certificado.update');
     Route::post('/ea/{id}/certificado/confirmar', [ResponsableLaboratorioController::class, 'confirmarDatosCertificados'])->name('confirmar.datos.certificados');
     Route::get('/ea/{id}/certificado/confirmados', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoConfirmados'])->name('ea.lab.desempeno.confirmado');
+    Route::get('/ea/gestion-formularios', [GestionFormulariosController::class, 'index'])->name('ea.formulario.index');
+    Route::get('/ea/{id}/gestion-formularios/labs', [GestionFormulariosController::class, 'labs'])->name('ea.formulario.lab.inscritos');
+    Route::get('/ea/{id}/gestion-formularios/labs/data', [GestionFormulariosController::class, 'getData'])->name('ea.formulario.lab.inscritos.getData');
+    Route::post('/ea/formulario/actualizar-cantidad', [GestionFormulariosController::class, 'actualizarCantidad'])
+        ->name('ea.formulario.actualizarCantidad');
+    Route::get('reportes/ensayos', [ReporteResultadosController::class, 'reporteEnsayos'])
+        ->name('reportes.resultados.ensayos');
+    Route::get('reportes/resultados/{idEA}/registrados', [ReporteResultadosController::class, 'resultadosRegistradosPorLab'])
+        ->name('reportes.resultados.registrados');
+    Route::get('reportes/ensayo/{idEA}/export/{ciclo}', [ReporteResultadosEvaluacioneController::class, 'exportEnsayoResultados'])
+        ->name('reportes.resultados.ensayos.export');
+    Route::get('reportes/ensayo/{idEA}/ciclo/{idCiclo}/lab/{idLab}', [ResultadosEnviadosLabController::class, 'listadoRespuestasEnviados'])
+        ->name('resultados.enviados.index');
+    Route::get('resultado/preview/{id}', [ResultadosEnviadosLabController::class, 'previewResultado'])
+        ->name('responsable.resultados.preview');
 });
+Route::get('/exportar-resultados/{id}', [ResultadoController::class, 'export'])->name('formularios.resultados.export');
+
 
 require __DIR__ . '/auth.php';
