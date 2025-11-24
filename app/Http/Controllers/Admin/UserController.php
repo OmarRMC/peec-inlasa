@@ -33,7 +33,7 @@ class UserController extends Controller
         $cargos = Cargo::active()->get();
         $permisos = Permiso::active()->listar()
             ->get();
-        $areas = Area::active()->active()->orderBy('descripcion')->get();
+        $areas = Area::listarConDescripcionUnica(true);
         $ensayoA = EnsayoAptitud::active()->orderBy('descripcion')->get();
         return view('usuario.create', compact('cargos', 'permisos', 'ensayoA', 'areas'));
     }
