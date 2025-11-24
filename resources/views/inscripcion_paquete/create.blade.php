@@ -20,7 +20,7 @@
         <div id="modal"
             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-2 sm:p-6">
             <div
-                class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-3xl relative overflow-y-auto max-h-[90vh] p-3 sm:p-6 text-xs sm:text-sm">
+                class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-4xl relative overflow-y-auto max-h-[90vh] p-3 sm:p-6 text-xs sm:text-sm">
                 @if ($deudasPendientes->isNotEmpty())
                     <div class="overflow-x-auto mb-4">
                         <div
@@ -51,54 +51,66 @@
                         </table>
                     </div>
                 @else
-                    <div>
-                        <div class="flex justify-between items-center mb-2 flex-wrap">
-                            <h2 class="text-base sm:text-lg font-bold mb-4">Selecciona Paquetes</h2>
-                            <div class="flex items-center gap-2 justify-end mb-1 flex-wrap w-full sm:w-auto">
-                                <div class="relative w-full sm:w-64 mb-2 sm:mb-0">
-                                    <span
-                                        class="absolute inset-y-0 left-0 flex items-center pl-2 sm:pl-3 text-gray-500 text-xs sm:text-sm">
+                    <div class="flex flex-col sm:flex-row gap-1">
+                        <div>
+                            <div class="flex justify-between items-center mb-2 flex-wrap">
+                                <h2 class="text-base sm:text-lg font-bold mb-4">Selecciona Paquetes</h2>
+                                <div class="flex items-center gap-2 justify-end mb-1 flex-wrap w-full sm:w-auto">
+                                    <div class="relative w-full sm:w-64 mb-2 sm:mb-0">
+                                        <span
+                                            class="absolute inset-y-0 left-0 flex items-center pl-2 sm:pl-3 text-gray-500 text-xs sm:text-sm">
+                                            <i class="fas fa-search"></i>
+                                        </span>
+                                        <input type="search" id="custom-search-lab"
+                                            class="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
+                                            placeholder="Buscar paquetes...">
+                                    </div>
+                                    <button id="btn-search-lab"
+                                        class="px-3 py-1 sm:px-4 sm:py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs sm:text-sm">
                                         <i class="fas fa-search"></i>
-                                    </span>
-                                    <input type="search" id="custom-search-lab"
-                                        class="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
-                                        placeholder="Buscar paquetes...">
+                                    </button>
                                 </div>
-                                <button id="btn-search-lab"
-                                    class="px-3 py-1 sm:px-4 sm:py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs sm:text-sm">
-                                    <i class="fas fa-search"></i>
-                                </button>
                             </div>
-                        </div>
 
-                        <!-- Selector de Programa -->
-                        <div class="mb-4">
-                            <label class="block mb-1 text-xs sm:text-sm font-medium">Programa</label>
-                            <select id="programaSelect"
-                                class="form-select block w-full border-gray-300 rounded-md shadow-sm text-xs sm:text-sm">
-                                <option value="">Seleccione un programa...</option>
-                                @foreach ($programas as $programa)
-                                    <option value="{{ $programa->id }}">{{ $programa->descripcion }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                            <!-- Selector de Programa -->
+                            <div class="mb-4">
+                                <label class="block mb-1 text-xs sm:text-sm font-medium">Programa</label>
+                                <select id="programaSelect"
+                                    class="form-select block w-full border-gray-300 rounded-md shadow-sm text-xs sm:text-sm">
+                                    <option value="">Seleccione un programa...</option>
+                                    @foreach ($programas as $programa)
+                                        <option value="{{ $programa->id }}">{{ $programa->descripcion }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <!-- Tabla de paquetes disponibles -->
-                        <div class="overflow-x-auto mb-4">
-                            <table class="table w-full text-xs sm:text-sm min-w-[500px]" id="tablaPaquetes">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Descripción</th>
-                                        <th>Área</th>
-                                        <th>Costo</th>
-                                    </tr>
-                                </thead>
-                            </table>
+                            <!-- Tabla de paquetes disponibles -->
+                            <div class="overflow-x-auto mb-4">
+                                <table class="table w-full text-xs sm:text-sm min-w-[500px]" id="tablaPaquetes">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Descripción</th>
+                                            {{-- <th>Área</th> --}}
+                                            <th>Costo</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="flex justify-between items-center flex-wrap mt-2 gap-2 text-xs sm:text-sm">
+                                <div id="custom-info"></div>
+                                <div id="custom-pagination" class="flex justify-center"></div>
+                            </div>
+
                         </div>
-                        <div class="flex justify-between items-center flex-wrap mt-2 gap-2 text-xs sm:text-sm">
-                            <div id="custom-info"></div>
-                            <div id="custom-pagination" class="flex justify-center"></div>
+                        <div id="paquetesSeleccionados" class="">
+                            <div
+                                class="relative bg-white w-full p-2  max-h-[50vh] h-[90%]
+                                    overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                                <div id="modal-selecionados">
+                                    <!-- Aquí se insertará el contenido clonado -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                 @endif
@@ -107,12 +119,13 @@
                 <div class="flex justify-end mt-4 gap-2 flex-wrap">
                     <button id="cerrarModal"
                         class="btn-secondary px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Cerrar</button>
-                    <button id="btn-ver-seleccionados"
+                    {{-- <button id="btn-ver-seleccionados"
                         class="px-3 py-1 sm:px-4 sm:py-2 text-white rounded btn-primary transition shadow text-xs sm:text-sm">
                         <i class="fas fa-eye"></i> Ver Paquetes Seleccionados
-                    </button>
+                    </button> --}}
                 </div>
             </div>
+
         </div>
 
         <div>
@@ -122,7 +135,7 @@
                 class="w-full border border-gray-300 rounded-md shadow-sm text-sm p-2 focus:outline-none focus:ring-1 focus:ring-blue-300"
                 rows="1"></textarea>
         </div>
-        <div id="paquetesSeleccionados"
+        {{-- <div id="paquetesSeleccionados"
             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-2 sm:p-6">
             <div
                 class="relative bg-white rounded-lg shadow-lg w-full max-w-3xl p-2 
@@ -136,7 +149,7 @@
                     <!-- Aquí se insertará el contenido clonado -->
                 </div>
             </div>
-        </div>
+        </div> --}}
         <!-- Tabla de paquetes seleccionados (fuera del modal) -->
         <div class="overflow-x-auto mb-4 mt-5" id="paquetesSeleccionadosContainer">
             <h3 class="font-semibold mb-2">Paquetes Seleccionados</h3>
@@ -144,7 +157,7 @@
                 <thead>
                     <tr>
                         <th>Paquete</th>
-                        <th>Área</th>
+                        <th class="head_area">Área</th>
                         <th>Costo</th>
                         <th class="head_obs">Observaciones</th>
                         <th>Acción</th>
@@ -153,7 +166,7 @@
                 <tbody id="tablaSeleccionados">
                 </tbody>
             </table>
-            <div class="text-right mt-2 font-bold">
+            <div class="text-right mt-2 font-bold costo-total">
                 Total: <span id="total">0 Bs.</span>
             </div>
         </div>
@@ -168,6 +181,7 @@
     @push('scripts')
         <script>
             document.addEventListener("DOMContentLoaded", () => {
+
                 const modal = document.getElementById('modal');
                 const openModalBtn = document.getElementById('openModal');
                 const cerrarModalBtn = document.getElementById('cerrarModal');
@@ -176,34 +190,47 @@
                 const tablaSeleccionados = document.getElementById('tablaSeleccionados');
                 const totalSpan = document.getElementById('total');
                 const confirmarBtn = document.getElementById('confirmarInscripcion');
+                const costoTotal = document.querySelector('.costo-total');
 
-                const btnListarInscripciones = document.getElementById('btn-ver-seleccionados');
-                const btnOcultarSeleccionados = document.getElementById('btn-ocultar-seleccionados');
+                // const btnListarInscripciones = document.getElementById('btn-ver-seleccionados');
+                // const btnOcultarSeleccionados = document.getElementById('btn-ocultar-seleccionados');
                 const listaInscripcionesDiv = document.getElementById('paquetesSeleccionados');
                 const paquetesSeleccionadosContainer = document.getElementById('paquetesSeleccionadosContainer');
 
-                btnOcultarSeleccionados.addEventListener('click', () => {
-                    listaInscripcionesDiv.classList.add('hidden');
-                    const modalContent = listaInscripcionesDiv.querySelector('#modal-selecionados');
-                    modalContent.innerHTML = '';
-                });
+
+
+                // btnOcultarSeleccionados.addEventListener('click', () => {
+                //     listaInscripcionesDiv.classList.add('hidden');
+                //     const modalContent = listaInscripcionesDiv.querySelector('#modal-selecionados');
+                //     modalContent.innerHTML = '';
+                // });
 
                 function renderModalSelecionadoPaquetes() {
                     const clone = paquetesSeleccionadosContainer.cloneNode(
                         true);
                     clone.id = '';
+                    const costoTotalClone = costoTotal.cloneNode(true);
                     const modalContent = listaInscripcionesDiv.querySelector('#modal-selecionados');
                     modalContent.innerHTML = '';
+                    modalContent.prepend(costoTotalClone);
                     modalContent.appendChild(clone);
 
                     modalContent.querySelectorAll('tr').forEach(tr => {
                         const tdToRemove = tr.querySelector('td.text_obs');
                         const thToRemove = tr.querySelector('th.head_obs');
+                        const thToArea = tr.querySelector('th.head_area');
+                        const tdToArea = tr.querySelector('td.text_area');
                         if (tdToRemove) {
                             tdToRemove.remove();
                         }
                         if (thToRemove) {
                             thToRemove.remove();
+                        }
+                        if (thToArea) {
+                            thToArea.remove();
+                        }
+                        if (tdToArea) {
+                            tdToArea.remove();
                         }
                     });
 
@@ -211,10 +238,10 @@
                         behavior: 'smooth'
                     });
                 }
-                btnListarInscripciones.addEventListener('click', () => {
-                    listaInscripcionesDiv.classList.remove('hidden');
-                    renderModalSelecionadoPaquetes();
-                });
+                // btnListarInscripciones.addEventListener('click', () => {
+                //     listaInscripcionesDiv.classList.remove('hidden');
+                //     renderModalSelecionadoPaquetes();
+                // });
 
                 const seleccionados = [];
                 let paquetesDisponibles = [];
@@ -224,6 +251,7 @@
 
                 openModalBtn.addEventListener('click', () => {
                     modal.classList.remove('hidden');
+                    listaInscripcionesDiv.classList.remove('hidden');
                 });
 
                 cerrarModalBtn.addEventListener('click', () => {
@@ -255,9 +283,9 @@
                                 {
                                     data: 'nombre_paquete'
                                 },
-                                {
-                                    data: 'nombre_area'
-                                },
+                                // {
+                                //     data: 'nombre_area'
+                                // },
                                 {
                                     data: 'costo',
                                     render: data => `${data} Bs.`
@@ -287,6 +315,7 @@
                                             nombre_area: area
                                         });
                                         renderizarSeleccionados();
+                                        renderModalSelecionadoPaquetes();
                                     }
                                 });
                             }
@@ -302,6 +331,7 @@
                 });
 
                 window.agregarPaquete = function(id) {
+                    console.log('Agregar paquete ID:', id);
                     const pkt = paquetesDisponibles.find(p => p.paquete_id === id);
                     if (!seleccionados.some(p => p.paquete_id === id)) {
                         seleccionados.push(pkt);
@@ -327,7 +357,7 @@
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                         <td>${pkt.nombre_paquete}</td>
-                        <td>${pkt.nombre_area}</td>
+                        <td class='text_area'>${pkt.nombre_area}</td>
                         <td>${pkt.costo} Bs.</td>
                         <td class='text_obs'>
                         </td>
@@ -408,11 +438,11 @@
                 <div class="max-h-40 overflow-y-auto pr-1">
                     <ul class="divide-y divide-gray-200">
                         ${seleccionados.map(pkt => `
-                                                    <li class="py-1 flex justify-between items-center">
-                                                        <span class="font-medium text-[12px]">${pkt.nombre_paquete}</span>
-                                                        <span class="text-[12px] text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
-                                                    </li>
-                                                `).join('')}
+                                                                                                                    <li class="py-1 flex justify-between items-center">
+                                                                                                                        <span class="font-medium text-[12px]">${pkt.nombre_paquete}</span>
+                                                                                                                        <span class="text-[12px] text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
+                                                                                                                    </li>
+                                                                                                                `).join('')}
                     </ul>
                 </div>
                 <!-- Total fijo -->
