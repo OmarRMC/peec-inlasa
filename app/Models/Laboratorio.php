@@ -637,4 +637,9 @@ class Laboratorio extends Model
             ->pluck('gestion')
             ->toArray();
     }
+
+    public function respuestas()
+    {
+        return $this->hasMany(FormularioEnsayoResultado::class, 'id_laboratorio');
+    }
 }
