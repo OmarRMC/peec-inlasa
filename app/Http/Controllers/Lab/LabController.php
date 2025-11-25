@@ -529,11 +529,20 @@ class LabController extends Controller
         }
 
         // Generar username incremental
-        $count = User::where('username', 'LIKE', "$sigla%")->count() + 1;
-        $username = $sigla . str_pad($count, 4, '0', STR_PAD_LEFT);
         try {
             DB::beginTransaction();
 
+            $lastUser = User::where('username', 'LIKE', "$sigla%")
+                ->lockForUpdate()
+                ->orderByDesc('username')
+                ->first();
+            if ($lastUser) {
+                $lastNumber = (int) substr($lastUser->username, strlen($sigla));
+                $newNumber = $lastNumber + 1;
+            } else {
+                $newNumber = 1;
+            }
+            $username = $sigla . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
             // Crear usuario
             $user = User::create([
                 'nombre' => $labTem->nombre_lab,
