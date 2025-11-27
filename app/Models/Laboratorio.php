@@ -59,6 +59,14 @@ class Laboratorio extends Model
         );
     }
 
+    protected function nombreLabSinModificacion(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, $attributes) => $attributes['nombre_lab']
+        );
+    }
+
+
     protected function siglaLab(): Attribute
     {
         return Attribute::make(
