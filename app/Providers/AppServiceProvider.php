@@ -72,5 +72,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define(Permiso::GESTION_CERTIFICADOS, function (User $user) {
             return $user->tienePermiso(Permiso::GESTION_CERTIFICADOS);
         });
+
+        Gate::define(Permiso::GESTION_FORMULARIOS, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_FORMULARIOS);
+        });
     }
 }
