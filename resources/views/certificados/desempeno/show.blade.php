@@ -52,7 +52,7 @@
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="px-4 py-2 text-left">Desempeño</th>
-                            <th class="px-4 py-2 text-left">Fecha Reg.</th>
+                            <th class="px-4 py-2 text-left">Fecha de Act.</th>
                             <th class="px-4 py-2 text-left">Codigo</th>
                             <th class="px-4 py-2 text-left">Laboratorio</th>
                             <th class="px-4 py-2 text-left">Correo</th>
@@ -88,8 +88,8 @@
                                 searchable: false
                             },
                             {
-                                data: 'created_at',
-                                name: 'created_at'
+                                data: 'updated_at',
+                                name: 'updated_at'
                             },
                             {
                                 data: 'cod_lab',

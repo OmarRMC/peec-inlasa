@@ -88,7 +88,7 @@
                 <table id="labs-certificados-tem" class="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-4 py-2 text-left">Fecha Reg.</th>
+                            <th class="px-4 py-2 text-left">Fecha de Act.</th>
                             <th class="px-4 py-2 text-left">Código</th>
                             <th class="px-4 py-2 text-left">Nombre</th>
                             <th class="px-4 py-2 text-left">Correo</th>
@@ -110,7 +110,7 @@
                 @csrf
                 <input type="hidden" name="gestion" value="{{ $gestion }}">
                 <button type="submit" class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
-                    Confirmar los datos
+                    Finalizar revisión de datos
                 </button>
             </form>
 
@@ -151,7 +151,7 @@
                 <table id="labs-certificados-ok" class="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-4 py-2 text-left">Fecha Reg.</th>
+                            <th class="px-4 py-2 text-left">Fecha de Act.</th>
                             <th class="px-4 py-2 text-left">Código</th>
                             <th class="px-4 py-2 text-left">Nombre</th>
                             <th class="px-4 py-2 text-left">Correo</th>
@@ -185,8 +185,8 @@
                         [0, 'desc']
                     ],
                     columns: [{
-                            data: 'created_at',
-                            name: 'certificado.detalles.created_at'
+                            data: 'updated_at',
+                            name: 'certificado.detalles.updated_at'
                         },
                         {
                             data: 'cod_lab',
@@ -271,8 +271,8 @@
                         [0, 'desc']
                     ],
                     columns: [{
-                            data: 'created_at',
-                            name: 'certificado.detalles.created_at'
+                            data: 'updated_at',
+                            name: 'certificado.detalles.updated_at'
                         },
                         {
                             data: 'cod_lab',

@@ -33,4 +33,9 @@ class DetalleCertificado extends Model
     {
         return formatDate($value);
     }
+
+    public function getUpdatedAtAttribute($value)
+    {
+        return formatDate($value);
+    }
 }

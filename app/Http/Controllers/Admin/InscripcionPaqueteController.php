@@ -520,6 +520,7 @@ class InscripcionPaqueteController extends Controller
         return datatables()
             ->of($query)
             ->addColumn('created_at', fn($ea) => $ea->inscripcion->certificado->detalles->first()?->created_at ?? '-')
+            ->addColumn('updated_at', fn($ea) => $ea->inscripcion->certificado->detalles->first()?->updated_at ?? '-')
             ->addColumn('nombre_lab', fn($ea) => $ea->inscripcion->laboratorio->nombre_lab)
             ->addColumn('cod_lab', fn($ea) => $ea->inscripcion->laboratorio->cod_lab)
             ->addColumn('wapp_lab', fn($ea) => $ea->inscripcion->laboratorio->wapp_lab)
