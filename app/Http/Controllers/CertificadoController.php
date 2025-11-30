@@ -18,7 +18,9 @@ class CertificadoController extends Controller
      */
     public function index()
     {
-        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER) ?? now()->year;
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
+        ]);
         return view('certificados.admin.index', compact('gestiones'));
     }
 
@@ -159,7 +161,9 @@ class CertificadoController extends Controller
         if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS])) {
             return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
         }
-        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER);
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
+        ]);
         return view('certificados.admin.des_participacion', compact('gestiones'));
     }
     public function publicarCertificado(Request $request, $gestion)

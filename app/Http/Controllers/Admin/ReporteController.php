@@ -58,7 +58,9 @@ class ReporteController extends Controller
             $query->where('gestion', now()->year);
         }
 
-        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER) ?? now()->year;
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
+        ]) ?? now()->year;
 
         $paginator = $query
             ->orderBy('created_at', 'desc')
@@ -82,7 +84,7 @@ class ReporteController extends Controller
     public function exportInscripcionesExcel(Request $request)
     {
         if (
-           !Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])
+            !Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])
         ) {
             return redirect()->back()->with('error', 'No tienes permisos para realizar esta acción.');
         }

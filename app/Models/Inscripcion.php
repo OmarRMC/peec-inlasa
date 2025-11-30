@@ -334,4 +334,33 @@ class Inscripcion extends Model
     {
         return $this->belongsTo(Contrato::class, 'id_contrato')->with('detallesActivos');
     }
+
+    public static function rangoGestion(array $filters = []): array
+    {
+        $query = self::query();
+        if (!empty($filters['status_inscripcion'])) {
+            $query->whereIn('status_inscripcion', (array) $filters['status_inscripcion']);
+        }
+
+        if (!empty($filters['status_cuenta'])) {
+            $query->whereIn('status_cuenta', (array) $filters['status_cuenta']);
+        }
+
+        if (!empty($filters['id_lab'])) {
+            $query->where('id_lab', $filters['id_lab']);
+        }
+
+        if (!empty($filters['fecha_desde'])) {
+            $query->whereDate('fecha_inscripcion', '>=', $filters['fecha_desde']);
+        }
+
+        if (!empty($filters['fecha_hasta'])) {
+            $query->whereDate('fecha_inscripcion', '<=', $filters['fecha_hasta']);
+        }
+        $result = $query->selectRaw('MIN(gestion) AS min_g, MAX(gestion) AS max_g')->first();
+        if (!$result->min_g || !$result->max_g) {
+            return [];
+        }
+        return array_reverse(range($result->min_g, $result->max_g));
+    }
 }

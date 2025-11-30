@@ -40,7 +40,9 @@ Route::get('/', function () {
 
 Route::get('/verificar/{code}/certificado/{type}', [VerificarController::class, 'verificarCertificado'])->name('verificar.certificado');
 Route::get('/vistas/validar_cert.php', [VerificarController::class, 'validarAntiguo']);
-
+Route::get('/formato/csv/descargar', function () {
+    return response()->download(public_path('formatos/subida_desemp.csv'));
+})->name('formato.csv.descargar');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -90,7 +90,7 @@ class LabController extends Controller
             'provincias' => [],
             'municipios' => [],
             'categorias' => [],
-            'gestiones' => configuracion(Configuracion::KEY_GESTION_FILTER),
+            'gestiones' => Inscripcion::rangoGestion(['id_lab' => $laboratorio->id]),
         ]);
     }
 

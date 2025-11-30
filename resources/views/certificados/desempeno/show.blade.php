@@ -24,9 +24,9 @@
                 <!-- Filtro por Gestión -->
                 <select id="filter-gestion"
                     class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
-                    <option value="">Todas las Gestiones</option>
                     @foreach ($gestiones as $gestion)
-                        <option value="{{ $gestion }}">{{ $gestion }}</option>
+                        <option value="{{ $gestion }}" {{ $gestion == now()->year ? 'selected' : '' }}>
+                            {{ $gestion }}</option>
                     @endforeach
                 </select>
                 <!-- Buscador -->

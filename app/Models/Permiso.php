@@ -85,6 +85,7 @@ class Permiso extends Model
 
     public const RESPONSABLE = 'responsable';
     public const LABORATORIO = 'laboratorio';
+    public const JEFE_PEEC = 'jefe.peec';
 
     // ------------------------------
     // Nombres legibles
@@ -160,6 +161,8 @@ class Permiso extends Model
     public const RESPONSABLE_NAME = 'Responsable';
     public const LABORATORIO_NAME = 'Laboratorio';
 
+    public const JEFE_PEEC_NAME = 'Jefe del PEEC';
+
     public const VER_ESCRITORIO = 'ver.escritorio';
     public const VER_ESCRITORIO_NAME = 'Ver escritorio';
 
@@ -209,6 +212,7 @@ class Permiso extends Model
         self::RESPONSABLE => self::RESPONSABLE_NAME,
         self::LABORATORIO => self::LABORATORIO_NAME,
         self::GESTION_CERTIFICADOS => self::GESTION_CERTIFICADOS_NAME,
+        self::JEFE_PEEC => self::JEFE_PEEC_NAME,
     ];
 
     protected $table = 'permiso';

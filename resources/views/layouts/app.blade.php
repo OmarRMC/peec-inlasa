@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Sig PEEC - INLASA') }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('img/logoinlasa.png') }}"/>
+    <link rel="icon" type="image/png" href="{{ asset('img/logoinlasa.png') }}" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://unpkg.com/alpinejs" defer></script>
@@ -182,6 +182,10 @@
             </main>
 
             <footer class="bg-white text-center py-3 border-t text-sm text-gray-600">
+                <div class="float-left ml-4">
+                    <img src="{{ asset('img/logoinlasa.png') }}" width="26px" class="mx-auto" style="display: inline"
+                        alt="INLASA Logo">
+                </div>
                 © 2025 | <strong>INLASA</strong> Instituto Nacional de Laboratorios de Salud
                 <span class="float-right mr-4 text-gray-400">SigPEEC v2</span>
             </footer>

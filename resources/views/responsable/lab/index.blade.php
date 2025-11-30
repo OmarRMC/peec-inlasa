@@ -46,7 +46,12 @@
                         <option value="{{ $nivel->id }}">{{ $nivel->descripcion_nivel }}</option>
                     @endforeach
                 </select> --}}
-
+                <select id="filter-gestion" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
+                    @foreach ($gestiones as $gestion)
+                        <option value="{{ $gestion }}" {{ $gestion == now()->year ? 'selected' : '' }}>
+                            {{ $gestion }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="flex items-center gap-2 justify-end">
                 <div class="relative w-full sm:w-64">
@@ -105,6 +110,7 @@
                             d.tipo = $('#filter-tipo').val();
                             d.categoria = $('#filter-categoria').val();
                             d.nivel = $('#filter-nivel').val();
+                            d.gestion = $('#filter-gestion').val();
                         }
                     },
                     order: [
@@ -146,7 +152,7 @@
                         },
                     ],
                     language: {
-                        url:  "{{ asset('translation/es.json') }}"
+                        url: "{{ asset('translation/es.json') }}"
                     },
                     dom: 'rt',
                     lengthChange: false,
@@ -165,7 +171,7 @@
                 $('#custom-search').on('keypress', e => {
                     if (e.which === 13) table.search($('#custom-search').val()).draw();
                 });
-
+                $('#filter-gestion').on('change', () => table.draw());
                 $('#filter-pais').on('change', async function() {
                     const pais = this.value;
                     $('#filter-dep').prop('disabled', !pais).html('<option>Cargando...</option>');
@@ -215,6 +221,20 @@
                         .prop('disabled', true));
                     table.draw();
                 }
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('filtrosForm');
+                const inputsAutoSubmit = [
+                    document.getElementById('filter-gestion')
+                ];
+                inputsAutoSubmit.forEach(input => {
+                    if (input) {
+                        input.addEventListener('change', () => {
+                            form.submit();
+                        });
+                    }
+                });
             });
         </script>
     @endpush

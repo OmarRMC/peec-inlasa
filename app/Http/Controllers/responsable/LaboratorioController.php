@@ -7,6 +7,7 @@ use App\Models\CategoriaLaboratorio;
 use App\Models\Certificado;
 use App\Models\Configuracion;
 use App\Models\DetalleCertificado;
+use App\Models\EnsayoAptitud;
 use App\Models\Inscripcion;
 use App\Models\InscripcionEA;
 use App\Models\NivelLaboratorio;
@@ -44,7 +45,10 @@ class LaboratorioController extends Controller
         $tipos = TipoLaboratorio::active()->get();
         $categorias = CategoriaLaboratorio::active()->get();
         $niveles = NivelLaboratorio::active()->get();
-        return view('responsable.lab.index', compact('laboratorios', 'paises', 'tipos', 'categorias', 'niveles', 'idEa', 'ensayosAptitud'));
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
+        ]);
+        return view('responsable.lab.index', compact('laboratorios', 'paises', 'tipos', 'categorias', 'niveles', 'idEa', 'ensayosAptitud', 'gestiones'));
     }
 
     public function getData(Request $request, $idEa)
@@ -56,9 +60,11 @@ class LaboratorioController extends Controller
         Log::info($idEa);
         $query = InscripcionEA::with(['inscripcion', 'inscripcion.laboratorio.departamento', 'inscripcion.laboratorio.usuario'])
             ->where('id_ea', $idEa)
-            ->whereHas('inscripcion', function ($q) {
-                $q->where('gestion', now()->year);
-                $q->AprobadoOrVencido();    
+            ->whereHas('inscripcion', function ($q) use ($request) {
+                if ($request->filled('gestion')) {
+                    $q->where('gestion', $request->gestion);
+                }
+                $q->aprobadoOrVencido();
             });
         // Log::info($Inscripciones);
         // Consultar solo los laboratorios filtrados por ID
@@ -105,13 +111,22 @@ class LaboratorioController extends Controller
             ->toJson();
     }
 
-    public function showUploadCertificado($id)
+    public function showUploadCertificado(Request $request, $id)
     {
-        if (!Configuracion::estaHabilitadoCargarCertificado()) {
+        if (!Gate::any([Permiso::JEFE_PEEC]) && !Configuracion::estaHabilitadoCargarCertificado()) {
             return redirect('/')->with('error', 'El periodo para la carga de desempeño no está habilitado actualmente.');
         }
         $responsable = Auth::user();
-        $ensayosAptitud = $responsable->responsablesEA->findOrFail($id);
+        $ensayosAptitud = null;
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayosAptitud = EnsayoAptitud::find($id);
+        }
+        if (Gate::allows(Permiso::RESPONSABLE)) {
+            $ensayosAptitud = $responsable->responsablesEA->findOrFail($id);
+        }
+        if (!$ensayosAptitud) {
+            return redirect('/')->with('error', 'No se tiene el ensayo de aptitud solicitado.');
+        }
         $paquete = $ensayosAptitud->paquete;
         $idEA = $ensayosAptitud->id;
 
@@ -128,17 +143,29 @@ class LaboratorioController extends Controller
             $descripcion = "</br>  $paquete->descripcion / $ensayosAptitud->descripcion";
         }
 
-        $gestion = configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year;
-        return view('responsable.upload_certificados', compact('ensayosAptitud', 'idEA', 'gestion', 'descripcion'));
+        $gestion = $request->query('gestion', now()->year);
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
+        ]);
+        return view('responsable.upload_certificados', compact('ensayosAptitud', 'idEA', 'gestion', 'descripcion', 'gestiones'));
     }
     public function uploadCertificadoData(Request $request, $id)
     {
-        if (!Configuracion::estaHabilitadoCargarCertificado()) {
+        if (!Gate::any([Permiso::JEFE_PEEC]) && !Configuracion::estaHabilitadoCargarCertificado()) {
             return response()->json([
                 'error' => 'El periodo para la carga de desempeño no está habilitado actualmente.'
             ], 422);
         }
         $responsable = Auth::user();
+        $ensayosAptitud = null;
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayosAptitud = EnsayoAptitud::find($id);
+        } else if (Gate::allows(Permiso::RESPONSABLE)) {
+            $ensayosAptitud = $responsable->responsablesEA->find($id);
+        }
+        if (!$ensayosAptitud) {
+            return redirect('/')->with('error', 'No se tiene el ensayo de aptitud solicitado.');
+        }
 
         $request->validate([
             'archivo' => 'required|mimes:csv,txt|max:2048',
@@ -165,9 +192,9 @@ class LaboratorioController extends Controller
             'inscripcion.laboratorio.usuario'
         ])
             ->where('id_ea', $id)
-            ->whereHas('inscripcion', function ($q) {
-                $q->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
-                    ->Aprobado();
+            ->whereHas('inscripcion', function ($q) use ($request) {
+                $q->where('gestion', $request->query('gestion', now()->year))
+                    ->aprobadoOrVencido();
             })
             ->get();
 
@@ -230,11 +257,19 @@ class LaboratorioController extends Controller
         return back()->with('success', 'Archivo procesado correctamente, Puedes revisar en al sección de Revision');
     }
 
-    public function getLaboratoriosDesempenoTemporal($idEa)
+    public function getLaboratoriosDesempenoTemporal(Request $request, $idEa)
     {
         $responsable = Auth::user();
-        $responsable->responsablesEA->findOrFail($idEa);
-
+        $ensayosAptitud = null;
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayosAptitud = EnsayoAptitud::find($idEa);
+        } else if (Gate::allows(Permiso::RESPONSABLE)) {
+            $ensayosAptitud = $responsable->responsablesEA->find($idEa);
+        }
+        if (!$ensayosAptitud) {
+            return redirect('/')->with('error', 'No se tiene el ensayo de aptitud solicitado.');
+        }
+        $gestion = $request->query('gestion', now()->year);
         $query = Inscripcion::with([
             'laboratorio',
             'certificado',
@@ -243,8 +278,8 @@ class LaboratorioController extends Controller
                     ->where('id_ea', $idEa);
             }
         ])
-            ->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
-            ->Aprobado()
+            ->where('gestion',  $gestion)
+            ->aprobadoOrVencido()
             ->whereHas('ensayos', function ($q) use ($idEa) {
                 $q->where('id_ea', $idEa);
             })
@@ -272,12 +307,20 @@ class LaboratorioController extends Controller
 
     public function confirmarDatosCertificados(Request $request, $idEa)
     {
-        if (!Gate::any([Permiso::RESPONSABLE])) {
-            return redirect('/')->withErrors(['error' => 'No tienes permiso para realizar esta acción.']);
-        }
+        // if (!Gate::any([Permiso::RESPONSABLE])) {
+        //     return redirect('/')->withErrors(['error' => 'No tienes permiso para realizar esta acción.']);
+        // }
         $responsable = Auth::user();
-        $responsable->responsablesEA->findOrFail($idEa);
-
+        $ensayosAptitud = null;
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayosAptitud = EnsayoAptitud::find($idEa);
+        } else if (Gate::allows(Permiso::RESPONSABLE)) {
+            $ensayosAptitud = $responsable->responsablesEA->find($idEa);
+        }
+        if (!$ensayosAptitud) {
+            return redirect('/')->with('error', 'No se tiene el ensayo de aptitud solicitado.');
+        }
+        $gestion  = $request->gestion ?? now()->year;
         $query = Inscripcion::with([
             'laboratorio',
             'certificado',
@@ -286,8 +329,8 @@ class LaboratorioController extends Controller
                     ->where('id_ea', $idEa);
             }
         ])
-            ->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
-            ->Aprobado()
+            ->where('gestion', $gestion)
+            ->aprobadoOrVencido()
             ->whereHas('ensayos', function ($q) use ($idEa) {
                 $q->where('id_ea', $idEa);
             })
@@ -315,10 +358,19 @@ class LaboratorioController extends Controller
         return redirect()->back()->with('success', 'Datos de certificados confirmados correctamente.');
     }
 
-    public function getLaboratoriosDesempenoConfirmados($idEa)
+    public function getLaboratoriosDesempenoConfirmados(Request $request,  $idEa)
     {
         $responsable = Auth::user();
-        $responsable->responsablesEA->findOrFail($idEa);
+        $ensayosAptitud = null;
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayosAptitud = EnsayoAptitud::find($idEa);
+        } else if (Gate::allows(Permiso::RESPONSABLE)) {
+            $ensayosAptitud = $responsable->responsablesEA->find($idEa);
+        }
+        if (!$ensayosAptitud) {
+            return redirect('/')->with('error', 'No se tiene el ensayo de aptitud solicitado.');
+        }
+        $gestion = $request->query('gestion', now()->year);
         $query = Inscripcion::with([
             'laboratorio',
             'certificado',
@@ -327,7 +379,7 @@ class LaboratorioController extends Controller
                     ->where('id_ea', $idEa);
             }
         ])
-            ->where('gestion', configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? now()->year)
+            ->where('gestion', $gestion)
             ->Aprobado()
             ->whereHas('ensayos', function ($q) use ($idEa) {
                 $q->where('id_ea', $idEa);

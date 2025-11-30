@@ -15,7 +15,7 @@
                 </div>
             @endif
             {{-- , ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'] --}}
-            @foreach ([['id' => 'registro', 'title' => 'Periodo de registro de nuevos laboratorios'], ['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.informacion', 'title' => 'Información personalizada para email'], ['id' => 'gestion.filter', 'title' => 'Gestiones para filtros'], ['id' => 'habilitar.docs.inscripcion', 'title' => 'Habilitar la subida de documentos de inscripción'], ['id' => 'habilitar.docs.pagos', 'title' => 'Habilitar la subida de comprobantes de pagos']] as $item)
+            @foreach ([['id' => 'registro', 'title' => 'Periodo de registro de nuevos laboratorios'], ['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.informacion', 'title' => 'Información personalizada para email'], ['id' => 'habilitar.docs.inscripcion', 'title' => 'Habilitar la subida de documentos de inscripción'], ['id' => 'habilitar.docs.pagos', 'title' => 'Habilitar la subida de comprobantes de pagos']] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -199,7 +199,7 @@
                                 @break
 
                                 @case('gestion.filter')
-                                    @php
+                                    {{-- @php
                                         $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER);
                                         $gestionesStr = implode(',', $gestiones);
                                     @endphp
@@ -217,31 +217,9 @@
                                             <button type="submit" class="btn-primary"><i
                                                     class="fas fa-save mr-1"></i>Guardar</button>
                                         </div>
-                                    </form>
+                                    </form> --}}
                                 @break
-
-                                @case('gestion.filter')
-                                    @php
-                                        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER);
-                                        $gestionesStr = implode(',', $gestiones);
-                                    @endphp
-                                    <form action="{{ route($config, 'gestion.filter') }}" method="POST">
-                                        @csrf @method('PUT')
-                                        <div>
-                                            <label for="{{ Configuracion::KEY_GESTION_FILTER }}"
-                                                class="block text-sm font-medium">Gestiones para filtros</label>
-                                            <input type="string" name="{{ Configuracion::KEY_GESTION_FILTER }}"
-                                                id="{{ Configuracion::KEY_GESTION_FILTER }}"
-                                                value="{{ old(Configuracion::KEY_GESTION_FILTER, $gestionesStr ?? date('Y')) }}"
-                                                class="mt-1 input-standard" min="2020" max="2100" required>
-                                        </div>
-                                        <div class="text-right mt-4">
-                                            <button type="submit" class="btn-primary"><i
-                                                    class="fas fa-save mr-1"></i>Guardar</button>
-                                        </div>
-                                    </form>
-                                @break
-
+                                    
                                 @case('email.informacion')
                                     <form action="{{ route($config, 'email.informacion') }}" method="POST">
                                         @csrf @method('PUT')

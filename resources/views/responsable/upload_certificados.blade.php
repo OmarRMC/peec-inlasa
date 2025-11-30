@@ -9,16 +9,33 @@
             <button id="btn-tab-view" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
                 En Revision
             </button>
-
             <button id="btn-tab-ponderaciones" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
                 Ver Ponderaciones
             </button>
+            <button id="btn-tab-download" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+                onclick="window.location='{{ route('formato.csv.descargar') }}'">
+                <i class="fas fa-file-csv"></i> Descargar Formato
+            </button>
+            <form method="GET" id="filtrosForm" class="bg-white rounded-lg p-2 shadow">
+                <div class="flex flex-wrap gap-3 items-end text-sm items-center">
+                    <label class="block text-sm whitespace-nowrap">Gestión</label>
+                    <select name="gestion" id="filter-gestion"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[140px]">
+                        @foreach ($gestiones ?? [now()->year] as $g)
+                            <option value="{{ $g }}"
+                                {{ (request('gestion') ?? now()->year) == $g ? 'selected' : '' }}>
+                                {{ $g }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </form>
         </div>
 
         <div id="section-upload" class="bg-white rounded-lg shadow p-6">
             <h2 class="text-lg font-bold text-gray-800 mb-4">Subir los datos para la certificación de gestión
                 {{ $gestion }} - Ensayo A. {!! $descripcion !!}</h2>
-            <form action="{{ route('ea.lab.subir.ponderaciones', ['id' => $idEA]) }}" method="POST"
+            <form action="{{ route('ea.lab.subir.ponderaciones', ['id' => $idEA] + request()->all()) }}" method="POST"
                 enctype="multipart/form-data"
                 class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 transition"
                 id="drop-area">
@@ -88,8 +105,10 @@
                 <div id="custom-pagination-certificado-tem" class="flex justify-center"></div>
             </div>
 
+
             <form action="{{ route('confirmar.datos.certificados', ['id' => $idEA]) }}" method="POST">
                 @csrf
+                <input type="hidden" name="gestion" value="{{ $gestion }}">
                 <button type="submit" class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
                     Confirmar los datos
                 </button>
@@ -160,7 +179,7 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('ea.lab.desempeno.temporal', ['id' => $idEA]) }}",
+                        url: "{{ route('ea.lab.desempeno.temporal', ['id' => $idEA] + request()->all()) }}",
                     },
                     order: [
                         [0, 'desc']
@@ -194,7 +213,7 @@
 
                     ],
                     language: {
-                        url:  "{{ asset('translation/es.json') }}"
+                        url: "{{ asset('translation/es.json') }}"
                     },
                     dom: 'rt',
                     lengthChange: false,
@@ -246,7 +265,7 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('ea.lab.desempeno.confirmado', ['id' => $idEA]) }}",
+                        url: "{{ route('ea.lab.desempeno.confirmado', ['id' => $idEA] + request()->all()) }}",
                     },
                     order: [
                         [0, 'desc']
@@ -277,7 +296,7 @@
                         }
                     ],
                     language: {
-                        url:  "{{ asset('translation/es.json') }}"
+                        url: "{{ asset('translation/es.json') }}"
                     },
                     dom: 'rt',
                     lengthChange: false,
@@ -297,86 +316,96 @@
                     table2.page.len(this.value).draw();
                 });
             });
+            // Botones
+            const btnTabUpload = document.getElementById('btn-tab-upload');
+            const btnTabView = document.getElementById('btn-tab-view');
+            const btnTabPonderaciones = document.getElementById('btn-tab-ponderaciones');
+            // Secciones
+            const sectionUpload = document.getElementById('section-upload');
+            const sectionView = document.getElementById('section-view');
+            const sectionPonderacionesView = document.getElementById('section-ponderaciones-view');
+
+            // Cambiar entre secciones
+            btnTabUpload.addEventListener('click', () => {
+                sectionUpload.classList.remove('hidden');
+                sectionView.classList.add('hidden');
+                sectionPonderacionesView.classList.add('hidden');
+                btnTabUpload.classList.add('bg-blue-600', 'text-white');
+                btnTabUpload.classList.remove('bg-gray-200', 'text-gray-800');
+                btnTabView.classList.remove('bg-blue-600', 'text-white');
+                btnTabView.classList.add('bg-gray-200', 'text-gray-800');
+                btnTabPonderaciones.classList.remove('bg-blue-600', 'text-white');
+                btnTabPonderaciones.classList.add('bg-gray-200', 'text-gray-800');
+            });
+
+            btnTabView.addEventListener('click', () => {
+                sectionUpload.classList.add('hidden');
+                sectionView.classList.remove('hidden');
+                sectionPonderacionesView.classList.add('hidden');
+                btnTabView.classList.add('bg-blue-600', 'text-white');
+                btnTabView.classList.remove('bg-gray-200', 'text-gray-800');
+                btnTabUpload.classList.remove('bg-blue-600', 'text-white');
+                btnTabUpload.classList.add('bg-gray-200', 'text-gray-800');
+                btnTabPonderaciones.classList.remove('bg-blue-600', 'text-white');
+                btnTabPonderaciones.classList.add('bg-gray-200', 'text-gray-800');
+            });
+
+            btnTabPonderaciones.addEventListener('click', () => {
+                sectionUpload.classList.add('hidden');
+                sectionView.classList.add('hidden');
+                sectionPonderacionesView.classList.remove('hidden');
+                btnTabPonderaciones.classList.add('bg-blue-600', 'text-white');
+                btnTabPonderaciones.classList.remove('bg-gray-200', 'text-gray-800');
+                btnTabUpload.classList.remove('bg-blue-600', 'text-white');
+                btnTabUpload.classList.add('bg-gray-200', 'text-gray-800');
+                btnTabView.classList.remove('bg-blue-600', 'text-white');
+                btnTabView.classList.add('bg-gray-200', 'text-gray-800');
+            });
+
+            // Drag & Drop
+            const dropArea = document.getElementById('drop-area');
+            const fileInput = document.getElementById('file-input');
+            const btnSelect = document.getElementById('btn-select');
+            const fileName = document.getElementById('file-name');
+            const btnUpload = document.getElementById('btn-upload');
+
+            btnSelect.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    fileName.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`;
+                    btnUpload.classList.remove('hidden');
+                }
+            });
+
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('border-blue-400', 'bg-blue-50');
+            });
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('border-blue-400', 'bg-blue-50');
+            });
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('border-blue-400', 'bg-blue-50');
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    fileName.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`;
+                    btnUpload.classList.remove('hidden');
+                }
+            });
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('filtrosForm');
+                const inputsAutoSubmit = [
+                    document.getElementById('filter-gestion'),
+                ];
+                inputsAutoSubmit.forEach(input => {
+                    if (input) {
+                        input.addEventListener('change', () => {
+                            form.submit();
+                        });
+                    }
+                });
+            });
         </script>
     @endpush
-    <!-- Script -->
-    <script>
-        // Botones
-        const btnTabUpload = document.getElementById('btn-tab-upload');
-        const btnTabView = document.getElementById('btn-tab-view');
-        const btnTabPonderaciones = document.getElementById('btn-tab-ponderaciones');
-        // Secciones
-        const sectionUpload = document.getElementById('section-upload');
-        const sectionView = document.getElementById('section-view');
-        const sectionPonderacionesView = document.getElementById('section-ponderaciones-view');
-
-        // Cambiar entre secciones
-        btnTabUpload.addEventListener('click', () => {
-            sectionUpload.classList.remove('hidden');
-            sectionView.classList.add('hidden');
-            sectionPonderacionesView.classList.add('hidden');
-            btnTabUpload.classList.add('bg-blue-600', 'text-white');
-            btnTabUpload.classList.remove('bg-gray-200', 'text-gray-800');
-            btnTabView.classList.remove('bg-blue-600', 'text-white');
-            btnTabView.classList.add('bg-gray-200', 'text-gray-800');
-            btnTabPonderaciones.classList.remove('bg-blue-600', 'text-white');
-            btnTabPonderaciones.classList.add('bg-gray-200', 'text-gray-800');
-        });
-
-        btnTabView.addEventListener('click', () => {
-            sectionUpload.classList.add('hidden');
-            sectionView.classList.remove('hidden');
-            sectionPonderacionesView.classList.add('hidden');
-            btnTabView.classList.add('bg-blue-600', 'text-white');
-            btnTabView.classList.remove('bg-gray-200', 'text-gray-800');
-            btnTabUpload.classList.remove('bg-blue-600', 'text-white');
-            btnTabUpload.classList.add('bg-gray-200', 'text-gray-800');
-            btnTabPonderaciones.classList.remove('bg-blue-600', 'text-white');
-            btnTabPonderaciones.classList.add('bg-gray-200', 'text-gray-800');
-        });
-
-        btnTabPonderaciones.addEventListener('click', () => {
-            sectionUpload.classList.add('hidden');
-            sectionView.classList.add('hidden');
-            sectionPonderacionesView.classList.remove('hidden');
-            btnTabPonderaciones.classList.add('bg-blue-600', 'text-white');
-            btnTabPonderaciones.classList.remove('bg-gray-200', 'text-gray-800');
-            btnTabUpload.classList.remove('bg-blue-600', 'text-white');
-            btnTabUpload.classList.add('bg-gray-200', 'text-gray-800');
-            btnTabView.classList.remove('bg-blue-600', 'text-white');
-            btnTabView.classList.add('bg-gray-200', 'text-gray-800');
-        });
-
-        // Drag & Drop
-        const dropArea = document.getElementById('drop-area');
-        const fileInput = document.getElementById('file-input');
-        const btnSelect = document.getElementById('btn-select');
-        const fileName = document.getElementById('file-name');
-        const btnUpload = document.getElementById('btn-upload');
-
-        btnSelect.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0) {
-                fileName.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`;
-                btnUpload.classList.remove('hidden');
-            }
-        });
-
-        dropArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropArea.classList.add('border-blue-400', 'bg-blue-50');
-        });
-        dropArea.addEventListener('dragleave', () => {
-            dropArea.classList.remove('border-blue-400', 'bg-blue-50');
-        });
-        dropArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropArea.classList.remove('border-blue-400', 'bg-blue-50');
-            if (e.dataTransfer.files.length > 0) {
-                fileInput.files = e.dataTransfer.files;
-                fileName.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`;
-                btnUpload.classList.remove('hidden');
-            }
-        });
-    </script>
 </x-app-layout>

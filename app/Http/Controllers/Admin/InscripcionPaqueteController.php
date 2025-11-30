@@ -43,6 +43,7 @@ class InscripcionPaqueteController extends Controller
     }
     public function index()
     {
+        $gestiones = Inscripcion::rangoGestion();
         return view('inscripcion_paquete.index', [
             'paises' => Pais::active()->get(),
             'niveles' => NivelLaboratorio::all(),
@@ -56,7 +57,7 @@ class InscripcionPaqueteController extends Controller
             'categorias' => CategoriaLaboratorio::all(),
             // 'paquetes' => Paquete::orderBy('descripcion', 'asc')->get(),
             'paquetes' => [],
-            'gestiones' => configuracion(Configuracion::KEY_GESTION_FILTER),
+            'gestiones' => $gestiones,
         ]);
     }
     public function getInscripcionesData(Request $request)
@@ -424,18 +425,24 @@ class InscripcionPaqueteController extends Controller
         if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS])) {
             return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
         }
+        $search = $request->search;
         $ensayos = EnsayoAptitud::query()
             ->select('ensayo_aptitud.*')
             ->join('paquete', 'ensayo_aptitud.id_paquete', '=', 'paquete.id')
             ->join('area', 'paquete.id_area', '=', 'area.id')
+            ->when($search, function ($q) use ($search) {
+                $q->where('ensayo_aptitud.descripcion', 'LIKE', "%$search%");
+            })
             ->with(['paquete', 'paquete.area'])
-            ->orderBy('area.descripcion', 'asc')
-            ->orderBy('paquete.descripcion', 'asc')
-            ->orderBy('ensayo_aptitud.descripcion', 'asc')
+            ->orderBy('area.descripcion', 'ASC')
+            ->orderBy('paquete.descripcion', 'ASC')
+            ->orderBy('ensayo_aptitud.descripcion', 'ASC')
             ->paginate(20);
         $gestion = $request->gestion ?? now()->year;
         return view('certificados.desempeno.index', [
-            'gestiones' => configuracion(Configuracion::KEY_GESTION_FILTER),
+            'gestiones' => Inscripcion::rangoGestion([
+                'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
+            ]),
             'gestion' => $gestion,
             'ensayos' => $ensayos,
         ]);
@@ -499,11 +506,11 @@ class InscripcionPaqueteController extends Controller
         ])
             ->where('inscripcion_ea.id_ea', $idEa)
             ->whereHas('inscripcion', function ($q) {
-                $q->Aprobado();
+                $q->aprobadoOrVencido();
             })
             ->whereHas('inscripcion.certificado.detalles', function ($q) use ($idEa) {
-                $q->where('temporal', false)
-                    ->where('id_ea', $idEa);
+                $q->where('temporal', false);
+                $q->where('id_ea', $idEa);
             });
         if ($request->filled('gestion')) {
             $query->whereHas('inscripcion', function ($q) use ($request) {
@@ -532,7 +539,9 @@ class InscripcionPaqueteController extends Controller
     public function certificadoDesempenoListLabs($id)
     {
         $idEA = $id;
-        $gestiones = configuracion(Configuracion::KEY_GESTION_FILTER);
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
+        ]);
         $ensayoA = EnsayoAptitud::findOrFail($idEA);
         return view('certificados.desempeno.show', compact('idEA', 'gestiones', 'ensayoA'));
     }
