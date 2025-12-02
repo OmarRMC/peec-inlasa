@@ -185,12 +185,17 @@ class InscripcionPaqueteController extends Controller
             'id_formulario' => 'nullable|exists:formulario,id',
             'paquetes' => 'required|array|min:1',
             'paquetes.*.id' => 'required|exists:paquete,id',
-            'paquetes.*.costo' => 'required|integer|min:0',
+            'paquetes.*.costo' => 'required|numeric|min:0',
             'obs_inscripcion' => 'nullable|string|max:255',
         ]);
         try {
             DB::beginTransaction();
-            $total = collect($request->paquetes)->sum('costo');
+            $paquetesColeccion = collect($request->paquetes);
+            $paqueteIds = $paquetesColeccion->pluck('id');
+            $paquetesDB = Paquete::whereIn('id', $paqueteIds)->get();
+            $total = $paquetesDB->sum(function ($paquete) {
+                return $paquete->precio_final;
+            });
             $now  = now();
             $contrato = Contrato::activo()
                 ->whereHas('detalles', function ($query) {
@@ -234,18 +239,20 @@ class InscripcionPaqueteController extends Controller
             $vigenciaInscripcion->save();
 
 
-            foreach ($request->paquetes as $p) {
+            foreach ($paquetesDB as $paquete) {
                 DetalleInscripcion::create([
                     'id_inscripcion' => $ins->id,
-                    'id_paquete' => $p['id'],
-                    'descripcion_paquete' => $p['descripcion'],
-                    'costo_paquete' => $p['costo'],
-                    'observaciones' => $p['observaciones'],
+                    'id_paquete' => $paquete->id,
+                    'descripcion_paquete' => $paquete->descripcion,
+                    'costo_paquete' => $paquete->precio_final,
+                    'descuento' => $paquete->descuento,
+                    'observaciones' => $paquetesColeccion
+                        ->firstWhere('id', $paquete->id)['observaciones'] ?? null,
                 ]);
-                $idsEA = EnsayoAptitud::where('id_paquete', $p['id'])
+                $ensayos = EnsayoAptitud::where('id_paquete', $paquete->id)
                     ->active()
                     ->pluck('descripcion', 'id');
-                foreach ($idsEA as $id => $descripcion) {
+                foreach ($ensayos as $id => $descripcion) {
                     InscripcionEA::create([
                         'id_inscripcion' => $ins->id,
                         'id_ea' => $id,

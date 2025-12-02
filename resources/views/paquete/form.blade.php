@@ -101,51 +101,96 @@
         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
     @enderror
 </div>
+<!-- Descuento (%) -->
+<div>
+    <label for="descuento" class="block text-sm font-semibold text-gray-700 mb-1">
+        Descuento (%)
+    </label>
+    <input type="number" name="descuento" id="descuento" value="{{ old('descuento', $paquete->descuento ?? 0) }}"
+        min="0" max="110" step="0.01"
+        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm 
+               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+    @error('descuento')
+        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+    @enderror
+</div>
+<!-- Precio final con descuento -->
+<div>
+    <label class="block text-sm font-semibold text-gray-700 mb-1">
+        Precio Final (Bs)
+    </label>
 
-<script>
-    const isResponsableCheckbox = document.getElementById('is_responsable');
-    const ensayoSelectWrapper = document.getElementById('ensayoSelect');
-    const ensayoSelect = document.getElementById('tipo_lab_app');
-    const chipsContainer = document.getElementById('ensayoChipsContainer');
+    <input type="text" id="precio_final_mostrar"
+        class="w-full border border-green-400 bg-green-50 rounded-md px-3 py-2 text-sm font-semibold text-green-700"
+        value="0.00" disabled>
+</div>
 
-    let selectedEnsayos = [...chipsContainer.querySelectorAll('input[name="tipo_laboratorio_ids[]"]')].map(input =>
-        input.value);
+@push('scripts')
+    <script>
+        const isResponsableCheckbox = document.getElementById('is_responsable');
+        const ensayoSelectWrapper = document.getElementById('ensayoSelect');
+        const ensayoSelect = document.getElementById('tipo_lab_app');
+        const chipsContainer = document.getElementById('ensayoChipsContainer');
 
-    ensayoSelect.addEventListener('change', () => {
+        let selectedEnsayos = [...chipsContainer.querySelectorAll('input[name="tipo_laboratorio_ids[]"]')].map(input =>
+            input.value);
 
-        const ensayoId = ensayoSelect.value;
-        console.log(ensayoId);
-        const ensayoText = ensayoSelect.options[ensayoSelect.selectedIndex].text;
+        ensayoSelect.addEventListener('change', () => {
 
-        if (!ensayoId || selectedEnsayos.includes(ensayoId)) return;
+            const ensayoId = ensayoSelect.value;
+            console.log(ensayoId);
+            const ensayoText = ensayoSelect.options[ensayoSelect.selectedIndex].text;
 
-        selectedEnsayos.push(ensayoId);
+            if (!ensayoId || selectedEnsayos.includes(ensayoId)) return;
 
-        const chip = document.createElement('div');
-        chip.className =
-            'flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm gap-2 ensayo-chip';
-        chip.setAttribute('data-id', ensayoId);
-        chip.innerHTML = `
+            selectedEnsayos.push(ensayoId);
+
+            const chip = document.createElement('div');
+            chip.className =
+                'flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm gap-2 ensayo-chip';
+            chip.setAttribute('data-id', ensayoId);
+            chip.innerHTML = `
             <span>${ensayoText}</span>
             <input type="hidden" name="tipo_laboratorio_ids[]" value="${ensayoId}">
             <button type="button" class="text-blue-600 hover:text-red-500 font-bold eliminar-chip">&times;</button>
         `;
 
-        chip.querySelector('.eliminar-chip').addEventListener('click', () => {
-            chip.remove();
-            selectedEnsayos = selectedEnsayos.filter(id => id !== ensayoId);
+            chip.querySelector('.eliminar-chip').addEventListener('click', () => {
+                chip.remove();
+                selectedEnsayos = selectedEnsayos.filter(id => id !== ensayoId);
+            });
+
+            chipsContainer.appendChild(chip);
+            ensayoSelect.value = '';
         });
 
-        chipsContainer.appendChild(chip);
-        ensayoSelect.value = '';
-    });
-
-    document.querySelectorAll('.eliminar-chip').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const chip = this.closest('.ensayo-chip');
-            const ensayoId = chip.dataset.id;
-            chip.remove();
-            selectedEnsayos = selectedEnsayos.filter(id => id !== ensayoId);
+        document.querySelectorAll('.eliminar-chip').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const chip = this.closest('.ensayo-chip');
+                const ensayoId = chip.dataset.id;
+                chip.remove();
+                selectedEnsayos = selectedEnsayos.filter(id => id !== ensayoId);
+            });
         });
-    });
-</script>
+        const costoInput = document.getElementById('costo_paquete');
+        const descuentoInput = document.getElementById('descuento');
+        const precioFinalInput = document.getElementById('precio_final_mostrar');
+
+        function calcularPrecioFinal() {
+            let costo = parseFloat(costoInput.value) || 0;
+            let descuento = parseFloat(descuentoInput.value) || 0;
+
+            if (descuento > 110) descuento = 110;
+            if (descuento < 0) descuento = 0;
+
+            const precioFinal = costo - (costo * (descuento / 100));
+
+            precioFinalInput.value = precioFinal.toFixed(2);
+        }
+
+        costoInput.addEventListener('input', calcularPrecioFinal);
+        descuentoInput.addEventListener('input', calcularPrecioFinal);
+
+        calcularPrecioFinal();
+    </script>
+@endpush
