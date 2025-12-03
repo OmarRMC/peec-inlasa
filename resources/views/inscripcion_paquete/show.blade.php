@@ -93,6 +93,9 @@
                         <div class="border rounded px-4 py-2 mb-2 text-sm text-gray-700 bg-gray-50">
                             <div><strong>Paquete:</strong> {{ $detalle->descripcion_paquete }}</div>
                             <div><strong>Costo:</strong> {{ number_format($detalle->costo_paquete, 2) }} Bs</div>
+                            @if (!empty($detalle->descuento) && $detalle->descuento > 0)
+                                <div><strong>Descuento aplicado:</strong> {{ $detalle->descuento }}%</div>
+                            @endif
                             <div><strong>Observación:</strong>
                                 {{ $detalle->observaciones ?? 'No tiene observaciones' }}
                             </div>

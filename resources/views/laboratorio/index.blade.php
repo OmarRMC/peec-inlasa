@@ -3,6 +3,10 @@
         '1' => 'Activo',
         '0' => 'Inactivo',
     ];
+    $descuento = [
+        '1' => 'Con Descuento',
+        '0' => 'Sin Descuento',
+    ];
     use App\Models\Permiso;
 @endphp
 <x-app-layout>
@@ -64,6 +68,13 @@
                         <option value="{{ $key }}">{{ $valor }}</option>
                     @endforeach
                 </select>
+                <select id="filter-descuento"
+                    class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
+                    <option value="">Filtrar por descuento</option>
+                    @foreach ($descuento as $key => $valor)
+                        <option value="{{ $key }}">{{ $valor }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <!-- Buscador -->
@@ -110,6 +121,7 @@
 
     @push('scripts')
         <script>
+            const routeToggleDescuentoTemplate = @json(route('laboratorio.toggle-descuento', ['id' => 'LAB_ID_PLACEHOLDER']));
             document.addEventListener('DOMContentLoaded', function() {
                 let table = $('#labs-table').DataTable({
                     processing: true,
@@ -124,6 +136,7 @@
                             d.tipo = $('#filter-tipo').val();
                             d.categoria = $('#filter-categoria').val();
                             // d.nivel = $('#filter-nivel').val();
+                            d.filter_descuento = $('#filter-descuento').val();
                             d.status = $('#filter-status').val();
                         }
                     },
@@ -166,7 +179,7 @@
                         },
                     ],
                     language: {
-                        url:  "{{ asset('translation/es.json') }}"
+                        url: "{{ asset('translation/es.json') }}"
                     },
                     dom: 'rt',
                     lengthChange: false,
@@ -177,10 +190,70 @@
                             table
                         });
                         setupPagination(table);
+                        document.querySelectorAll('.toggle-descuento-btn').forEach(btn => {
+                            btn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                let btn = $(this);
+                                let id = btn.data('id');
+                                let token = $('meta[name="csrf-token"]').attr('content');
+                                let url = routeToggleDescuentoTemplate.replace(
+                                    'LAB_ID_PLACEHOLDER', id);
+                                $.ajax({
+                                    url: url,
+                                    type: 'POST',
+                                    data: {
+                                        _token: token
+                                    },
+                                    success: function(response) {
+                                        if (!response.success) {
+                                            showToast({
+                                                icon: 'error',
+                                                title: 'No se pudo actualizar'
+                                            });
+                                            return;
+                                        }
+
+                                        if (response.tiene_descuento) {
+                                            btn.html(
+                                                '<i class="fas fa-tags text-green-600"></i>'
+                                            );
+                                            btn.attr('data-tippy-content',
+                                                'Tiene descuento');
+                                        } else {
+                                            btn.html(
+                                                '<i class="fas fa-ban text-red-600"></i>'
+                                            );
+                                            btn.attr('data-tippy-content',
+                                                'No tiene descuento');
+                                        }
+
+                                        if (btn[0] && btn[0]._tippy) {
+                                            btn[0]._tippy.setContent(btn.attr(
+                                                'data-tippy-content'));
+                                        } else {
+                                            tippy(btn[0]);
+                                        }
+
+                                        showToast({
+                                            icon: 'success',
+                                            title: response.message ||
+                                                'Estado actualizado'
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        showToast({
+                                            icon: 'error',
+                                            title: 'Error al cambiar el estado'
+                                        });
+                                        console.error(xhr);
+                                    }
+                                });
+                            });
+                        });
                     }
                 });
 
-                $('#filter-tipo, #filter-categoria').on('change', () => table.draw());
+                $('#filter-tipo, #filter-categoria, #filter-descuento').on('change', () => table.draw());
                 $('#filter-status').on('change', () => table.draw());
                 $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());
                 $('#custom-search').on('keypress', e => {
