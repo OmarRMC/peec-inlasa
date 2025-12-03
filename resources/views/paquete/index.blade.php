@@ -51,7 +51,20 @@
                                         <td rowspan="{{ $paquetesPorArea->count() }}">{{ $area }}</td>
                                     @endif
                                     <td>{{ $paquete->descripcion }}</td>
-                                    <td>{{ $paquete->costo_paquete }} Bs</td>
+                                    <td>
+                                        @php
+                                            $descuento = $paquete->descuento ?? 0;
+                                            $costoOriginal = $paquete->costo_paquete;
+                                        @endphp
+                                        <div>
+                                            <span>{{ $costoOriginal }} Bs</span>
+                                            @if ($descuento > 0)
+                                                {!! $paquete->descuento_html !!}
+                                                <span>{{ $paquete->precio_final }} Bs</span>
+                                            @endif
+                                        </div>
+                                    </td>
+
                                     <td>{{ $paquete->max_participantes }}</td>
                                     <td>{{ $paquete->tiposLaboratorios->pluck('descripcion')->implode(', ') }}</td>
                                     <td>
@@ -88,15 +101,15 @@
                         @endforeach
                     @empty
                         <tr>
-                           <td colspan="6" class="px-4 py-4 text-center text-muted">No hay paquetes registrados.
-                           </td>
+                            <td colspan="6" class="px-4 py-4 text-center text-muted">No hay paquetes registrados.
+                            </td>
                         </tr>
                     @endforelse
-                    </tbody>
-                </table>
-            </div>
-            <div class="mt-4">
-                {{ $paquetes->links() }}
-            </div>
+                </tbody>
+            </table>
         </div>
-    </x-app-layout>
+        <div class="mt-4">
+            {{ $paquetes->links() }}
+        </div>
+    </div>
+</x-app-layout>

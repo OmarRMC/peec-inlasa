@@ -1,7 +1,7 @@
 @php
     use App\Models\Permiso;
 @endphp
-@props(['showUrl', 'editUrl', 'deleteUrl', 'inscribirUrl', 'nombre', 'id', 'activo' => false])
+@props(['showUrl', 'editUrl', 'deleteUrl', 'inscribirUrl', 'nombre', 'id', 'activo' => false, 'tiene_descuento'])
 
 <div class="flex space-x-1">
     {{-- Ver --}}
@@ -11,6 +11,19 @@
             <i class="fas fa-eye"></i>
         </a>
     @endif
+
+    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_LABORATORIO]))
+        <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded shadow-sm toggle-descuento-btn"
+            data-id="{{ $id }}"
+            data-tippy-content="{{ $tiene_descuento ? 'Tiene descuento' : 'No tiene descuento' }}">
+            @if ($tiene_descuento)
+                <i class="fas fa-tags text-green-600"></i>
+            @else
+                <i class="fas fa-ban text-red-600"></i>
+            @endif
+        </button>
+    @endif
+
 
     {{-- Editar --}}
     @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_LABORATORIO]))

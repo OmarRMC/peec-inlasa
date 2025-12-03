@@ -362,6 +362,24 @@ class LaboratorioController extends Controller
         ];
     }
 
+    public function toggleDescuento($id)
+    {
+        $lab = Laboratorio::find($id);
+        if (!$lab) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Laboratorio no encontrado.'
+            ], 404);
+        }
+        $lab->tiene_descuento = !$lab->tiene_descuento;
+        $lab->save();
+
+        return response()->json([
+            'success' => true,
+            'tiene_descuento' => $lab->tiene_descuento
+        ]);
+    }
+
     public function getData(Request $request)
     {
         if (!Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])) {
@@ -377,6 +395,9 @@ class LaboratorioController extends Controller
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+        if ($request->filled('filter_descuento')) {
+            $query->where('tiene_descuento', $request->filter_descuento);
         }
 
         return datatables()
@@ -400,6 +421,7 @@ class LaboratorioController extends Controller
                     'nombre' => $lab->nombre_lab,
                     'id' => $lab->id,
                     'activo' => $lab->status,
+                    'tiene_descuento' => $lab->tiene_descuento,
                 ])->render();
             })
             ->rawColumns(['status_label', 'actions'])
