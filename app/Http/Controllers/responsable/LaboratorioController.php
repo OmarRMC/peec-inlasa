@@ -25,13 +25,22 @@ class LaboratorioController extends Controller
 
     public function __construct()
     {
-        $this->middleware('can:' . Permiso::RESPONSABLE)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+        $this->middleware('can:' . Permiso::RESPONSABLE)->only(['create', 'update', 'destroy', 'show', 'edit']);
     }
 
     public function index(Request $request, $idEa)
     {
         $responsable = Auth::user();
-        $ensayosAptitud = $responsable->responsablesEA->findOrFail($idEa);
+        $ensayosAptitud = null;
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayosAptitud = EnsayoAptitud::find($idEa);
+        }
+        if (Gate::allows(Permiso::RESPONSABLE)) {
+            $ensayosAptitud = $responsable->responsablesEA->find($idEa);
+        }
+        if (!$ensayosAptitud) {
+            return redirect('/')->with('error', 'No se tiene el ensayo de aptitud solicitado.');
+        }
         $laboratorios = InscripcionEA::with('inscripcion.laboratorio')
             ->where('id_ea', $idEa)
             ->whereHas('inscripcion', function ($q) {
@@ -54,10 +63,16 @@ class LaboratorioController extends Controller
     public function getData(Request $request, $idEa)
     {
         $responsable = Auth::user();
-        $responsable->responsablesEA->findOrFail($idEa);
-
-        Log::info('$idEa');
-        Log::info($idEa);
+        $ensayosAptitud = null;
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayosAptitud = EnsayoAptitud::find($idEa);
+        }
+        if (Gate::any([Permiso::RESPONSABLE])) {
+            $ensayosAptitud = $responsable->responsablesEA->find($idEa);
+        }
+        if (!$ensayosAptitud) {
+            return collect();
+        }
         $query = InscripcionEA::with(['inscripcion', 'inscripcion.laboratorio.departamento', 'inscripcion.laboratorio.usuario'])
             ->where('id_ea', $idEa)
             ->whereHas('inscripcion', function ($q) use ($request) {

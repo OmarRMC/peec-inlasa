@@ -76,6 +76,11 @@
                                     </td>
                                     <td class="px-3 py-2 align-middle">
                                         <div class="flex gap-2">
+                                            <a href="{{ route('ea.lab.inscritos', $ensayo->id) }}"
+                                                class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm ml-1"
+                                                data-tippy-content="Lista de inscripciones aprobadas" traget="_blank">
+                                                <i class="fas fa-list-check"></i>
+                                            </a>
                                             <a href="{{ route('certificados.desempeno.labs.show', $ensayo->id) }}"
                                                 target="_blank"
                                                 class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"

@@ -1,3 +1,6 @@
+@php
+    use App\Models\Permiso;
+@endphp
 @props(['showUrl', 'boletaPdf', 'contratoPdf', 'docPagosUrl', 'tieneDocPagoPendiente'])
 
 <div class="flex space-x-1">
@@ -18,11 +21,11 @@
         data-tippy-content="Generar contrato de inscripción">
         <i class="fas fa-file-signature"></i>
     </a>
-    @if (isset($tieneDocPagoPendiente) && $tieneDocPagoPendiente)
+    @if (isset($tieneDocPagoPendiente) && $tieneDocPagoPendiente && Gate::any([Permiso::ADMIN, Permiso::GESTION_PAGOS]))
         @if ($tieneDocPagoPendiente)
             <a href="{{ $docPagosUrl }}" target="_blank"
                 class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm"
-                data-tippy-content="Documentos de Pago">
+                data-tippy-content="El documento de pago está pendiente de revisión">
                 <i class="fas fa-file-invoice-dollar"></i>
             </a>
         @endif
