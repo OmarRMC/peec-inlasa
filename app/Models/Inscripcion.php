@@ -36,6 +36,10 @@ class Inscripcion extends Model
         self::STATUS_PAGADO => 'Pagado',
         self::STATUS_DEUDOR => 'Pendiente',
     ];
+    const STATUS_DOCUMENTO_PAGO = [
+        DocumentoInscripcion::STATUS_DOCUMENTO_REGISTRADO => 'Registrados',
+        DocumentoInscripcion::STATUS_DOCUMENTO_PENDIENTE  => 'Pendientes',
+    ];
 
     protected $fillable = [
         'id_lab',

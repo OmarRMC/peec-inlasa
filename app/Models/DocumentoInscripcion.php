@@ -23,7 +23,8 @@ class DocumentoInscripcion extends Model
         self::TYPE_DOCUMENTO_INSCRIPCION => 'Documentos de Inscripción',
         self::TYPE_DOCUMENTO_PAGO        => 'Documentos de Pago',
     ];
-
+    const STATUS_DOCUMENTO_REGISTRADO = 0;
+    const STATUS_DOCUMENTO_PENDIENTE = 1;
     public function inscripcion()
     {
         return $this->belongsTo(Inscripcion::class, 'id_inscripcion');

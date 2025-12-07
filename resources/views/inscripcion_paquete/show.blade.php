@@ -115,7 +115,7 @@
                                     Registrar Pago
                                 </button>
                             @endif
-                            @if (Gate::any([Permiso::LABORATORIO]) && configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS))
+                            @if (Gate::any([Permiso::LABORATORIO,Permiso::GESTION_PAGOS, Permiso::ADMIN]) && configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS) && $inscripcion->estaAprobado())
                                 <button onclick="document.getElementById('modalSubirPagos').showModal()"
                                     class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
                                     aria-label="Subir documentos" title="Subir documentos">

@@ -14,6 +14,7 @@ use App\Models\Laboratorio;
 use App\Models\Paquete;
 use App\Models\Programa;
 use App\Models\DetalleInscripcion;
+use App\Models\DocumentoInscripcion;
 use App\Models\EnsayoAptitud;
 use App\Models\Formulario;
 use App\Models\Inscripcion;
@@ -68,6 +69,7 @@ class InscripcionPaqueteController extends Controller
             'laboratorio.categoria',
             'laboratorio.nivel',
             'detalleInscripciones',
+            'documentosPago'
         ]);
 
         foreach (['pais', 'tipo', 'categoria', 'nivel', 'dep', 'prov', 'municipio'] as $filtro) {
@@ -105,6 +107,13 @@ class InscripcionPaqueteController extends Controller
             Log::info($request->status_ins ? '1' : '01');
             $query->where('status_inscripcion', $request->status_ins);
         }
+
+        if ($request->filled('status_doc_pago')) {
+            $statusDocPago = $request->get('status_doc_pago');
+            $query->whereHas('documentosPago', function ($q) use ($statusDocPago) {
+                $q->where('status', $statusDocPago);
+            });
+        }
         return datatables()
             ->of($query)
             ->addColumn('nombre_lab', fn($i) => $i->laboratorio->nombre_lab ?? '-')
@@ -120,10 +129,13 @@ class InscripcionPaqueteController extends Controller
             ->addColumn('estado', fn($i) => $i->getStatusInscripcion())
             ->addColumn('cuenta', fn($i) => $i->getStatusCuenta())
             ->addColumn('acciones', function ($i) {
+                $tieneDocPagoPendiente = $i->documentosPago->where('status', DocumentoInscripcion::STATUS_DOCUMENTO_PENDIENTE)->isNotEmpty();
                 return view('inscripcion_paquete.action-buttons', [
                     'showUrl' => route('inscripcion_paquete.show', $i->id),
                     'boletaPdf' => route('formulario_inscripcion_lab.pdf', $i->id),
                     'contratoPdf' => route('formulario_contrato_lab.pdf', $i->id),
+                    'docPagosUrl' => route('documentos.pagos.index', $i->id),
+                    'tieneDocPagoPendiente' => $tieneDocPagoPendiente,
                 ])->render();
             })
             ->rawColumns(['estado', 'cuenta', 'acciones'])

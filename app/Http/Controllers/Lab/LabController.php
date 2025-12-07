@@ -96,6 +96,9 @@ class LabController extends Controller
 
     public function getInscripcionData()
     {
+        if (!Gate::check(Permiso::LABORATORIO)) {
+            return collect();
+        }
         $lab = Auth::user()->laboratorio;
         $query = Inscripcion::with([
             'laboratorio.pais',

@@ -114,6 +114,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
         Route::get('reportes/inscripciones/export', [ReporteController::class, 'exportInscripcionesExcel'])
             ->name('reportes.inscripciones.export');
     });
+    Route::post('/documentos/{id}/toggle', [DocumentosController::class, 'toggle'])->name('documentos.pago.toggle');
 });
 Route::middleware(['auth', 'usuario.activo', 'canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_INSCRIPCIONES])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');

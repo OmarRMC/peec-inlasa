@@ -157,4 +157,27 @@ class DocumentosController extends Controller
         $documentos = $inscripcion->documentosPago;
         return view('inscripcion_paquete.pagos.index', compact('documentos', 'gestion', 'codigo'));
     }
+
+    public function toggle($id)
+    {
+        if (!Gate::any([Permiso::GESTION_PAGOS, Permiso::ADMIN])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No tiene permiso para realizar esta acción.'
+            ], 403);
+        }
+
+        $doc = DocumentoInscripcion::findOrFail($id);
+
+        if ($doc->status == DocumentoInscripcion::STATUS_DOCUMENTO_PENDIENTE) {
+            $doc->status = DocumentoInscripcion::STATUS_DOCUMENTO_REGISTRADO;
+        } else {
+            $doc->status = DocumentoInscripcion::STATUS_DOCUMENTO_PENDIENTE;
+        }
+        $doc->save();
+        return response()->json([
+            'success' => true,
+            'new_status' => $doc->status
+        ]);
+    }
 }

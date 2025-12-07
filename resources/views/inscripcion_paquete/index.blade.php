@@ -105,6 +105,13 @@
                             <option value="{{ $key }}">{{ $value }}</option>
                         @endforeach
                     </select>
+                    <select id="filter-status-doc-pago"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
+                        <option value="">Estados de doc. pagos</option>
+                        @foreach (Inscripcion::STATUS_DOCUMENTO_PAGO as $key => $value)
+                            <option value="{{ $key }}">{{ $value }}</option>
+                        @endforeach
+                    </select>
                     <select id="filter-area"
                         class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                         <option value="">Todos los areas</option>
@@ -227,6 +234,7 @@
                                 // d.nivel = $('#filter-nivel').val();
                                 d.status_ins = $('#filter-status-inscripcion').val();
                                 d.status_cuenta = $('#filter-status-cuenta').val();
+                                d.status_doc_pago = $('#filter-status-doc-pago').val();
                                 d.dep = $('#filter-dep').val();
                                 d.prov = $('#filter-prov').val();
                                 d.municipio = $('#filter-mun').val();
@@ -310,7 +318,7 @@
                     });
                     $('#filter-pais, #filter-tipo, #filter-categoria, #filter-nivel').on('change', () => table.draw());
 
-                    $('#filter-status-inscripcion, #filter-status-cuenta').on('change', () => table.draw());
+                    $('#filter-status-inscripcion, #filter-status-cuenta, #filter-status-doc-pago').on('change', () => table.draw());
 
                     $('#filter-pais').on('change', async function() {
                         const pais = this.value;
