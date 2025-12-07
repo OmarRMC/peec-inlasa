@@ -125,13 +125,22 @@ class ConfiguracionController extends Controller
                 configuracion(Configuracion::NOTIFICACION_FECHA_FIN, $request->notificacion_fecha_fin);
                 break;
 
-            case 'email.informacion':
+            case 'email.aprobacion':
                 $request->validate([
-                    'email_informacion' => 'required|string',
+                    'email_aprobacion' => 'required|string',
                 ], [
-                    'email_informacion.string' => 'El mensaje debe ser una cadena de texto.',
+                    'email_aprobacion.string' => 'El mensaje debe ser una cadena de texto.',
                 ]);
-                configuracion(Configuracion::EMAIL_INFORMACION, $request->email_informacion);
+                configuracion(Configuracion::EMAIL_APROBACION, $request->email_aprobacion);
+                break;
+
+            case 'email.observacion':
+                $request->validate([
+                    'email_observacion' => 'required|string',
+                ], [
+                    'email_observacion.string' => 'El mensaje debe ser una cadena de texto.',
+                ]);
+                configuracion(Configuracion::EMAIL_OBSERVACION, $request->email_observacion);
                 break;
 
             case 'certificados':

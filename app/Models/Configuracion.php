@@ -42,7 +42,8 @@ class Configuracion extends Model
     public const NOTIFICACION_MENSAJE = 'notificacion.mensaje';
     public const NOTIFICACION_FECHA_INICIO = 'notificacion.fecha_inicio';
     public const NOTIFICACION_FECHA_FIN = 'notificacion.fecha_fin';
-    public const EMAIL_INFORMACION = 'email.informacion';
+    public const EMAIL_APROBACION = 'email.aprobacion';
+    public const EMAIL_OBSERVACION = 'email.observacion';
     public const CARGO_EVALUACION_EXTERNA = 'evaluacion_externa';
     public const CARGO_COORDINADORA_RED   = 'coordinadora_red';
     public const CARGO_DIRECTORA_GENERAL  = 'directora_general';

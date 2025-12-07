@@ -1,5 +1,5 @@
 @php
-use App\Models\Configuracion;
+    use App\Models\Configuracion;
 @endphp
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -549,7 +549,7 @@ use App\Models\Configuracion;
                                                             </tr>
                                                             <tr>
                                                                 <td align="left" style="padding:0;Margin:0">
-                                                                    {!! configuracion(Configuracion::EMAIL_INFORMACION) !!}
+                                                                    {!! configuracion(Configuracion::EMAIL_APROBACION) !!}
                                                                 </td>
                                                             </tr>
                                                         </table>

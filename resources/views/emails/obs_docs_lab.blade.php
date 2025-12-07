@@ -4,6 +4,7 @@
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -453,11 +454,12 @@
                                                                     style="padding:0;Margin:0;padding-top:10px">
                                                                     <h2
                                                                         style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:24px;font-style:normal;font-weight:bold;line-height:28.8px;color:#0b5394">
-                                                                        CÓDIGO:&nbsp;{{ $usuario->username}}</h2>
+                                                                        CÓDIGO:&nbsp;{{ $usuario->username }}</h2>
                                                                     <h2
                                                                         style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:24px;font-style:normal;font-weight:bold;line-height:28.8px;color:#0b5394">
                                                                         LABORATORIO<span
-                                                                            style="line-height:120%">:&nbsp; {{$laboratorio->nombre_lab}}</span><br><br>
+                                                                            style="line-height:120%">:&nbsp;
+                                                                            {{ $laboratorio->nombre_lab }}</span><br><br>
                                                                     </h2>
                                                                 </td>
                                                             </tr>
@@ -505,7 +507,7 @@
                                                                                     </li>
                                                                                 </ul>
                                                                             </li>
-                                                                         @endforeach
+                                                                        @endforeach
                                                                     </ol>
                                                                     <p class="b"
                                                                         style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:12px;letter-spacing:0;color:#333333;font-size:12px">
@@ -617,7 +619,7 @@
                                                             </tr>
                                                             <tr>
                                                                 <td align="left" style="padding:0;Margin:0">
-                                                                    {!! configuracion(Configuracion::EMAIL_INFORMACION) !!}
+                                                                    {!! configuracion(Configuracion::EMAIL_OBSERVACION) !!}
                                                                 </td>
                                                             </tr>
                                                         </table>
