@@ -120,8 +120,8 @@
                 Lado del Hospital del Niño) de la zona de Miraflores de la ciudad de La Paz, legalmente representado por
                 su Directora General Ejecutiva {{ $contrato->firmante_nombre ?? 'PATRICIA CARLA VACAFLOR TORRICO' }},
                 titular de la Cédula de Identidad N.º
-                {{ $contrato->identificacion ?? '1881125' }}, en mérito a la Resolución Ministerial N° 0533 de 16 de
-                diciembre 2020, quien en adelante y para
+                {{ $contrato->identificacion ?? '1881125 OR.' }}, en mérito a la Resolución Ministerial N° 0017 de 21 de
+                noviembre 2025, quien en adelante y para
                 efectos del presente contrato se denominará INLASA.
                 </br>
                 Por otro lado, el Laboratorio <strong>{{ $laboratorio->nombre_lab }}</strong> participante del Programa
