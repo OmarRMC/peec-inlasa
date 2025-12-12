@@ -78,6 +78,7 @@ class PaqueteController extends Controller
                 'max:15000',
                 'regex:/^\d+(\.\d{1,2})?$/'
             ],
+            'descuento' => 'nullable|numeric|min:0|max:100',
             'max_participantes' => 'required|integer|min:0',
             'tipo_laboratorio_ids' => 'array',
             'tipo_laboratorio_ids.*' => 'exists:tipo_laboratorio,id',
@@ -116,6 +117,7 @@ class PaqueteController extends Controller
                 'max:15000',
                 'regex:/^\d+(\.\d{1,2})?$/'
             ],
+            'descuento' => 'nullable|numeric|min:0|max:100',
             'max_participantes' => 'required|integer|min:0',
             'tipo_laboratorio_ids' => 'array',
             'tipo_laboratorio_ids.*' => 'exists:tipo_laboratorio,id',
@@ -155,6 +157,7 @@ class PaqueteController extends Controller
                 $data[] = [
                     'paquete_id' => $paquete->id,
                     'costo' => $paquete->costo_paquete,
+                    'costo_final' => $paquete->costo_con_descuento,
                     'nombre_paquete' => $paquete->descripcion,
                     'area_id' => $area->id,
                     'nombre_area' => $area->descripcion
@@ -179,6 +182,7 @@ class PaqueteController extends Controller
             $laboratorio = Laboratorio::findOrFail($labId);
         }
         $tipoLabId = $laboratorio->id_tipo;
+        $aplicaDescuento = $laboratorio->tiene_descuento;
 
         if (!$programaId) {
             return datatables()->of(collect())->toJson();
@@ -215,8 +219,10 @@ class PaqueteController extends Controller
         foreach ($paquetesDB as $paquete) {
             $paquetes->push([
                 'id' => $paquete->id,
-                'nombre_paquete' => $paquete->descripcion,
-                'costo' => $paquete->costo_paquete,
+                'nombre_paquete' =>  $paquete->descuento > 0 && $aplicaDescuento ? "{$paquete->descripcion} {$paquete->descuento_html}" : $paquete->descripcion,
+                'costo' => $aplicaDescuento? $paquete->precio_final : $paquete->costo_paquete,
+                'descuento' => $paquete->descuento,
+                'costo_con_descuento' => $paquete->descuento > 0 && $aplicaDescuento ? "{$paquete->costo_paquete} Bs <br/> {$paquete->precio_final_html}"   : $paquete->costo_paquete,
                 'nombre_area' => $paquete->area->descripcion,
                 'status' => $paquete->status ?? 1,
             ]);
@@ -231,7 +237,8 @@ class PaqueteController extends Controller
                         data-id="' . $row['id'] . '" 
                         data-paquete="' . e($row['nombre_paquete']) . '" 
                         data-costo="' . $row['costo'] . '" 
-                            data-area-id="' . e($row['nombre_area']) . '" 
+                        data-descuento="' . $row['descuento'] . '" 
+                        data-area-id="' . e($row['nombre_area']) . '" 
                         data-area="' . e($row['nombre_area']) . '"
                         data-tippy-content="Agregar paquete"
                     >
@@ -239,7 +246,7 @@ class PaqueteController extends Controller
                     </button>
                 </div>';
             })
-            ->rawColumns(['acciones'])
+            ->rawColumns(['acciones', 'costo_con_descuento', 'nombre_paquete'])
             ->toJson();
     }
 

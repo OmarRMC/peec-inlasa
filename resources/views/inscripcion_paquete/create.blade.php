@@ -54,19 +54,19 @@
                     <div class="flex flex-col sm:flex-row gap-1">
                         <div>
                             <div class="flex justify-between items-center mb-2 flex-wrap">
-                                <h2 class="text-base sm:text-lg font-bold mb-4">Selecciona Paquetes</h2>
-                                <div class="flex items-center gap-2 justify-end mb-1 flex-wrap w-full sm:w-auto">
-                                    <div class="relative w-full sm:w-64 mb-2 sm:mb-0">
+                                <h2 class="text-sm font-bold mb-2">Selecciona Paquetes</h2>
+                                <div class="flex items-center gap-1 justify-end mb-1 flex-wrap w-full sm:w-auto">
+                                    <div class="relative w-full sm:w-56 mb-1 sm:mb-0">
                                         <span
-                                            class="absolute inset-y-0 left-0 flex items-center pl-2 sm:pl-3 text-gray-500 text-xs sm:text-sm">
+                                            class="absolute inset-y-0 left-0 flex items-center pl-1.5 sm:pl-2 text-gray-500 text-xs">
                                             <i class="fas fa-search"></i>
                                         </span>
                                         <input type="search" id="custom-search-lab"
-                                            class="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm"
+                                            class="w-full pl-7 sm:pl-8 pr-2 sm:pr-3 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs"
                                             placeholder="Buscar paquetes...">
                                     </div>
                                     <button id="btn-search-lab"
-                                        class="px-3 py-1 sm:px-4 sm:py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs sm:text-sm">
+                                        class="px-2 py-1 sm:px-3 sm:py-1.5 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
@@ -92,7 +92,7 @@
                                             <th></th>
                                             <th>Descripción</th>
                                             {{-- <th>Área</th> --}}
-                                            <th>Costo</th>
+                                            <th>Costo (Bs)</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -116,7 +116,7 @@
                 @endif
 
                 <!-- Botón cerrar modal -->
-                <div class="flex justify-end mt-4 gap-2 flex-wrap">
+                <div class="flex justify-end gap-2 flex-wrap">
                     <button id="cerrarModal"
                         class="btn-secondary px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Cerrar</button>
                     {{-- <button id="btn-ver-seleccionados"
@@ -281,14 +281,27 @@
                                     searchable: false
                                 },
                                 {
-                                    data: 'nombre_paquete'
+                                    data: 'nombre_paquete',
                                 },
                                 // {
                                 //     data: 'nombre_area'
                                 // },
                                 {
-                                    data: 'costo',
-                                    render: data => `${data} Bs.`
+                                    data: 'costo_con_descuento',
+                                    render: data => `${data}`
+                                }
+                            ],
+                            columnDefs: [{
+                                    width: '40px',
+                                    targets: 0
+                                },
+                                {
+                                    width: '250px',
+                                    targets: 1
+                                },
+                                {
+                                    width: '100px',
+                                    targets: 2
                                 }
                             ],
                             language: {
@@ -298,6 +311,7 @@
                             lengthChange: false,
                             paging: true,
                             pageLength: 6,
+                            autoWidth: false,
                             drawCallback: function() {
                                 tippy('[data-tippy-content]');
                                 setupPagination(tablaPaquetesDT);
@@ -438,11 +452,11 @@
                 <div class="max-h-40 overflow-y-auto pr-1">
                     <ul class="divide-y divide-gray-200">
                         ${seleccionados.map(pkt => `
-                                                                                                                    <li class="py-1 flex justify-between items-center">
-                                                                                                                        <span class="font-medium text-[12px]">${pkt.nombre_paquete}</span>
-                                                                                                                        <span class="text-[12px] text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
-                                                                                                                    </li>
-                                                                                                                `).join('')}
+                                                                                                                                                            <li class="py-1 flex justify-between items-center">
+                                                                                                                                                                <span class="font-medium text-[12px]">${pkt.nombre_paquete}</span>
+                                                                                                                                                                <span class="text-[12px] text-gray-600">${parseFloat(pkt.costo).toFixed(2)} Bs.</span>
+                                                                                                                                                            </li>
+                                                                                                                                                        `).join('')}
                     </ul>
                 </div>
                 <!-- Total fijo -->
