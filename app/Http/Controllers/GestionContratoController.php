@@ -66,6 +66,7 @@ class GestionContratoController extends Controller
             'firmante_institucion' => $request->firmante_institucion,
             'firmante_detalle'     => $request->firmante_detalle,
             'estado'               => $request->estado ?? true,
+            'identificacion'       => $request->identificacion,
         ]);
 
         return redirect()->route('contratos.index')
@@ -94,6 +95,7 @@ class GestionContratoController extends Controller
             'firmante_institucion' => $request->firmante_institucion,
             'firmante_detalle'     => $request->firmante_detalle,
             'estado'               => $request->estado,
+            'identificacion'       => $request->identificacion,
         ]);
 
         return redirect()->route('contratos.index', $contrato->id)

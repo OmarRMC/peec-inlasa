@@ -14,6 +14,7 @@ class Contrato extends Model
         'firmante_institucion',
         'firmante_detalle',
         'estado',
+        'identificacion',
     ];
 
     //estado

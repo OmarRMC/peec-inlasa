@@ -97,29 +97,33 @@
                 <input type="hidden" id="methodField">
 
                 {{-- NOMBRE --}}
-                <div class="mb-4">
+                <div class="mb-2">
                     <label class="label">Nombre del Firmante</label>
                     <input type="text" id="firmante_nombre" name="firmante_nombre" class="input-standard" required>
                 </div>
 
+                <div class="mb-2">
+                    <label class="label">CI</label>
+                    <input type="text" id="identificacion" name="identificacion" class="input-standard">
+                </div>
                 {{-- CARGO --}}
-                <div class="mb-4">
+                <div class="mb-2">
                     <label class="label">Cargo</label>
                     <input type="text" id="firmante_cargo" name="firmante_cargo" class="input-standard" required>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-2">
                     <label class="label">Institución</label>
                     <input type="text" id="firmante_institucion" name="firmante_institucion" class="input-standard"
                         required>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-2">
                     <label class="label">Detalle bajo la firma</label>
                     <textarea name="firmante_detalle" id="firmante_detalle" class="input-standard"></textarea>
                 </div>
 
-                <div class="mb-4">
+                <div class="mb-2">
                     <label class="label">Estado</label>
                     <select id="estado" name="estado" class="input-standard">
                         <option value="1">Activo</option>
@@ -167,6 +171,7 @@
                     `<input type="hidden" name="_method" value="PUT" id="methodField">`;
 
                 document.getElementById("firmante_nombre").value = data.firmante_nombre ?? "";
+                document.getElementById("identificacion").value = data.identificacion ?? "";
                 document.getElementById("firmante_cargo").value = data.firmante_cargo ?? "";
                 document.getElementById("firmante_institucion").value = data.firmante_institucion ?? "";
                 document.getElementById("firmante_detalle").value = data.firmante_detalle ?? "";

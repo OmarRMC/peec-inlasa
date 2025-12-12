@@ -115,7 +115,14 @@
 
         <div class="clause" style="margin: 0">
             <p>
-                El Instituto Nacional de Laboratorios de Salud "Dr Néstor Morales Villazón" INLASA, con Número de Identificación Tributaria N° 1001419025 y domicilio establecido en el pasaje Rafael Zubieta N°1889 (al Lado del Hospital del Niño) de la zona de Miraflores de la ciudad de La Paz, legalmente representado por su Directora General Ejecutiva Dra. Evelin Esther Fortún Fernández, titular de la Cédula de Identidad N.º 4824138 QR., en mérito a la Resolución Ministerial N° 0533 de 16 de diciembre 2020, quien en adelante y para efectos del presente contrato se denominará INLASA.
+                El Instituto Nacional de Laboratorios de Salud "Dr Néstor Morales Villazón" INLASA, con Número de
+                Identificación Tributaria N° 1001419025 y domicilio establecido en el pasaje Rafael Zubieta N°1889 (al
+                Lado del Hospital del Niño) de la zona de Miraflores de la ciudad de La Paz, legalmente representado por
+                su Directora General Ejecutiva {{ $contrato->firmante_nombre ?? 'PATRICIA CARLA VACAFLOR TORRICO' }},
+                titular de la Cédula de Identidad N.º
+                {{ $contrato->identificacion ?? '1881125' }}, en mérito a la Resolución Ministerial N° 0533 de 16 de
+                diciembre 2020, quien en adelante y para
+                efectos del presente contrato se denominará INLASA.
                 </br>
                 Por otro lado, el Laboratorio <strong>{{ $laboratorio->nombre_lab }}</strong> participante del Programa
                 de
