@@ -113,7 +113,11 @@ class PdfInscripcionController extends Controller
             'laboratorioCiReprelegLab' => $laboratorio->ci_repreleg_lab,
             'departamento' => Str::title(strtolower($laboratorio->departamento->nombre_dep))
         ];
-
+        $data = array_map(function ($v) {
+            return is_string($v)
+                ? preg_replace('/\s+/', ' ', trim($v))
+                : $v;
+        }, $data);
         if ($contrato) {
             foreach ($contrato->detalles as $detalle) {
                 $detalle->descripcion = $this->procesarTextoContrato($detalle->descripcion, $data);

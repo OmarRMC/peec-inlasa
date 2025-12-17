@@ -26,7 +26,7 @@ class GestionContratoController extends Controller
                 $detalle = ContratoDetalle::find($id);
                 if (!$detalle) continue;
 
-                $detalle->titulo      = $data['titulo'] ?? $detalle->titulo;
+                $detalle->titulo      = $data['titulo'] ?? '';
                 $detalle->descripcion = $data['descripcion'] ?? null;
                 $detalle->posicion    = $data['posicion'] ?? 1;
                 $detalle->estado      = isset($data['estado']) ? 1 : 0;
@@ -41,13 +41,9 @@ class GestionContratoController extends Controller
         if ($request->has('nuevas')) {
 
             foreach ($request->nuevas as $data) {
-                if (!isset($data['titulo']) || $data['titulo'] == "") {
-                    continue;
-                }
-
                 ContratoDetalle::create([
                     'id_contrato' => $idContrato,
-                    'titulo' => $data['titulo'],
+                    'titulo' => $data['titulo']??'',
                     'descripcion' => $data['descripcion'] ?? null,
                     'posicion' => $data['posicion'] ?? 1,
                     'estado' => isset($data['estado']) ? 1 : 0,
@@ -66,7 +62,6 @@ class GestionContratoController extends Controller
             'firmante_institucion' => $request->firmante_institucion,
             'firmante_detalle'     => $request->firmante_detalle,
             'estado'               => $request->estado ?? true,
-            'identificacion'       => $request->identificacion,
         ]);
 
         return redirect()->route('contratos.index')
@@ -95,7 +90,6 @@ class GestionContratoController extends Controller
             'firmante_institucion' => $request->firmante_institucion,
             'firmante_detalle'     => $request->firmante_detalle,
             'estado'               => $request->estado,
-            'identificacion'       => $request->identificacion,
         ]);
 
         return redirect()->route('contratos.index', $contrato->id)

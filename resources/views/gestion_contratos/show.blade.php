@@ -39,6 +39,8 @@
                 </ul>
                 <p style="margin-top: 4px; font-size: 0.9em;"><em>💡 Usa las claves en la plantilla como
                         <code>{{ '{' . '{ ' }}clave{{ ' }' . '}' }}</code></em></p>
+                <p style="margin-top: 4px; font-size: 0.9em;"><em>💡 Para que el texto este en negrita se usa
+                        <code> **TextoEnNegrita**</code></em></p>
             </div>
         </div>
 

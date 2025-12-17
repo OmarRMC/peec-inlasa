@@ -113,37 +113,20 @@
             CONTRATO N° {{ $contrato_numero }}
         </p>
 
-        <div class="clause" style="margin: 0">
-            <p>
-                El Instituto Nacional de Laboratorios de Salud "Dr Néstor Morales Villazón" INLASA, con Número de
-                Identificación Tributaria N° 1001419025 y domicilio establecido en el pasaje Rafael Zubieta N°1889 (al
-                Lado del Hospital del Niño) de la zona de Miraflores de la ciudad de La Paz, legalmente representado por
-                su Directora General Ejecutiva {{ $contrato->firmante_nombre ?? 'PATRICIA CARLA VACAFLOR TORRICO' }},
-                titular de la Cédula de Identidad N.º
-                {{ $contrato->identificacion ?? '1881125 OR.' }}, en mérito a la Resolución Ministerial N° 0017 de 21 de
-                noviembre 2025, quien en adelante y para
-                efectos del presente contrato se denominará INLASA.
-                </br>
-                Por otro lado, el Laboratorio <strong>{{ $laboratorio->nombre_lab }}</strong> participante del Programa
-                de
-                Evaluación Externa de la Calidad - INLASA {{ $gestion }}, con domicilio establecido en
-                <strong>{{ $laboratorio->zona_lab }}, {{ $laboratorio->direccion_lab }}</strong>
-                de la ciudad/departamento de <strong>{{ $departamento_raw }}</strong>, legalmente representado
-                por <strong>{{ $laboratorio->repreleg_lab }}</strong>, titular de la cedula identidad
-                N.º <strong>{{ $laboratorio->ci_repreleg_lab }}</strong>, que para fines de ejecución y seguimiento del
-                presente
-                contrato se denominara "PARTICIPANTE".
-            </p>
-        </div>
         @if (!$contrato)
             @include('pdf.partials.clausulas')
         @else
             @forelse ($contrato->detalles as $detalle)
                 <div class="section">
-                    <strong>{{ $detalle->titulo }}</strong>
-                    <p class="clause">
-                        {!! nl2br(e($detalle->descripcion)) !!}
-                    </p>
+                    @if ($detalle->titulo)
+                        <strong>{{ $detalle->titulo }}</strong>
+                    @endif
+                    @php
+                    $texto = preg_replace("/\r\n|\r|\n/", "  \n", $detalle->descripcion);
+                    @endphp
+                    <div class="clause">
+                        {!! Str::markdown($texto) !!}
+                    </div>
                 </div>
             @empty
                 @include('pdf.partials.clausulas')
