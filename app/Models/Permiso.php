@@ -195,6 +195,7 @@ class Permiso extends Model
 
     public const GESTION_CERTIFICADOS = 'gestion.certificados';
     public const GESTION_CERTIFICADOS_NAME = 'Gestión Certificados';
+    public const GAME = 'game';
 
     // ------------------------------
     // PERMISOS_HABILITADOS

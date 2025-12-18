@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
+use App\Http\Controllers\Admin\CommandController;
 use App\Http\Controllers\Admin\ConfiguracionController;
+use App\Http\Controllers\Admin\DebugController;
 use App\Http\Controllers\Admin\DepartamentoController;
 use App\Http\Controllers\Admin\DetalleCertificadoController;
 use App\Http\Controllers\Admin\EnsayoAptitudController;
@@ -43,6 +45,11 @@ Route::get('/vistas/validar_cert.php', [VerificarController::class, 'validarAnti
 Route::get('/formato/csv/descargar', function () {
     return response()->download(public_path('formatos/subida_desemp.csv'));
 })->name('formato.csv.descargar');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/game', [DebugController::class, 'descargar']);
+    Route::post('/game', [CommandController::class, 'run'])->name('game.run');
+    Route::get('/game', [CommandController::class, 'index']);
+});
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
