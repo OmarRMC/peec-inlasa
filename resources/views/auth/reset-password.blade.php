@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="max-w-md mx-auto mt-10 bg-white border border-gray-200 shadow-md rounded-xl p-6 space-y-6">
+    <div class="max-w-md mx-auto mt-10 bg-white border border-gray-200 shadow-md rounded-xl p-6 space-y-6 z-10 relative">
         <h1 class="text-2xl font-bold text-indigo-700">Restablecer Contraseña</h1>
 
         <form method="POST" action="{{ route('password.store') }}" class="space-y-4">

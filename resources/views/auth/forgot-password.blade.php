@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="max-w-md mx-auto mt-10 bg-white border border-gray-200 shadow-md rounded-xl p-6 space-y-6">
+    <div class="max-w-md mx-auto mt-10 bg-white border border-gray-200 shadow-md rounded-xl p-6 space-y-6 z-10 relative">
         <h1 class="text-2xl font-bold text-indigo-700">¿Olvidaste tu Contraseña?</h1>
 
         <p class="text-sm text-gray-700 leading-relaxed">
