@@ -25,7 +25,11 @@ return [
         'type' => 'git',
         'description' => 'Guarda cambios locales',
     ],
-
+    'git_stash_apply_0' => [
+        'cmd' => ['git', 'stash', 'apply', '0'],
+        'type' => 'git',
+        'description' => 'Aplica el stash en la posición 0',
+    ],
     'git_status' => [
         'cmd' => ['git', 'status'],
         'type' => 'git',
