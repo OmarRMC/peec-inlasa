@@ -1,0 +1,22 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # --- BLOQUE 1: Forzar HTTPS ---
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # --- BLOQUE 2: Entrar a la carpeta public ---
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+<Files xmlrpc.php>
+order allow,deny
+deny from all
+</Files>
+
+Options -Indexes
+ServerSignature Off
