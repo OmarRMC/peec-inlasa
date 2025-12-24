@@ -59,6 +59,10 @@ Route::get('/vistas/validar_cert.php', [VerificarController::class, 'validarAnti
 Route::get('/formato/csv/descargar', function () {
     return response()->download(public_path('formatos/subida_desemp.csv'));
 })->name('formato.csv.descargar');
+Route::get('/formato/zip/descargar', function () {
+    return response()->download(public_path('formatos/subida_informe.zip'));
+})->name('formato.zip.descargar');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/game', [DebugController::class, 'descargar']);
     Route::post('/game', [CommandController::class, 'run'])->name('game.run');
