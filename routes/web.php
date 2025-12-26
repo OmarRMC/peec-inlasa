@@ -75,6 +75,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::resource('tipo_laboratorio', TipoLaboratorioController::class);
     Route::resource('categoria_laboratorio', CategoriaLaboratorioController::class);
     Route::resource('laboratorio', LaboratorioController::class);
+    Route::post('/laboratorio/{id}/toggle-descuento', [LaboratorioController::class, 'toggleDescuento'])
+        ->name('laboratorio.toggle-descuento');
     Route::get('laboratorio/ajax/data', [LaboratorioController::class, 'getData'])->name('laboratorio.ajax.data');
     Route::resource('laboratorio', LaboratorioController::class);
     Route::get('/searchLab', [LaboratorioController::class, 'getLabBySearch'])->name('getSearchLab');
