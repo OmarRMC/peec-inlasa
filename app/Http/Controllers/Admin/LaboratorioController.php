@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\LaboratoriosExport;
 use App\Http\Controllers\Controller;
 use App\Mail\VerificacionCorreoLaboratorio;
 use App\Models\CategoriaLaboratorio;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LaboratorioController extends Controller
 {
@@ -40,7 +42,8 @@ class LaboratorioController extends Controller
         $tipos = TipoLaboratorio::active()->get();
         $categorias = CategoriaLaboratorio::active()->get();
         $niveles = NivelLaboratorio::active()->get();
-        return view('laboratorio.index', compact('laboratorios', 'paises', 'tipos', 'categorias', 'niveles'));
+        $gestionesDisponibles = Laboratorio::getGestionesDisponibles();
+        return view('laboratorio.index', compact('laboratorios', 'paises', 'tipos', 'categorias', 'niveles', 'gestionesDisponibles'));
     }
 
     public function create()
@@ -379,6 +382,9 @@ class LaboratorioController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('gestionesDisponibles')) {
+            $query->whereYear('created_at', $request->gestionesDisponibles);
+        }
         return datatables()
             ->of($query)
             ->addColumn('pais_nombre', fn($lab) => $lab->pais->nombre_pais)
@@ -434,5 +440,37 @@ class LaboratorioController extends Controller
             })
             ->rawColumns(['status_label', 'acciones'])
             ->toJson();
+    }
+
+    public function exportExcel(Request $request)
+    {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_LABORATORIO])) {
+            return redirect()->back()
+                ->with('error', 'No tienes permisos para realizar esta acción.');
+        }
+        $format = $request->query('format', 'xlsx');
+        $fileName = 'laboratorios_' . now()->format('Y-m-d_H-i-s') . '.' . $format;
+        $export = new LaboratoriosExport($request);
+        if ($format === 'json') {
+            $headers = $export->headings();
+            $data = $export->collection();
+            return response()->streamDownload(function () use ($headers, $data) {
+                echo json_encode([
+                    'headers' => $headers,
+                    'data' => $data->values(),
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            }, $fileName, [
+                'Content-Type' => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
+            ]);
+        }
+        switch ($format) {
+            case 'csv':
+                return Excel::download($export, $fileName, \Maatwebsite\Excel\Excel::CSV,  ['Content-Type' => 'text/csv; charset=UTF-8']);
+
+            case 'xlsx':
+            default:
+                return Excel::download($export, $fileName);
+        }
     }
 }

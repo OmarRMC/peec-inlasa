@@ -77,6 +77,10 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::resource('laboratorio', LaboratorioController::class);
     Route::get('laboratorio/ajax/data', [LaboratorioController::class, 'getData'])->name('laboratorio.ajax.data');
     Route::resource('laboratorio', LaboratorioController::class);
+    Route::get(
+        '/laboratorio/export/excel',
+        [LaboratorioController::class, 'exportExcel']
+    )->name('laboratorio.export');
     Route::get('/searchLab', [LaboratorioController::class, 'getLabBySearch'])->name('getSearchLab');
     Route::get('/certificados', [CertificadoController::class, 'index'])->name('admin.certificado.index');
     Route::get('/certificados/ajax', [CertificadoController::class, 'getDataCertificado'])->name('admin.certificado.ajax.index');

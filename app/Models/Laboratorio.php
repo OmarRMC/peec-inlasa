@@ -465,4 +465,20 @@ class Laboratorio extends Model
             ->toArray();
         return $idsPaquetes;
     }
+
+    public static function getGestionesDisponibles(array $filters = []): array
+    {
+        $query = self::query();
+        if (isset($filters['status'])) {
+            $query->whereIn('status', $filters['status']);
+        }
+
+        return $query
+            ->selectRaw('YEAR(created_at) as gestion')
+            ->whereNotNull('created_at')
+            ->distinct()
+            ->orderByDesc('gestion')
+            ->pluck('gestion')
+            ->toArray();
+    }
 }

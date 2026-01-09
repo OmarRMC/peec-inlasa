@@ -7,6 +7,20 @@
 @endphp
 <x-app-layout>
     <div class="px-4 max-w-6xl mx-auto">
+        <div class="flex sm:flex-row flex-wrap gap-2 sm:justify-end  sm:w-auto mb-1">
+            <button id="btn-export"
+                class="flex items-center gap-2 px-4 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 shadow-sm">
+                <i class="fas fa-file-excel"></i> Exportar Excel
+            </button>
+            <button id="btn-export-csv"
+                class="flex items-center gap-2 px-4 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 shadow-sm">
+                <i class="fas fa-file-csv"></i> Exportar CSV
+            </button>
+            <button id="btn-export-json"
+                class="flex items-center gap-2 px-4 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 shadow-sm">
+                <i class="fas fa-file-code"></i> Exportar JSON
+            </button>
+        </div>
 
         <!-- Encabezado -->
         <div class="flex justify-between items-center flex-wrap gap-4">
@@ -62,6 +76,12 @@
                     <option value="">Todos los Estados</option>
                     @foreach ($estados as $key => $valor)
                         <option value="{{ $key }}">{{ $valor }}</option>
+                    @endforeach
+                </select>
+                <select id="filter-gestiones-disponibles" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
+                    <option value="">Todos los gestiones</option>
+                    @foreach ($gestionesDisponibles as $key => $valor)
+                        <option value="{{ $valor }}">{{ $valor }}</option>
                     @endforeach
                 </select>
             </div>
@@ -124,6 +144,7 @@
                             d.tipo = $('#filter-tipo').val();
                             d.categoria = $('#filter-categoria').val();
                             // d.nivel = $('#filter-nivel').val();
+                            d.gestionesDisponibles = $('#filter-gestiones-disponibles').val(),
                             d.status = $('#filter-status').val();
                         }
                     },
@@ -166,7 +187,7 @@
                         },
                     ],
                     language: {
-                        url:  "{{ asset('translation/es.json') }}"
+                        url: "{{ asset('translation/es.json') }}"
                     },
                     dom: 'rt',
                     lengthChange: false,
@@ -182,6 +203,7 @@
 
                 $('#filter-tipo, #filter-categoria').on('change', () => table.draw());
                 $('#filter-status').on('change', () => table.draw());
+                $('#filter-gestiones-disponibles').on('change', () => table.draw());
                 $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());
                 $('#custom-search').on('keypress', e => {
                     if (e.which === 13) table.search($('#custom-search').val()).draw();
@@ -236,6 +258,26 @@
                         .prop('disabled', true));
                     table.draw();
                 }
+
+                function exportLaboratorios(format = 'xlsx') {
+                    const params = new URLSearchParams({
+                        pais: $('#filter-pais').val(),
+                        dep: $('#filter-dep').val(),
+                        prov: $('#filter-prov').val(),
+                        municipio: $('#filter-mun').val(),
+                        tipo: $('#filter-tipo').val(),
+                        categoria: $('#filter-categoria').val(),
+                        status: $('#filter-status').val(),
+                        search: $('#custom-search').val(),
+                        gestionesDisponibles: $('#filter-gestiones-disponibles').val(),
+                        format: format
+                    });
+
+                    window.location.href = `{{ route('laboratorio.export') }}?${params.toString()}`;
+                }
+                $('#btn-export').on('click', () => exportLaboratorios('xlsx'));
+                $('#btn-export-csv').on('click', () => exportLaboratorios('csv'));
+                $('#btn-export-json').on('click', () => exportLaboratorios('json'));
             });
         </script>
     @endpush
