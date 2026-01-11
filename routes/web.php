@@ -104,6 +104,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::delete('/pago/{pago}', [PagoController::class, 'destroy'])->name('pago.destroy');
     Route::get('reportes/pagos', [ReporteController::class, 'reportePagos'])
         ->name('reportes.pagos.index');
+    Route::get('reportes/pagos/export', [ReporteController::class, 'exportReportePagos'])
+        ->name('reportes.pagos.export');
     Route::get('/paquetes/programa', [PaqueteController::class, 'getPaquetesPorPrograma'])->name('paquetes.programa');
     Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
     Route::resource('contratos', GestionContratoController::class);
