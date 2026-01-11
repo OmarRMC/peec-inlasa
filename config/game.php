@@ -95,4 +95,10 @@ return [
         'type' => 'artisan',
         'description' => 'Estados de las migraciones',
     ],
+    
+    'certificado_fix_nombre_laboratorio' => [
+        'cmd' => ['php', 'artisan', 'certificado:fix-nombre-laboratorio'],
+        'type' => 'artisan',
+        'description' => 'Corrige caracteres especiales del nombre del laboratorio en certificados',
+    ],
 ];
