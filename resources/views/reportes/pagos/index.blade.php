@@ -7,21 +7,21 @@ use App\Models\Inscripcion;
         <!-- Encabezado -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-2">
             <!-- Título -->
-            <h1 class="text-xl font-bold text-gray-800">Reporte de Inscripciones</h1>
+            <h1 class="text-xl font-bold text-gray-800">Reporte de Pagos</h1>
 
             <!-- Botones -->
             <div class="flex sm:flex-row flex-wrap gap-2 sm:justify-end  sm:w-auto">
-                <a href="{{ route('reportes.inscripciones.export', array_merge(request()->query(), ['format' => 'xlsx'])) }}"
+                <a href="{{ route('reportes.pagos.export', array_merge(request()->query(), ['format' => 'xlsx'])) }}"
                     class="flex items-center gap-2 px-4 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 shadow-sm">
                     <i class="fas fa-file-excel"></i> Exportar Excel
                 </a>
 
-                <a href="{{ route('reportes.inscripciones.export', array_merge(request()->query(), ['format' => 'csv'])) }}"
+                <a href="{{ route('reportes.pagos.export', array_merge(request()->query(), ['format' => 'csv'])) }}"
                     class="flex items-center gap-2 px-4 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 shadow-sm">
                     <i class="fas fa-file-csv"></i> Exportar CSV
                 </a>
 
-                <a href="{{ route('reportes.inscripciones.export', array_merge(request()->query(), ['format' => 'json'])) }}"
+                <a href="{{ route('reportes.pagos.export', array_merge(request()->query(), ['format' => 'json'])) }}"
                     class="flex items-center gap-2 px-4 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 shadow-sm">
                     <i class="fas fa-file-code"></i> Exportar JSON
                 </a>
@@ -67,7 +67,6 @@ use App\Models\Inscripcion;
             class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[140px]">
     </div> --}}
 
-    <!-- Buscador -->
     <div class="flex items-center gap-2 justify-end !w-full sm:!w-auto ml-auto">
         <div class="relative w-full sm:w-64">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">
@@ -75,7 +74,7 @@ use App\Models\Inscripcion;
             </span>
             <input type="search" name="search" id="custom-search" value="{{ request('search') }}"
                 class="w-full pl-10 pr-4 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs"
-                placeholder="Buscar por código, laboratorio o correo...">
+                placeholder="Buscar por código/nombre del lab">
         </div>
 
         <button type="submit"
@@ -91,56 +90,106 @@ use App\Models\Inscripcion;
         <table class="min-w-full text-sm text-gray-800">
             <thead class="bg-gray-100">
                 <tr>
-                    <th class="px-4 py-2 text-left">Código</th>
-                    <th class="px-4 py-2 text-left">Laboratorio</th>
-                    <th class="px-4 py-2 text-left">Correo</th>
-                    <th class="px-4 py-2 text-left">Paquetes</th>
-                    <th class="px-4 py-2 text-left">Saldo</th>
-                    <th class="px-4 py-2 text-left">Costo</th>
-                    <th class="px-4 py-2 text-left">Cantidad Ins.</th>
-                    <th class="px-4 py-2 text-left">Estado de Cuenta</th>
-                    <th class="px-4 py-2 text-left">Fecha de ultima Ins.</th>
+                    <th>Laboratorio</th>
+                    <th>Paquetes Inscritos</th>
+                    <th>Gestión</th>
+                    <th>Fecha Inscripción</th>
+                    <th># de Pagos</th>
+                    <th>Total Pagado</th>
+                    <th>Saldo</th>
+                    <th>Estado</th>
+                    <th>Detalle de Pagos</th>
                 </tr>
             </thead>
 
             <tbody>
-                @forelse($inscripciones as $ins)
+                @forelse($inscripciones as $row)
                 @php
-                $lab = optional($ins['laboratorio']);
-                $paquetes = $ins['paquetes'];
-
+                $ins = $row['model'];
+                $lab = optional($ins->laboratorio);
                 @endphp
-                <tr class="border-t">
-                    <td class="px-4 py-2 font-medium">
-                        {{ optional($lab)->cod_lab ?? $ins->id_lab }}
-                    </td>
-                    <td class="px-4 py-2">{{ $lab->nombre_lab ?? '-' }}</td>
-                    <td class="px-4 py-2 text-sm text-gray-600">
-                        {{ optional($lab)->mail_lab ?? '-' }}
-                    </td>
+
+                <tr class="border-t align-top">
+                    <!-- Laboratorio -->
                     <td class="px-4 py-2">
-                        @if (!empty($paquetes))
-                        <ul class="list-disc pl-5">
-                            @foreach ($paquetes as $d)
-                            <li class="text-sm">
-                                <span class="font-medium">{{ $d['descripcion_paquete'] }}</span>
-                            </li>
-                            @endforeach
-                        </ul>
-                        @else
-                        <span class="text-sm text-gray-500">—</span>
-                        @endif
+                        <div class="font-medium">{{ $lab->cod_lab ?? '-' }}</div>
+                        <div class="text-xs text-gray-500">{{ $lab->nombre_lab ?? '-' }}</div>
                     </td>
 
-                    <td class="px-4 py-2">{{ $ins['saldo_total'] ?? '-' }}</td>
-                    <td class="px-4 py-2">{{ $ins['costo_total'] ?? '-' }}</td>
-                    <td class="px-4 py-2">{{ $ins['inscripciones_count'] ?? '-' }}</td>
-                    <td class="px-4 py-2">
-                        {{ $ins['deuda_pendiente'] ? Inscripcion::STATUS_CUENTA[Inscripcion::STATUS_DEUDOR] : Inscripcion::STATUS_CUENTA[Inscripcion::STATUS_PAGADO] }}
-                    </td>
                     <td class="px-4 py-2 text-sm text-gray-600">
-                        {{ $ins['ultima_fecha_inscripcion'] ?? '-' }}
+                        {{ $ins->detalleInscripciones->pluck('descripcion_paquete')->implode(', ') ?? '-' }}
                     </td>
+
+                    <!-- Gestión -->
+                    <td class="px-4 py-2">{{ $ins->gestion }}</td>
+
+                    <!-- Fecha inscripción -->
+                    <td class="px-4 py-2 text-sm">
+                        {{ $ins->fecha_inscripcion }}
+                    </td>
+
+                    <!-- Pagos -->
+                    <td class="px-4 py-2">
+                        <div class="text-sm">
+                            {{-- <span class="font-medium">Pagos:</span>  --}}
+                            {{ $row['cantidad_pagos'] }}
+                        </div>
+                    </td>
+
+                    <!-- Total pagado -->
+                    <td class="px-4 py-2 text-green-700 font-medium">
+                        Bs {{ number_format($row['total_pagado'], 2) }}
+                    </td>
+
+                    <!-- Saldo -->
+                    <td class="px-4 py-2 {{ $row['saldo'] > 0 ? 'text-red-600' : 'text-green-600' }}">
+                        Bs {{ number_format($row['saldo'], 2) }}
+                    </td>
+
+                    <!-- Estado cuenta -->
+                    <td class="px-4 py-2">
+                        <span
+                            class="px-2 py-1 rounded text-xs
+                {{ $row['saldo'] > 0 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' }}">
+                            {{ $row['saldo'] > 0 ? 'Pendiente' : 'Pagado' }}
+                        </span>
+                    </td>
+
+                    <!-- Detalle pagos -->
+
+                    <td class="px-4 py-2 text-xs text-gray-700">
+                        @foreach ($ins->pagos as $pago)
+                        <div class="mb-1">
+                            <span class="font-medium text-gray-800">
+                                {{ \Carbon\Carbon::parse($pago->fecha_pago)->format('d/m/Y') }}
+                            </span>
+                            /
+                            <span class="text-xs px-1 rounded font-semibold bg-blue-100 text-blue-700">
+                                {{ $pago->tipo_transaccion }}
+                            </span>
+
+                            <span class="font-bold text-green-700">
+                                / Bs {{ number_format($pago->monto_pagado, 2) }}
+                            </span>
+
+                            @if($pago->nro_tranferencia)
+                            / N°Transf.: {{ $pago->nro_tranferencia }}
+                            @endif
+                            @if($pago->nro_factura)
+                            / Factura: {{ $pago->nro_factura }}
+                            @endif
+
+                            @if($pago->razon_social)
+                            / Razon Social: {{ $pago->razon_social }}
+                            @endif
+
+                            @if($pago->obs_pago)
+                            / Obs: <span class="text-gray-500 italic">{{ $pago->obs_pago }}</span>
+                            @endif
+                        </div>
+                        @endforeach
+                    </td>
+
                 </tr>
                 @empty
                 <tr>
@@ -163,7 +212,6 @@ use App\Models\Inscripcion;
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('filtrosForm');
 
-            // Seleccionamos los inputs que dispararán la actualización
             const inputsAutoSubmit = [
                 document.getElementById('fecha_desde'),
                 document.getElementById('fecha_hasta'),

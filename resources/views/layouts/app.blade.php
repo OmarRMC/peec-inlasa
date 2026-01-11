@@ -186,7 +186,7 @@
                     <img src="{{ asset('img/logoinlasa.png') }}" width="26px" class="mx-auto" style="display: inline"
                         alt="INLASA Logo">
                 </div>
-                © 2025 | <strong>INLASA</strong> Instituto Nacional de Laboratorios de Salud
+                ©  {{ now()->year }} | <strong>INLASA</strong> Instituto Nacional de Laboratorios de Salud
                 <span class="float-right mr-4 text-gray-400">SigPEEC v2</span>
             </footer>
         </div>

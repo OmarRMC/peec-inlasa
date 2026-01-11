@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Exports\InscripcionesExport;
+use App\Exports\PagosExport;
 use App\Http\Controllers\Controller;
 use App\Models\Configuracion;
 use App\Models\Inscripcion;
@@ -106,6 +107,93 @@ class ReporteController extends Controller
         switch ($format) {
             case 'csv':
                 return Excel::download($export, $fileName, \Maatwebsite\Excel\Excel::CSV);
+            case 'xlsx':
+            default:
+                return Excel::download($export, $fileName);
+        }
+    }
+    public function reportePagos(Request $request)
+    {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_PAGOS, Permiso::GESTION_INSCRIPCIONES])) {
+            return redirect()->back()->with('error', 'No tienes permisos para realizar esta acción.');
+        }
+
+        $gestion = $request->query('gestion', now()->year);
+        $search = $request->query('search');
+
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
+        ]) ?? now()->year;
+        $inscripcionesQuery = Inscripcion::with([
+            'laboratorio',
+            'formulario',
+            'pagos'
+        ])
+            ->where('gestion', $gestion)
+            ->whereHas('pagos');
+        if ($search) {
+            $inscripcionesQuery->whereHas('laboratorio', function ($q) use ($search) {
+                $q->where('cod_lab', 'like', "%{$search}%")
+                    ->orWhere('nombre_lab', 'like', "%{$search}%");
+            });
+        }
+        $inscripciones = $inscripcionesQuery
+            ->orderBy('fecha_inscripcion', 'desc')
+            ->paginate(25)
+            ->through(function ($ins) {
+                $totalPagado = $ins->pagos->sum('monto_pagado');
+
+                return [
+                    'model' => $ins,
+                    'total_pagado' => $totalPagado,
+                    'saldo' => $ins->costo_total - $totalPagado,
+                    'cantidad_pagos' => $ins->pagos->count(),
+                    'ultimo_pago' => $ins->pagos->max('fecha_pago'),
+                ];
+            });
+
+        return view('reportes.pagos.index', compact('inscripciones', 'gestion', 'gestiones', 'search'));
+    }
+
+    public function exportReportePagos(Request $request)
+    {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_PAGOS, Permiso::GESTION_INSCRIPCIONES])) {
+            return redirect()->back()->with('error', 'No tienes permisos para realizar esta acción.');
+        }
+
+        $format = $request->query('format', 'xlsx');
+        $fileName = 'reporte_pagos_' . now()->format('Y-m-d_H-i-s') . '.' . $format;
+
+        $export = new PagosExport($request->all());
+        $data = $export->collection();
+        if ($format === 'json') {
+            $headers = $export->headings();
+            $data = $export->collection();
+            return response()->streamDownload(function () use ($headers, $data) {
+                echo json_encode([
+                    'headers' => $headers,
+                    'data' => $data->values(),
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            }, $fileName, [
+                'Content-Type' => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
+            ]);
+            $headers = $export->headings();
+            $data = $export->collection();
+            return response()->streamDownload(function () use ($headers, $data) {
+                echo json_encode([
+                    'headers' => $headers,
+                    'data' => $data->values(),
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            }, $fileName, [
+                'Content-Type' => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
+            ]);
+        }
+
+        switch ($format) {
+            case 'csv':
+                return Excel::download($export, $fileName, \Maatwebsite\Excel\Excel::CSV,  ['Content-Type' => 'text/csv; charset=UTF-8']);
             case 'xlsx':
             default:
                 return Excel::download($export, $fileName);
