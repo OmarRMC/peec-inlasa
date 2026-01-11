@@ -156,7 +156,7 @@
 
         {{-- Pie institucional --}}
         <div class="mt-8 text-center text-xs text-slate-500">
-            © 2025 | Instituto Nacional de Laboratorios de Salud · Programa de Evaluación Externa de la Calidad
+            © {{ now()->year }} | Instituto Nacional de Laboratorios de Salud · Programa de Evaluación Externa de la Calidad
         </div>
     </div>
 </body>

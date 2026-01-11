@@ -201,8 +201,8 @@ use App\Models\Inscripcion;
             </tbody>
         </table>
     </div>
-    <div class="flex justify-between items-center flex-wrap mt-6 gap-2">
-        <div class="flex justify-center">
+    <div class="mt-6">
+        <div class="text-center">
             {{ $inscripciones->appends(request()->except('page'))->links() }}
         </div>
     </div>
