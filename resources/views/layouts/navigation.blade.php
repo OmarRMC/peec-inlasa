@@ -467,6 +467,12 @@
                         <i class="fas fa-file-alt"></i> Reporte de inscripciones
                     </a>
                 @endif
+                @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_PAGOS]))
+                    <a href="{{ route('reportes.pagos.index') }}"
+                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                        <i class="fas fa-file-alt"></i> Reporte de pagos
+                    </a>
+                @endif
             </div>
         </div>
     @endif

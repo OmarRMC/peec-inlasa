@@ -111,4 +111,40 @@ class ReporteController extends Controller
                 return Excel::download($export, $fileName);
         }
     }
+
+    public function reportePagos(Request $request)
+    {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_PAGOS])) {
+            return redirect()->back()->with('error', 'No tienes permisos para realizar esta acción.');
+        }
+
+        $gestion = $request->query('gestion', now()->year); // ejemplo: 2025
+
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
+        ]) ?? now()->year;
+        $inscripciones = Inscripcion::with([
+            'laboratorio',
+            'formulario',
+            'pagos'
+        ])
+            ->where('gestion', $gestion)
+            ->whereHas('pagos')
+            ->orderBy('fecha_inscripcion', 'desc')
+            ->paginate(25)
+            ->through(function ($ins) {
+                $totalPagado = $ins->pagos->sum('monto_pagado');
+
+                return [
+                    'model' => $ins,
+                    'total_pagado' => $totalPagado,
+                    'saldo' => $ins->costo_total - $totalPagado,
+                    'cantidad_pagos' => $ins->pagos->count(),
+                    'ultimo_pago' => $ins->pagos->max('fecha_pago'),
+                ];
+            });
+
+
+        return view('reportes.pagos.index', compact('inscripciones', 'gestion', 'gestiones'));
+    }
 }
