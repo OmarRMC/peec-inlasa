@@ -32,6 +32,13 @@ class Inscripcion extends Model
         self::STATUS_EN_OBSERVACION => 'En observación'
     ];
 
+    const STATUS_INSCRIPCION_VALIDO = [
+        self::STATUS_EN_REVISION => 'En revision',
+        self::STATUS_APROBADO => 'Aprobado/Vencido',
+        self::STATUS_ANULADO => 'Anulado',
+        self::STATUS_EN_OBSERVACION => 'En observación'
+    ];
+
     const STATUS_CUENTA = [
         self::STATUS_PAGADO => 'Pagado',
         self::STATUS_DEUDOR => 'Pendiente',
@@ -161,6 +168,18 @@ class Inscripcion extends Model
         return formatDate($value);
     }
 
+    public function getStatusInscripcionLabelAttribute(): string
+    {
+        if (
+            $this->status_inscripcion === self::STATUS_APROBADO &&
+            $this->gestion < now()->year
+        ) {
+            return self::STATUS_INSCRIPCION[self::STATUS_APROBADO]
+                . '/'
+                . self::STATUS_INSCRIPCION[self::STATUS_VENCIDO];
+        }
+        return self::STATUS_INSCRIPCION[$this->status_inscripcion] ?? 'Desconocido';
+    }
     public function getStatusInscripcion()
     {
         switch ($this->status_inscripcion) {
@@ -277,7 +296,7 @@ class Inscripcion extends Model
         $groups = [];
 
         foreach ($inscripciones as $inscripcion) {
-            $key = $inscripcion->id_lab;
+            $key = $inscripcion->id_lab . '_' . $inscripcion->status_inscripcion;
 
             $saldoInscripcion = max(0, (float) ($inscripcion->saldo ?? 0));
             $paquetesActuales = $inscripcion->paquetes ?? [];
@@ -287,11 +306,15 @@ class Inscripcion extends Model
                     'gestion' => $inscripcion->gestion,
                     'id_lab' => $inscripcion->id_lab,
                     'laboratorio' => $inscripcion->laboratorio ?? null,
+
+                    'status_inscripcion_label' => $inscripcion->getStatusInscripcion(),
+                    'status_cuenta_label' => $inscripcion->getStatusCuenta(),
+                    'status_inscripcion' =>  $inscripcion->status_inscripcion_label,
                     'inscripciones_count' => 1,
                     'costo_total' => (float) $inscripcion->costo_total,
                     'saldo_total' => (float) $saldoInscripcion,
                     'paquetes' => $paquetesActuales,
-                    'ultima_fecha_inscripcion' => $inscripcion->created_at,
+                    'ultima_fecha_inscripcion' => $inscripcion->fecha_inscripcion,
                     'inscripciones_ids' => [$inscripcion->id],
                     'deuda_pendiente' => $saldoInscripcion > 0,
                 ];
@@ -299,21 +322,21 @@ class Inscripcion extends Model
                 $groups[$key]['inscripciones_count']++;
                 $groups[$key]['costo_total'] += (float) $inscripcion->costo_total;
                 $groups[$key]['saldo_total'] += (float) $saldoInscripcion;
-                $merged = collect($groups[$key]['paquetes'])
+
+                $groups[$key]['paquetes'] = collect($groups[$key]['paquetes'])
                     ->merge($paquetesActuales)
                     ->reject(fn($p) => empty($p['id_paquete']))
                     ->unique('id_paquete')
                     ->values()
                     ->toArray();
 
-                $groups[$key]['paquetes'] = $merged;
                 $groups[$key]['inscripciones_ids'][] = $inscripcion->id;
 
                 $timestampNueva = Carbon::createFromFormat(getFormat(), $inscripcion->created_at)->getTimestampMs();
                 $timestampUltima = Carbon::createFromFormat(getFormat(), $groups[$key]['ultima_fecha_inscripcion'])->getTimestampMs();
 
                 if ($timestampNueva > $timestampUltima) {
-                    $groups[$key]['ultima_fecha_inscripcion'] = $inscripcion->created_at;
+                    $groups[$key]['ultima_fecha_inscripcion'] = $inscripcion->fecha_inscripcion;
                 }
 
                 $groups[$key]['deuda_pendiente'] =
@@ -321,7 +344,7 @@ class Inscripcion extends Model
             }
         }
 
-        return collect($groups);
+        return collect($groups)->values();
     }
 
     public function scopeEnEspera($query)

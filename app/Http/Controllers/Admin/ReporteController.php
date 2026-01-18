@@ -30,8 +30,15 @@ class ReporteController extends Controller
             return redirect()->back()->with('error', 'No tienes permisos para realizar esta acción.');
         }
         $query = Inscripcion::query()
-            ->aprobadoOrVencido()
             ->with(['detalleInscripciones', 'laboratorio', 'pagos', 'laboratorio.departamento']);
+
+        if ($request->filled('status_inscripcion')) {
+            if ($request->status_inscripcion == Inscripcion::STATUS_APROBADO || $request->status_inscripcion == Inscripcion::STATUS_VENCIDO) {
+                $query->whereIn('status_inscripcion', [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO]);
+            } else {
+                $query->where('status_inscripcion', $request->status_inscripcion);
+            }
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;

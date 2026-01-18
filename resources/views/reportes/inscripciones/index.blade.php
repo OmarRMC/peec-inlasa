@@ -53,7 +53,15 @@ use App\Models\Inscripcion;
                     @endforeach
                 </select>
             </div>
-
+            <select id="filter-status-inscripcion" name="status_inscripcion"
+                class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[180px]">
+                <option value="">Estados de Inscripción</option>
+                @foreach (Inscripcion::STATUS_INSCRIPCION_VALIDO as $key => $value)
+                <option value="{{ $key }}" 
+                {{ (request('status_inscripcion') ?? null) == $key ? 'selected' : '' }}
+                    >{{ $value }}</option>
+                @endforeach
+            </select>
             <!-- Fecha desde / hasta -->
             {{-- <div class="flex items-center gap-2">
                     <label for="fecha_desde" class="whitespace-nowrap text-sm">Desde</label>
@@ -100,6 +108,7 @@ use App\Models\Inscripcion;
                     <th class="px-4 py-2 text-left">Cantidad Ins.</th>
                     <th class="px-4 py-2 text-left">Estado de Cuenta</th>
                     <th class="px-4 py-2 text-left">Fecha de ultima Ins.</th>
+                    <th class="px-4 py-2 text-left">Estado de inscripcion</th>
                 </tr>
             </thead>
 
@@ -141,6 +150,9 @@ use App\Models\Inscripcion;
                     <td class="px-4 py-2 text-sm text-gray-600">
                         {{ $ins['ultima_fecha_inscripcion'] ?? '-' }}
                     </td>
+                    <td class="px-4 py-2 text-sm text-gray-600">
+                        {!! $ins['status_inscripcion_label'] ?? '-' !!}
+                    </td>
                 </tr>
                 @empty
                 <tr>
@@ -168,6 +180,7 @@ use App\Models\Inscripcion;
                 document.getElementById('fecha_desde'),
                 document.getElementById('fecha_hasta'),
                 document.getElementById('filter-gestion'),
+                document.getElementById('filter-status-inscripcion'),
                 document.getElementById('per_page')
             ];
             inputsAutoSubmit.forEach(input => {

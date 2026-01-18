@@ -29,6 +29,7 @@ class InscripcionesExport implements FromCollection, WithHeadings, WithStyles, W
             'Saldo',
             'Costo Total',
             'Estado de cuenta',
+            'Estado de inscripcion',
         ];
 
         $this->headersLaboratorio = [
@@ -58,7 +59,6 @@ class InscripcionesExport implements FromCollection, WithHeadings, WithStyles, W
     {
         $inscripciones = Inscripcion::all();
         $query = Inscripcion::query()
-            ->aprobadoOrVencido()
             ->with(['detalleInscripciones', 'laboratorio.tipo', 'laboratorio.categoria', 'laboratorio.nivel', 'pagos', 'laboratorio.departamento', 'laboratorio.provincia', 'laboratorio.municipio']);
 
         if (isset($this->filters['search'])) {
@@ -84,6 +84,13 @@ class InscripcionesExport implements FromCollection, WithHeadings, WithStyles, W
             $query->where('gestion', $this->filters['gestion']);
         } else {
             $query->where('gestion', now()->year);
+        }
+        if (isset($this->filters['status_inscripcion'])) {
+            if ($this->filters['status_inscripcion'] == Inscripcion::STATUS_APROBADO || $this->filters['status_inscripcion'] == Inscripcion::STATUS_VENCIDO) {
+                $query->whereIn('status_inscripcion', [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO]);
+            } else {
+                $query->where('status_inscripcion', $this->filters['status_inscripcion']);
+            }
         }
 
         $inscripciones = $query
@@ -125,6 +132,7 @@ class InscripcionesExport implements FromCollection, WithHeadings, WithStyles, W
             $row['Saldo'] = $item['saldo_total'] ?? '';
             $row['Costo Total'] = $item['costo_total'];
             $row['Estados de cuenta'] = $item['deuda_pendiente'] ? Inscripcion::STATUS_CUENTA[Inscripcion::STATUS_DEUDOR] : Inscripcion::STATUS_CUENTA[Inscripcion::STATUS_PAGADO];
+            $row['Estado de inscripcion'] = $item['status_inscripcion'];
             return $row;
         });
         return $data;
@@ -201,13 +209,53 @@ class InscripcionesExport implements FromCollection, WithHeadings, WithStyles, W
 
     public function columnWidths(): array
     {
-        return [
-            'A' => 5,
-            'B' => 15,
-            'C' => 30,
-            'D' => 20,
-            'E' => 20,
-            // Las demás columnas se ajustarán automáticamente
+        $widths = [];
+
+        $laboratorioWidths = [
+            5,   // NRO
+            10,  // Código
+            35,  // Nombre Laboratorio
+            25,  // Correo 1
+            25,  // Correo 2
+            12,  // Sigla
+            15,  // Tipo
+            15,  // Nivel
+            18,  // Categoría
+            25,  // Responsable
+            18,  // CI Responsable
+            25,  // Representante Legal
+            20,  // CI Representante Legal
+            18,  // Departamento
+            18,  // Provincia
+            18,  // Municipio
+            30,  // Dirección
+            15,  // Cel. 1
+            15,  // Cel. 2
         ];
+
+        $colIndex = 1;
+
+        foreach ($laboratorioWidths as $width) {
+            $widths[\PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex)] = $width;
+            $colIndex++;
+        }
+
+        foreach ($this->paquetes as $paquete) {
+            $widths[\PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex)] = 8;
+            $colIndex++;
+        }
+
+        $resumenWidths = [
+            6,
+            8,
+            8,
+            10,
+            20,
+        ];
+        foreach ($resumenWidths as $width) {
+            $widths[\PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex)] = $width;
+            $colIndex++;
+        }
+        return $widths;
     }
 }
