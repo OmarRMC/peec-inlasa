@@ -4,6 +4,10 @@
     </IfModule>
 
     RewriteEngine On
+    
+	# SI ES UNA PETICIÓN DE LET'S ENCRYPT, NO HACER NADA (DETENER REGLAS)
+	RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/ [NC]
+	RewriteRule ^ - [L]
 
     # --- BLOQUE 1: Forzar HTTPS ---
     RewriteCond %{HTTPS} off
