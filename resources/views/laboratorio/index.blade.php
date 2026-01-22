@@ -1,9 +1,9 @@
 @php
-    $estados = [
-        '1' => 'Activo',
-        '0' => 'Inactivo',
-    ];
-    use App\Models\Permiso;
+$estados = [
+'1' => 'Activo',
+'0' => 'Inactivo',
+];
+use App\Models\Permiso;
 @endphp
 <x-app-layout>
     <div class="px-4 max-w-6xl mx-auto">
@@ -26,10 +26,10 @@
         <div class="flex justify-between items-center flex-wrap gap-4">
             <h1 class="text-xl font-bold text-gray-800">Lista de Laboratorios</h1>
             @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_LABORATORIO]))
-                <a href="{{ route('laboratorio.create') }}"
-                    class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition shadow-md text-sm">
-                    <i class="fas fa-plus-circle"></i> Nuevo Laboratorio
-                </a>
+            <a href="{{ route('laboratorio.create') }}"
+                class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition shadow-md text-sm">
+                <i class="fas fa-plus-circle"></i> Nuevo Laboratorio
+            </a>
             @endif
         </div>
 
@@ -37,10 +37,20 @@
         <div class="flex justify-between items-center flex-wrap gap-3 mb-4 text-sm">
             <!-- Filtros ubicación -->
             <div class="flex flex-wrap gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <label for="custom-length" class="whitespace-nowrap">Mostrar</label>
+                    <select id="custom-length"
+                        class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[80px]">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                    <span class="whitespace-nowrap">registros</span>
+                </div>
                 <select id="filter-pais" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todos los Países</option>
                     @foreach ($paises as $pais)
-                        <option value="{{ $pais->id }}">{{ $pais->nombre_pais }}</option>
+                    <option value="{{ $pais->id }}">{{ $pais->nombre_pais }}</option>
                     @endforeach
                 </select>
                 <select id="filter-dep" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]"
@@ -62,26 +72,26 @@
                 <select id="filter-tipo" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todos los Tipos</option>
                     @foreach ($tipos as $tipo)
-                        <option value="{{ $tipo->id }}">{{ $tipo->descripcion }}</option>
+                    <option value="{{ $tipo->id }}">{{ $tipo->descripcion }}</option>
                     @endforeach
                 </select>
                 <select id="filter-categoria"
                     class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todas las Categorías</option>
                     @foreach ($categorias as $categoria)
-                        <option value="{{ $categoria->id }}">{{ $categoria->descripcion }}</option>
+                    <option value="{{ $categoria->id }}">{{ $categoria->descripcion }}</option>
                     @endforeach
                 </select>
                 <select id="filter-status" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todos los Estados</option>
                     @foreach ($estados as $key => $valor)
-                        <option value="{{ $key }}">{{ $valor }}</option>
+                    <option value="{{ $key }}">{{ $valor }}</option>
                     @endforeach
                 </select>
                 <select id="filter-gestiones-disponibles" class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todos los gestiones</option>
                     @foreach ($gestionesDisponibles as $key => $valor)
-                        <option value="{{ $valor }}">{{ $valor }}</option>
+                    <option value="{{ $valor }}">{{ $valor }}</option>
                     @endforeach
                 </select>
             </div>
@@ -129,156 +139,159 @@
     </div>
 
     @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                let table = $('#labs-table').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: "{{ route('laboratorio.ajax.data') }}",
-                        data: function(d) {
-                            d.pais = $('#filter-pais').val();
-                            d.dep = $('#filter-dep').val();
-                            d.prov = $('#filter-prov').val();
-                            d.municipio = $('#filter-mun').val();
-                            d.tipo = $('#filter-tipo').val();
-                            d.categoria = $('#filter-categoria').val();
-                            // d.nivel = $('#filter-nivel').val();
-                            d.gestionesDisponibles = $('#filter-gestiones-disponibles').val(),
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let table = $('#labs-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('laboratorio.ajax.data') }}",
+                    data: function(d) {
+                        d.pais = $('#filter-pais').val();
+                        d.dep = $('#filter-dep').val();
+                        d.prov = $('#filter-prov').val();
+                        d.municipio = $('#filter-mun').val();
+                        d.tipo = $('#filter-tipo').val();
+                        d.categoria = $('#filter-categoria').val();
+                        // d.nivel = $('#filter-nivel').val();
+                        d.gestionesDisponibles = $('#filter-gestiones-disponibles').val(),
                             d.status = $('#filter-status').val();
-                        }
+                    }
+                },
+                order: [
+                    [1, 'desc']
+                ],
+                columns: [{
+                        data: 'actions',
+                        name: 'actions',
+                        orderable: false,
+                        searchable: false
                     },
-                    order: [
-                        [1, 'desc']
-                    ],
-                    columns: [{
-                            data: 'actions',
-                            name: 'actions',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'created_at',
-                            name: 'created_at',
-                        },
-                        {
-                            data: 'cod_lab',
-                            name: 'cod_lab'
-                        },
-                        {
-                            data: 'nombre_lab',
-                            name: 'nombre_lab'
-                        },
-                        {
-                            data: 'email',
-                            name: 'usuario.email',
-                        },
-                        {
-                            data: 'wapp_lab',
-                            name: 'wapp_lab'
-                        },
-                        {
-                            data: 'departamento_nombre',
-                            name: 'departamento.nombre_dep'
-                        },
-                        {
-                            data: 'status_label',
-                            name: 'status',
-                        },
-                    ],
-                    language: {
-                        url: "{{ asset('translation/es.json') }}"
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
                     },
-                    dom: 'rt',
-                    lengthChange: false,
-                    drawCallback: function() {
-                        tippy('[data-tippy-content]');
-                        confirmDelete({
-                            csrfToken: '{{ csrf_token() }}',
-                            table
-                        });
-                        setupPagination(table);
-                    }
-                });
-
-                $('#filter-tipo, #filter-categoria').on('change', () => table.draw());
-                $('#filter-status').on('change', () => table.draw());
-                $('#filter-gestiones-disponibles').on('change', () => table.draw());
-                $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());
-                $('#custom-search').on('keypress', e => {
-                    if (e.which === 13) table.search($('#custom-search').val()).draw();
-                });
-
-                $('#filter-pais').on('change', async function() {
-                    const pais = this.value;
-                    $('#filter-dep').prop('disabled', !pais).html('<option>Cargando...</option>');
-                    if (!pais) {
-                        resetFilters(['dep', 'prov', 'mun']);
-                        return;
-                    }
-                    const data = await fetch(`{{ url('/api/admin/departamento') }}/${pais}`).then(r => r
-                        .json());
-                    $('#filter-dep').html('<option value="">Todos</option>' + data.map(d =>
-                        `<option value="${d.id}">${d.nombre_dep}</option>`)).prop('disabled', false);
-                    resetFilters(['prov', 'mun']);
-                    table.draw();
-                });
-                $('#filter-dep').on('change', async function() {
-                    const dep = this.value;
-                    $('#filter-prov').prop('disabled', !dep).html('<option>Cargando...</option>');
-                    if (!dep) {
-                        resetFilters(['prov', 'mun']);
-                        return;
-                    }
-                    const data = await fetch(`{{ url('/api/admin/provincia') }}/${dep}`).then(r => r
-                        .json());
-                    $('#filter-prov').html('<option value="">Todos</option>' + data.map(d =>
-                        `<option value="${d.id}">${d.nombre_prov}</option>`)).prop('disabled', false);
-                    resetFilters(['mun']);
-                    table.draw();
-                });
-                $('#filter-prov').on('change', async function() {
-                    const prov = this.value;
-                    $('#filter-mun').prop('disabled', !prov).html('<option>Cargando...</option>');
-                    if (!prov) {
-                        resetFilters(['mun']);
-                        return;
-                    }
-                    const data = await fetch(`{{ url('/api/admin/municipio') }}/${prov}`).then(r => r
-                        .json());
-                    $('#filter-mun').html('<option value="">Todos</option>' + data.map(d =>
-                        `<option value="${d.id}">${d.nombre_municipio}</option>`)).prop('disabled',
-                        false);
-                    table.draw();
-                });
-                $('#filter-mun').on('change', () => table.draw());
-
-                function resetFilters(ids) {
-                    ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i}</option>`)
-                        .prop('disabled', true));
-                    table.draw();
-                }
-
-                function exportLaboratorios(format = 'xlsx') {
-                    const params = new URLSearchParams({
-                        pais: $('#filter-pais').val(),
-                        dep: $('#filter-dep').val(),
-                        prov: $('#filter-prov').val(),
-                        municipio: $('#filter-mun').val(),
-                        tipo: $('#filter-tipo').val(),
-                        categoria: $('#filter-categoria').val(),
-                        status: $('#filter-status').val(),
-                        search: $('#custom-search').val(),
-                        gestionesDisponibles: $('#filter-gestiones-disponibles').val(),
-                        format: format
+                    {
+                        data: 'cod_lab',
+                        name: 'cod_lab'
+                    },
+                    {
+                        data: 'nombre_lab',
+                        name: 'nombre_lab'
+                    },
+                    {
+                        data: 'email',
+                        name: 'usuario.email',
+                    },
+                    {
+                        data: 'wapp_lab',
+                        name: 'wapp_lab'
+                    },
+                    {
+                        data: 'departamento_nombre',
+                        name: 'departamento.nombre_dep'
+                    },
+                    {
+                        data: 'status_label',
+                        name: 'status',
+                    },
+                ],
+                language: {
+                    url: "{{ asset('translation/es.json') }}"
+                },
+                dom: 'rt',
+                lengthChange: false,
+                drawCallback: function() {
+                    tippy('[data-tippy-content]');
+                    confirmDelete({
+                        csrfToken: '{{ csrf_token() }}',
+                        table
                     });
-
-                    window.location.href = `{{ route('laboratorio.export') }}?${params.toString()}`;
+                    setupPagination(table);
                 }
-                $('#btn-export').on('click', () => exportLaboratorios('xlsx'));
-                $('#btn-export-csv').on('click', () => exportLaboratorios('csv'));
-                $('#btn-export-json').on('click', () => exportLaboratorios('json'));
             });
-        </script>
+
+            $('#filter-tipo, #filter-categoria').on('change', () => table.draw());
+            $('#filter-status').on('change', () => table.draw());
+            $('#filter-gestiones-disponibles').on('change', () => table.draw());
+            $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());
+            $('#custom-search').on('keypress', e => {
+                if (e.which === 13) table.search($('#custom-search').val()).draw();
+            });
+
+            $('#custom-length').on('change', function() {
+                table.page.len(this.value).draw();
+            });
+            $('#filter-pais').on('change', async function() {
+                const pais = this.value;
+                $('#filter-dep').prop('disabled', !pais).html('<option>Cargando...</option>');
+                if (!pais) {
+                    resetFilters(['dep', 'prov', 'mun']);
+                    return;
+                }
+                const data = await fetch(`{{ url('/api/admin/departamento') }}/${pais}`).then(r => r
+                    .json());
+                $('#filter-dep').html('<option value="">Todos</option>' + data.map(d =>
+                    `<option value="${d.id}">${d.nombre_dep}</option>`)).prop('disabled', false);
+                resetFilters(['prov', 'mun']);
+                table.draw();
+            });
+            $('#filter-dep').on('change', async function() {
+                const dep = this.value;
+                $('#filter-prov').prop('disabled', !dep).html('<option>Cargando...</option>');
+                if (!dep) {
+                    resetFilters(['prov', 'mun']);
+                    return;
+                }
+                const data = await fetch(`{{ url('/api/admin/provincia') }}/${dep}`).then(r => r
+                    .json());
+                $('#filter-prov').html('<option value="">Todos</option>' + data.map(d =>
+                    `<option value="${d.id}">${d.nombre_prov}</option>`)).prop('disabled', false);
+                resetFilters(['mun']);
+                table.draw();
+            });
+            $('#filter-prov').on('change', async function() {
+                const prov = this.value;
+                $('#filter-mun').prop('disabled', !prov).html('<option>Cargando...</option>');
+                if (!prov) {
+                    resetFilters(['mun']);
+                    return;
+                }
+                const data = await fetch(`{{ url('/api/admin/municipio') }}/${prov}`).then(r => r
+                    .json());
+                $('#filter-mun').html('<option value="">Todos</option>' + data.map(d =>
+                    `<option value="${d.id}">${d.nombre_municipio}</option>`)).prop('disabled',
+                    false);
+                table.draw();
+            });
+            $('#filter-mun').on('change', () => table.draw());
+
+            function resetFilters(ids) {
+                ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i}</option>`)
+                    .prop('disabled', true));
+                table.draw();
+            }
+
+            function exportLaboratorios(format = 'xlsx') {
+                const params = new URLSearchParams({
+                    pais: $('#filter-pais').val(),
+                    dep: $('#filter-dep').val(),
+                    prov: $('#filter-prov').val(),
+                    municipio: $('#filter-mun').val(),
+                    tipo: $('#filter-tipo').val(),
+                    categoria: $('#filter-categoria').val(),
+                    status: $('#filter-status').val(),
+                    search: $('#custom-search').val(),
+                    gestionesDisponibles: $('#filter-gestiones-disponibles').val(),
+                    format: format
+                });
+
+                window.location.href = `{{ route('laboratorio.export') }}?${params.toString()}`;
+            }
+            $('#btn-export').on('click', () => exportLaboratorios('xlsx'));
+            $('#btn-export-csv').on('click', () => exportLaboratorios('csv'));
+            $('#btn-export-json').on('click', () => exportLaboratorios('json'));
+        });
+    </script>
     @endpush
 </x-app-layout>
