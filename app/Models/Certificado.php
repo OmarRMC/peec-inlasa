@@ -114,4 +114,9 @@ class Certificado extends Model
                     " . self::STATUS_CERTIFICADO[self::STATUS_HABILITADO] . "
                 </span>";
     }
+
+    public function plantilla()
+    {
+        return $this->belongsTo(PlantillaCertificado::class, 'plantilla_certificado_id');
+    }
 }

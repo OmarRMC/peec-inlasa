@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\NivelLaboratorioController;
 use App\Http\Controllers\Admin\PagoController;
 use App\Http\Controllers\Admin\PaisController;
 use App\Http\Controllers\Admin\PaqueteController;
+use App\Http\Controllers\Admin\PlantillaCertificadoController;
 use App\Http\Controllers\Admin\ProgramaController;
 use App\Http\Controllers\Admin\ProvinciaController;
 use App\Http\Controllers\Admin\ReporteController;
@@ -56,6 +57,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function () {
+    Route::get('/plantillas-certificados/{plantilla}/preview', [PlantillaCertificadoController::class, 'preview'])
+        ->name('plantillas-certificados.preview');
+    Route::resource('plantillas-certificados', PlantillaCertificadoController::class)
+        ->except(['show']);
     Route::get('/cargos/data', [CargoController::class, 'getData'])->name('cargos.data');
     Route::resource('cargos', CargoController::class)->except(['show']);
     Route::resource('permiso', PermisoController::class)->except(['show']);
