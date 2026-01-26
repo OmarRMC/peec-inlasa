@@ -27,7 +27,8 @@ class PlantillaCertificadoController extends Controller
             ->orderByDesc('id')
             ->paginate(10);
 
-        return view('certificados.plantillas.index', compact('plantillas'));
+        $plantillaDefaultId = PlantillaCertificado::query()->oldest()->value('id');
+        return view('certificados.plantillas.index', compact('plantillas', 'plantillaDefaultId'));
     }
 
     public function create()
@@ -86,6 +87,13 @@ class PlantillaCertificadoController extends Controller
 
     public function destroy(PlantillaCertificado $plantillas_certificado)
     {
+        $plantillaDefault = PlantillaCertificado::query()->oldest()->first();
+        if ($plantillaDefault && $plantillas_certificado->id === $plantillaDefault->id) {
+            return redirect()
+                ->route('plantillas-certificados.index')
+                ->with('error', 'No se puede eliminar la plantilla por defecto (la más antigua).');
+        }
+
         if ($plantillas_certificado->certificados()->exists()) {
             return redirect()
                 ->route('plantillas-certificados.index')

@@ -78,7 +78,7 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
 
-                                {{-- Eliminar --}}
+                                @if($tpl->id !== $plantillaDefaultId)
                                 <form method="POST" action="{{ route('plantillas-certificados.destroy', $tpl->id) }}"
                                     class="delete-form inline" data-nombre="{{ $tpl->nombre }}">
                                     @csrf
@@ -89,6 +89,12 @@
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>
+                                @else
+                                <span data-tippy-content="Plantilla por defecto (no eliminable)"
+                                    class="bg-gray-100 text-gray-400 px-2 py-1 rounded shadow-sm cursor-not-allowed">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                @endif
                             </div>
                         </td>
                     </tr>
