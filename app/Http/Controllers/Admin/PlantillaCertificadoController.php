@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certificado;
+use App\Models\Permiso;
 use App\Models\PlantillaCertificado;
 use App\Utils\StorageHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -18,6 +20,9 @@ class PlantillaCertificadoController extends Controller
 {
     public function index()
     {
+        if (!Gate::any([Permiso::GESTION_CERTIFICADOS, Permiso::ADMIN])) {
+            return redirect('/')->with('error', 'No tienes permiso para acceder a esta sección.');
+        }
         $plantillas = PlantillaCertificado::query()
             ->orderByDesc('id')
             ->paginate(10);
@@ -143,7 +148,7 @@ class PlantillaCertificadoController extends Controller
         $elements = $plantilla->getElementos();
 
         $pdf = Pdf::loadView('certificados.plantillas.preview', [
-            'type'=> Certificado::TYPE_DESEMP,
+            'type' => Certificado::TYPE_DESEMP,
             'plantilla' => $plantilla,
             'background' => $backgroundDataUri,
             'firmas' => $firmas,
