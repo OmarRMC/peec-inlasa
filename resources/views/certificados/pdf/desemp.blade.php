@@ -5,7 +5,6 @@
             $cert = $detalles['certificado'];
         @endphp
 
-        {{-- <body style="padding: 0px; margin: 0px; page-break-after: always;background-image: url('{{ public_path('certificados/gestion2024.png') }}');"> --}}
         <body style="page-break-after: always;">
             <div class="ribbon">
                 <div class="img">

@@ -3,7 +3,6 @@
 @endphp
 @extends('certificados.pdf.layout')
 @section('contenido')
-    {{-- <body style="background-image: url('{{ public_path('certificados/fondo.png') }}');"> --}}
 
     <body>
         <div class="ribbon">
