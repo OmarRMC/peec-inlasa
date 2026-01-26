@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\NivelLaboratorioController;
 use App\Http\Controllers\Admin\PagoController;
 use App\Http\Controllers\Admin\PaisController;
 use App\Http\Controllers\Admin\PaqueteController;
+use App\Http\Controllers\Admin\PlantillaCertificadoController;
 use App\Http\Controllers\Admin\ProgramaController;
 use App\Http\Controllers\Admin\ProvinciaController;
 use App\Http\Controllers\Admin\ReporteController;
@@ -56,6 +57,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function () {
+    Route::get('/plantillas-certificados/{plantilla}/preview', [PlantillaCertificadoController::class, 'preview'])
+        ->name('plantillas-certificados.preview');
+    Route::resource('plantillas-certificados', PlantillaCertificadoController::class)
+        ->except(['show']);
     Route::get('/cargos/data', [CargoController::class, 'getData'])->name('cargos.data');
     Route::resource('cargos', CargoController::class)->except(['show']);
     Route::resource('permiso', PermisoController::class)->except(['show']);
@@ -84,6 +89,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/searchLab', [LaboratorioController::class, 'getLabBySearch'])->name('getSearchLab');
     Route::get('/certificados', [CertificadoController::class, 'index'])->name('admin.certificado.index');
     Route::get('/certificados/ajax', [CertificadoController::class, 'getDataCertificado'])->name('admin.certificado.ajax.index');
+    Route::post('/certificados/update-plantilla', [CertificadoController::class, 'updatePlantilla'])->name('admin.certificado.update-plantilla');
     Route::get('/certificados/{idLaboratorio}/descargar/{gestion}/{type}', [CertificadoController::class, 'descargarCertificado'])->name('admin.certificado.descargar');
 
     Route::prefix('inscripcion')->group(function () {

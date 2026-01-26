@@ -13,6 +13,7 @@ use App\Models\InscripcionEA;
 use App\Models\NivelLaboratorio;
 use App\Models\Pais;
 use App\Models\Permiso;
+use App\Models\PlantillaCertificado;
 use App\Models\TipoLaboratorio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -167,9 +168,11 @@ class LaboratorioController extends Controller
     public function uploadCertificadoData(Request $request, $id)
     {
         if (!Gate::any([Permiso::JEFE_PEEC]) && !Configuracion::estaHabilitadoCargarCertificado()) {
-            return response()->json([
-                'error' => 'El periodo para la carga de desempeño no está habilitado actualmente.'
-            ], 422);
+             return redirect()->back()->with('notice', [
+                'title' => 'Error del periodo de registro',
+                'message' => 'El periodo para la carga de desempeño no está habilitado actualmente.',
+                'type' => 'error',
+            ]);
         }
         $responsable = Auth::user();
         $ensayosAptitud = null;
@@ -179,7 +182,7 @@ class LaboratorioController extends Controller
             $ensayosAptitud = $responsable->responsablesEA->find($id);
         }
         if (!$ensayosAptitud) {
-            return redirect('/')->with('error', 'No se tiene el ensayo de aptitud solicitado.');
+            return redirect()->back()->with('error', 'No se tiene el ensayo de aptitud solicitado.');
         }
 
         $request->validate([
@@ -187,7 +190,6 @@ class LaboratorioController extends Controller
         ]);
 
         $path = $request->file('archivo')->getRealPath();
-
         $rows = collect();
         if (($handle = fopen($path, 'r')) !== false) {
             $header = fgetcsv($handle, 1000, ','); // cabecera
@@ -208,7 +210,7 @@ class LaboratorioController extends Controller
         ])
             ->where('id_ea', $id)
             ->whereHas('inscripcion', function ($q) use ($request) {
-                $q->where('gestion', $request->query('gestion', now()->year))
+                $q->where('gestion', $request->query('gestion', $request->query('gestion', now()->year)))
                     ->aprobadoOrVencido();
             })
             ->get();
@@ -217,6 +219,7 @@ class LaboratorioController extends Controller
         $configCoordRed = configuracion(Configuracion::CARGO_COORDINADORA_RED);
         $configEvalExt = configuracion(Configuracion::CARGO_EVALUACION_EXTERNA);
 
+        $plantillaSeleccionada = PlantillaCertificado::where('activo', PlantillaCertificado::SELECCIONADO)->first();
         foreach ($inscripciones as $inscripcionEA) {
             $inscripcion = $inscripcionEA->inscripcion;
             $lab = $inscripcion->laboratorio;
@@ -239,20 +242,10 @@ class LaboratorioController extends Controller
                 ['id_inscripcion' => $inscripcion->id],
                 [
                     'gestion_certificado' => $inscripcion->gestion,
-                    'nombre_coordinador' => $configCoordRed->nombre,
-                    'nombre_jefe' => $configEvalExt->nombre,
-                    'nombre_director' => $configDirGen->nombre,
-                    'firma_coordinador' => $configCoordRed->imagen,
-                    'firma_jefe' => $configEvalExt->imagen,
-                    'firma_director' => $configDirGen->imagen,
                     'nombre_laboratorio' => $lab->nombre_lab,
                     'cod_lab' => $lab->cod_lab,
-                    'codigo_certificado' => null,
-                    'tipo_certificado' => 1,
                     'status_certificado' => 0,
-                    'cargo_coordinador' => $configCoordRed->cargo,
-                    'cargo_jefe' => $configEvalExt->cargo,
-                    'cargo_director' => $configDirGen->cargo
+                    'plantilla_certificado_id' => $plantillaSeleccionada?->id,
                 ]
             );
             DetalleCertificado::updateOrCreate(
@@ -396,7 +389,7 @@ class LaboratorioController extends Controller
             }
         ])
             ->where('gestion', $gestion)
-            ->Aprobado()
+            ->aprobadoOrVencido()
             ->whereHas('ensayos', function ($q) use ($idEa) {
                 $q->where('id_ea', $idEa);
             })

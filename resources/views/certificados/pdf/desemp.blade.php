@@ -5,7 +5,6 @@
             $cert = $detalles['certificado'];
         @endphp
 
-        {{-- <body style="padding: 0px; margin: 0px; page-break-after: always;background-image: url('{{ public_path('certificados/gestion2024.png') }}');"> --}}
         <body style="page-break-after: always;">
             <div class="ribbon">
                 <div class="img">
@@ -34,8 +33,7 @@
                 <!-- Cuerpo -->
                 <div class="content">
                     <p class="center">
-                        Por su desempeño en el Programa de Evaluación Externa de la Calidad del Instituto Nacional de
-                        Laboratorios de Salud - PEEC INLASA, en el área de:
+                        {{ $descripcionTexto ?? 'Por su desempeño en el Programa de Evaluación Externa de la Calidad del Instituto Nacional de Laboratorios de Salud - PEEC INLASA, en el área de:' }}
                     </p>
                     <div class='evaluaciones'>
                         <div class="area">{{ mb_strtoupper($area) }}</div>

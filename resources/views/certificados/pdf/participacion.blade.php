@@ -3,7 +3,6 @@
 @endphp
 @extends('certificados.pdf.layout')
 @section('contenido')
-    {{-- <body style="background-image: url('{{ public_path('certificados/fondo.png') }}');"> --}}
 
     <body>
         <div class="ribbon">
@@ -33,8 +32,7 @@
             <!-- Cuerpo -->
             <div class="content">
                 <p class="center">
-                    Por su participación en el Programa de Evaluación Externa de la Calidad del
-                    Instituto Nacional de Laboratorios de Salud - PEEC INLASA, en
+                    {{ $descripcionTexto ?? 'Por su participación en el Programa de Evaluación Externa de la Calidad del Instituto Nacional de Laboratorios de Salud - PEEC INLASA, en' }}
                 </p>
                 <div class='evaluaciones'>
                     <div class="ensayos">{{ mb_strtoupper($ensayosA) }}</div>

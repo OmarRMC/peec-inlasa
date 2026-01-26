@@ -1,7 +1,7 @@
 @php
-    use App\Models\Inscripcion;
-    use App\Models\Permiso;
-    use App\Models\Certificado;
+use App\Models\Inscripcion;
+use App\Models\Permiso;
+use App\Models\Certificado;
 @endphp
 
 <x-app-layout>
@@ -27,7 +27,7 @@
                     class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                     <option value="">Todas las Gestiones</option>
                     @foreach ($gestiones as $gestion)
-                        <option value="{{ $gestion }}">{{ $gestion }}</option>
+                    <option value="{{ $gestion }}">{{ $gestion }}</option>
                     @endforeach
                 </select>
 
@@ -37,7 +37,7 @@
                         class="border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[160px]">
                         <option value="">Estados de certificado</option>
                         @foreach (Certificado::STATUS_CERTIFICADO as $key => $value)
-                            <option value="{{ $key }}">{{ $value }}</option>
+                        <option value="{{ $key }}">{{ $value }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -73,6 +73,7 @@
                             <th class="px-4 py-2 text-left">Laboratorio</th>
                             <th class="px-4 py-2 text-left">Código</th>
                             <th class="px-4 py-2 text-left">Gestión</th>
+                            <th class="px-4 py-2 text-left">Plantilla</th>
                             <th class="px-4 py-2 text-left">Participacion</th>
                             <th class="px-4 py-2 text-left">Desempeño</th>
                             <th class="px-4 py-2 text-left">Estado</th>
@@ -86,76 +87,148 @@
             </div>
         </div>
         @push('scripts')
-            <script>
-                const filtrosPaquetes = new Set();
-                document.addEventListener('DOMContentLoaded', function() {
-                    const table = $('#inscripciones-table').DataTable({
-                        processing: true,
-                        serverSide: true,
-                        ajax: {
-                            url: "{{ route('admin.certificado.ajax.index') }}",
-                            data: function(d) {
-                                d.pais = $('#filter-pais').val();
-                                d.estado = $('#filter-status').val();
-                                d.gestion = $('#filter-gestion').val();
-                            }
+        <script>
+            const filtrosPaquetes = new Set();
+            const plantillasDisponibles = @json($plantillas);
+
+            function renderPlantillaSelect(data, type, row) {
+                let options = '<option value="">Sin plantilla</option>';
+                plantillasDisponibles.forEach(p => {
+                    const selected = (row.plantilla_id == p.id) ? 'selected' : '';
+                    options += `<option value="${p.id}" ${selected}>${p.nombre}</option>`;
+                });
+                return `<select class="plantilla-select border-gray-300 rounded-md shadow-sm text-xs px-2 py-1 min-w-[140px]"
+                                data-id-lab="${row.idLab}"
+                                data-gestion="${row.gestion}">
+                                ${options}
+                            </select>`;
+            }
+
+            function updatePlantilla(idLab, gestion, plantillaId, selectElement) {
+                const originalValue = selectElement.dataset.originalValue || '';
+
+                fetch("{{ route('admin.certificado.update-plantilla') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
                         },
-                        order: [
-                            [1, 'desc']
-                        ],
-                        columns: [{
-                                data: 'laboratorio',
-                                name: 'laboratorio'
-                            },
-                            {
-                                data: 'codigo_lab',
-                                name: 'codigo_lab'
-                            },
-                            {
-                                data: 'gestion',
-                                name: 'gestion'
-                            },
-                            {
-                                data: 'participacion',
-                                name: 'participacion'
-                            },
-                            {
-                                data: 'desempeño',
-                                name: 'desempeño'
-                            },
-                            {
-                                data: 'estado',
-                                name: 'estado'
-                            }
-                        ],
-                        language: {
-                            url: "{{ asset('translation/es.json') }}"
-                        },
-                        dom: 'rt',
-                        lengthChange: false,
-                        drawCallback: () => {
-                            tippy('[data-tippy-content]');
-                            setupPagination(table);
+                        body: JSON.stringify({
+                            id_laboratorio: idLab,
+                            gestion: gestion,
+                            plantilla_id: plantillaId || null
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            selectElement.dataset.originalValue = plantillaId;
+                            showToast({
+                                title: 'Plantilla actualizada correctamente.'
+                            });
+                        } else {
+                            selectElement.value = originalValue;
+                            showError('Error: ' + (data.error || 'No se pudo actualizar'))
                         }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        selectElement.value = originalValue;
+                        alert('Error al actualizar la plantilla');
                     });
-                    $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());
-                    $('#custom-search').on('keypress', e => {
-                        if (e.which === 13) table.search($('#custom-search').val()).draw();
-                    });
-                    $('#custom-length').on('change', function() {
-                        table.page.len(this.value).draw();
-                    });
-                    // $('#filter-pais').on('change', () => table.draw());
+            }
 
-                    $('#filter-status').on('change', () => table.draw());
+            document.addEventListener('DOMContentLoaded', function() {
+                const table = $('#inscripciones-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('admin.certificado.ajax.index') }}",
+                        data: function(d) {
+                            d.pais = $('#filter-pais').val();
+                            d.estado = $('#filter-status').val();
+                            d.gestion = $('#filter-gestion').val();
+                        }
+                    },
+                    order: [
+                        [1, 'desc']
+                    ],
+                    columns: [{
+                            data: 'laboratorio',
+                            name: 'laboratorio'
+                        },
+                        {
+                            data: 'codigo_lab',
+                            name: 'codigo_lab'
+                        },
+                        {
+                            data: 'gestion',
+                            name: 'gestion'
+                        },
+                        {
+                            data: 'plantilla_id',
+                            name: 'plantilla',
+                            render: renderPlantillaSelect,
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'participacion',
+                            name: 'participacion'
+                        },
+                        {
+                            data: 'desempeño',
+                            name: 'desempeño'
+                        },
+                        {
+                            data: 'estado',
+                            name: 'estado'
+                        }
+                    ],
+                    language: {
+                        url: "{{ asset('translation/es.json') }}"
+                    },
+                    dom: 'rt',
+                    lengthChange: false,
+                    drawCallback: () => {
+                        tippy('[data-tippy-content]');
+                        setupPagination(table);
 
-                    $('#filter-gestion').on('change', () => table.draw());
-
-                    function resetFilters(ids) {
-                        ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i}</option>`)
-                            .prop('disabled', true));
+                        // Guardar valores originales y agregar listeners a los selects
+                        document.querySelectorAll('.plantilla-select').forEach(select => {
+                            select.dataset.originalValue = select.value;
+                        });
                     }
                 });
-            </script>
+
+                // Delegación de eventos para los selects de plantilla
+                $('#inscripciones-table').on('change', '.plantilla-select', function() {
+                    const select = this;
+                    const idLab = select.dataset.idLab;
+                    const gestion = select.dataset.gestion;
+                    const plantillaId = select.value;
+                    updatePlantilla(idLab, gestion, plantillaId, select);
+                });
+
+                $('#btn-search').on('click', () => table.search($('#custom-search').val()).draw());
+                $('#custom-search').on('keypress', e => {
+                    if (e.which === 13) table.search($('#custom-search').val()).draw();
+                });
+                $('#custom-length').on('change', function() {
+                    table.page.len(this.value).draw();
+                });
+                // $('#filter-pais').on('change', () => table.draw());
+
+                $('#filter-status').on('change', () => table.draw());
+
+                $('#filter-gestion').on('change', () => table.draw());
+
+                function resetFilters(ids) {
+                    ids.forEach(i => $(`#filter-${i}`).html(`<option value="">Seleccione ${i}</option>`)
+                        .prop('disabled', true));
+                }
+            });
+        </script>
         @endpush
 </x-app-layout>

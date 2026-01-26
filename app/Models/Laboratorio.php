@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Utils\StorageHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -323,20 +324,23 @@ class Laboratorio extends Model
         $query = $this->inscripciones()
             ->aprobadoOrVencido()
             ->whereHas('certificado', fn($query) => $query->Publicado())
-            ->where('gestion', $gestion);
-
-        $ins = $query->with('certificado')
+            ->where('gestion', $gestion)->with([
+                'certificado.detalles',
+                'certificado.plantilla',
+            ]);
+        $inscripcion = $query->with('certificado')
             ->first();
-        if (!$ins) {
+        if (!$inscripcion) {
             return redirect('/')
                 ->with('info', '⚠️ No se encontraron certificados registrados para la gestión seleccionada.');
         }
-        $certificado = $ins->certificado;
-        $codigoCertificado = $ins->ulid ?? $ins->id;
-        $query = $this->inscripciones()
-            ->aprobadoOrVencido()
-            ->whereHas('certificado', fn($query) => $query->Publicado())
-            ->where('gestion', $gestion);
+        $plantilla = null;
+        $codigoCertificado = $inscripcion->ulid ?? $inscripcion->id;
+
+        $certificado = $inscripcion->certificado;
+        if ($certificado->plantilla) {
+            $plantilla = $certificado->plantilla;
+        }
         $ensayosA = $query
             ->whereHas('certificado.detalles')
             ->with(['certificado.detalles'])
@@ -345,15 +349,68 @@ class Laboratorio extends Model
             ->flatten()
             ->pluck('detalle_ea')
             ->implode(', ');
-        $url = route('verificar.certificado', ['code' => $codigoCertificado, 'type' => Certificado::TYPE_PARTICIPACION]);
-        $qr = base64_encode(
-            QrCode::format('png')->size(220)->margin(1)->generate($url)
+        $verifyUrl = route('verificar.certificado', [
+            'code' => $codigoCertificado,
+            'type' => Certificado::TYPE_PARTICIPACION,
+        ]);
+        $qrBase64 = base64_encode(
+            QrCode::format('png')->size(320)->margin(1)->generate($verifyUrl)
         );
-        // return view('certificados.pdf.participacion', ['ensayosA' => $ensayosA, 'certificado' => $certificado, 'qr' => $qr]);
-        $pdf = Pdf::loadView('certificados.pdf.participacion', ['ensayosA' => $ensayosA, 'certificado' => $certificado, 'qr' => $qr])
-            ->setPaper('A4', 'portrait');
+        $qrDataUri = "data:image/png;base64,{$qrBase64}";
+        if (!$plantilla) {
+            $plantillaDefault = PlantillaCertificado::query()
+                ->oldest()
+                ->first();
+            $firmas = $plantillaDefault ? $plantillaDefault->getFirmas() : [];
+            $descripcionTexto = $plantillaDefault ? $plantillaDefault->descripcion_part_text : null;
+            $notaTexto = $plantillaDefault ? data_get($plantillaDefault->diseno, 'nota.text', '') : null;
+
+            $pdf = Pdf::loadView('certificados.pdf.participacion', [
+                'ensayosA' => $ensayosA,
+                'certificado' => $certificado,
+                'qr' => $qrDataUri,
+                'firmas' => $firmas,
+                'descripcionTexto' => $descripcionTexto,
+                'notaTexto' => $notaTexto,
+            ])->setPaper('A4', 'portrait');
+
+            $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
+
+            return $pdf->stream("certificado-participacion-{$gestion}.pdf");
+        }
+
+        $backgroundDataUri = StorageHelper::storageUrlToDataUri($plantilla->imagen_fondo);
+        $firmas = $plantilla->getFirmas();
+        $paper = $plantilla->paperFromMm();
+        $nombreLaboratorio = $this->nombre_lab ?? '';
+        $descripcion = $plantilla->descripcion_part ?? ($plantilla->descripcion ?? '');
+
+        $diseno = $plantilla->diseno ?? [];
+        $qrConfig = $diseno['qr'] ?? [];
+        $notaConfig = $diseno['nota'] ?? [];
+        $elements = $plantilla->getElementos();
+
+        $pdf = Pdf::loadView('certificados.plantillas.preview', [
+            'type' => Certificado::TYPE_PARTICIPACION,
+            'plantilla' => $plantilla,
+            'background' => $backgroundDataUri,
+            'firmas' => $firmas,
+            'qr' => $qrDataUri,
+            'qrConfig' => $qrConfig,
+            'notaConfig' => $notaConfig,
+            'elements' => $elements,
+
+            'nombreLaboratorio' => $nombreLaboratorio,
+            'gestion' => $gestion,
+
+            'ensayosA' => $ensayosA,
+
+            'descripcion' => $descripcion,
+            'diseno' => $diseno,
+        ])->setPaper($paper);
+
         $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
-        return $pdf->stream('certificados-particiapcion.pdf');
+        return $pdf->stream("certificado-participacion-{$gestion}.pdf");
     }
 
     public function descargarCertificadoDesemp($gestion)
@@ -363,16 +420,23 @@ class Laboratorio extends Model
             ->whereHas('certificado', fn($query) => $query->Publicado())
             ->where('gestion', $gestion)
             ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
-            ->with(['certificado.detalles'])
+            ->with([
+                'certificado.detalles',
+                'certificado.plantilla',
+            ])
             ->get();
         if ($inscripciones->isEmpty()) {
             return redirect('/')
                 ->with('info', '⚠️ No se encontraron certificados registrados para la gestión seleccionada.');
         }
+        $plantilla = null;
         $dataPorArea = [];
-        $codigoCertificado = '';
+        $codigoCertificado = null;
         foreach ($inscripciones as $inscripcion) {
             $certificado = $inscripcion->certificado;
+            if ($certificado->plantilla) {
+                $plantilla = $certificado->plantilla;
+            }
             $detalles = $certificado->detalles;
 
             if ($detalles->isEmpty()) continue;
@@ -394,16 +458,68 @@ class Laboratorio extends Model
                 $codigoCertificado = $inscripcion->ulid ?? $inscripcion->id;
             }
         }
-        $url = route('verificar.certificado', ['code' => $codigoCertificado, 'type' => Certificado::TYPE_DESEMP]);
-        $qr = base64_encode(
-            QrCode::format('png')->size(400)->margin(1)->generate($url)
-        );
-        $pdf = Pdf::loadView('certificados.pdf.desemp', ['data' => $dataPorArea, 'qr' => $qr])
-            ->setPaper('A4', 'portrait');
-        $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
 
-        $response = $pdf->stream('certificados-desempeno.pdf');
-        return $response;
+        if (empty($dataPorArea) || !$codigoCertificado) {
+            return redirect('/')
+                ->with('info', '⚠️ No se encontraron detalles válidos para generar el certificado.');
+        }
+        $verifyUrl = route('verificar.certificado', [
+            'code' => $codigoCertificado,
+            'type' => Certificado::TYPE_DESEMP,
+        ]);
+        $qrBase64 = base64_encode(
+            QrCode::format('png')->size(320)->margin(1)->generate($verifyUrl)
+        );
+        $qrDataUri = "data:image/png;base64,{$qrBase64}";
+        if (!$plantilla) {
+            $plantillaDefault = PlantillaCertificado::query()
+                ->oldest()
+                ->first();
+            $firmas = $plantillaDefault ? $plantillaDefault->getFirmas() : [];
+            $descripcionTexto = $plantillaDefault ? $plantillaDefault->descripcion_desmp_text : null;
+            $notaTexto = $plantillaDefault ? data_get($plantillaDefault->diseno, 'nota.text', '') : null;
+
+            $pdf = Pdf::loadView('certificados.pdf.desemp', [
+                'data' => $dataPorArea,
+                'qr' => $qrDataUri,
+                'firmas' => $firmas,
+                'descripcionTexto' => $descripcionTexto,
+                'notaTexto' => $notaTexto,
+            ])->setPaper('A4', 'portrait');
+            $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
+
+            $response = $pdf->stream('certificados-desempeno.pdf');
+            return $response;
+        }
+        $backgroundDataUri = StorageHelper::storageUrlToDataUri($plantilla->imagen_fondo);
+        $firmas = $plantilla->getFirmas();
+        $paper = $plantilla->paperFromMm();
+        $nombreLaboratorio = $this->nombre_lab ?? '';
+        $descripcion = $plantilla->descripcion_desmp;
+
+        $diseno = $plantilla->diseno ?? [];
+        $qrConfig = $diseno['qr'] ?? [];
+        $notaConfig = $diseno['nota'] ?? [];
+
+        $elements = $plantilla->getElementos();
+
+        $pdf = Pdf::loadView('certificados.plantillas.preview', [
+            'type' => Certificado::TYPE_DESEMP,
+            'plantilla' => $plantilla,
+            'background' => $backgroundDataUri,
+            'firmas' => $firmas,
+            'qr' => $qrDataUri,
+            'qrConfig' => $qrConfig,
+            'notaConfig' => $notaConfig,
+            'elements' => $elements,
+            'nombreLaboratorio' => $nombreLaboratorio,
+            'gestion' => $gestion,
+            'areas' => $dataPorArea,
+            'descripcion' => $descripcion,
+            'diseno' => $diseno,
+        ])->setPaper($paper);
+        $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
+        return $pdf->stream("certificado-desempeno-{$gestion}.pdf");
     }
 
     public function getCalleAttribute()

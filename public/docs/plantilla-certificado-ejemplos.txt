@@ -1,0 +1,1106 @@
+================================================================================
+     GUIA COMPLETA DE JSON PARA PLANTILLAS DE CERTIFICADOS
+                         PEEC INLASA
+================================================================================
+
+Este documento contiene ejemplos detallados para configurar los campos JSON
+de las plantillas de certificados.
+
+CAMPOS DISPONIBLES:
+  - descripcion_desmp : Texto principal del certificado (ej: "Por su desempeno...")
+  - descripcion_part  : Nota/disclaimer del certificado
+  - diseno            : Configuracion visual completa (QR, nota, elementos)
+
+================================================================================
+                    TABLA DE CONTENIDOS
+================================================================================
+
+1. DESCRIPCION DESMP (descripcion_desmp)
+2. DESCRIPCION PART (descripcion_part)
+3. DISENO - Estructura general
+4. ELEMENTOS DINAMICOS (elements)
+   4.1 Elemento tipo TEXTO
+   4.2 Elemento tipo QR
+   4.3 Elemento tipo IMAGEN
+5. PROPIEDADES CSS DISPONIBLES
+6. PROPIEDADES DE POSICION Y TAMANO
+7. EJEMPLOS COMPLETOS POR CASO DE USO
+8. ERRORES COMUNES Y SOLUCIONES
+
+
+================================================================================
+1. DESCRIPCION DESMP (descripcion_desmp)
+================================================================================
+
+Este campo define el texto principal que aparece en el certificado,
+generalmente describiendo el motivo del reconocimiento.
+
+ESTRUCTURA:
+{
+    "text": "El texto que aparecera en el certificado",
+    "style": {
+        "propiedad-css": "valor"
+    }
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 1.1 - Basico sin formato
+--------------------------------------------------------------------------------
+{
+    "text": "Por su desempeno en el Programa de Evaluacion Externa de la Calidad del Instituto Nacional de Laboratorios de Salud - PEEC INLASA, en el area de:",
+    "style": {
+        "font-size": "13pt",
+        "color": "#111111"
+    }
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 1.2 - Con negritas usando Markdown
+--------------------------------------------------------------------------------
+{
+    "text": "Por su desempeno en el **Programa de Evaluacion Externa de la Calidad** del Instituto Nacional de Laboratorios de Salud - **PEEC INLASA**, en el area de:",
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "600",
+        "text-align": "center",
+        "color": "#333333",
+        "line-height": "1.4"
+    }
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 1.3 - Texto formal con multiples lineas
+--------------------------------------------------------------------------------
+{
+    "text": "Por su destacada **participacion** y **desempeno** en el Programa de Evaluacion Externa de la Calidad del Instituto Nacional de Laboratorios de Salud, durante la gestion correspondiente, en el area de:",
+    "style": {
+        "font-size": "12pt",
+        "font-weight": "500",
+        "text-align": "justify",
+        "color": "#222222",
+        "line-height": "1.5"
+    }
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 1.4 - Estilo corporativo
+--------------------------------------------------------------------------------
+{
+    "text": "El **Instituto Nacional de Laboratorios de Salud** reconoce el compromiso con la calidad demostrado en el area de:",
+    "style": {
+        "font-size": "15pt",
+        "font-weight": "700",
+        "text-align": "center",
+        "color": "#1a365d",
+        "letter-spacing": "0.5pt"
+    }
+}
+
+
+================================================================================
+2. DESCRIPCION PART (descripcion_part)
+================================================================================
+
+Este campo define la nota o disclaimer que aparece generalmente al pie
+del certificado con informacion adicional o legal.
+
+--------------------------------------------------------------------------------
+EJEMPLO 2.1 - Nota estandar
+--------------------------------------------------------------------------------
+{
+    "text": "El PEEC INLASA extiende el presente Certificado unicamente a los Laboratorios Clinicos que cumplieron con el porcentaje de participacion y/o desempeno exigido, segun procedimientos internos; respaldados por los Informes de Evaluacion emitidos durante la gestion.",
+    "style": {
+        "font-size": "5pt",
+        "color": "#333333",
+        "text-align": "justify"
+    }
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 2.2 - Nota con formato italico
+--------------------------------------------------------------------------------
+{
+    "text": "Este certificado es valido unicamente con el codigo QR de verificacion. Para validar la autenticidad, escanee el codigo QR o visite nuestro sitio web.",
+    "style": {
+        "font-size": "6pt",
+        "color": "#666666",
+        "font-style": "italic",
+        "text-align": "center"
+    }
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 2.3 - Nota legal extendida
+--------------------------------------------------------------------------------
+{
+    "text": "**NOTA IMPORTANTE:** Este documento es un reconocimiento oficial emitido por el PEEC INLASA. Cualquier alteracion o reproduccion no autorizada sera sancionada conforme a ley. Documento valido sin firmas ni sellos adicionales cuando se verifica mediante codigo QR.",
+    "style": {
+        "font-size": "5.5pt",
+        "color": "#444444",
+        "text-align": "justify",
+        "line-height": "1.3"
+    }
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 2.4 - Nota minimalista
+--------------------------------------------------------------------------------
+{
+    "text": "Gestion {{ gestion }} - La Paz, Bolivia",
+    "style": {
+        "font-size": "7pt",
+        "color": "#888888",
+        "text-align": "center"
+    }
+}
+
+
+================================================================================
+3. DISENO - ESTRUCTURA GENERAL
+================================================================================
+
+El campo "diseno" es el mas completo y permite configurar:
+- Posicion y tamano del codigo QR
+- Nota/disclaimer con posicion personalizada
+- Elementos dinamicos adicionales (textos, imagenes, QRs extras)
+
+ESTRUCTURA BASICA:
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": { ... },
+    "nota": { ... },
+    "elements": [ ... ]
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 3.1 - Estructura minima
+--------------------------------------------------------------------------------
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": {
+        "position": {
+            "right": 6,
+            "bottom": 6
+        },
+        "size": {
+            "width": 20,
+            "height": 20
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 3.2 - Con QR y nota
+--------------------------------------------------------------------------------
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": {
+        "position": {
+            "right": 8,
+            "bottom": 8
+        },
+        "size": {
+            "width": 22,
+            "height": 22
+        }
+    },
+    "nota": {
+        "text": "Certificado oficial del PEEC INLASA",
+        "position": {
+            "left": 40,
+            "bottom": 10
+        },
+        "size": {
+            "width": 100
+        },
+        "style": {
+            "font-size": "6pt",
+            "color": "#555555",
+            "text-align": "center"
+        }
+    }
+}
+
+--------------------------------------------------------------------------------
+EJEMPLO 3.3 - Completo con elementos
+--------------------------------------------------------------------------------
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": {
+        "position": {
+            "right": 10,
+            "bottom": 10
+        },
+        "size": {
+            "width": 25,
+            "height": 25
+        }
+    },
+    "nota": {
+        "text": "El PEEC INLASA extiende el presente Certificado...",
+        "position": {
+            "left": 30,
+            "bottom": 12
+        },
+        "size": {
+            "width": 120
+        },
+        "style": {
+            "font-size": "5pt",
+            "text-align": "justify"
+        }
+    },
+    "elements": [
+        {
+            "type": "text",
+            "text": "Gestion {{ gestion }}",
+            "position": {
+                "left": 0,
+                "right": 0,
+                "bottom": 25
+            },
+            "style": {
+                "text-align": "center",
+                "font-size": "10pt",
+                "font-weight": "700"
+            }
+        }
+    ]
+}
+
+
+================================================================================
+4. ELEMENTOS DINAMICOS (elements)
+================================================================================
+
+Los elementos son componentes adicionales que puedes agregar al certificado.
+Se definen dentro del array "elements" en el campo "diseno".
+
+TIPOS DISPONIBLES:
+  - text  : Bloques de texto con formato
+  - qr    : Codigos QR adicionales
+  - image : Imagenes (logos, sellos, iconos)
+
+VARIABLES DISPONIBLES EN TEXTOS:
+  - {{ gestion }}           : Ano de gestion (ej: 2026)
+  - {{ area }}              : Area del certificado (ej: ANALISIS CLINICOS)
+  - {{ nombreLaboratorio }} : Nombre completo del laboratorio
+
+FORMATO MARKDOWN SOPORTADO:
+  - **texto**  : Negrita
+  - *texto*    : Cursiva
+  - ***texto*** : Negrita y cursiva
+
+
+--------------------------------------------------------------------------------
+4.1 ELEMENTO TIPO TEXTO
+--------------------------------------------------------------------------------
+
+ESTRUCTURA:
+{
+    "type": "text",
+    "text": "El texto a mostrar",
+    "position": {
+        "left": 0,
+        "top": 0
+    },
+    "size": {
+        "width": 100,
+        "height": 20
+    },
+    "style": {
+        "font-size": "12pt"
+    }
+}
+
+--- EJEMPLO: Texto simple ---
+{
+    "type": "text",
+    "text": "CERTIFICADO DE PARTICIPACION",
+    "position": {
+        "left": 0,
+        "right": 0,
+        "top": 40
+    },
+    "style": {
+        "text-align": "center",
+        "font-size": "18pt",
+        "font-weight": "900",
+        "color": "#1a1a1a",
+        "text-transform": "uppercase"
+    }
+}
+
+--- EJEMPLO: Texto con variables ---
+{
+    "type": "text",
+    "text": "Otorgado a: **{{ nombreLaboratorio }}**",
+    "position": {
+        "left": 20,
+        "top": 70
+    },
+    "size": {
+        "width": 200
+    },
+    "style": {
+        "font-size": "14pt",
+        "color": "#333333"
+    }
+}
+
+--- EJEMPLO: Texto en el area especifica ---
+{
+    "type": "text",
+    "text": "Area: **{{ area }}**",
+    "position": {
+        "left": 0,
+        "right": 0,
+        "top": 100
+    },
+    "style": {
+        "text-align": "center",
+        "font-size": "16pt",
+        "font-weight": "700",
+        "color": "#b8860b"
+    }
+}
+
+--- EJEMPLO: Gestion centrada al pie ---
+{
+    "type": "text",
+    "text": "Gestion {{ gestion }}",
+    "position": {
+        "left": 0,
+        "right": 0,
+        "bottom": 20
+    },
+    "style": {
+        "text-align": "center",
+        "font-size": "11pt",
+        "font-weight": "600"
+    }
+}
+
+--- EJEMPLO: Ciudad y pais ---
+{
+    "type": "text",
+    "text": "La Paz - Bolivia",
+    "position": {
+        "left": 0,
+        "right": 0,
+        "bottom": 8
+    },
+    "style": {
+        "text-align": "center",
+        "font-size": "8pt",
+        "color": "#666666",
+        "font-style": "italic"
+    }
+}
+
+--- EJEMPLO: Texto en esquina ---
+{
+    "type": "text",
+    "text": "Codigo: CERT-2026-001",
+    "position": {
+        "right": 10,
+        "top": 10
+    },
+    "size": {
+        "width": 50
+    },
+    "style": {
+        "font-size": "7pt",
+        "color": "#999999",
+        "text-align": "right"
+    }
+}
+
+--- EJEMPLO: Parrafo justificado ---
+{
+    "type": "text",
+    "text": "Por haber demostrado excelencia en los procesos de evaluacion externa de calidad, cumpliendo satisfactoriamente con todos los requisitos establecidos por el programa.",
+    "position": {
+        "left": 25,
+        "top": 85
+    },
+    "size": {
+        "width": 160
+    },
+    "style": {
+        "font-size": "11pt",
+        "text-align": "justify",
+        "line-height": "1.4"
+    }
+}
+
+
+--------------------------------------------------------------------------------
+4.2 ELEMENTO TIPO QR
+--------------------------------------------------------------------------------
+
+Permite agregar codigos QR adicionales (el QR principal se configura
+en la seccion "qr" del diseno).
+
+ESTRUCTURA:
+{
+    "type": "qr",
+    "position": {
+        "left": 0,
+        "bottom": 0
+    },
+    "size": {
+        "width": 20,
+        "height": 20
+    }
+}
+
+--- EJEMPLO: QR esquina inferior derecha ---
+{
+    "type": "qr",
+    "position": {
+        "right": 10,
+        "bottom": 10
+    },
+    "size": {
+        "width": 25,
+        "height": 25
+    }
+}
+
+--- EJEMPLO: QR esquina superior izquierda ---
+{
+    "type": "qr",
+    "position": {
+        "left": 8,
+        "top": 8
+    },
+    "size": {
+        "width": 18,
+        "height": 18
+    }
+}
+
+--- EJEMPLO: QR pequeno junto a texto ---
+{
+    "type": "qr",
+    "position": {
+        "left": 15,
+        "bottom": 15
+    },
+    "size": {
+        "width": 15,
+        "height": 15
+    }
+}
+
+--- EJEMPLO: QR grande centrado ---
+{
+    "type": "qr",
+    "position": {
+        "left": 95,
+        "bottom": 30
+    },
+    "size": {
+        "width": 35,
+        "height": 35
+    }
+}
+
+
+--------------------------------------------------------------------------------
+4.3 ELEMENTO TIPO IMAGEN
+--------------------------------------------------------------------------------
+
+Permite agregar imagenes como logos, sellos, firmas, iconos, etc.
+
+FUENTES DE IMAGEN SOPORTADAS:
+  - URLs LOCALES  : /storage/ruta/a/imagen.png
+  - URLs EXTERNAS : https://ejemplo.com/imagen.png
+
+FORMATOS SOPORTADOS:
+  - PNG (recomendado)
+  - JPG/JPEG
+  - GIF
+  - WEBP
+  - SVG
+
+ESTRUCTURA:
+{
+    "type": "image",
+    "src": "URL de la imagen",
+    "position": {
+        "left": 0,
+        "top": 0
+    },
+    "size": {
+        "width": 30,
+        "height": 30
+    }
+}
+
+--- EJEMPLO: Logo institucional arriba ---
+{
+    "type": "image",
+    "src": "/storage/certificados/logos/logo-inlasa.png",
+    "position": {
+        "left": 0,
+        "right": 0,
+        "top": 10
+    },
+    "size": {
+        "width": 40,
+        "height": 40
+    }
+}
+
+--- EJEMPLO: Sello en esquina ---
+{
+    "type": "image",
+    "src": "/storage/certificados/sellos/sello-oficial.png",
+    "position": {
+        "right": 15,
+        "bottom": 40
+    },
+    "size": {
+        "width": 35,
+        "height": 35
+    }
+}
+
+--- EJEMPLO: Imagen desde internet ---
+{
+    "type": "image",
+    "src": "https://ejemplo.com/logos/ministerio-salud.png",
+    "position": {
+        "left": 10,
+        "top": 5
+    },
+    "size": {
+        "width": 50,
+        "height": 25
+    }
+}
+
+--- EJEMPLO: Icono decorativo ---
+{
+    "type": "image",
+    "src": "/storage/certificados/iconos/medalla.png",
+    "position": {
+        "left": 130,
+        "top": 55
+    },
+    "size": {
+        "width": 20,
+        "height": 20
+    }
+}
+
+--- EJEMPLO: Firma digital ---
+{
+    "type": "image",
+    "src": "/storage/certificados/firmas/firma-director.png",
+    "position": {
+        "left": 80,
+        "bottom": 45
+    },
+    "size": {
+        "width": 60,
+        "height": 25
+    }
+}
+
+NOTAS IMPORTANTES SOBRE IMAGENES:
+  - Las imagenes externas se descargan automaticamente
+  - El tiempo de generacion aumenta con imagenes externas
+  - Usar formato PNG para mejor calidad
+  - Imagenes muy grandes pueden afectar el rendimiento
+
+
+================================================================================
+5. PROPIEDADES CSS DISPONIBLES
+================================================================================
+
+Estas propiedades se usan dentro del objeto "style" de cada elemento.
+
+--------------------------------------------------------------------------------
+TIPOGRAFIA
+--------------------------------------------------------------------------------
+font-size        : Tamano de fuente
+                   Valores: "8pt", "10pt", "12pt", "14pt", "16pt", "18pt"...
+
+font-weight      : Grosor de fuente
+                   Valores: "400" (normal), "500", "600", "700" (bold),
+                            "800", "900" (extra bold)
+
+font-style       : Estilo de fuente
+                   Valores: "normal", "italic"
+
+font-family      : Familia de fuente
+                   Valores: "Arial", "DejaVu Sans", "Helvetica"
+
+letter-spacing   : Espaciado entre letras
+                   Valores: "0.2pt", "0.5pt", "1pt", "1px"
+
+line-height      : Altura de linea
+                   Valores: "1", "1.25", "1.4", "1.5", "2"
+
+--------------------------------------------------------------------------------
+COLOR
+--------------------------------------------------------------------------------
+color            : Color del texto
+                   Valores: "#000000", "#333333", "#666666", "#999999"
+                            "#1a365d" (azul oscuro), "#b8860b" (dorado)
+                            "rgb(0,0,0)", "rgba(0,0,0,0.8)"
+
+--------------------------------------------------------------------------------
+ALINEACION
+--------------------------------------------------------------------------------
+text-align       : Alineacion horizontal del texto
+                   Valores: "left", "center", "right", "justify"
+
+vertical-align   : Alineacion vertical
+                   Valores: "top", "middle", "bottom"
+
+--------------------------------------------------------------------------------
+TRANSFORMACION
+--------------------------------------------------------------------------------
+text-transform   : Transformacion de texto
+                   Valores: "uppercase" (MAYUSCULAS)
+                            "lowercase" (minusculas)
+                            "capitalize" (Primera Letra Mayuscula)
+
+--------------------------------------------------------------------------------
+COLORES COMUNES
+--------------------------------------------------------------------------------
+Negro puro       : "#000000"
+Negro suave      : "#111111", "#1a1a1a"
+Gris oscuro      : "#333333", "#444444"
+Gris medio       : "#666666", "#777777"
+Gris claro       : "#999999", "#aaaaaa"
+Azul corporativo : "#1a365d", "#2c5282"
+Dorado           : "#b8860b", "#d4a017"
+Rojo             : "#c53030", "#e53e3e"
+Verde            : "#276749", "#38a169"
+
+
+================================================================================
+6. PROPIEDADES DE POSICION Y TAMANO
+================================================================================
+
+Todas las medidas estan en MILIMETROS (mm).
+
+--------------------------------------------------------------------------------
+POSITION - Posicion del elemento
+--------------------------------------------------------------------------------
+left   : Distancia desde el borde IZQUIERDO
+right  : Distancia desde el borde DERECHO
+top    : Distancia desde el borde SUPERIOR
+bottom : Distancia desde el borde INFERIOR
+
+NOTA: Para centrar horizontalmente, usar "left": 0 y "right": 0 juntos
+      combinado con "text-align": "center" en style.
+
+--------------------------------------------------------------------------------
+SIZE - Tamano del elemento
+--------------------------------------------------------------------------------
+width  : Ancho del elemento
+height : Alto del elemento (opcional para texto)
+
+--------------------------------------------------------------------------------
+EJEMPLOS DE POSICIONAMIENTO
+--------------------------------------------------------------------------------
+
+--- Centrado horizontal arriba ---
+{
+    "position": {
+        "left": 0,
+        "right": 0,
+        "top": 30
+    },
+    "style": {
+        "text-align": "center"
+    }
+}
+
+--- Esquina superior izquierda ---
+{
+    "position": {
+        "left": 10,
+        "top": 10
+    }
+}
+
+--- Esquina superior derecha ---
+{
+    "position": {
+        "right": 10,
+        "top": 10
+    }
+}
+
+--- Esquina inferior izquierda ---
+{
+    "position": {
+        "left": 10,
+        "bottom": 10
+    }
+}
+
+--- Esquina inferior derecha ---
+{
+    "position": {
+        "right": 10,
+        "bottom": 10
+    }
+}
+
+--- Centrado horizontal abajo ---
+{
+    "position": {
+        "left": 0,
+        "right": 0,
+        "bottom": 15
+    },
+    "style": {
+        "text-align": "center"
+    }
+}
+
+--- Posicion especifica con tamano ---
+{
+    "position": {
+        "left": 25,
+        "top": 80
+    },
+    "size": {
+        "width": 160,
+        "height": 40
+    }
+}
+
+
+================================================================================
+7. EJEMPLOS COMPLETOS POR CASO DE USO
+================================================================================
+
+--------------------------------------------------------------------------------
+CASO 1: Certificado simple con QR y gestion
+--------------------------------------------------------------------------------
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": {
+        "position": {
+            "right": 8,
+            "bottom": 8
+        },
+        "size": {
+            "width": 22,
+            "height": 22
+        }
+    },
+    "elements": [
+        {
+            "type": "text",
+            "text": "Gestion {{ gestion }}",
+            "position": {
+                "left": 0,
+                "right": 0,
+                "bottom": 20
+            },
+            "style": {
+                "text-align": "center",
+                "font-size": "10pt",
+                "font-weight": "700"
+            }
+        }
+    ]
+}
+
+--------------------------------------------------------------------------------
+CASO 2: Certificado con nota legal
+--------------------------------------------------------------------------------
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": {
+        "position": {
+            "right": 10,
+            "bottom": 10
+        },
+        "size": {
+            "width": 20,
+            "height": 20
+        }
+    },
+    "nota": {
+        "text": "El PEEC INLASA extiende el presente Certificado unicamente a los Laboratorios Clinicos que cumplieron con el porcentaje de participacion y/o desempeno exigido.",
+        "position": {
+            "left": 35,
+            "bottom": 12
+        },
+        "size": {
+            "width": 100
+        },
+        "style": {
+            "font-size": "5pt",
+            "color": "#444444",
+            "text-align": "justify"
+        }
+    },
+    "elements": [
+        {
+            "type": "text",
+            "text": "Gestion {{ gestion }}",
+            "position": {
+                "left": 0,
+                "right": 0,
+                "bottom": 22
+            },
+            "style": {
+                "text-align": "center",
+                "font-size": "10pt",
+                "font-weight": "600"
+            }
+        }
+    ]
+}
+
+--------------------------------------------------------------------------------
+CASO 3: Certificado con logo e imagen de internet
+--------------------------------------------------------------------------------
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": {
+        "position": {
+            "right": 8,
+            "bottom": 8
+        },
+        "size": {
+            "width": 25,
+            "height": 25
+        }
+    },
+    "elements": [
+        {
+            "type": "image",
+            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Escudo_de_Bolivia.svg/200px-Escudo_de_Bolivia.svg.png",
+            "position": {
+                "left": 10,
+                "top": 8
+            },
+            "size": {
+                "width": 20,
+                "height": 25
+            }
+        },
+        {
+            "type": "text",
+            "text": "ESTADO PLURINACIONAL DE BOLIVIA",
+            "position": {
+                "left": 35,
+                "top": 12
+            },
+            "size": {
+                "width": 150
+            },
+            "style": {
+                "font-size": "9pt",
+                "font-weight": "600",
+                "color": "#1a365d"
+            }
+        },
+        {
+            "type": "text",
+            "text": "Gestion {{ gestion }} - La Paz, Bolivia",
+            "position": {
+                "left": 0,
+                "right": 0,
+                "bottom": 15
+            },
+            "style": {
+                "text-align": "center",
+                "font-size": "9pt",
+                "font-weight": "500"
+            }
+        }
+    ]
+}
+
+--------------------------------------------------------------------------------
+CASO 4: Certificado completo con multiples elementos
+--------------------------------------------------------------------------------
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": {
+        "position": {
+            "right": 10,
+            "bottom": 10
+        },
+        "size": {
+            "width": 28,
+            "height": 28
+        }
+    },
+    "nota": {
+        "text": "**NOTA:** Este certificado es valido unicamente con codigo QR verificable. El PEEC INLASA extiende el presente reconocimiento a los laboratorios que cumplieron satisfactoriamente con los criterios de evaluacion.",
+        "position": {
+            "left": 45,
+            "bottom": 8
+        },
+        "size": {
+            "width": 110
+        },
+        "style": {
+            "font-size": "5pt",
+            "color": "#555555",
+            "text-align": "justify",
+            "line-height": "1.3"
+        }
+    },
+    "elements": [
+        {
+            "type": "text",
+            "text": "MINISTERIO DE SALUD Y DEPORTES",
+            "position": {
+                "left": 0,
+                "right": 0,
+                "top": 15
+            },
+            "style": {
+                "text-align": "center",
+                "font-size": "11pt",
+                "font-weight": "700",
+                "text-transform": "uppercase"
+            }
+        },
+        {
+            "type": "text",
+            "text": "Instituto Nacional de Laboratorios de Salud",
+            "position": {
+                "left": 0,
+                "right": 0,
+                "top": 22
+            },
+            "style": {
+                "text-align": "center",
+                "font-size": "10pt",
+                "font-weight": "600"
+            }
+        },
+        {
+            "type": "text",
+            "text": "Gestion {{ gestion }}",
+            "position": {
+                "left": 0,
+                "right": 0,
+                "bottom": 42
+            },
+            "style": {
+                "text-align": "center",
+                "font-size": "12pt",
+                "font-weight": "700",
+                "color": "#1a365d"
+            }
+        },
+        {
+            "type": "text",
+            "text": "La Paz - Bolivia",
+            "position": {
+                "left": 0,
+                "right": 0,
+                "bottom": 35
+            },
+            "style": {
+                "text-align": "center",
+                "font-size": "9pt",
+                "color": "#666666",
+                "font-style": "italic"
+            }
+        },
+        {
+            "type": "image",
+            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Flag_of_Bolivia.svg/200px-Flag_of_Bolivia.svg.png",
+            "position": {
+                "left": 8,
+                "bottom": 8
+            },
+            "size": {
+                "width": 25,
+                "height": 17
+            }
+        }
+    ]
+}
+
+--------------------------------------------------------------------------------
+CASO 5: Diseno minimalista
+--------------------------------------------------------------------------------
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": {
+        "position": {
+            "right": 5,
+            "bottom": 5
+        },
+        "size": {
+            "width": 18,
+            "height": 18
+        }
+    },
+    "elements": [
+        {
+            "type": "text",
+            "text": "{{ gestion }}",
+            "position": {
+                "left": 5,
+                "bottom": 5
+            },
+            "style": {
+                "font-size": "8pt",
+                "color": "#888888"
+            }
+        }
+    ]
+}
+
+
+================================================================================
+8. ERRORES COMUNES Y SOLUCIONES
+================================================================================
+
+ERROR: JSON invalido
+SOLUCION: Verificar que las comillas sean dobles (") no simples (')
+          Verificar que no falten comas entre elementos
+          Usar el validador integrado en el formulario
+
+ERROR: Imagen no se muestra
+SOLUCION: Verificar que la URL sea correcta
+          Para imagenes locales: debe empezar con /storage/
+          Para imagenes externas: debe empezar con http:// o https://
+
+ERROR: Texto no aparece centrado
+SOLUCION: Usar "left": 0 y "right": 0 en position
+          Y agregar "text-align": "center" en style
+
+ERROR: Elemento fuera de la pagina
+SOLUCION: Verificar que las coordenadas esten dentro del tamano del papel
+          Papel A4 horizontal: 297mm x 210mm aproximadamente
+
+ERROR: Variables no se reemplazan
+SOLUCION: Usar exactamente {{ gestion }}, {{ area }}, {{ nombreLaboratorio }}
+          Con espacios despues de {{ y antes de }}
+
+
+================================================================================
+                         FIN DEL DOCUMENTO
+                    PEEC INLASA - Documentacion v2.0
+================================================================================
