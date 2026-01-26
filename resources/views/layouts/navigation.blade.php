@@ -203,14 +203,14 @@ use App\Models\Configuracion;
             <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
         </button>
         <div x-show="openMenu === 2" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-            <a href="{{ route('plantillas-certificados.index') }}"
+            <!-- <a href="{{ route('plantillas-certificados.index') }}"
                 class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                 <i class="fas fa-award mr-2"></i> Plantillas de certificados
-            </a>
-            <!-- <a href="{{ route('configuracion.cerfificado') }}"
+            </a> -->
+            <a href="{{ route('configuracion.cerfificado') }}"
                 class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                 <i class="fas fa-sliders-h"></i> Configuración
-            </a> -->
+            </a>
             <a href="{{ route('list.cert.participacion.desemp') }}"
                 class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
                 <i class="fas fa-bullhorn"></i> Publicar Certificados
