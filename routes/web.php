@@ -89,6 +89,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/searchLab', [LaboratorioController::class, 'getLabBySearch'])->name('getSearchLab');
     Route::get('/certificados', [CertificadoController::class, 'index'])->name('admin.certificado.index');
     Route::get('/certificados/ajax', [CertificadoController::class, 'getDataCertificado'])->name('admin.certificado.ajax.index');
+    Route::post('/certificados/update-plantilla', [CertificadoController::class, 'updatePlantilla'])->name('admin.certificado.update-plantilla');
     Route::get('/certificados/{idLaboratorio}/descargar/{gestion}/{type}', [CertificadoController::class, 'descargarCertificado'])->name('admin.certificado.descargar');
 
     Route::prefix('inscripcion')->group(function () {

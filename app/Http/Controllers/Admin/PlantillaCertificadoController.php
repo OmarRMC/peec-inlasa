@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Certificado;
 use App\Models\PlantillaCertificado;
+use App\Utils\StorageHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -31,8 +34,13 @@ class PlantillaCertificadoController extends Controller
     {
         $data = $this->validatePayload($request);
         $data['diseno'] = $this->decodeDiseno($data['diseno'] ?? null);
+        $data['descripcion'] = $this->decodeDescripcion($request);
         $data['imagen_fondo'] = $this->resolveImagenFondo($request, null);
         $data['firmas'] = $this->resolveFirmas($request);
+        if ((int) ($data['activo'] ?? 0) === PlantillaCertificado::SELECCIONADO) {
+            PlantillaCertificado::where('activo', PlantillaCertificado::SELECCIONADO)
+                ->update(['activo' => PlantillaCertificado::NO_SELECCIONADO]);
+        }
         PlantillaCertificado::create($data);
         return redirect()
             ->route('plantillas-certificados.index')
@@ -52,10 +60,17 @@ class PlantillaCertificadoController extends Controller
         $data = $this->validatePayload($request, $plantilla->id);
 
         $data['diseno'] = $this->decodeDiseno($data['diseno'] ?? null);
+        $data['descripcion'] = $this->decodeDescripcion($request);
         $data['imagen_fondo'] = $this->resolveImagenFondo($request, $plantilla->imagen_fondo);
         $newFirmas = $this->resolveFirmas($request);
         $this->cleanupRemovedFirmas($plantilla->firmas ?? [], $newFirmas);
         $data['firmas'] = $newFirmas;
+
+        if ((int) ($data['activo'] ?? 0) === PlantillaCertificado::SELECCIONADO) {
+            PlantillaCertificado::where('activo', PlantillaCertificado::SELECCIONADO)
+                ->where('id', '!=', $plantilla->id)
+                ->update(['activo' => PlantillaCertificado::NO_SELECCIONADO]);
+        }
 
         $plantilla->update($data);
 
@@ -66,6 +81,12 @@ class PlantillaCertificadoController extends Controller
 
     public function destroy(PlantillaCertificado $plantillas_certificado)
     {
+        if ($plantillas_certificado->certificados()->exists()) {
+            return redirect()
+                ->route('plantillas-certificados.index')
+                ->with('error', 'No se puede eliminar la plantilla porque tiene certificados asociados.');
+        }
+
         $this->deleteStorageUrlIfLocal($plantillas_certificado->imagen_fondo);
         foreach (($plantillas_certificado->firmas ?? []) as $f) {
             $this->deleteStorageUrlIfLocal($f['firma'] ?? null);
@@ -79,22 +100,10 @@ class PlantillaCertificadoController extends Controller
     public function preview(PlantillaCertificado $plantilla)
     {
         // Fondo como data-uri para que DomPDF lo renderice sin isRemoteEnabled
-        $backgroundDataUri = $this->storageUrlToDataUri($plantilla->imagen_fondo);
+        $backgroundDataUri = StorageHelper::storageUrlToDataUri($plantilla->imagen_fondo);
 
         // Firmas con data-uri
-        $firmas = collect($plantilla->firmas ?? [])
-            ->map(function ($f) {
-                $url = $f['firma'] ?? null;
-                return [
-                    'nombre' => $f['nombre'] ?? '',
-                    'cargo'  => $f['cargo'] ?? '',
-                    'firma'  => $url,
-                    'firma_data_uri' => $this->storageUrlToDataUri($url),
-                ];
-            })
-            ->values()
-            ->all();
-
+        $firmas = $plantilla->getFirmas();
         // QR dummy para preview
         $code = (string) $plantilla->id;
         $verifyUrl = route('verificar.certificado', [
@@ -108,33 +117,48 @@ class PlantillaCertificadoController extends Controller
         $qrDataUri = "data:image/png;base64,{$qrBase64}";
 
         // Papel basado en mm (custom paper)
-        $paper = $this->paperFromMm(
-            (float) $plantilla->ancho_mm,
-            (float) $plantilla->alto_mm
-        );
+        $paper = $plantilla->paperFromMm();
 
         // Datos ejemplo (para ver cómo quedará)
-        $sample = [
-            'laboratorio_linea_1' => 'LABORATORIO HOSPITAL MILITAR N° 4 "COSSMIL"',
-            'laboratorio_linea_2' => 'TRINIDAD CNL. (+) EDWIN CASPARI VARGAS',
-            'area' => 'ANÁLISIS CLÍNICOS',
-            'items' => [
-                'HEMATOLOGÍA: EXCELENTE',
-                'QUÍMICA SANGUÍNEA: EXCELENTE',
-                'FROTIS BÁSICO: EXCELENTE',
-                'GRUPO SANGUÍNEO: EXCELENTE',
-                'INMUNOLOGÍA: EXCELENTE',
-                'BACTERIOLOGÍA: EXCELENTE',
-            ],
-            'gestion' => now()->year,
+        $nombreLaboratorio = 'LABORATORIO HOSPITAL MILITAR N° 4 "COSSMIL" TRINIDAD CNL. (+) EDWIN CASPARI VARGAS';
+        $ensayosA = '';
+        $areas = [
+            'ANÁLISIS CLÍNICOS' => [
+                "detalles" => [
+                    ["ensayo" => "HEMATOLOGÍA", "ponderacion" => "EXCELENTE"],
+                    ["ensayo" => "QUÍMICA SANGUÍNEA", "ponderacion" => "SATISFACTORIO"],
+                ]
+            ]
         ];
+        $gestion  =  now()->year;
+
+        // Descripción desde la plantilla (descripcion_desmp)
+        $descripcion = $plantilla->descripcion_desmp;
+        // Extraer configuración de diseño (QR, nota, elements, etc.)
+        $diseno = $plantilla->diseno ?? [];
+        $qrConfig = $diseno['qr'] ?? [];
+        $notaConfig = $diseno['nota'] ?? [];
+
+        // Procesar elements y convertir imágenes a data-uri (local o externa)
+        $elements = $plantilla->getElementos();
 
         $pdf = Pdf::loadView('certificados.plantillas.preview', [
+            'type'=> Certificado::TYPE_DESEMP,
             'plantilla' => $plantilla,
             'background' => $backgroundDataUri,
             'firmas' => $firmas,
             'qr' => $qrDataUri,
-            'sample' => $sample,
+            'qrConfig' => $qrConfig,
+            'notaConfig' => $notaConfig,
+            'elements' => $elements,
+
+            'nombreLaboratorio' => $nombreLaboratorio,
+            'gestion' => $gestion,
+            'areas' => $areas,
+            'ensayosA' =>  $ensayosA,
+
+            'descripcion' => $descripcion,
+            'diseno' => $diseno,
         ])->setPaper($paper);
 
         $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
@@ -165,6 +189,36 @@ class PlantillaCertificadoController extends Controller
             'firmas.*.firma' => ['nullable', 'string', 'max:2048'],
             'firmas.*.firma_file' => ['nullable', 'image', 'max:5120'],
         ]);
+    }
+
+
+    private function decodeDescripcion(Request $request): array
+    {
+        $rawDesmp = $request->input('descripcion_desmp');
+        $rawPart  = $request->input('descripcion_part');
+        $decodeObjectJson = function ($raw): array {
+            if ($raw === null) return [];
+            if (is_array($raw)) return $raw;
+
+            $raw = trim((string) $raw);
+            if ($raw === '') return [];
+            $decoded = json_decode($raw, true);
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+                return [];
+            }
+            $isList = array_keys($decoded) === range(0, count($decoded) - 1);
+            if ($isList) return [];
+
+            return $decoded;
+        };
+
+        $desmp = $decodeObjectJson($rawDesmp);
+        $part  = $decodeObjectJson($rawPart);
+
+        return [
+            'descripcion_desmp' => $desmp,
+            'descripcion_part' => $part,
+        ];
     }
 
     private function decodeDiseno($value): array
@@ -269,40 +323,5 @@ class PlantillaCertificadoController extends Controller
 
         $relative = Str::after($url, '/storage/');
         Storage::disk('public')->delete($relative);
-    }
-
-    private function paperFromMm(float $widthMm, float $heightMm): array
-    {
-        $w = $this->mmToPt($widthMm);
-        $h = $this->mmToPt($heightMm);
-        return [0, 0, $w, $h];
-    }
-
-    private function mmToPt(float $mm): float
-    {
-        return ($mm * 72) / 25.4;
-    }
-
-    /**
-     * Convierte una URL tipo "/storage/xxx/yyy.png" a data-uri.
-     */
-    private function storageUrlToDataUri(?string $url): ?string
-    {
-        if (!$url) return null;
-
-        if (!Str::startsWith($url, '/storage/')) {
-            return null;
-        }
-
-        $relative = Str::after($url, '/storage/');
-        $absolute = storage_path('app/public/' . $relative);
-
-        if (!is_file($absolute)) return null;
-
-        $mime = mime_content_type($absolute) ?: 'image/png';
-        $content = file_get_contents($absolute);
-        if ($content === false) return null;
-
-        return "data:{$mime};base64," . base64_encode($content);
     }
 }

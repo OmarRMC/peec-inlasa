@@ -95,10 +95,15 @@ return [
         'type' => 'artisan',
         'description' => 'Estados de las migraciones',
     ],
-    
+
     'certificado_fix_nombre_laboratorio' => [
         'cmd' => ['php', 'artisan', 'certificado:fix-nombre-laboratorio'],
         'type' => 'artisan',
         'description' => 'Corrige caracteres especiales del nombre del laboratorio en certificados',
     ],
+    'seeder_plantilla' => [
+        'cmd' => ['php', 'artisan', 'db:seed', '--class=PlantillaCertificadoSeeder'],
+        'type' => 'artisan',
+        'description' => 'Ejecuta el seeder PlantillaCertificadoSeeder para poblar/actualizar las plantillas de certificados en la base de datos.',
+    ]
 ];

@@ -14,10 +14,8 @@
                     <tr>
                         <th>Nro</th>
                         <th>Plantilla</th>
-                        <th>Descripción</th>
                         <th>Dimensiones</th>
-                        <th>Firmas</th>
-                        <th>Estado</th>
+                        <th>Seleccionado</th>
                         <th class="w-40">Acciones</th>
                     </tr>
                 </thead>
@@ -41,35 +39,25 @@
 
                                 <div class="leading-tight">
                                     <div class="font-semibold text-gray-900">{{ $tpl->nombre }}</div>
-                                    <div class="text-xs text-gray-500">
-                                        Fuente: {{ $tpl->fuente_por_defecto }} · {{ $tpl->tamano_fuente_por_defecto }}px
-                                    </div>
                                 </div>
                             </div>
                         </td>
 
-                        <td class="max-w-sm">
+                        <!-- <td class="max-w-sm">
                             <div class="text-sm text-gray-700 line-clamp-2">
-                                {{ $tpl->descripcion ?? '—' }}
+                                
                             </div>
-                        </td>
+                        </td> -->
 
                         <td class="whitespace-nowrap">
                             {{ number_format($tpl->ancho_mm, 2) }} × {{ number_format($tpl->alto_mm, 2) }} mm
                         </td>
 
-                        <td class="whitespace-nowrap">
-                            <span class="badge badge-info">
-                                {{ is_array($tpl->firmas) ? count($tpl->firmas) : (is_string($tpl->firmas) ? count(json_decode($tpl->firmas, true) ?? []) : 0) }}
-                                firmas
-                            </span>
-                        </td>
-
                         <td>
                             @if ($tpl->activo)
-                            <span class="badge badge-success">Activo</span>
+                            <span class="badge badge-success">Seleccionado</span>
                             @else
-                            <span class="badge badge-danger">Inactivo</span>
+                            <span class="badge badge-danger">No Seleccionado</span>
                             @endif
                         </td>
 

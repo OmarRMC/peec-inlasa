@@ -10,17 +10,12 @@ return new class extends Migration {
         Schema::create('plantillas_certificados', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->text('descripcion')->nullable();
+            $table->json('descripcion')->nullable();
 
             $table->text('imagen_fondo')->nullable();
 
             $table->decimal('ancho_mm', 6, 2)->nullable();   // ej: 297.00
             $table->decimal('alto_mm', 6, 2)->nullable();    // ej: 210.00
-
-            // Configuración visual por defecto
-            $table->string('fuente_por_defecto')->nullable();
-            $table->string('color_texto_por_defecto', 20)->nullable();
-            $table->integer('tamano_fuente_por_defecto')->nullable();
 
             // Diseño del certificado (posiciones, textos, QR, firmas, etc.)
             /*

@@ -85,8 +85,9 @@
                              class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm
                                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                              required>
-                             <option value="1" @selected((int) old('activo', $plantilla->activo ?? 1) === 1)>Activo</option>
-                             <option value="0" @selected((int) old('activo', $plantilla->activo ?? 1) === 0)>Inactivo</option>
+                             @foreach (\App\Models\PlantillaCertificado::ESTADOS as $value => $label)
+                                 <option value="{{ $value }}" @selected((int) old('activo', $plantilla->activo ?? 1) === $value)>{{ $label }}</option>
+                             @endforeach
                          </select>
                          @error('activo')
                          <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
@@ -95,18 +96,33 @@
                  </div>
 
                  {{-- Descripción --}}
-                 <div>
-                     <label for="descripcion" class="block text-sm font-semibold text-gray-700 mb-1">Descripción</label>
-                     <textarea
-                         name="descripcion"
-                         id="descripcion"
-                         rows="3"
-                         class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm
-                               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">{{ old('descripcion', $plantilla->descripcion) }}</textarea>
-                     @error('descripcion')
-                     <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                     @enderror
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div>
+                         <label for="descripcion_desmp" class="block text-sm font-semibold text-gray-700 mb-1">Descripción(key=descripcion_desmp)</label>
+                         <textarea
+                             name="descripcion_desmp"
+                             id="descripcion_desmp"
+                             rows="6"
+                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm
+                               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">{{ old('descripcion_desmp', json_encode($plantilla->descripcion_desmp, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
+                         @error('descripcion_desmp')
+                         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                         @enderror
+                     </div>
+                     <div>
+                         <label for="descripcion_part" class="block text-sm font-semibold text-gray-700 mb-1">Descripción(key=descripcion_part)</label>
+                         <textarea
+                             name="descripcion_part"
+                             id="descripcion_part"
+                            rows="6"
+                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm
+                               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">{{ old('descripcion_part', json_encode($plantilla->descripcion_part, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) }}</textarea>
+                         @error('descripcion_part')
+                         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                         @enderror
+                     </div>
                  </div>
+
 
                  {{-- ========================= FONDO (preview dentro del mismo input visual) ========================= --}}
                  <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-3">
@@ -212,85 +228,6 @@
                          @enderror
                      </div>
                  </div>
-
-                 <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label for="fuente_por_defecto" class="block text-sm font-semibold text-gray-700 mb-1">Fuente por defecto</label>
-                        <input
-                            type="text"
-                            name="fuente_por_defecto"
-                            id="fuente_por_defecto"
-                            value="{{ old('fuente_por_defecto', $plantilla->fuente_por_defecto) }}"
-                            maxlength="80"
-                            required
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm
-                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        @error('fuente_por_defecto')
-                        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="color_texto_por_defecto" class="block text-sm font-semibold text-gray-700 mb-1">Color por defecto</label>
-                        <input
-                            type="text"
-                            name="color_texto_por_defecto"
-                            id="color_texto_por_defecto"
-                            value="{{ old('color_texto_por_defecto', $plantilla->color_texto_por_defecto) }}"
-                            placeholder="#111111"
-                            maxlength="20"
-                            required
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm
-                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        @error('color_texto_por_defecto')
-                        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="tamano_fuente_por_defecto" class="block text-sm font-semibold text-gray-700 mb-1">Tamaño fuente</label>
-                        <input
-                            type="number"
-                            name="tamano_fuente_por_defecto"
-                            id="tamano_fuente_por_defecto"
-                            min="1"
-                            max="200"
-                            value="{{ old('tamano_fuente_por_defecto', $plantilla->tamano_fuente_por_defecto) }}"
-                            required
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm
-                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        @error('tamano_fuente_por_defecto')
-                        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div> -->
-
-                 {{-- ========================= DISEÑO JSON ========================= --}}
-                 <!-- <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                     <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
-                         <div>
-                             <h3 class="text-sm font-semibold text-gray-800">Diseño (JSON)</h3>
-                             <p class="text-xs text-gray-500">Defina positions/elements (text/qr/image), unit:mm</p>
-                         </div>
-                         <span class="text-xs text-gray-500">Ej: schemaVersion, elements[]</span>
-                     </div>
-
-                     <textarea
-                         name="diseno"
-                         id="diseno"
-                         rows="10"
-                         class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-mono
-                               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                         placeholder='{
-  "schemaVersion": 1,
-  "unit": "mm",
-  "elements": []
-}'>{{ $disenoValue }}</textarea>
-
-                     @error('diseno')
-                     <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                     @enderror
-                 </div> -->
 
                  {{-- ========================= FIRMAS (dinámico) ========================= --}}
                  <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
@@ -417,6 +354,38 @@
                      </div>
                  </div>
 
+                 {{-- ========================= DISEÑO JSON ========================= --}}
+                 <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                     <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+                         <div>
+                             <h3 class="text-sm font-semibold text-gray-800">Diseño (JSON)</h3>
+                             <p class="text-xs text-gray-500">Defina positions/elements (text/qr/image), unit:mm</p>
+                         </div>
+                         <a href="{{ asset('docs/plantilla-certificado-ejemplos.txt') }}"
+                             target="_blank"
+                             class="inline-flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md text-xs font-medium transition"
+                             title="Ver ejemplos de JSON">
+                             <i class="fas fa-file-alt"></i>
+                             <span>Ver ejemplos JSON</span>
+                         </a>
+                     </div>
+
+                     <textarea
+                         name="diseno"
+                         id="diseno"
+                         rows="10"
+                         class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-mono
+                               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                         placeholder='{
+  "schemaVersion": 1,
+  "unit": "mm",
+  "elements": []
+}'>{{ $disenoValue }}</textarea>
+
+                     @error('diseno')
+                     <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                     @enderror
+                 </div>
                  {{-- ========================= ACCIONES ========================= --}}
                  <div class="flex justify-end gap-2 pt-2">
                      <a href="{{ route('plantillas-certificados.index') }}"
@@ -778,5 +747,90 @@
                  showRemove: false
              });
          }
+
+         // ========================= VALIDACIÓN JSON =========================
+         const jsonFields = ['descripcion_desmp', 'descripcion_part', 'diseno'];
+
+         function validateJson(value) {
+             if (!value || value.trim() === '') {
+                 return { valid: true, parsed: null };
+             }
+             try {
+                 const parsed = JSON.parse(value);
+                 // Debe ser un objeto o array, no un primitivo
+                 if (typeof parsed !== 'object' || parsed === null) {
+                     return { valid: false, error: 'Debe ser un objeto JSON {} o un array []' };
+                 }
+                 return { valid: true, parsed };
+             } catch (e) {
+                 return { valid: false, error: e.message };
+             }
+         }
+
+         function showJsonError(field, message) {
+             const container = field.parentElement;
+             let errorEl = container.querySelector('.json-error');
+
+             if (!errorEl) {
+                 errorEl = document.createElement('p');
+                 errorEl.className = 'json-error text-red-600 text-xs mt-1';
+                 container.appendChild(errorEl);
+             }
+
+             errorEl.textContent = 'JSON inválido: ' + message;
+             field.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+             field.classList.remove('border-gray-300', 'focus:ring-indigo-500', 'focus:border-indigo-500');
+         }
+
+         function clearJsonError(field) {
+             const container = field.parentElement;
+             const errorEl = container.querySelector('.json-error');
+             if (errorEl) errorEl.remove();
+
+             field.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+             field.classList.add('border-gray-300', 'focus:ring-indigo-500', 'focus:border-indigo-500');
+         }
+
+         function validateJsonField(field) {
+             const result = validateJson(field.value);
+             if (!result.valid) {
+                 showJsonError(field, result.error);
+                 return false;
+             }
+             clearJsonError(field);
+             return true;
+         }
+
+         // Validar en tiempo real (cada cambio)
+         jsonFields.forEach(fieldId => {
+             const field = document.getElementById(fieldId);
+             if (!field) return;
+
+             field.addEventListener('input', () => validateJsonField(field));
+             field.addEventListener('blur', () => validateJsonField(field));
+         });
+
+         // Validar al enviar formulario
+         const form = document.querySelector('form');
+         form.addEventListener('submit', (e) => {
+             let hasError = false;
+
+             jsonFields.forEach(fieldId => {
+                 const field = document.getElementById(fieldId);
+                 if (!field) return;
+
+                 if (!validateJsonField(field)) {
+                     hasError = true;
+                 }
+             });
+
+             if (hasError) {
+                 e.preventDefault();
+                 const firstError = document.querySelector('.json-error');
+                 if (firstError) {
+                     firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                 }
+             }
+         });
      </script>
  </x-app-layout>

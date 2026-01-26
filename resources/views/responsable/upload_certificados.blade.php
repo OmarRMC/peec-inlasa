@@ -173,13 +173,32 @@
 
     @push('scripts')
         <script>
+            let table, table2;
             document.addEventListener('DOMContentLoaded', function() {
 
-                let table = $('#labs-certificados-tem').DataTable({
+                const urlParams = new URLSearchParams(window.location.search);
+                if (!urlParams.has('gestion')) {
+                    const selectGestion = document.getElementById('filter-gestion');
+                    const gestionDefault = selectGestion ? selectGestion.value : '{{ now()->year }}';
+                    urlParams.set('gestion', gestionDefault);
+                    window.location.search = urlParams.toString();
+                    return;
+                }
+                table = $('#labs-certificados-tem').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
                         url: "{{ route('ea.lab.desempeno.temporal', ['id' => $idEA] + request()->all()) }}",
+                        error: function(xhr, error, thrown) {
+                            let mensaje = 'Error al cargar los datos en revisión.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                mensaje = xhr.responseJSON.message;
+                            } else if (xhr.responseJSON && xhr.responseJSON.info) {
+                                mensaje = xhr.responseJSON.info;
+                            }
+                            showError(mensaje);
+                            console.error('Error DataTable temporal:', error, thrown);
+                        }
                     },
                     order: [
                         [0, 'desc']
@@ -245,8 +264,15 @@
                                     });
                                 },
                                 error: function(xhr) {
-                                    showError('Error al actualizar el desempeño: ' + xhr
-                                        .responseJSON.message);
+                                    let mensaje = 'Error al actualizar el desempeño.';
+                                    if (xhr.responseJSON) {
+                                        if (xhr.responseJSON.message) {
+                                            mensaje = xhr.responseJSON.message;
+                                        } else if (xhr.responseJSON.info) {
+                                            mensaje = xhr.responseJSON.info;
+                                        }
+                                    }
+                                    showError(mensaje);
                                 }
                             });
                         });
@@ -261,11 +287,21 @@
                     table.page.len(this.value).draw();
                 });
 
-                let table2 = $('#labs-certificados-ok').DataTable({
+                table2 = $('#labs-certificados-ok').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
                         url: "{{ route('ea.lab.desempeno.confirmado', ['id' => $idEA] + request()->all()) }}",
+                        error: function(xhr, error, thrown) {
+                            let mensaje = 'Error al cargar las ponderaciones.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                mensaje = xhr.responseJSON.message;
+                            } else if (xhr.responseJSON && xhr.responseJSON.info) {
+                                mensaje = xhr.responseJSON.info;
+                            }
+                            showError(mensaje);
+                            console.error('Error DataTable confirmado:', error, thrown);
+                        }
                     },
                     order: [
                         [0, 'desc']

@@ -29,24 +29,13 @@ class Certificado extends Model
     protected $fillable = [
         'id_inscripcion',
         'gestion_certificado',
-        'nombre_coordinador',
-        'nombre_jefe',
-        'nombre_director',
-        'firma_coordinador',
-        'firma_jefe',
-        'firma_director',
         'nombre_laboratorio',
-        'codigo_certificado',
-        'tipo_certificado',
-        'id_redaccion',
         'status_certificado',
         'created_by',
         'updated_by',
         'cod_lab',
         'publicado',
-        'cargo_coordinador',
-        'cargo_jefe',
-        'cargo_director'
+        'plantilla_certificado_id'
     ];
 
     public function inscripcion()

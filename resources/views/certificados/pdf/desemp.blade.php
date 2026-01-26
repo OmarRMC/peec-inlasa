@@ -34,8 +34,7 @@
                 <!-- Cuerpo -->
                 <div class="content">
                     <p class="center">
-                        Por su desempeño en el Programa de Evaluación Externa de la Calidad del Instituto Nacional de
-                        Laboratorios de Salud - PEEC INLASA, en el área de:
+                        {{ $descripcionTexto ?? 'Por su desempeño en el Programa de Evaluación Externa de la Calidad del Instituto Nacional de Laboratorios de Salud - PEEC INLASA, en el área de:' }}
                     </p>
                     <div class='evaluaciones'>
                         <div class="area">{{ mb_strtoupper($area) }}</div>
