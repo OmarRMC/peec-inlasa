@@ -14,7 +14,7 @@
                     </ul>
                 </div>
             @endif
-            @foreach ([['id' => 'certificado', 'title' => 'Certificado'], ['id' => 'periodoRegistroDesemp', 'title' => 'Periodo de Registro de Desempeño (para Certificados)']] as $item)
+            @foreach ([['id' => 'periodoRegistroDesemp', 'title' => 'Periodo de Registro de Desempeño (para Certificados)']] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -110,7 +110,7 @@
                                         </div>
                                         <p class="text-xs text-gray-500 mt-2">La fecha fin debe ser posterior a la fecha inicio.
                                         </p>
-                                        <div class="mt-1">
+                                        <!-- <div class="mt-1">
                                             <label for="{{ Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION }}"
                                                 class="block text-sm font-medium">Para la Gestion de inscripciones</label>
                                             <input type="number"
@@ -118,7 +118,7 @@
                                                 id="{{ Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION }}"
                                                 value="{{ old(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION, configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION) ?? date('Y')) }}"
                                                 class="mt-1 input-standard" min="2020" max="2100" required>
-                                        </div>
+                                        </div> -->
                                         <div class="text-right mt-4">
                                             <button type="submit" class="btn-primary"><i class="fas fa-save mr-1"></i>Guardar
                                             </button>

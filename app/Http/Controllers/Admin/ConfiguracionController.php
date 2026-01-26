@@ -221,7 +221,6 @@ class ConfiguracionController extends Controller
                 $request->validate([
                     'fecha_inicio_registro_certificados' => 'required|date',
                     'fecha_fin_registro_certificados' => 'required|date|after_or_equal:fecha_inicio_registro_certificados',
-                    'registro_ponderaciones_certificados_gestion' => 'required|digits:4',
                 ], [
                     'fecha_inicio_registro_certificados.required' => 'La fecha de inicio es obligatoria.',
                     'fecha_inicio_registro_certificados.date' => 'La fecha de inicio debe ser una fecha válida.',
@@ -234,7 +233,7 @@ class ConfiguracionController extends Controller
 
                 configuracion(Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS, $request->fecha_inicio_registro_certificados);
                 configuracion(Configuracion::FECHA_FIN_REGISTRO_CERTIFICADOS, $request->fecha_fin_registro_certificados);
-                configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION, $request->registro_ponderaciones_certificados_gestion);
+                // configuracion(Configuracion::REGISTRO_PONDERACIONES_CERTIFICADOS_GESTION, $request->registro_ponderaciones_certificados_gestion);
                 break;
             case 'gestion.filter':
                 $request->validate([
