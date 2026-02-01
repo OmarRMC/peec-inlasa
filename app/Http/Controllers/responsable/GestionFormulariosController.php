@@ -67,7 +67,7 @@ class GestionFormulariosController extends Controller
             ->where('id_ea', $idEa)
             ->whereHas('inscripcion', function ($q) {
                 $q->where('gestion', now()->year);
-                $q->Aprobado();
+                $q->aprobadoOrVencido();
             });
         $data = $query->get();
 
@@ -96,15 +96,15 @@ class GestionFormulariosController extends Controller
 
 
                     $html .= '
-                        <div class="flex align-items-center" style="align-items: center;  gap: 2px; justify-content: space-between">
+                        <div class="flex align-items-center" style="align-items: center;  gap: 4px; justify-content: space-between">
                             <small class="text-muted" style="min-width:50px;">' . e($formulario->nombre) . '</small>
                             <input type="number" 
                                 data-id-registro="' . e($registro->id) . '"
                                 step="1" min="1" max="10"
                                 name="formulario_' . $formulario->id . '" 
                                 value="' . $cantidad . '"
-                                class="form-control form-control-sm" 
-                                style="width: 40px; padding: 1px 1px; font-size: 12px; border-radius:5px" />
+                                class="form-control form-control-sm"
+                                style="width: 40px; padding:0px; font-size: 12px; border-radius:5px; text-align: center; -webkit-appearance: none; margin: 0;" />
                         </div>';
                 }
 

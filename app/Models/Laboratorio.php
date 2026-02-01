@@ -602,4 +602,9 @@ class Laboratorio extends Model
     {
         return $this->hasMany(FormularioEnsayoResultado::class, 'id_laboratorio');
     }
+
+    public function informesTecnicos()
+    {
+        return $this->hasMany(InformeTecnico::class, 'id_laboratorio');
+    }
 }

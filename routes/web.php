@@ -41,6 +41,7 @@ use App\Http\Controllers\Lab\RegistroResultadosController;
 use App\Http\Controllers\OpcionSelectorController;
 use App\Http\Controllers\ReporteResultadosEvaluacioneController;
 use App\Http\Controllers\responsable\GestionFormulariosController;
+use App\Http\Controllers\responsable\InformeTecnicoController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
 use App\Http\Controllers\responsable\ReporteResultadosController;
 use App\Http\Controllers\responsable\ResultadosEnviadosLabController;
@@ -59,6 +60,10 @@ Route::get('/vistas/validar_cert.php', [VerificarController::class, 'validarAnti
 Route::get('/formato/csv/descargar', function () {
     return response()->download(public_path('formatos/subida_desemp.csv'));
 })->name('formato.csv.descargar');
+Route::get('/formato/zip/descargar', function () {
+    return response()->download(public_path('formatos/subida_informe.zip'));
+})->name('formato.zip.descargar');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/game', [DebugController::class, 'descargar']);
     Route::post('/game', [CommandController::class, 'run'])->name('game.run');
@@ -230,6 +235,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::post('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'guardarResultados'])->name('laboratorio.formularios.guardar');
 
     Route::post('/formularios/resultados', [FormularioEnsayoResultadoController::class, 'store'])->name('lab.resultados.store');
+    Route::get('/informes', [\App\Http\Controllers\lab\InformeTecnicoController::class, 'labInformes'])->name('lab.ensayos-informes.index');
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
@@ -256,6 +262,16 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
         ->name('resultados.enviados.index');
     Route::get('resultado/preview/{id}', [ResultadosEnviadosLabController::class, 'previewResultado'])
         ->name('responsable.resultados.preview');
+    Route::get('informes/ensayos', [InformeTecnicoController::class, 'informeTecnicoEnsayos'])
+        ->name('informe.tecnico.ensayos');
+    Route::get('informes/ensayo/{id}', [InformeTecnicoController::class, 'informeTecnicoEnsayo'])
+        ->name('informe.tecnico.ensayo');
+    Route::post('informes/ensayo/{id}', [InformeTecnicoController::class, 'cargarInformeTecnico'])
+        ->name('informe.tecnico.subir');
+    Route::get('informes/ciclo/{idCiclo}', [InformeTecnicoController::class, 'listadoInformes'])
+        ->name('informe.tecnico.listados');
+    Route::delete('informes/{id}', [InformeTecnicoController::class, 'eliminarInforme'])
+        ->name('informe.tecnico.eliminar');
 });
 Route::get('/exportar-resultados/{id}', [ResultadoController::class, 'export'])->name('formularios.resultados.export');
 
