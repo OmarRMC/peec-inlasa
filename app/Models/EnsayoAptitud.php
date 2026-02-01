@@ -129,4 +129,9 @@ class EnsayoAptitud extends Model
             ->first();
         return $cicloPorPeriodo;
     }
+
+    // public function informesTecnicos()
+    // {
+    //     return $this->hasMany(InformeTecnico::class, 'id_ensayo');
+    // }
 }

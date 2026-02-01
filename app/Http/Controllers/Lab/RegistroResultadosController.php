@@ -27,7 +27,7 @@ class RegistroResultadosController extends Controller
         ])
             ->whereHas('inscripcion', function ($q) use ($lab) {
                 $q->where('id_lab', $lab->id)
-                    ->Aprobado()
+                    ->aprobadoOrVencido()
                     ->where('gestion', now()->year);
             })
             ->get();
@@ -59,7 +59,7 @@ class RegistroResultadosController extends Controller
         $laboratorio = Auth::user()->laboratorio;
         $inscripciones = $laboratorio->inscripciones()
             ->where('gestion', now()->year)
-            ->aprobado()
+            ->aprobadoOrVencido()
             ->get();
         $ensayos = $inscripciones->flatMap(function ($inscripcion) use ($idEA) {
             return $inscripcion->ensayos()->where('id_ea', $idEA)->get();

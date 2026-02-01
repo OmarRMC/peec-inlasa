@@ -54,7 +54,7 @@ class Ciclo extends Model
 
     public function scopeGestion($query, $gestion)
     {
-        return $query->whereYear('fecha_fin_envio_resultados', $gestion);
+        return $query->whereYear('fecha_inicio_envio_resultados', $gestion);
     }
     public function getFechaInicioEnvioReporteShowAttribute()
     {
@@ -74,4 +74,20 @@ class Ciclo extends Model
             $this->fecha_fin_envio_resultados &&
             $hoy->between($this->fecha_inicio_envio_resultados, $this->fecha_fin_envio_resultados);
     }
+
+    public function scopeGestionParaInforme($query, $gestion)
+    {
+        return $query->whereYear('fecha_inicio_envio_resultados', $gestion)
+            ->whereDate('fecha_inicio_envio_reporte', '<=', Carbon::today());
+    }
+
+    public function informes()
+    {
+        return $this->hasMany(InformeTecnico::class, 'id_ciclo');
+    }
+
+    // public function scopePorGestion($query, $gestion)
+    // {
+    //     return $query->where('gestion', $gestion);
+    // }
 }
