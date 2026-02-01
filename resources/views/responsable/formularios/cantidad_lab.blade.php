@@ -4,6 +4,9 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap gap-4 mb-6">
             <div>
                 <h1 class="text-xl font-bold text-gray-800">
+                    {{ $ensayosAptitud->paquete->descripcion }}
+                </h1>
+                <h1 class="text-xl font-bold text-gray-800">
                     Lista de inscripciones a
                     <span class="text-blue-600">{{ $ensayosAptitud->descripcion }}</span>
                 </h1>
