@@ -421,12 +421,11 @@ use App\Models\Certificado;
             $sigTableStyleCss = \App\Models\PlantillaCertificado::toInlineCss($sigTableStyleArr);
             @endphp
             <table width="{{ $sigTableWidth }}" cellspacing="{{ $sigTableSpacing }}" cellpadding="{{ $sigTablePadding }}" style="{{ $sigTableStyleCss }}">
+                {{-- Fila 1: imágenes de firma --}}
                 <tr>
                     @if($sig->isEmpty())
                     <td align="center" valign="bottom" style="width: 100%;">
-                        <div class="sig-name">FIRMANTE</div>
-                        <div class="sig-role upper">CARGO</div>
-                        <div class="sig-org upper">{{ $sigOrgLabel }}</div>
+                        <div style="height: {{ $sigImgHeight }}mm; margin-bottom: -{{ $sigImgOverlap }}mm; overflow: visible;"></div>
                     </td>
                     @else
                     @foreach($sig as $f)
@@ -436,7 +435,34 @@ use App\Models\Certificado;
                             <img class="sig-img" src="{{ $f['firma_data_uri'] }}" style="display: block; margin: 0 auto; height: {{ $sigImgHeight }}mm; width:{{ $sigImgWidth }}%;" alt="Firma">
                             @endif
                         </div>
+                    </td>
+                    @endforeach
+                    @endif
+                </tr>
+                {{-- Fila 2: nombres --}}
+                <tr>
+                    @if($sig->isEmpty())
+                    <td align="center" style="width: 100%;">
+                        <div class="sig-name">FIRMANTE</div>
+                    </td>
+                    @else
+                    @foreach($sig as $f)
+                    <td align="center" style="width:{{ $colWidth }}% !important;">
                         <div class="sig-name">{{ $f['nombre'] ?? '' }}</div>
+                    </td>
+                    @endforeach
+                    @endif
+                </tr>
+                {{-- Fila 3: cargo + institución juntos (sin separación vertical) --}}
+                <tr>
+                    @if($sig->isEmpty())
+                    <td align="center" valign="top" style="width: 100%;">
+                        <div class="sig-role upper">CARGO</div>
+                        <div class="sig-org upper">{{ $sigOrgLabel }}</div>
+                    </td>
+                    @else
+                    @foreach($sig as $f)
+                    <td align="center" valign="top" style="width:{{ $colWidth }}% !important;">
                         <div class="sig-role upper">{{ $f['cargo'] ?? '' }}</div>
                         <div class="sig-org upper">{{ $sigOrgLabel }}</div>
                     </td>
