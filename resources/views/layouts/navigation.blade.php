@@ -33,195 +33,29 @@ use App\Models\Configuracion;
     @endif
 
     @if (Gate::any([Permiso::LABORATORIO]))
-        <div>
-            <button @click="openMenu !== 102 ? openMenu = 102 : openMenu = null"
-                class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
-                <i class="fas fa-vials w-5 text-indigo-500"></i>
-                <span>Laboratorio</span>
-                <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-            </button>
-            <div x-show="openMenu === 102" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-                <a href="{{ route('lab.profile') }}"
-                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                    <i class="fas fa-id-card-alt w-4 mr-1 text-indigo-500"></i> Perfil de laboratorio
-                </a>
-                @if (Configuracion::esPeriodoInscripcion())
-                    <a href="{{ route('lab.profile.edit') }}"
-                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                        <i class="fas fa-user-edit w-4 mr-1 text-indigo-500"></i> Actualizar tu información
-                    </a>
-                @endif
-            </div>
-        </div>
-    @endif
-
-    @if (Gate::any([Permiso::LABORATORIO]))
-        <div>
-            <button @click="openMenu !== 103 ? openMenu = 103 : openMenu = null"
-                class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
-                <i class="fas fa-vials w-5 text-indigo-500"></i>
-                <span>Gestion de inscripciones</span>
-                <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-            </button>
-            <div x-show="openMenu === 103" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-                <a href="{{ route('lab.ins.index') }}"
-                    class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                    <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i>
-                    Listado de inscripciones
-                </a>
-                {{-- href="{{ route('formulario_contrato_lab.pdf') }}" --}}
-                @if (Auth::user()->laboratorio->tieneIscripcionGestionActual())
-                    <a href="{{ route('formulario_contrato') }}" target="_blank"
-                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                        <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Contrato
-                    </a>
-                @endif
-            </div>
-        </div>
-    @endif
-    @if (Gate::any([Permiso::RESPONSABLE]))
-        @php
-            $user = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
-            $ensayoAps = $user->responsablesEA;
-        @endphp
-        <div>
-            <button @click="openMenu !== 20 ? openMenu = 20 : openMenu = null"
-                class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
-                <i class="fas fa-vials w-5 text-indigo-500"></i>
-                <span>Gestión de Ensayos de Aptitud</span>
-                <i class="fas ml-auto" :class="openMenu === 20 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-            </button>
-            <div x-show="openMenu === 20" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-                @foreach ($ensayoAps as $ea)
-                    @php
-                        $paquete = $ea->paquete;
-                        $eaDesc = mb_strtolower(
-                            trim(\Normalizer::normalize($ea->descripcion, Normalizer::FORM_C)),
-                            'UTF-8',
-                        );
-                        $paqueteDesc = mb_strtolower(
-                            trim(\Normalizer::normalize($paquete->descripcion, Normalizer::FORM_C)),
-                            'UTF-8',
-                        );
-                    @endphp
-                    <div>
-                        <div class="font-semibold text-indigo-700 px-1 py-1">
-                            {{-- <i class="fas fa-vial"></i> EA: {{ $ea->descripcion }} --}}
-                            <a href="{{ route('ea.lab.inscritos', $ea->id) }}"
-                                class="block px-1 py-1 text-[10px] text-gray-600 hover:bg-indigo-100 rounded">
-                                <i class="fas fa-flask w-4 text-indigo-500"></i>
-                                <p class="inline">
-                                    @if ($eaDesc == $paqueteDesc)
-                                        <span class="text-[12px]">
-                                            {{ $ea->descripcion }}
-                                        </span>
-                                    @else
-                                        {{ $paquete->descripcion }} <br>
-                                        <span class="text-[12px]">
-                                            {{ $ea->descripcion }}
-                                        </span>
-                                    @endif
-                                </p>
-                            </a>
-                        </div>
-                        {{-- @foreach ($ea->inscripciones as $inscripcion)
-                            <a href="{{ route('ruta.lab.resultados', $inscripcion->laboratorio->id) }}"
-                                class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                                <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
-                                {{ $inscripcion->laboratorio->nombre }}
-                            </a>
-                        @endforeach --}}
-                    </div>
-                @endforeach
-            </div>
-            @if (Configuracion::estaHabilitadoCargarCertificado())
-                <button @click="openMenu !== 21 ? openMenu = 21 : openMenu = null"
-                    class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
-                    <i class="fas fa-clipboard-check w-5 text-indigo-500"></i>
-                    <span>Registrar Evaluacion</span>
-                    <i class="fas ml-auto" :class="openMenu === 20 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                </button>
-                <div x-show="openMenu === 21" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-                    @php
-                        $user = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
-                        $ensayoAps = $user->responsablesEA;
-                    @endphp
-                    @foreach ($ensayoAps as $ea)
-                        @php
-                            $paquete = $ea->paquete;
-                            $eaDesc = mb_strtolower(
-                                trim(\Normalizer::normalize($ea->descripcion, Normalizer::FORM_C)),
-                                'UTF-8',
-                            );
-                            $paqueteDesc = mb_strtolower(
-                                trim(\Normalizer::normalize($paquete->descripcion, Normalizer::FORM_C)),
-                                'UTF-8',
-                            );
-                        @endphp
-                        <div>
-                            <div class="font-semibold text-indigo-700 px-3 py-1">
-                                {{-- <i class="fas fa-vial"></i> EA: {{ $ea->descripcion }} --}}
-                                <a href="{{ route('ea.lab.certificados', $ea->id) }}"
-                                    class="block px-1 py-1 text-[10px] text-gray-600 hover:bg-indigo-100 rounded">
-                                    <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
-                                    <p class="inline">
-                                        @if ($eaDesc == $paqueteDesc)
-                                            <span class="text-[12px]">
-                                                {{ $ea->descripcion }}
-                                            </span>
-                                        @else
-                                            {{ $paquete->descripcion }} <br>
-                                            <span class="text-[12px]">
-                                                {{ $ea->descripcion }}
-                                            </span>
-                                        @endif
-                                    </p>
-                                </a>
-                            </div>
-                            {{-- @foreach ($ea->inscripciones as $inscripcion)
-                            <a href="{{ route('ruta.lab.resultados', $inscripcion->laboratorio->id) }}"
-                                class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                                <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
-                                {{ $inscripcion->laboratorio->nombre }}
-                            </a>
-                        @endforeach --}}
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-            <a href="{{ route('ea.formulario.index') }}"
-                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
-                <i class="fas fa-clipboard-list w-5 text-indigo-500"></i>
-                <span>Gestion de formularios</span>
-            </a>
-        </div>
-    </div>
-    @endif
-
-    @if (Gate::any([Permiso::LABORATORIO]))
     <div>
-        <button @click="openMenu !== 103 ? openMenu = 103 : openMenu = null"
+        <button @click="openMenu !== 102 ? openMenu = 102 : openMenu = null"
             class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
             <i class="fas fa-vials w-5 text-indigo-500"></i>
-            <span>Gestion de inscripciones</span>
+            <span>Laboratorio</span>
             <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
         </button>
-        <div x-show="openMenu === 103" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-            <a href="{{ route('lab.ins.index') }}"
+        <div x-show="openMenu === 102" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
+            <a href="{{ route('lab.profile') }}"
                 class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i>
-                Listado de inscripciones
+                <i class="fas fa-id-card-alt w-4 mr-1 text-indigo-500"></i> Perfil de laboratorio
             </a>
-            {{-- href="{{ route('formulario_contrato_lab.pdf') }}" --}}
-            @if (Auth::user()->laboratorio->tieneIscripcionGestionActual())
-            <a href="{{ route('formulario_contrato') }}" target="_blank"
+            @if (Configuracion::esPeriodoInscripcion())
+            <a href="{{ route('lab.profile.edit') }}"
                 class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Contrato
+                <i class="fas fa-user-edit w-4 mr-1 text-indigo-500"></i> Actualizar tu información
             </a>
             @endif
         </div>
     </div>
     @endif
+
+
     @if (Gate::any([Permiso::RESPONSABLE]))
     @php
     $user = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
@@ -332,8 +166,150 @@ use App\Models\Configuracion;
             @endforeach
         </div>
         @endif
+        <a href="{{ route('ea.formulario.index') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+            <i class="fas fa-clipboard-list w-5 text-indigo-500"></i>
+            <span>Gestion de formularios</span>
+        </a>
     </div>
     @endif
+
+    @if (Gate::any([Permiso::LABORATORIO]))
+    <div>
+        <button @click="openMenu !== 103 ? openMenu = 103 : openMenu = null"
+            class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
+            <i class="fas fa-vials w-5 text-indigo-500"></i>
+            <span>Gestion de inscripciones</span>
+            <i class="fas ml-auto" :class="openMenu === 2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </button>
+        <div x-show="openMenu === 103" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
+            <a href="{{ route('lab.ins.index') }}"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i>
+                Listado de inscripciones
+            </a>
+            {{-- href="{{ route('formulario_contrato_lab.pdf') }}" --}}
+            @if (Auth::user()->laboratorio->tieneIscripcionGestionActual())
+            <a href="{{ route('formulario_contrato') }}" target="_blank"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                <i class="fas fa-file-alt w-4 mr-1 text-indigo-500"></i> Contrato
+            </a>
+            @endif
+        </div>
+    </div>
+    @endif
+    <!-- @if (Gate::any([Permiso::RESPONSABLE]))
+    @php
+    $user = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
+    $ensayoAps = $user->responsablesEA;
+    @endphp
+    <div>
+        <button @click="openMenu !== 20 ? openMenu = 20 : openMenu = null"
+            class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
+            <i class="fas fa-vials w-5 text-indigo-500"></i>
+            <span>Gestión de Ensayos de Aptitud</span>
+            <i class="fas ml-auto" :class="openMenu === 20 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </button>
+        <div x-show="openMenu === 20" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
+            @foreach ($ensayoAps as $ea)
+            @php
+            $paquete = $ea->paquete;
+            $eaDesc = mb_strtolower(
+            trim(\Normalizer::normalize($ea->descripcion, Normalizer::FORM_C)),
+            'UTF-8',
+            );
+            $paqueteDesc = mb_strtolower(
+            trim(\Normalizer::normalize($paquete->descripcion, Normalizer::FORM_C)),
+            'UTF-8',
+            );
+            @endphp
+            <div>
+                <div class="font-semibold text-indigo-700 px-1 py-1">
+                    {{-- <i class="fas fa-vial"></i> EA: {{ $ea->descripcion }} --}}
+                    <a href="{{ route('ea.lab.inscritos', $ea->id) }}"
+                        class="block px-1 py-1 text-[10px] text-gray-600 hover:bg-indigo-100 rounded">
+                        <i class="fas fa-flask w-4 text-indigo-500"></i>
+                        <p class="inline">
+                            @if ($eaDesc == $paqueteDesc)
+                            <span class="text-[12px]">
+                                {{ $ea->descripcion }}
+                            </span>
+                            @else
+                            {{ $paquete->descripcion }} <br>
+                            <span class="text-[12px]">
+                                {{ $ea->descripcion }}
+                            </span>
+                            @endif
+                        </p>
+                    </a>
+                </div>
+                {{-- @foreach ($ea->inscripciones as $inscripcion)
+                            <a href="{{ route('ruta.lab.resultados', $inscripcion->laboratorio->id) }}"
+                class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
+                {{ $inscripcion->laboratorio->nombre }}
+                </a>
+                @endforeach --}}
+            </div>
+            @endforeach
+        </div>
+        @if (Configuracion::estaHabilitadoCargarCertificado())
+        <button @click="openMenu !== 21 ? openMenu = 21 : openMenu = null"
+            class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
+            <i class="fas fa-clipboard-check w-5 text-indigo-500"></i>
+            <span>Registrar Evaluacion</span>
+            <i class="fas ml-auto" :class="openMenu === 20 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </button>
+        <div x-show="openMenu === 21" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
+            @php
+            $user = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
+            $ensayoAps = $user->responsablesEA;
+            @endphp
+            @foreach ($ensayoAps as $ea)
+            @php
+            $paquete = $ea->paquete;
+            $eaDesc = mb_strtolower(
+            trim(\Normalizer::normalize($ea->descripcion, Normalizer::FORM_C)),
+            'UTF-8',
+            );
+            $paqueteDesc = mb_strtolower(
+            trim(\Normalizer::normalize($paquete->descripcion, Normalizer::FORM_C)),
+            'UTF-8',
+            );
+            @endphp
+            <div>
+                <div class="font-semibold text-indigo-700 px-3 py-1">
+                    {{-- <i class="fas fa-vial"></i> EA: {{ $ea->descripcion }} --}}
+                    <a href="{{ route('ea.lab.certificados', $ea->id) }}"
+                        class="block px-1 py-1 text-[10px] text-gray-600 hover:bg-indigo-100 rounded">
+                        <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
+                        <p class="inline">
+                            @if ($eaDesc == $paqueteDesc)
+                            <span class="text-[12px]">
+                                {{ $ea->descripcion }}
+                            </span>
+                            @else
+                            {{ $paquete->descripcion }} <br>
+                            <span class="text-[12px]">
+                                {{ $ea->descripcion }}
+                            </span>
+                            @endif
+                        </p>
+                    </a>
+                </div>
+                {{-- @foreach ($ea->inscripciones as $inscripcion)
+                            <a href="{{ route('ruta.lab.resultados', $inscripcion->laboratorio->id) }}"
+                class="block px-5 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                <i class="fas fa-flask w-4 mr-1 text-indigo-500"></i>
+                {{ $inscripcion->laboratorio->nombre }}
+                </a>
+                @endforeach --}}
+            </div>
+            @endforeach
+        </div>
+        @endif
+    </div>
+    @endif -->
 
 
     <!-- Certificados -->
@@ -398,20 +374,20 @@ use App\Models\Configuracion;
     </div>
     @endif
     @if (Gate::any([Permiso::LABORATORIO]))
-        <div>
-            <a href="{{ route('lab.inscritos-ensayos.index') }}"
-                class="flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
-                <i class="fas fa-check-circle w-5 text-indigo-500"></i>
-                <span>Registrar resultados</span>
-            </a>
-        </div>
-        <div>
-            <a href="{{ route('lab.ensayos-informes.index') }}"
-                class="flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
-                <i class="fas fa-file-alt w-5 text-indigo-500"></i>
-                <span>Ver informes</span>
-            </a>
-        </div>
+    <div>
+        <a href="{{ route('lab.inscritos-ensayos.index') }}"
+            class="flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
+            <i class="fas fa-check-circle w-5 text-indigo-500"></i>
+            <span>Registrar resultados</span>
+        </a>
+    </div>
+    <div>
+        <a href="{{ route('lab.ensayos-informes.index') }}"
+            class="flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
+            <i class="fas fa-file-alt w-5 text-indigo-500"></i>
+            <span>Ver informes</span>
+        </a>
+    </div>
     @endif
     @if (Gate::any([Permiso::ADMIN, Permiso::CONFIGURACION]))
     <div>
@@ -641,40 +617,40 @@ use App\Models\Configuracion;
     @endif
 
     @if (Gate::any([Permiso::ADMIN]))
-        <div>
-            <a href="{{ route('admin.formularios.ea') }}"
-                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
-                <i class="fas fa-cogs w-5 text-indigo-500"></i>
-                <span>Formularios de EA</span>
-            </a>
-        </div>
+    <div>
+        <a href="{{ route('admin.formularios.ea') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+            <i class="fas fa-cogs w-5 text-indigo-500"></i>
+            <span>Formularios de EA</span>
+        </a>
+    </div>
     @endif
 
     @if (Gate::any([Permiso::ADMIN, Permiso::RESPONSABLE]))
-        <div>
-            <button @click="openMenu !== 600 ? openMenu = 600 : openMenu = null"
-                class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
-                <i class="fas fa-chart-line w-5 text-indigo-500"></i>
-                <span> Gestion de resultados </span>
-                <i class="fas ml-auto" :class="openMenu === 600 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-            </button>
-            <div x-show="openMenu === 600" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-                @if (Gate::any([Permiso::RESPONSABLE]))
-                    <a href="{{ route('reportes.resultados.ensayos') }}"
-                        class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
-                        <i class="fas fa-file-alt"></i> Reporte de resultados
-                    </a>
-                @endif
-            </div>
+    <div>
+        <button @click="openMenu !== 600 ? openMenu = 600 : openMenu = null"
+            class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
+            <i class="fas fa-chart-line w-5 text-indigo-500"></i>
+            <span> Gestion de resultados </span>
+            <i class="fas ml-auto" :class="openMenu === 600 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </button>
+        <div x-show="openMenu === 600" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
+            @if (Gate::any([Permiso::RESPONSABLE]))
+            <a href="{{ route('reportes.resultados.ensayos') }}"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-file-alt"></i> Reporte de resultados
+            </a>
+            @endif
         </div>
+    </div>
     @endif
     @if (Gate::any([Permiso::RESPONSABLE]))
-        <div class="ml-0 mt-1 space-y-1">
-            <a href="{{ route('informe.tecnico.ensayos') }}"
-                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
-                <i class="fas fa-clipboard-list w-5 text-indigo-500"></i>
-                <span>Informe tecnico de resultados</span>
-            </a>
-        </div>
+    <div class="ml-0 mt-1 space-y-1">
+        <a href="{{ route('informe.tecnico.ensayos') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+            <i class="fas fa-clipboard-list w-5 text-indigo-500"></i>
+            <span>Informe tecnico de resultados</span>
+        </a>
+    </div>
     @endif
 </nav>

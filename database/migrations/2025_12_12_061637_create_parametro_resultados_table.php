@@ -51,6 +51,7 @@ return new class extends Migration
             // $table->json('reglas')->nullable();           // Validaciones extra en JSON
             $table->string('valor')->nullable();
             $table->boolean('modificable')->default(true);
+            $table->boolean('auto_guardar')->default(false);
 
             // Dependencias
             $table->json('dependencias')->nullable();     // Ej: mostrar si otro input = X
