@@ -12,16 +12,16 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user()->loadMissing(['permisos', 'laboratorio', 'cargo']);
-        $gestion = configuracion(Configuracion::GESTION_INSCRIPCION);
 
         // ── LABORATORIO ──────────────────────────────────────────────
         if ($user->isLaboratorio()) {
             $lab = $user->laboratorio;
             $inscripcionActual = $lab->inscripciones()
-                ->where('gestion', $gestion)
                 ->with('detalleInscripciones')
                 ->latest('id')
                 ->first();
+
+            $gestion = $inscripcionActual?->gestion ?? configuracion(Configuracion::GESTION_INSCRIPCION);
 
             return view('dashboard', [
                 'tipo'                    => 'laboratorio',
@@ -36,6 +36,7 @@ class DashboardController extends Controller
         // ── RESPONSABLE DE EA ────────────────────────────────────────
         if ($user->isResponsableEA()) {
             $ensayoAps = $user->responsablesEA()->with('paquete')->get();
+            $gestion = Inscripcion::latest('id')->value('gestion') ?? configuracion(Configuracion::GESTION_INSCRIPCION);
 
             return view('dashboard', [
                 'tipo'                    => 'responsable',
@@ -46,6 +47,7 @@ class DashboardController extends Controller
         }
 
         // ── ADMIN / JEFE PEEC / PERSONAL INTERNO ────────────────────
+        $gestion = Inscripcion::latest('id')->value('gestion') ?? configuracion(Configuracion::GESTION_INSCRIPCION);
         $inscripcionesGestion = Inscripcion::where('gestion', $gestion)->get();
 
         return view('dashboard', [

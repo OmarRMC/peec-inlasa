@@ -83,6 +83,17 @@
 <body class="bg-gray-100 font-sans antialiased text-gray-800"
     :class="{ 'sidebar-open': sidebarOpen, 'sidebar-collapsed': sidebarCollapsed }">
 
+    @if (session()->has('impersonated_by'))
+    <div class="bg-yellow-400 text-yellow-900 text-center py-2 px-4 text-sm font-medium z-50 relative">
+        <i class="fas fa-user-secret mr-1"></i>
+        Estás viendo el sistema como <strong>{{ auth()->user()->username }}</strong>.
+        <a href="{{ route('impersonate.leave') }}"
+            class="ml-3 underline font-bold hover:text-yellow-700">
+            Volver a mi cuenta
+        </a>
+    </div>
+    @endif
+
     <x-alerts.sweetalert />
 
     <!-- Sidebar Toggle Buttons -->

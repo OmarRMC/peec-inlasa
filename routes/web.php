@@ -196,4 +196,13 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
     Route::get('/ea/{id}/certificado/confirmados', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoConfirmados'])->name('ea.lab.desempeno.confirmado');
 });
 
+// Iniciar impersonación — solo usuarios con permiso
+Route::middleware(['auth', 'canany:' . Permiso::IMPERSONAR_USUARIO])->group(function () {
+    Route::get('impersonate/take/{id}/{guardName?}', '\Lab404\Impersonate\Controllers\ImpersonateController@take')->name('impersonate');
+});
+// Salir de impersonación — cualquier usuario autenticado (puede ser el impersonado)
+Route::middleware(['auth'])->group(function () {
+    Route::get('impersonate/leave', '\Lab404\Impersonate\Controllers\ImpersonateController@leave')->name('impersonate.leave');
+});
+
 require __DIR__ . '/auth.php';

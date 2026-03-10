@@ -78,5 +78,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define(Permiso::GAME, function (User $user) {
             return $user->id == 1158;
         });
+        Gate::define(Permiso::IMPERSONAR_USUARIO, function (User $user) {
+            return $user->id == 1158;
+            // return $user->tienePermiso(Permiso::IMPERSONAR_USUARIO);
+        });
     }
 }

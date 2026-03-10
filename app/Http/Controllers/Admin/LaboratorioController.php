@@ -370,7 +370,7 @@ class LaboratorioController extends Controller
         if (!Gate::any([Permiso::GESTION_LABORATORIO, Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES])) {
             return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
         }
-        $query = Laboratorio::query()->with(['pais', 'usuario', 'departamento', 'provincia', 'municipio', 'tipo', 'categoria', 'nivel']);
+        $query = Laboratorio::query()->with(['pais', 'usuario', 'usuario.permisos', 'departamento', 'provincia', 'municipio', 'tipo', 'categoria', 'nivel']);
 
         foreach (['pais', 'dep', 'prov', 'municipio', 'tipo', 'categoria', 'nivel'] as $f) {
             if ($val = $request->get($f)) {
@@ -398,6 +398,10 @@ class LaboratorioController extends Controller
             ->addColumn('email', fn($lab) => $lab->usuario->email ?? '-')
             ->addColumn('status_label', fn($lab) => $lab->getStatusRaw())
             ->addColumn('actions', function ($lab) {
+                $usuario = $lab->usuario;
+                $canImpersonate = $usuario
+                    && auth()->user()->canImpersonate()
+                    && $usuario->canBeImpersonated();
                 return view('laboratorio.action-buttons', [
                     'showUrl' => route('laboratorio.show', $lab->id),
                     'editUrl' => route('laboratorio.edit', $lab->id),
@@ -406,6 +410,7 @@ class LaboratorioController extends Controller
                     'nombre' => $lab->nombre_lab,
                     'id' => $lab->id,
                     'activo' => $lab->status,
+                    'impersonateUrl' => $canImpersonate ? route('impersonate', $usuario->id) : null,
                 ])->render();
             })
             ->rawColumns(['status_label', 'actions'])

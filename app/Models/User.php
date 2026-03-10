@@ -13,10 +13,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Lab404\Impersonate\Models\Impersonate;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use General;
+    use General, Impersonate;
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
@@ -131,6 +132,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function tienePermiso($clave)
     {
         return $this->permisos->contains('clave', $clave);
+    }
+
+    public function canImpersonate(): bool
+    {
+        return $this->tienePermiso(Permiso::IMPERSONAR_USUARIO);
+    }
+
+    public function canBeImpersonated(): bool
+    {
+        return !$this->tienePermiso(Permiso::ADMIN)
+            && !$this->tienePermiso(Permiso::IMPERSONAR_USUARIO);
     }
 
     public function sendPasswordResetNotification($token)

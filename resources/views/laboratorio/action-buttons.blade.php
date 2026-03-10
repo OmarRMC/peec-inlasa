@@ -1,7 +1,7 @@
 @php
     use App\Models\Permiso;
 @endphp
-@props(['showUrl', 'editUrl', 'deleteUrl', 'inscribirUrl', 'nombre', 'id', 'activo' => false])
+@props(['showUrl', 'editUrl', 'deleteUrl', 'inscribirUrl', 'nombre', 'id', 'activo' => false, 'impersonateUrl' => null])
 
 <div class="flex space-x-1">
     {{-- Ver --}}
@@ -31,6 +31,14 @@
         @endif
     @endif
 
+    {{-- Impersonar --}}
+    @if ($impersonateUrl)
+        <a href="{{ $impersonateUrl }}" class="impersonate-button bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm"
+            data-nombre="{{ $nombre }}" data-tippy-content="Ingresar como este laboratorio">
+            <i class="fas fa-user-secret"></i>
+        </a>
+    @endif
+
     {{-- Eliminar --}}
     @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_LABORATORIO]))
         <button class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm"
@@ -40,3 +48,4 @@
         </button>
     @endif
 </div>
+

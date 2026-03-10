@@ -244,12 +244,14 @@ class UserController extends Controller
                     : '<span class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-red-500 text-white">Inactivo</span>'
             )
             ->addColumn('actions', function ($u) {
+                $canImpersonate = auth()->user()->canImpersonate() && $u->canBeImpersonated();
                 return view('usuario.action-buttons', [
                     'id' => $u->id,
                     'nombre' => $u->username,
                     'editUrl' => route('usuario.edit', $u->id),
                     'showUrl' => route('usuario.show', $u->id),
-                    'deleteUrl' => route('usuario.destroy', $u->id)
+                    'deleteUrl' => route('usuario.destroy', $u->id),
+                    'impersonateUrl' => $canImpersonate ? route('impersonate', $u->id) : null,
                 ])->render();
             })
             ->rawColumns(['status_label', 'actions', 'cargo'])
