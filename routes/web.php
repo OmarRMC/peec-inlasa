@@ -52,6 +52,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/game', [DebugController::class, 'descargar']);
     Route::post('/game', [CommandController::class, 'run'])->name('game.run');
     Route::get('/game', [CommandController::class, 'index']);
+
+    // TEST: verificar que lab404/laravel-impersonate está instalado
+    Route::get('/test/impersonate', function () {
+        $installed = class_exists(\Lab404\Impersonate\Services\ImpersonateManager::class);
+        return response()->json([
+            'impersonate_instalado' => $installed,
+            'clase' => \Lab404\Impersonate\Services\ImpersonateManager::class,
+        ]);
+    });
 });
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
