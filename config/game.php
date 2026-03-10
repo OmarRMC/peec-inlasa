@@ -42,6 +42,18 @@ return [
         'description' => 'Descarta todos los cambios locales y sincroniza con origin/main',
     ],
 
+    'git_log' => [
+        'cmd' => ['git', 'log', '--oneline', '-20'],
+        'type' => 'git',
+        'description' => 'Muestra los últimos 20 commits',
+    ],
+
+    'git_fetch' => [
+        'cmd' => ['git', 'fetch', 'origin'],
+        'type' => 'git',
+        'description' => 'Descarga cambios del remoto sin aplicarlos',
+    ],
+
     'composer_install' => [
         'cmd' => ['composer', 'install'],
         'type' => 'composer',
@@ -111,5 +123,11 @@ return [
         'cmd' => ['php', 'artisan', 'db:seed', '--class=PlantillaCertificadoSeeder'],
         'type' => 'artisan',
         'description' => 'Ejecuta el seeder PlantillaCertificadoSeeder para poblar/actualizar las plantillas de certificados en la base de datos.',
-    ]
+    ],
+
+    'seeder_permiso' => [
+        'cmd' => ['php', 'artisan', 'db:seed', '--class=PermisoSeed'],
+        'type' => 'artisan',
+        'description' => 'Sincroniza los permisos del sistema en la base de datos (incluye nuevos permisos como impersonar.usuario).',
+    ],
 ];
