@@ -176,6 +176,12 @@ class UserController extends Controller
 
     public function destroy(User $usuario)
     {
+        if (auth()->id() === $usuario->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No puedes eliminar tu propio usuario.'
+            ], 403);
+        }
 
         $usuario->delete();
         // if ($user && $user->laboratorios()->count() <= 1) {
@@ -252,6 +258,7 @@ class UserController extends Controller
                     'showUrl' => route('usuario.show', $u->id),
                     'deleteUrl' => route('usuario.destroy', $u->id),
                     'impersonateUrl' => $canImpersonate ? route('impersonate', $u->id) : null,
+                    'isCurrentUser' => auth()->id() === $u->id,
                 ])->render();
             })
             ->rawColumns(['status_label', 'actions', 'cargo'])

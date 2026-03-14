@@ -42,6 +42,7 @@
                                         class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm">
                                         <i class="fas fa-edit"></i>
                                     </a>
+                                    @if (config('settings.allow_delete_permiso'))
                                     <form method="POST" action="{{ route('permiso.destroy', $permiso->id) }}"
                                         class="delete-form inline" data-nombre="{{ $permiso->nombre_permiso }}">
                                         @csrf
@@ -51,6 +52,7 @@
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

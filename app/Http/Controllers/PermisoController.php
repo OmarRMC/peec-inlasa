@@ -56,6 +56,10 @@ class PermisoController extends Controller
 
     public function destroy(Permiso $permiso)
     {
+        if (!config('settings.allow_delete_permiso')) {
+            return redirect()->route('permiso.index')->with('error', 'La eliminación de permisos está deshabilitada.');
+        }
+
         $permiso->delete();
 
         return redirect()->route('permiso.index')->with('success', 'Permiso eliminado.');
