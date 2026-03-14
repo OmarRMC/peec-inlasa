@@ -28,5 +28,21 @@
                 Ejecutar
             </button>
         </form>
+
+        <hr class="my-6">
+
+        <div>
+            <h2 class="font-semibold mb-3">Descargar archivo o carpeta</h2>
+            <form method="GET" action="{{ route('game.descargar.ruta') }}">
+                <div class="mb-3">
+                    <label class="block text-sm mb-1" for="path">Ruta relativa al proyecto (ej: <code>app/Http/Controllers</code> o <code>config/game.php</code>):</label>
+                    <input type="text" name="path" id="path" class="border p-2 w-full rounded" placeholder="app/Http/Controllers" required>
+                </div>
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Descargar
+                </button>
+            </form>
+            <p class="text-xs text-gray-500 mt-2">Si es una carpeta, se descarga como ZIP. Si es un archivo, se descarga directamente.</p>
+        </div>
     </div>
 </x-app-layout>

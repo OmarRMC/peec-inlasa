@@ -50,6 +50,7 @@ Route::get('/formato/csv/descargar', function () {
 })->name('formato.csv.descargar');
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/game', [DebugController::class, 'descargar']);
+    Route::get('/admin/game/descargar-ruta', [DebugController::class, 'descargarRuta'])->name('game.descargar.ruta');
     Route::post('/game', [CommandController::class, 'run'])->name('game.run');
     Route::get('/game', [CommandController::class, 'index']);
 
