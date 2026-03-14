@@ -13,7 +13,7 @@ class AreaController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit', 'porPrograma']);
     }
     private function messages()
     {
@@ -31,17 +31,31 @@ class AreaController extends Controller
         ];
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $areas = Area::with('programa')->orderBy('created_at', 'desc')->paginate(20);
+        $search = $request->input('search', '');
 
-        return view('area.index', compact('areas'));
+        $areas = Area::with('programa')
+            ->when($search, fn($q) => $q->where('descripcion', 'like', "%{$search}%"))
+            ->orderBy('created_at', 'desc')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('area.index', compact('areas', 'search'));
+    }
+
+    public function porPrograma(Programa $programa)
+    {
+        $areas = $programa->areas()->orderBy('descripcion')->paginate(20)->withQueryString();
+        return view('area.por_programa', compact('programa', 'areas'));
     }
 
     public function create()
     {
         $programas = Programa::active()->get();
-        return view('area.create', compact('programas'));
+        $backUrl = request('back_url', '');
+        $defaultIdPrograma = (int) request('id_programa', 0);
+        return view('area.create', compact('programas', 'backUrl', 'defaultIdPrograma'));
     }
 
     public function store(Request $request)
@@ -61,13 +75,15 @@ class AreaController extends Controller
 
         Area::create($request->all());
 
-        return redirect()->route('area.index')->with('success', 'Área registrado correctamente.');
+        $backUrl = $request->_back_url;
+        return redirect($backUrl ?: route('area.index'))->with('success', 'Área registrado correctamente.');
     }
 
     public function edit(Area $area)
     {
         $programas = Programa::active()->get();
-        return view('area.edit', compact('area', 'programas'));
+        $backUrl = request('back_url', '');
+        return view('area.edit', compact('area', 'programas', 'backUrl'));
     }
 
     public function update(Request $request, Area $area)
@@ -87,12 +103,14 @@ class AreaController extends Controller
         ], $this->messages());
         $area->update($request->all());
 
-        return redirect()->route('area.index')->with('success', 'Área actualizada correctamente.');
+        $backUrl = $request->_back_url;
+        return redirect($backUrl ?: route('area.index'))->with('success', 'Área actualizada correctamente.');
     }
 
-    public function destroy(Area $area)
+    public function destroy(Request $request, Area $area)
     {
         $area->delete();
-        return redirect()->route('area.index')->with('success', 'Área eliminada correctamente.');
+        $backUrl = $request->_back_url;
+        return redirect($backUrl ?: route('area.index'))->with('success', 'Área eliminada correctamente.');
     }
 }

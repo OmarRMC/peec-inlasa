@@ -21,7 +21,7 @@ class PaqueteController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit', 'porArea']);
     }
     private function messages()
     {
@@ -38,26 +38,31 @@ class PaqueteController extends Controller
         ];
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search', '');
+
         $paquetes = Paquete::with(['area.programa', 'tiposLaboratorios'])
+            ->when($search, fn($q) => $q->where('descripcion', 'like', "%{$search}%"))
             ->orderBy(
                 Area::select('id_programa')
                     ->whereColumn('area.id', 'paquete.id_area')
             )
-            ->orderBy(
-                'id_area'
-            )
+            ->orderBy('id_area')
             ->orderBy('descripcion')
-            ->paginate(20);
-        return view('paquete.index', compact('paquetes'));
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('paquete.index', compact('paquetes', 'search'));
     }
 
     public function create()
     {
         $areas = Area::active()->get();
         $tiposLaboratorios = TipoLaboratorio::active()->get();
-        return view('paquete.create', compact('areas', 'tiposLaboratorios'));
+        $backUrl = request('back_url', '');
+        $defaultIdArea = (int) request('id_area', 0);
+        return view('paquete.create', compact('areas', 'tiposLaboratorios', 'backUrl', 'defaultIdArea'));
     }
 
     public function store(Request $request)
@@ -86,7 +91,9 @@ class PaqueteController extends Controller
 
         $paquete = Paquete::create($request->all());
         $paquete->tiposLaboratorios()->sync($request['tipo_laboratorio_ids'] ?? []);
-        return redirect()->route('paquete.index')->with('success', 'Paquete creado correctamente.');
+
+        $backUrl = $request->_back_url;
+        return redirect($backUrl ?: route('paquete.index'))->with('success', 'Paquete creado correctamente.');
     }
 
     public function edit(Paquete $paquete)
@@ -94,7 +101,8 @@ class PaqueteController extends Controller
         $areas = Area::active()->get();
         $tiposLaboratorios = TipoLaboratorio::active()->get();
         $tiposLaboratoriosSelecionados  = $paquete->tiposLaboratorios()->get();
-        return view('paquete.edit', compact('paquete', 'areas', 'tiposLaboratorios', 'tiposLaboratoriosSelecionados'));
+        $backUrl = request('back_url', '');
+        return view('paquete.edit', compact('paquete', 'areas', 'tiposLaboratorios', 'tiposLaboratoriosSelecionados', 'backUrl'));
     }
 
     public function update(Request $request, Paquete $paquete)
@@ -125,13 +133,22 @@ class PaqueteController extends Controller
         $paquete->update($request->all());
         $paquete->tiposLaboratorios()->sync($request['tipo_laboratorio_ids'] ?? []);
 
-        return redirect()->route('paquete.index')->with('success', 'Paquete actualizado correctamente.');
+        $backUrl = $request->_back_url;
+        return redirect($backUrl ?: route('paquete.index'))->with('success', 'Paquete actualizado correctamente.');
     }
 
-    public function destroy(Paquete $paquete)
+    public function destroy(Request $request, Paquete $paquete)
     {
         $paquete->delete();
-        return redirect()->route('paquete.index')->with('success', 'Paquete eliminado correctamente.');
+        $backUrl = $request->_back_url;
+        return redirect($backUrl ?: route('paquete.index'))->with('success', 'Paquete eliminado correctamente.');
+    }
+
+    public function porArea(Area $area)
+    {
+        $area->load('programa');
+        $paquetes = $area->paquetes()->with('tiposLaboratorios')->orderBy('descripcion')->paginate(20)->withQueryString();
+        return view('paquete.por_area', compact('area', 'paquetes'));
     }
 
     public function porPrograma(Request $request)

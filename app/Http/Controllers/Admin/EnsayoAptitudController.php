@@ -7,6 +7,7 @@ use App\Models\Area;
 use App\Models\EnsayoAptitud;
 use App\Models\Paquete;
 use App\Models\Permiso;
+use App\Models\Programa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -14,7 +15,7 @@ class EnsayoAptitudController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit']);
+        $this->middleware('canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA)->only(['index', 'create', 'update', 'destroy', 'show', 'edit', 'porPaquete']);
     }
     private function messages()
     {
@@ -29,16 +30,35 @@ class EnsayoAptitudController extends Controller
         ];
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $ensayos = EnsayoAptitud::with(['paquete', 'paquete.area'])->orderBy('created_at', 'desc')->paginate(20);
-        return view('ensayo_aptitud.index', compact('ensayos'));
+        $search = $request->input('search', '');
+
+        $ensayos = EnsayoAptitud::with(['paquete', 'paquete.area'])
+            ->when($search, fn($q) => $q->where('descripcion', 'like', "%{$search}%"))
+            ->orderBy('created_at', 'desc')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('ensayo_aptitud.index', compact('ensayos', 'search'));
     }
 
     public function create()
     {
+        $backUrl = request('back_url', '');
+        $defaultIdPaquete = (int) request('id_paquete', 0);
+
         $paquetes = Paquete::active()->get();
-        return view('ensayo_aptitud.create', compact('paquetes'));
+
+        // Si venimos de jerarquía, asegurar que el paquete padre esté en la lista
+        if ($defaultIdPaquete && $paquetes->doesntContain('id', $defaultIdPaquete)) {
+            $paquetePadre = Paquete::find($defaultIdPaquete);
+            if ($paquetePadre) {
+                $paquetes->prepend($paquetePadre);
+            }
+        }
+
+        return view('ensayo_aptitud.create', compact('paquetes', 'backUrl', 'defaultIdPaquete'));
     }
 
     public function store(Request $request)
@@ -51,14 +71,16 @@ class EnsayoAptitudController extends Controller
 
         EnsayoAptitud::create($request->all());
 
-        return redirect()->route('ensayo_aptitud.index')->with('success', 'Ensayo de Aptitud creado correctamente.');
+        $backUrl = $request->_back_url;
+        return redirect($backUrl ?: route('ensayo_aptitud.index'))->with('success', 'Ensayo de Aptitud creado correctamente.');
     }
 
     public function edit(EnsayoAptitud $ensayoAptitud)
     {
         $paquetes = Paquete::active()->get();
         $ensayo_aptitud = $ensayoAptitud;
-        return view('ensayo_aptitud.edit', compact('ensayo_aptitud', 'paquetes'));
+        $backUrl = request('back_url', '');
+        return view('ensayo_aptitud.edit', compact('ensayo_aptitud', 'paquetes', 'backUrl'));
     }
 
     public function update(Request $request, EnsayoAptitud $ensayoAptitud)
@@ -71,13 +93,22 @@ class EnsayoAptitudController extends Controller
 
         $ensayoAptitud->update($request->all());
 
-        return redirect()->route('ensayo_aptitud.index')->with('success', 'Ensayo de Aptitud actualizado correctamente.');
+        $backUrl = $request->_back_url;
+        return redirect($backUrl ?: route('ensayo_aptitud.index'))->with('success', 'Ensayo de Aptitud actualizado correctamente.');
     }
 
-    public function destroy(EnsayoAptitud $ensayoAptitud)
+    public function destroy(Request $request, EnsayoAptitud $ensayoAptitud)
     {
         $ensayoAptitud->delete();
-        return redirect()->route('ensayo_aptitud.index')->with('success', 'Ensayo de Aptitud eliminado correctamente.');
+        $backUrl = $request->_back_url;
+        return redirect($backUrl ?: route('ensayo_aptitud.index'))->with('success', 'Ensayo de Aptitud eliminado correctamente.');
+    }
+
+    public function porPaquete(Paquete $paquete)
+    {
+        $paquete->load('area.programa');
+        $ensayos = $paquete->ensayosAptitud()->orderBy('descripcion')->paginate(20)->withQueryString();
+        return view('ensayo_aptitud.por_paquete', compact('paquete', 'ensayos'));
     }
 
     public function getEnsayoPorAreaAjax(Request $request, $id)

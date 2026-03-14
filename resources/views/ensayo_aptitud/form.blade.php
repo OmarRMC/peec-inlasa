@@ -2,23 +2,44 @@
 @if (isset($method) && $method === 'PUT')
     @method('PUT')
 @endif
+@php
+    $ensayo_aptitud ??= new \App\Models\EnsayoAptitud();
+    $defaultIdPaquete ??= '';
+    $backUrl ??= '';
+@endphp
+@if (!empty($backUrl))
+    <input type="hidden" name="_back_url" value="{{ $backUrl }}">
+@endif
 
 <!-- Paquete -->
 <div class="mb-4">
     <label for="id_paquete" class="label">Paquete</label>
-    <select name="id_paquete" id="id_paquete" class="input-standard @error('id_paquete') border-red-500 @enderror"
-        required>
-        <option value="">Seleccione un paquete</option>
-        @foreach ($paquetes as $paquete)
-            <option value="{{ $paquete->id }}"
-                {{ old('id_paquete', $ensayo_aptitud->id_paquete ?? '') == $paquete->id ? 'selected' : '' }}>
-                {{ $paquete->descripcion }}
-            </option>
-        @endforeach
-    </select>
-    @error('id_paquete')
-        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-    @enderror
+    @if (!empty($backUrl))
+        @php $selectedPaqueteId = (int) old('id_paquete', $ensayo_aptitud->id_paquete ?? $defaultIdPaquete); @endphp
+        <input type="hidden" name="id_paquete" value="{{ $selectedPaqueteId }}">
+        <select id="id_paquete" class="input-standard bg-gray-100 cursor-not-allowed" disabled>
+            <option value="">Seleccione un paquete</option>
+            @foreach ($paquetes as $paquete)
+                <option value="{{ $paquete->id }}" @selected($selectedPaqueteId === $paquete->id)>
+                    {{ $paquete->descripcion }}
+                </option>
+            @endforeach
+        </select>
+    @else
+        <select name="id_paquete" id="id_paquete" class="input-standard @error('id_paquete') border-red-500 @enderror"
+            required>
+            <option value="">Seleccione un paquete</option>
+            @foreach ($paquetes as $paquete)
+                <option value="{{ $paquete->id }}"
+                    {{ old('id_paquete', $ensayo_aptitud->id_paquete ?? $defaultIdPaquete) == $paquete->id ? 'selected' : '' }}>
+                    {{ $paquete->descripcion }}
+                </option>
+            @endforeach
+        </select>
+        @error('id_paquete')
+            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+        @enderror
+    @endif
 </div>
 
 <!-- Descripción -->

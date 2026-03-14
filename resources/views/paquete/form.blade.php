@@ -1,25 +1,45 @@
 @php
     $paquete ??= new \App\Models\Paquete();
     $tiposLaboratoriosSelecionados = $tiposLaboratoriosSelecionados ?? [];
+    $defaultIdArea ??= '';
+    $backUrl ??= '';
 @endphp
+@if (!empty($backUrl))
+    <input type="hidden" name="_back_url" value="{{ $backUrl }}">
+@endif
 
 
 <!-- Área -->
 <div>
     <label for="id_area" class="block text-sm font-semibold text-gray-700 mb-1">Área</label>
-    <select name="id_area" id="id_area"
-        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-        required>
-        <option value="">Seleccione un área</option>
-        @foreach ($areas as $area)
-            <option value="{{ $area->id }}" @selected(old('id_area', $paquete->id_area) == $area->id)>
-                {{ $area->descripcion }}
-            </option>
-        @endforeach
-    </select>
-    @error('id_area')
-        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-    @enderror
+    @if (!empty($backUrl))
+        @php $selectedAreaId = (int) old('id_area', $paquete->id_area ?? $defaultIdArea); @endphp
+        <input type="hidden" name="id_area" value="{{ $selectedAreaId }}">
+        <select id="id_area"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100 cursor-not-allowed"
+            disabled>
+            <option value="">Seleccione un área</option>
+            @foreach ($areas as $area)
+                <option value="{{ $area->id }}" @selected($selectedAreaId === $area->id)>
+                    {{ $area->descripcion }}
+                </option>
+            @endforeach
+        </select>
+    @else
+        <select name="id_area" id="id_area"
+            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            required>
+            <option value="">Seleccione un área</option>
+            @foreach ($areas as $area)
+                <option value="{{ $area->id }}" @selected(old('id_area', $paquete->id_area ?? $defaultIdArea) == $area->id)>
+                    {{ $area->descripcion }}
+                </option>
+            @endforeach
+        </select>
+        @error('id_area')
+            <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+        @enderror
+    @endif
 </div>
 
 <!-- Descripción -->

@@ -2,22 +2,42 @@
 @if (isset($method) && $method === 'PUT')
     @method('PUT')
 @endif
+@if (!empty($backUrl))
+    <input type="hidden" name="_back_url" value="{{ $backUrl }}">
+@endif
+@php
+    $area ??= new \App\Models\Area();
+    $defaultIdPrograma ??= '';
+@endphp
 
 <!-- Programa -->
 <div class="mb-4">
     <label for="id_programa" class="label">Programa</label>
-    <select name="id_programa" id="id_programa" class="input-standard @error('id_programa') border-red-500 @enderror">
-        <option value="">Selecciona un programa</option>
-        @foreach ($programas as $programa)
-            <option value="{{ $programa->id }}"
-                {{ old('id_programa', $area->id_programa ?? '') == $programa->id ? 'selected' : '' }}>
-                {{ $programa->descripcion }}
-            </option>
-        @endforeach
-    </select>
-    @error('id_programa')
-        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-    @enderror
+    @if (!empty($backUrl))
+        @php $selectedProgramaId = (int) old('id_programa', $area->id_programa ?? $defaultIdPrograma); @endphp
+        <input type="hidden" name="id_programa" value="{{ $selectedProgramaId }}">
+        <select id="id_programa" class="input-standard bg-gray-100 cursor-not-allowed" disabled>
+            <option value="">Selecciona un programa</option>
+            @foreach ($programas as $programa)
+                <option value="{{ $programa->id }}" @selected($selectedProgramaId === $programa->id)>
+                    {{ $programa->descripcion }}
+                </option>
+            @endforeach
+        </select>
+    @else
+        <select name="id_programa" id="id_programa" class="input-standard @error('id_programa') border-red-500 @enderror">
+            <option value="">Selecciona un programa</option>
+            @foreach ($programas as $programa)
+                <option value="{{ $programa->id }}"
+                    {{ old('id_programa', $area->id_programa ?? $defaultIdPrograma) == $programa->id ? 'selected' : '' }}>
+                    {{ $programa->descripcion }}
+                </option>
+            @endforeach
+        </select>
+        @error('id_programa')
+            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+        @enderror
+    @endif
 </div>
 <!-- Descripción -->
 <div class="mb-4">

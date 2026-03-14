@@ -36,6 +36,11 @@
                             </td>
                             <td>
                                 <div class="flex space-x-1">
+                                    <a href="{{ route('programa.areas', $programa->id) }}"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm"
+                                        data-tippy-content="Ver áreas">
+                                        <i class="fas fa-layer-group"></i>
+                                    </a>
                                     <a href="{{ route('programa.edit', $programa->id) }}"
                                         class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"
                                         data-tippy-content="Editar">

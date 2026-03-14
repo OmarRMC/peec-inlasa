@@ -1,48 +1,37 @@
 @php
     use App\Models\Permiso;
+    $backUrl = route('programa.areas', $programa->id);
 @endphp
 <x-app-layout>
     <div class="container py-6 max-w-5xl">
-        <!-- Encabezado -->
-        <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
-            <h1 class="text-xl font-bold text-primary">Lista de Áreas</h1>
-            <div class="flex items-center gap-2 flex-wrap">
-                <form method="GET" action="{{ route('area.index') }}" class="flex items-center gap-2">
-                    <div class="relative w-56">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                            <i class="fas fa-search text-xs"></i>
-                        </span>
-                        <input type="text" name="search" value="{{ $search }}"
-                            placeholder="Buscar área..."
-                            class="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-xs">
-                    </div>
-                    <button type="submit"
-                        class="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    @if ($search)
-                        <a href="{{ route('area.index') }}"
-                            class="px-3 py-1.5 border border-gray-300 text-gray-600 rounded hover:bg-gray-50 transition shadow text-xs">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    @endif
-                </form>
-                <a href="{{ route('area.create') }}"
-                    class="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs flex items-center gap-1">
-                    <i class="fas fa-plus-circle"></i> Nueva Área
-                </a>
-            </div>
+
+        {{-- Breadcrumb --}}
+        <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4 flex-wrap">
+            <a href="{{ route('programa.index') }}" class="hover:text-primary flex items-center gap-1">
+                <i class="fas fa-th-list"></i> Programas
+            </a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-gray-800 font-medium">{{ $programa->descripcion }}</span>
+        </nav>
+
+        {{-- Encabezado --}}
+        <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
+            <h1 class="text-xl font-bold text-primary">
+                <i class="fas fa-layer-group mr-1"></i> Áreas de: {{ $programa->descripcion }}
+            </h1>
+            <a href="{{ route('area.create', ['back_url' => $backUrl, 'id_programa' => $programa->id]) }}"
+                class="btn-primary">
+                <i class="fas fa-plus-circle"></i> Nueva Área
+            </a>
         </div>
 
-        <!-- Tabla -->
+        {{-- Tabla --}}
         <div class="overflow-x-auto bg-white rounded-lg shadow">
             <table class="table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Programa</th>
-                        <th>Area</th>
-                        {{-- <th>Máx. Paquetes</th> --}}
+                        <th>Área</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -51,9 +40,7 @@
                     @forelse ($areas as $area)
                         <tr>
                             <td>{{ $area->id }}</td>
-                            <td>{{ $area->programa->descripcion ?? 'N/D' }}</td>
                             <td>{{ $area->descripcion }}</td>
-                            {{-- <td>{{ $area->max_paquetes_inscribir }}</td> --}}
                             <td>
                                 @if ($area->status)
                                     <span class="badge badge-success">Activo</span>
@@ -63,7 +50,12 @@
                             </td>
                             <td>
                                 <div class="flex space-x-1">
-                                    <a href="{{ route('area.edit', $area->id) }}"
+                                    <a href="{{ route('area.paquetes', $area->id) }}"
+                                        class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm"
+                                        data-tippy-content="Ver paquetes">
+                                        <i class="fas fa-box-open"></i>
+                                    </a>
+                                    <a href="{{ route('area.edit', [$area->id, 'back_url' => $backUrl]) }}"
                                         class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"
                                         data-tippy-content="Editar">
                                         <i class="fas fa-edit"></i>
@@ -73,6 +65,7 @@
                                             class="delete-form inline" data-nombre="{{ $area->descripcion }}">
                                             @csrf
                                             @method('DELETE')
+                                            <input type="hidden" name="_back_url" value="{{ $backUrl }}">
                                             <button type="submit" data-tippy-content="Eliminar"
                                                 class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
                                                 <i class="fas fa-trash-alt"></i>
@@ -84,12 +77,15 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-4 text-center text-muted">No hay áreas registradas.</td>
+                            <td colspan="4" class="px-4 py-4 text-center text-muted">
+                                No hay áreas registradas para este programa.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
+
         <div class="mt-4">
             {{ $areas->links() }}
         </div>

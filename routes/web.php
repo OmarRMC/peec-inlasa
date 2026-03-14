@@ -82,6 +82,9 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::resource('/area', AreaController::class)->except(['show']);
     Route::resource('/paquete', PaqueteController::class)->except(['show']);
     Route::resource('/ensayo_aptitud', EnsayoAptitudController::class)->except(['show']);
+    Route::get('/programa/{programa}/areas', [AreaController::class, 'porPrograma'])->name('programa.areas');
+    Route::get('/area/{area}/paquetes', [PaqueteController::class, 'porArea'])->name('area.paquetes');
+    Route::get('/paquete/{paquete}/ensayos', [EnsayoAptitudController::class, 'porPaquete'])->name('paquete.ensayos');
 
     Route::resource('/pais', PaisController::class)->parameters(['pais' => 'pais'])->except(['show']);
     Route::resource('/departamento', DepartamentoController::class)->except(['show']);
