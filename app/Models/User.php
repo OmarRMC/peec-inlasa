@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Gate;
 use Lab404\Impersonate\Models\Impersonate;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -136,13 +137,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function canImpersonate(): bool
     {
-        return $this->tienePermiso(Permiso::IMPERSONAR_USUARIO);
+        return Gate::forUser($this)->allows(Permiso::IMPERSONAR_USUARIO);
     }
 
     public function canBeImpersonated(): bool
     {
-        return !$this->tienePermiso(Permiso::ADMIN)
-            && !$this->tienePermiso(Permiso::IMPERSONAR_USUARIO);
+        return !Gate::forUser($this)->allows(Permiso::ADMIN)
+            && !Gate::forUser($this)->allows(Permiso::IMPERSONAR_USUARIO);
     }
 
     public function sendPasswordResetNotification($token)
