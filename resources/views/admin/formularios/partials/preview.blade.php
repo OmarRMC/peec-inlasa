@@ -1,13 +1,22 @@
 @php
-    $fromRes = $respuestas[$i - 1] ?? null;
-    $observaciones = $respuestas[$i - 1]['observaciones'] ?? '';
-    $res = $respuestas[$i - 1]['respuestas'] ?? [];
-    $respuestas = collect($res);
+    $formIdx = $i ?? 1;
+    $fromRes = $respuestas[$formIdx - 1] ?? null;
+    $observaciones = $respuestas[$formIdx - 1]['observaciones'] ?? '';
+    $res = $respuestas[$formIdx - 1]['respuestas'] ?? [];
+    $respuestasActuales = collect($res);
     dump($fromRes['id'] ?? '');
     $readonly = $readonly ?? false;
+
+    // Obtener las respuestas anteriores para este índice de formulario (para auto_guardar)
+    $respuestasAnterioresList = $respuestasAnterioresList ?? collect([]);
+    $respuestaAnteriorActual = $respuestasAnterioresList[$formIdx - 1] ?? null;
+    $respuestasAnteriores = $respuestaAnteriorActual ? $respuestaAnteriorActual->respuestas : collect([]);
+
+    // Prefijo para los nombres de los campos (para múltiples formularios)
+    $namePrefix = "formularios[$formIdx]";
 @endphp
 @if ($fromRes)
-    <input type="hidden" name="id_formulario_ensayos_resultados" value="{{ $fromRes['id'] }}">
+    <input type="hidden" name="{{ $namePrefix }}[id_formulario_ensayos_resultados]" value="{{ $fromRes['id'] }}">
 @endif
 {{-- Secciones --}}
 @foreach ($formulario->secciones as $secIdx => $seccion)
@@ -35,7 +44,7 @@
             <tbody>
                 @foreach ($seccion->parametros as $paramIdx => $parametro)
                     @php
-                        $valorParametro = $respuestas->firstWhere('id_parametro', $parametro->id);
+                        $valorParametro = $respuestasActuales->firstWhere('id_parametro', $parametro->id);
                         $campoAnterior = '';
                     @endphp
                     <tr data-parametro-id="{{ $parametro->id }}"
@@ -56,8 +65,8 @@
                                         @endphp
                             @endif
                             @php
-                                $inputName = "secciones[$secIdx][parametros][$paramIdx][campos][$campoIdx][valor]";
-                                $inputNameText = "secciones[$secIdx][parametros][$paramIdx][campos][$campoIdx][valorTexto]";
+                                $inputName = "{$namePrefix}[secciones][$secIdx][parametros][$paramIdx][campos][$campoIdx][valor]";
+                                $inputNameText = "{$namePrefix}[secciones][$secIdx][parametros][$paramIdx][campos][$campoIdx][valorTexto]";
                                 $parametroRespuestas = collect($valorParametro->respuestas ?? []);
                                 $valorCampos = $parametroRespuestas->firstWhere('id', $campo->id);
                                 if( $readonly &&  $campo->tipo == 'select'){
@@ -65,6 +74,17 @@
                                 }else {
                                     $valorCampo = $valorCampos['valor'] ?? null;
                                 }
+
+                                // Auto-guardar: si el campo tiene auto_guardar y no tiene valor actual, buscar en respuestas anteriores
+                                if ($campo->auto_guardar && empty($valorCampo) && $respuestasAnteriores->isNotEmpty()) {
+                                    $respuestaAnteriorParam = $respuestasAnteriores->firstWhere('id_parametro', $parametro->id);
+                                    if ($respuestaAnteriorParam) {
+                                        $respuestasAnteriorCampos = collect($respuestaAnteriorParam->respuestas ?? []);
+                                        $valorAnterior = $respuestasAnteriorCampos->firstWhere('id', $campo->id);
+                                        $valorCampo = $valorAnterior['valor'] ?? null;
+                                    }
+                                }
+
                                 $valorCampoText = '';
                                 if ($campo->grupoSelector) {
                                     foreach ($campo->grupoSelector->opciones as $op) {
@@ -106,7 +126,7 @@
                                 @endif>
                             @elseif ($campo->tipo === 'textarea')
                                 <textarea name="{{ $inputName }}"
-                                    class="w-full {{ !$campo->modificable ? 'border-0 bg-transparent cursor-default pointer-events-none' : 'border rounded px-2 py-1' }} text-xs campo-entrada"
+                                    class="w-full {{ !$campo->modificable ? 'border-0 bg-transparent cursor-default pointer-events-none' : 'border rounded px-2 py-1' }} text-xs"
                                     placeholder="{{ $campo->placeholder }}"
                                     @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif @endif @readonly(!$campo->modificable) 
                                     @if ($campo->mensaje) title="{{ $campo->mensaje }}"
@@ -163,33 +183,33 @@
                                     @if (!$parametro->requerido_si_completa && $campo->requerido) required @endif>
                             @endif
                             {{-- Campos hidden para mantener estructura JSON --}}
-                            <input type="hidden" name="secciones[{{ $secIdx }}][id]"
+                            <input type="hidden" name="{{ $namePrefix }}[secciones][{{ $secIdx }}][id]"
                                 value="{{ $seccion->id }}">
-                            <input type="hidden" name="secciones[{{ $secIdx }}][nombre]"
+                            <input type="hidden" name="{{ $namePrefix }}[secciones][{{ $secIdx }}][nombre]"
                                 value="{{ $seccion->nombre }}">
-                            <input type="hidden" name="secciones[{{ $secIdx }}][descripcion]"
+                            <input type="hidden" name="{{ $namePrefix }}[secciones][{{ $secIdx }}][descripcion]"
                                 value="{{ $seccion->descripcion }}">
                             <input type="hidden"
-                                name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][id]"
+                                name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][id]"
                                 value="{{ $parametro->id }}">
                             <input type="hidden"
-                                name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][nombre]"
+                                name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][nombre]"
                                 value="{{ $parametro->nombre }}">
                             <input type="hidden"
-                                name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][visible_nombre]"
+                                name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][visible_nombre]"
                                 value="{{ $parametro->visible_nombre }}">
                             <input type="hidden"
-                                name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][id]"
+                                name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][id]"
                                 value="{{ $campo->id }}">
                             <input type="hidden"
-                                name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][label]"
+                                name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][label]"
                                 value="{{ $campo->label }}">
                             <input type="hidden"
-                                name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][tipo]"
+                                name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][tipo]"
                                 value="{{ $campo->tipo }}">
                             @if ($campo->unidad)
                                 <input type="hidden"
-                                    name="secciones[{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][unidad]"
+                                    name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][unidad]"
                                     value="{{ $campo->unidad }}">
                             @endif
                             @if ($campoAnterior != $campo->label)

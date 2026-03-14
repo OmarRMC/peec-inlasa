@@ -86,8 +86,28 @@ class RegistroResultadosController extends Controller
         }
         $respuestas = $laboratorio->respuestas()->where('id_ciclo', $cicloId)->where('gestion', now()->year)->where('id_formulario', $formulario->id)->get();
         $respuestas->load(['respuestas']);
-        // return $respuestas;
-        return view('laboratorio.resultados.llenar', compact('formulario', 'laboratorio', 'cantidad', 'idEA', 'respuestas'));
+
+        // Buscar las respuestas anteriores del laboratorio para este formulario (para campos con auto_guardar)
+        // Obtiene todas las respuestas del ciclo anterior más reciente
+        $cicloAnteriorConRespuestas = $laboratorio->respuestas()
+            ->where('id_formulario', $formulario->id)
+            ->where('id_ciclo', '!=', $cicloId)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        $respuestasAnterioresList = collect([]);
+        if ($cicloAnteriorConRespuestas) {
+            // Obtener todas las respuestas del mismo ciclo anterior, reindexadas para acceso por índice
+            $respuestasAnterioresList = $laboratorio->respuestas()
+                ->where('id_formulario', $formulario->id)
+                ->where('id_ciclo', $cicloAnteriorConRespuestas->id_ciclo)
+                ->with('respuestas')
+                ->orderBy('id')
+                ->get()
+                ->values();
+        }
+
+        return view('laboratorio.resultados.llenar', compact('formulario', 'laboratorio', 'cantidad', 'idEA', 'respuestas', 'respuestasAnterioresList'));
     }
 
     function guardarResultados(Request $request, $id)

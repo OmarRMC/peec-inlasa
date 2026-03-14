@@ -39,33 +39,32 @@
         @endif
 
         {{-- Formularios en lista --}}
-        @for ($i = 1; $i <= $cantidad; $i++)
-            <div class="space-y-4 mb-8 border-b pb-6">
-                <form method="POST" action="{{ route('lab.resultados.store') }}">
-                    <input type="hidden" value="{{ $formulario->id }}" name="id_formulario">
-                    @csrf
+        <form method="POST" action="{{ route('lab.resultados.store') }}">
+            @csrf
+            <input type="hidden" value="{{ $formulario->id }}" name="id_formulario">
+            <input type="hidden" name="id_ensayo" value="{{ $idEA }}">
+            <input type="hidden" name="cantidad" value="{{ $cantidad }}">
 
+            @for ($i = 1; $i <= $cantidad; $i++)
+                <div class="space-y-4 mb-8 {{ $i < $cantidad ? 'border-b pb-6' : '' }}">
                     <h2 class="font-bold text-lg mb-2" style="color: {{ $primaryColor }}">
                         Formulario {{ $i }} / {{ $cantidad }}
                     </h2>
-                    <input type="hidden" name="id_ensayo" value="{{ $idEA }}">
 
                     {{-- Secciones --}}
                     @include('admin.formularios.partials.preview')
-                    {{-- Acciones --}}
-                    <div class="flex justify-end gap-2">
-                        {{-- <a href="{{ route('lab.inscritos-ensayos.index') }}" class="px-3 py-1 text-white rounded"
-                            style="background-color: red;">
-                            Cancelar
-                        </a> --}}
-                        <button type="submit" class="px-3 py-1 text-white rounded"
-                            style="background-color: {{ $primaryColor }}">
-                            Guardar este formulario
-                        </button>
-                    </div>
-                </form>
+                </div>
+            @endfor
+
+            {{-- Botón único de guardar --}}
+            <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                <button type="submit" class="px-6 py-2 text-white rounded font-semibold"
+                    style="background-color: {{ $primaryColor }}">
+                    <i class="fas fa-save mr-2"></i>
+                    Guardar {{ $cantidad > 1 ? 'todos los formularios' : 'formulario' }}
+                </button>
             </div>
-        @endfor
+        </form>
     </div>
 
     @push('scripts')
