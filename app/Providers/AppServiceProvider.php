@@ -75,12 +75,16 @@ class AppServiceProvider extends ServiceProvider
         Gate::define(Permiso::JEFE_PEEC, function (User $user) {
             return $user->tienePermiso(Permiso::JEFE_PEEC);
         });
+
         Gate::define(Permiso::GAME, function (User $user) {
             return $user->id == 1158;
         });
         Gate::define(Permiso::IMPERSONAR_USUARIO, function (User $user) {
             return $user->id == 1158;
             // return $user->tienePermiso(Permiso::IMPERSONAR_USUARIO);
+        });
+        Gate::define(Permiso::GESTION_FORMULARIOS, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_FORMULARIOS);
         });
     }
 }
