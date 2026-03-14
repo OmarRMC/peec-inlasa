@@ -23,6 +23,7 @@ return new class extends Migration
             $table->date('fecha_fin_envio_resultados')->nullable();
             $table->date('fecha_inicio_envio_reporte')->nullable();
             $table->date('fecha_fin_envio_reporte')->nullable();
+            $table->unsignedSmallInteger('gestion')->nullable();
             $table->boolean('estado')->default(true);
 
             $table->foreign('id_ensayo')

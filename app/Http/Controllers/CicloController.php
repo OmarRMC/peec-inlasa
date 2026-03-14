@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Ciclo;
 use App\Models\EnsayoAptitud;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class CicloController extends Controller
@@ -13,14 +12,28 @@ class CicloController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($idEa)
+    public function index(Request $request, $idEa)
     {
-        $ensayo = EnsayoAptitud::with('ciclos')->find($idEa);
+        $ensayo = EnsayoAptitud::find($idEa);
         if (!$ensayo) {
             return redirect()->back()->with('error', 'Ensayo no encontrado.');
         }
-        $ciclos = $ensayo->ciclos()->orderBy('numero')->get();
-        return view('admin.ciclos.index', compact('ensayo', 'ciclos'));
+
+        $gestiones = $ensayo->ciclos()
+            ->selectRaw('gestion')
+            ->whereNotNull('gestion')
+            ->distinct()
+            ->orderByDesc('gestion')
+            ->pluck('gestion');
+
+        $gestionActual = $request->query('gestion', $gestiones->first() ?? now()->year);
+
+        $ciclos = $ensayo->ciclos()
+            ->where('gestion', $gestionActual)
+            ->orderBy('numero')
+            ->get();
+
+        return view('admin.ciclos.index', compact('ensayo', 'ciclos', 'gestiones', 'gestionActual'));
     }
 
     public function toggle(Request $request, $id)
@@ -49,9 +62,11 @@ class CicloController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateData($request);
-        Ciclo::create($data);
-        // return redirect()->route('admin.ciclos.index', ['idEa' => $request->id_ensayo])->with('success', 'Ciclo creado correctamente.');
-        return redirect()->back()->with('success', 'Ciclo eliminado correctamente.');
+        $ciclo = Ciclo::create($data);
+        return redirect()->route('admin.ciclos.index', [
+            'idEa'    => $request->id_ensayo,
+            'gestion' => $ciclo->gestion,
+        ])->with('success', 'Ciclo creado correctamente.');
     }
 
     /**
@@ -75,14 +90,16 @@ class CicloController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Log::info('Info sadatos');
         $ciclo = Ciclo::find($id);
         if (!$ciclo) {
             return redirect()->back()->with('error', 'Ciclo no encontrado.');
         }
         $data = $this->validateData($request, $ciclo->id);
         $ciclo->update($data);
-        return redirect()->route('admin.ciclos.index', ['idEa' => $ciclo->id_ensayo])->with('success', 'Ciclo actualizado correctamente.');
+        return redirect()->route('admin.ciclos.index', [
+            'idEa'    => $ciclo->id_ensayo,
+            'gestion' => $ciclo->gestion,
+        ])->with('success', 'Ciclo actualizado correctamente.');
     }
 
     /**
@@ -91,7 +108,6 @@ class CicloController extends Controller
     public function destroy($id)
     {
         $ciclo = Ciclo::find($id);
-        Log::info($ciclo);
         if (!$ciclo) {
             return redirect()->back()->with('error', 'Ciclo no encontrado.');
         }

@@ -14,11 +14,16 @@ class ReporteResultadosController extends Controller
 {
     public function reporteEnsayos()
     {
-        if (!Gate::any(Permiso::RESPONSABLE)) {
+        if (!Gate::any([Permiso::RESPONSABLE, Permiso::JEFE_PEEC])) {
             return redirect('/')->with('error', 'Acceso restringido. No dispones de los permisos requeridos para realizar esta operación.');
         }
-        $resposable  = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
-        $ensayos = $resposable->responsablesEA;
+
+        if (Gate::allows(Permiso::JEFE_PEEC)) {
+            $ensayos = \App\Models\EnsayoAptitud::with('paquete')->get();
+        } else {
+            $ensayos = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete'])->responsablesEA;
+        }
+
         return view('reportes.ensayos.respuestas.index', compact('ensayos'));
     }
 
@@ -26,12 +31,16 @@ class ReporteResultadosController extends Controller
 
     public function resultadosRegistradosPorLab(Request $request, $idEA)
     {
-        if (!Gate::any(Permiso::RESPONSABLE)) {
+        if (!Gate::any([Permiso::RESPONSABLE, Permiso::JEFE_PEEC])) {
             return redirect('/')->with('error', 'Acceso restringido. No dispones de los permisos requeridos para realizar esta operación.');
         }
 
-        $responsable = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
-        $ensayo = $responsable->responsablesEA()->find($idEA);
+        if (Gate::allows(Permiso::JEFE_PEEC)) {
+            $ensayo = \App\Models\EnsayoAptitud::with('paquete')->find($idEA);
+        } else {
+            $responsable = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
+            $ensayo      = $responsable->responsablesEA()->find($idEA);
+        }
 
         if (!$ensayo) {
             return redirect('/')->with('error', 'Acceso restringido. No dispones de los permisos requeridos para realizar esta operación.');

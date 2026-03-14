@@ -15,12 +15,15 @@ class ResultadosEnviadosLabController extends Controller
 {
     public function listadoRespuestasEnviados(Request $request, $idEA, $idCiclo, $idLab)
     {
-        if (!Gate::any([Permiso::ADMIN, Permiso::RESPONSABLE])) {
+        if (!Gate::any([Permiso::ADMIN, Permiso::RESPONSABLE, Permiso::JEFE_PEEC])) {
             return redirect('/')->with('error', 'Acceso restringido.');
         }
 
-        $responsable = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
-        $ensayo = $responsable->responsablesEA()->find($idEA);
+        if (Gate::allows(Permiso::JEFE_PEEC)) {
+            $ensayo = \App\Models\EnsayoAptitud::find($idEA);
+        } else {
+            $ensayo = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete'])->responsablesEA()->find($idEA);
+        }
         if (!$ensayo) {
             return redirect('/')->with('error', 'Acceso restringido.');
         }
@@ -45,7 +48,7 @@ class ResultadosEnviadosLabController extends Controller
     public function previewResultado($id)
     {
 
-        if (!Gate::any([Permiso::ADMIN, Permiso::RESPONSABLE])) {
+        if (!Gate::any([Permiso::ADMIN, Permiso::RESPONSABLE, Permiso::JEFE_PEEC])) {
             return redirect('/')->with('error', 'Acceso restringido.');
         }
 
@@ -54,8 +57,11 @@ class ResultadosEnviadosLabController extends Controller
         $idEA = $resultado->id_ensayo;
         $idCiclo = $resultado->id_ciclo;
 
-        $responsable = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete']);
-        $ensayo = $responsable->responsablesEA()->find($idEA);
+        if (Gate::allows(Permiso::JEFE_PEEC)) {
+            $ensayo = \App\Models\EnsayoAptitud::find($idEA);
+        } else {
+            $ensayo = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete'])->responsablesEA()->find($idEA);
+        }
         if (!$ensayo) {
             return redirect('/')->with('error', 'Acceso restringido.');
         }
