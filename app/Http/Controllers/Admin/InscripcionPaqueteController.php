@@ -454,7 +454,7 @@ class InscripcionPaqueteController extends Controller
 
     public function certificadoDesempenoIndex(Request $request)
     {
-        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS])) {
+        if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS, Permiso::JEFE_PEEC])) {
             return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
         }
         $search = $request->search;

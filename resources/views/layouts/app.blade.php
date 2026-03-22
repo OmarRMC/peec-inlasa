@@ -120,41 +120,58 @@
         <!-- Main -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <header class="bg-white border-b px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
+                @php $authUser = Auth::user(); @endphp
                 <div class="flex items-center gap-3">
                     <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 md:hidden">
                         <i class="fas fa-bars"></i>
                     </button>
-
-                    {{-- <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 hidden">
-                        <i class="fas fa-bars"></i>
-                    </button> --}}
                     <button class="sidebar-toggle-button hidden md:block text-gray-500"
                         @click="sidebarCollapsed = false" x-show="sidebarCollapsed">
                         <i class="fas fa-bars"></i>
                     </button>
                     <h1 class="text-sm font-semibold text-indigo-600 flex items-center gap-2">
-                        <i class="fas fa-flask text-indigo-500"></i> {{ Auth::user()->nombre }}
+                        @if ($authUser->isLaboratorio())
+                            <i class="fas fa-building text-indigo-500"></i>
+                            {{ $authUser->laboratorio->nombre_lab }}
+                        @else
+                            <i class="fas fa-user text-indigo-500"></i>
+                            {{ $authUser->nombre }} {{ $authUser->ap_paterno }}
+                        @endif
                     </h1>
                 </div>
-                <div class="relative}">
+                <div class="relative">
                     <button @click="document.getElementById('userMenu').classList.toggle('hidden')"
                         class="flex items-center gap-2 text-sm text-gray-700 hover:text-indigo-600">
                         <i class="fas fa-user-circle text-lg"></i>
-                        <span class="hidden sm:inline">{{ Auth::user()->nombre ?? 'Usuario' }}</span>
+                        <span class="hidden sm:inline text-xs">{{ $authUser->username }}</span>
                         <i class="fas fa-chevron-down ml-1 text-xs"></i>
                     </button>
                     <div id="userMenu"
-                        class="absolute right-0 mt-2 bg-white border rounded shadow-md w-56 hidden z-50">
+                        class="absolute right-0 mt-2 bg-white border rounded shadow-md w-64 hidden z-50">
                         <div class="px-4 py-3 border-b text-center text-sm">
-                            <div class="text-indigo-600 font-semibold">
-                                @if (Auth::user()->isLaboratorio())
-                                    LABORATORIO REGISTRADO
+                            <div class="text-indigo-600 font-semibold text-xs tracking-wide uppercase">
+                                @if ($authUser->isLaboratorio())
+                                    Laboratorio
+                                @elseif ($authUser->tienePermiso(\App\Models\Permiso::ADMIN))
+                                    Administrador
+                                @elseif ($authUser->tienePermiso(\App\Models\Permiso::JEFE_PEEC))
+                                    Jefe del PEEC
+                                @elseif ($authUser->isResponsableEA())
+                                    Responsable de EA
+                                @elseif ($authUser->cargo)
+                                    {{ $authUser->cargo->nombre }}
                                 @else
-                                    USUARIO REGISTRADO
+                                    Usuario Registrado
                                 @endif
                             </div>
-                            <div>PEEC - INLASA</div>
-                            <div class="font-bold">{{ Auth::user()->username ?? 'BOL1146' }}</div>
+                            @if ($authUser->isLaboratorio())
+                                <div class="font-bold mt-1 text-gray-800 text-sm truncate" title="{{ $authUser->laboratorio->nombre_lab }}">{{ $authUser->laboratorio->nombre_lab }}</div>
+                                <div class="text-gray-500 text-xs mt-0.5">{{ $authUser->username }}</div>
+                            @else
+                                <div class="font-bold mt-1 text-gray-800 text-sm">{{ $authUser->nombre }} {{ $authUser->ap_paterno }}</div>
+                                <div class="text-gray-500 text-xs mt-0.5">{{ $authUser->username }}</div>
+                            @endif
+                            <div class="text-gray-400 text-xs mt-1">PEEC - INLASA</div>
                         </div>
                         <form method="POST" action="{{ route('logout') }}" class="text-sm"
                             onsubmit="sessionStorage.clear()">

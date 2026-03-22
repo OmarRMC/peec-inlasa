@@ -35,12 +35,13 @@ use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
 use App\Http\Controllers\VerificarController;
+use App\Http\Controllers\DashboardController;
 use App\Models\Permiso;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'usuario.activo'])->name('dashboard');
+Route::get('/', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'usuario.activo'])
+    ->name('dashboard');
 
 Route::get('/verificar/{code}/certificado/{type}', [VerificarController::class, 'verificarCertificado'])->name('verificar.certificado');
 Route::get('/vistas/validar_cert.php', [VerificarController::class, 'validarAntiguo']);
