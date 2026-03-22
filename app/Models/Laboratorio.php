@@ -186,6 +186,26 @@ class Laboratorio extends Model
         return $this->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_INSCRIPCION))->exists();
     }
 
+    /**
+     * Convierte $dataPorArea (array asociativo área => {certificado, detalles[]})
+     * en un array plano de páginas, con máximo $perPage detalles por página.
+     * Úsalo en cualquier lugar donde necesites paginar los detalles del certificado.
+     */
+    public static function paginarAreasCertificado(array $dataPorArea, int $perPage = 7): array
+    {
+        $paginas = [];
+        foreach ($dataPorArea as $area => $data) {
+            foreach (array_chunk($data['detalles'], $perPage) as $chunk) {
+                $paginas[] = [
+                    'area'        => $area,
+                    'certificado' => $data['certificado']?? '',
+                    'detalles'    => $chunk,
+                ];
+            }
+        }
+        return $paginas;
+    }
+
     public function getDataCertificadoDesemp(string $gestion)
     {
         $inscripciones = $this->inscripciones()
@@ -357,13 +377,12 @@ class Laboratorio extends Model
             QrCode::format('png')->size(320)->margin(1)->generate($verifyUrl)
         );
         $qrDataUri = "data:image/png;base64,{$qrBase64}";
-        if (!$plantilla) {
-            $plantillaDefault = PlantillaCertificado::query()
-                ->oldest()
-                ->first();
-            $firmas = $plantillaDefault ? $plantillaDefault->getFirmas() : [];
-            $descripcionTexto = $plantillaDefault ? $plantillaDefault->descripcion_part_text : null;
-            $notaTexto = $plantillaDefault ? data_get($plantillaDefault->diseno, 'nota.text', '') : null;
+        $plantillaDefault = PlantillaCertificado::query()->oldest()->first();
+        if (!$plantilla || ($plantillaDefault && $plantilla->id === $plantillaDefault->id)) {
+            $usarPlantilla = $plantilla ?? $plantillaDefault;
+            $firmas = $usarPlantilla ? $usarPlantilla->getFirmas() : [];
+            $descripcionTexto = $usarPlantilla ? $usarPlantilla->descripcion_part_text : null;
+            $notaTexto = $usarPlantilla ? data_get($usarPlantilla->diseno, 'nota.text', '') : null;
 
             $pdf = Pdf::loadView('certificados.pdf.participacion', [
                 'ensayosA' => $ensayosA,
@@ -382,7 +401,7 @@ class Laboratorio extends Model
         $backgroundDataUri = StorageHelper::storageUrlToDataUri($plantilla->imagen_fondo);
         $firmas = $plantilla->getFirmas();
         $paper = $plantilla->paperFromMm();
-        $nombreLaboratorio = $this->nombre_lab ?? '';
+        $nombreLaboratorio = $certificado->nombre_laboratorio ?? $this->nombre_lab ?? '';
         $descripcion = $plantilla->descripcion_part ?? ($plantilla->descripcion ?? '');
 
         $diseno = $plantilla->diseno ?? [];
@@ -471,13 +490,12 @@ class Laboratorio extends Model
             QrCode::format('png')->size(320)->margin(1)->generate($verifyUrl)
         );
         $qrDataUri = "data:image/png;base64,{$qrBase64}";
-        if (!$plantilla) {
-            $plantillaDefault = PlantillaCertificado::query()
-                ->oldest()
-                ->first();
-            $firmas = $plantillaDefault ? $plantillaDefault->getFirmas() : [];
-            $descripcionTexto = $plantillaDefault ? $plantillaDefault->descripcion_desmp_text : null;
-            $notaTexto = $plantillaDefault ? data_get($plantillaDefault->diseno, 'nota.text', '') : null;
+        $plantillaDefault = PlantillaCertificado::query()->oldest()->first();
+        if (!$plantilla || ($plantillaDefault && $plantilla->id === $plantillaDefault->id)) {
+            $usarPlantilla = $plantilla ?? $plantillaDefault;
+            $firmas = $usarPlantilla ? $usarPlantilla->getFirmas() : [];
+            $descripcionTexto = $usarPlantilla ? $usarPlantilla->descripcion_desmp_text : null;
+            $notaTexto = $usarPlantilla ? data_get($usarPlantilla->diseno, 'nota.text', '') : null;
 
             $pdf = Pdf::loadView('certificados.pdf.desemp', [
                 'data' => $dataPorArea,
@@ -488,13 +506,12 @@ class Laboratorio extends Model
             ])->setPaper('A4', 'portrait');
             $pdf->getDomPDF()->getOptions()->set('isHtml5ParserEnabled', true);
 
-            $response = $pdf->stream('certificados-desempeno.pdf');
-            return $response;
+            return $pdf->stream('certificados-desempeno.pdf');
         }
         $backgroundDataUri = StorageHelper::storageUrlToDataUri($plantilla->imagen_fondo);
         $firmas = $plantilla->getFirmas();
         $paper = $plantilla->paperFromMm();
-        $nombreLaboratorio = $this->nombre_lab ?? '';
+        $nombreLaboratorio = $certificado->nombre_laboratorio ?? $this->nombre_lab ?? '';
         $descripcion = $plantilla->descripcion_desmp;
 
         $diseno = $plantilla->diseno ?? [];
@@ -502,6 +519,7 @@ class Laboratorio extends Model
         $notaConfig = $diseno['nota'] ?? [];
 
         $elements = $plantilla->getElementos();
+        $areasPaginadas = self::paginarAreasCertificado($dataPorArea);
 
         $pdf = Pdf::loadView('certificados.plantillas.preview', [
             'type' => Certificado::TYPE_DESEMP,
@@ -514,7 +532,7 @@ class Laboratorio extends Model
             'elements' => $elements,
             'nombreLaboratorio' => $nombreLaboratorio,
             'gestion' => $gestion,
-            'areas' => $dataPorArea,
+            'areas' => $areasPaginadas,
             'descripcion' => $descripcion,
             'diseno' => $diseno,
         ])->setPaper($paper);

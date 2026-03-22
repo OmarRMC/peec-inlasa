@@ -196,8 +196,7 @@ class LaboratorioController extends Controller
             while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 $rows->push([
                     'codigoLab' => $data[0] ?? null,
-                    'nombreLab' => $data[1] ?? null,
-                    'desempeno' => $data[2] ?? null,
+                    'desempeno' => $data[1] ?? null,
                 ]);
             }
             fclose($handle);

@@ -305,6 +305,26 @@ class InscripcionPaqueteController extends Controller
         return back()->with('success', 'La inscripción fue aprobada exitosamente.');
     }
 
+    /**
+     * Aprueba la inscripción SIN enviar correo de notificación.
+     * Solo permitido para gestiones pasadas (anteriores al año actual).
+     */
+    public function aprobarSinCorreo(Request $request, $id)
+    {
+        $ins = Inscripcion::findOrFail($id);
+
+        if ($ins->gestion >= now()->year) {
+            return back()->with('error', 'Esta acción solo está permitida para gestiones pasadas.');
+        }
+
+        $ins->status_inscripcion = Inscripcion::STATUS_APROBADO;
+        $ins->updated_by = Auth::user()->id;
+        $ins->updated_at = now();
+        $ins->save();
+
+        return back()->with('success', 'La inscripción fue aprobada correctamente (sin envío de correo).');
+    }
+
     public function anularInscripcion(Request $request,  $id)
     {
         $ins = Inscripcion::findOrFail($id);

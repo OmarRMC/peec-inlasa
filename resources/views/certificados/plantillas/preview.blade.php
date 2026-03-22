@@ -73,10 +73,12 @@ use App\Models\Certificado;
             font-size: 20pt;
             font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-weight: bold;
+            margin-left: 20mm;
         }
 
         .lab {
             font-size: 14pt;
+            width: 60% !important;
             /* font-weight: 500;
             letter-spacing: .4pt; */
         }
@@ -96,9 +98,8 @@ use App\Models\Certificado;
         }
 
         .items {
-            font-size: 7.5pt;
+            font-size: 9pt;
             line-height: 1.25;
-            letter-spacing: .2pt;
         }
 
         .itemsEnsayos{
@@ -134,15 +135,14 @@ use App\Models\Certificado;
         .block-a {
             position: absolute;
             top: 65mm;
-            left: 25mm;
-            right: 18mm;
+            width: 100%;
         }
 
         .block-paragraph {
             position: absolute;
+            display: inline-block;
             top: 85mm;
-            left: 28mm;
-            right: 28mm;
+            width: 100%;
             font-family: Verdana, Geneva, Tahoma, sans-serif;
             font-weight: bold;
         }
@@ -264,7 +264,7 @@ use App\Models\Certificado;
 </head>
 
 <body>
-    @foreach(($areas ?? [1]) as $area => $detalles)
+    @foreach(($areas ?? [[]]) as $paginaArea)
     <div class="page">
 
         <div class="block-header center upper">
@@ -285,23 +285,29 @@ use App\Models\Certificado;
             </div>
         </div>
 
+        @php
+        $descStyle = is_array($descripcion) ? ($descripcion['style'] ?? []) : [];
+        $descFontSize = $descStyle['font-size'] ?? $descStyle['fontSize'] ?? '14pt';
+        $labLen = mb_strlen($nombreLaboratorio ?? '');
+        if ($labLen <= 80) {
+            $labFontSize = $descFontSize;
+        } elseif ($labLen <= 120) {
+            $labFontSize = '12pt';
+        } else {
+            $labFontSize = '10pt';
+        }
+        @endphp
         <div class="block-a">
-            <table width="80%" cellspacing="0" cellpadding="0" style="margin: auto;">
-                <tr>
-                    <td style="width: 5%; vertical-align: top;">
-                        <div class="label-a upper">A:</div>
-                    </td>
-                    <td style="vertical-align: top ; padding-top: 4mm;">
-                        <div class="center upper lab" style="text-align: center;">{{ $nombreLaboratorio }}</div>
-                    </td>
-                </tr>
-            </table>
+            <div class="label-a upper" style="height: 12px;">A:</div>
+            <div class="upper lab" style="text-align: center; font-size: {{ $labFontSize }}; word-break: break-word; width: 70%; margin:auto;">{{ $nombreLaboratorio }}</div>
         </div>
 
-        <div class="block-paragraph center" style="{{ isset($descripcion['style']) ? PlantillaCertificado::toInlineCss($descripcion['style']) : ''}}">
+        <div class="block-paragraph center">
+            <span style="display: block; width: 70%; margin:auto; {{ isset($descripcion['style']) ? PlantillaCertificado::toInlineCss($descripcion['style']) : ''}}">
             @if(isset($descripcion['text']))
-            {!! Str::markdown($descripcion['text']) !!}
+                {!! Str::markdown($descripcion['text']) !!}
             @endif
+            </span>
         </div>
 
         @if( $type == Certificado::TYPE_PARTICIPACION)
@@ -310,11 +316,11 @@ use App\Models\Certificado;
         </div>
         @else
         <div class="block-area center upper" style="font-family: 'DejaVu Sans', sans-serif;">
-            <div class="area"> {{ $area }} </div>
+            <div class="area"> {{ $paginaArea['area'] ?? '' }} </div>
         </div>
 
         <div class="block-items center upper items">
-            @foreach(($detalles['detalles'] ?? []) as $detalle)
+            @foreach(($paginaArea['detalles'] ?? []) as $detalle)
             <div>
                 {{ mb_strtoupper($detalle['ensayo']) }} :
                 {{ mb_strtoupper($detalle['ponderacion']) }}    

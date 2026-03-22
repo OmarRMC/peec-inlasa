@@ -66,6 +66,10 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="mt-4">
+            {{ $certificadosDisponibles->links() }}
+        </div>
     </div>
 
     @push('scripts')

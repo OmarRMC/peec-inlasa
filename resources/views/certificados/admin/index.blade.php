@@ -152,7 +152,7 @@ use App\Models\Certificado;
                         }
                     },
                     order: [
-                        [1, 'desc']
+                        [2, 'desc']
                     ],
                     columns: [{
                             data: 'laboratorio',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certificado;
+use App\Models\Laboratorio;
 use App\Models\Permiso;
 use App\Models\PlantillaCertificado;
 use App\Utils\StorageHelper;
@@ -113,6 +114,7 @@ class PlantillaCertificadoController extends Controller
     public function preview(PlantillaCertificado $plantilla)
     {
         // Fondo como data-uri para que DomPDF lo renderice sin isRemoteEnabled
+        // SVG se convierte automáticamente a PNG via Imagick en StorageHelper
         $backgroundDataUri = StorageHelper::storageUrlToDataUri($plantilla->imagen_fondo);
 
         // Firmas con data-uri
@@ -155,6 +157,7 @@ class PlantillaCertificadoController extends Controller
         // Procesar elements y convertir imágenes a data-uri (local o externa)
         $elements = $plantilla->getElementos();
 
+        $areasPaginadas =  Laboratorio::paginarAreasCertificado($areas);
         $pdf = Pdf::loadView('certificados.plantillas.preview', [
             'type' => Certificado::TYPE_DESEMP,
             'plantilla' => $plantilla,
@@ -167,7 +170,7 @@ class PlantillaCertificadoController extends Controller
 
             'nombreLaboratorio' => $nombreLaboratorio,
             'gestion' => $gestion,
-            'areas' => $areas,
+            'areas' => $areasPaginadas,
             'ensayosA' =>  $ensayosA,
 
             'descripcion' => $descripcion,
@@ -193,14 +196,14 @@ class PlantillaCertificadoController extends Controller
             'diseno' => ['nullable', 'string'],
 
             // fondo
-            'imagen_fondo_file' => ['nullable', 'image', 'max:5120'],
+            'imagen_fondo_file' => ['nullable', 'file', 'mimes:jpeg,jpg,png,gif,bmp,webp,svg', 'max:51200'],
 
             // firmas
             'firmas' => ['nullable', 'array'],
             'firmas.*.nombre' => ['required_with:firmas', 'string', 'max:150'],
             'firmas.*.cargo' => ['nullable', 'string', 'max:150'],
             'firmas.*.firma' => ['nullable', 'string', 'max:2048'],
-            'firmas.*.firma_file' => ['nullable', 'image', 'max:5120'],
+            'firmas.*.firma_file' => ['nullable', 'file', 'mimes:jpeg,jpg,png,gif,bmp,webp,svg', 'max:51200'],
         ]);
     }
 

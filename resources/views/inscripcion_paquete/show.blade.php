@@ -195,16 +195,29 @@
                                 @if ($inscripcion->estaAprobado())
                                     <p class="text-green-700 text-sm bg-green-50 p-2">Documentos aprobados</p>
                                 @else
-                                    {{-- Botón para aprobar inscripción --}}
+                                    {{-- Botón para aprobar inscripción (con correo) --}}
                                     <form method="POST" id="aprobar-inscripcion"
                                         action="{{ route('inscripcion-paquetes.aprobar', $inscripcion->id) }}">
                                         @csrf
-                                        <button type="submit" {{-- onclick="return confirm('¿Estás seguro de aprobar esta inscripción?')" --}}
+                                        <button type="submit"
                                             class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
                                             aria-label="Aprobar inscripción" title="Aprobar inscripción">
-                                            Aprobar
+                                            <i class="fas fa-check mr-1"></i> Aprobar
                                         </button>
                                     </form>
+
+                                    {{-- Aprobar sin correo: solo para gestiones pasadas --}}
+                                    @if ($inscripcion->gestion < now()->year)
+                                    <form method="POST" id="aprobar-sin-correo-inscripcion"
+                                        action="{{ route('inscripcion-paquetes.aprobar-sin-correo', $inscripcion->id) }}">
+                                        @csrf
+                                        <button type="submit"
+                                            class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded text-sm transition duration-200"
+                                            title="Aprueba la inscripción sin enviar correo al laboratorio (solo gestiones pasadas)">
+                                            <i class="fas fa-check-double mr-1"></i> Aprobar sin correo
+                                        </button>
+                                    </form>
+                                    @endif
                                 @endif
 
                                 @if (!$inscripcion->estaAprobado())
@@ -635,9 +648,20 @@
                     e.preventDefault();
                     mostrarAlertaConfirmacion(
                         '¿Aprobar Inscripción?',
-                        'La inscripción quedará aprobada.',
+                        'La inscripción quedará aprobada y se notificará al laboratorio por correo.',
                         'success',
                         'Aprobar',
+                        () => this.submit()
+                    );
+                });
+
+                document.getElementById('aprobar-sin-correo-inscripcion')?.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    mostrarAlertaConfirmacion(
+                        '¿Aprobar sin enviar correo?',
+                        'La inscripción quedará aprobada pero NO se notificará al laboratorio.',
+                        'warning',
+                        'Sí, aprobar',
                         () => this.submit()
                     );
                 });

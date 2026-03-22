@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AreaController;
+use App\Http\Controllers\Admin\GaleriaController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\CommandController;
 use App\Http\Controllers\Admin\ConfiguracionController;
@@ -101,6 +102,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
             ->name('inscripcion.create');
         Route::post('/paquetes', [InscripcionPaqueteController::class, 'store'])->name('inscripcion-paquetes.store');
         Route::post('/{id}/aprobar', [InscripcionPaqueteController::class, 'aprobarInscripcion'])->name('inscripcion-paquetes.aprobar');
+        Route::post('/{id}/aprobar-sin-correo', [InscripcionPaqueteController::class, 'aprobarSinCorreo'])->name('inscripcion-paquetes.aprobar-sin-correo');
         Route::post('/{id}/anular', [InscripcionPaqueteController::class, 'anularInscripcion'])->name('inscripcion-paquetes.anular');
         Route::post('/{id}/revision', [InscripcionPaqueteController::class, 'enRevision'])->name('inscripcion-paquetes.enRevision');
         Route::post('/{id}/obs', [InscripcionPaqueteController::class, 'obsInscripcion'])->name('inscripcion-paquetes.obserbaciones');
@@ -136,6 +138,11 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
             ->name('reportes.inscripciones.export');
     });
     Route::post('/documentos/{id}/toggle', [DocumentosController::class, 'toggle'])->name('documentos.pago.toggle');
+
+    // Galería de archivos
+    Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria.index');
+    Route::post('/galeria/upload', [GaleriaController::class, 'upload'])->name('galeria.upload');
+    Route::delete('/galeria/{filename}', [GaleriaController::class, 'destroy'])->name('galeria.destroy');
 });
 Route::middleware(['auth', 'usuario.activo', 'canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_INSCRIPCIONES])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');

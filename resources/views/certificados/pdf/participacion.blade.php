@@ -24,8 +24,21 @@
                 </div>
                 <div class="title" style="text-align:center;">CERTIFICADO</div>
                 <div class="subtitle" style="text-align:center;">DE PARTICIPACIÓN A</div>
-                <div class="labname" style="text-align:center;">
-                    {{ mb_strtoupper($certificado->nombre_laboratorio) }}
+                @php
+                $labName = mb_strtoupper($certificado->nombre_laboratorio ?? '');
+                $labLen = mb_strlen($labName);
+                if ($labLen <= 35) {
+                    $labFontSize = '25pt';
+                } elseif ($labLen <= 55) {
+                    $labFontSize = '20pt';
+                } elseif ($labLen <= 75) {
+                    $labFontSize = '16pt';
+                } else {
+                    $labFontSize = '13pt';
+                }
+                @endphp
+                <div class="labname" style="text-align:center; font-size: {{ $labFontSize }}; word-break: break-word;">
+                    {{ $labName }}
                 </div>
             </div>
 

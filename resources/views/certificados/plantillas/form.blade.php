@@ -128,7 +128,7 @@
                  <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-3">
                      <div>
                          <h3 class="text-sm font-semibold text-gray-800">Imagen de fondo</h3>
-                         <p class="text-xs text-gray-500">Haga clic para subir o cambiar el fondo (PNG/JPG).</p>
+                         <p class="text-xs text-gray-500">Haga clic para subir o cambiar el fondo (PNG, JPG, SVG, WEBP, BMP, GIF - máx. 50 MB).</p>
                      </div>
 
                      {{-- Input real (oculto) --}}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Lab;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\PdfInscripcionController;
 use App\Mail\EnvioCodigoLab;
 use App\Mail\LaboratorioVerificacionDatos;
@@ -210,7 +211,19 @@ class LabController extends Controller
                     'tiene_certificado_desempeno' => $tieneDesempeno,
                     'codigo' => $inscripciones->first()->laboratorio->cod_lab ?? ''
                 ];
-            });
+            })
+            ->sortKeysDesc();
+
+        $perPage = 10;
+        $page = request()->get('page', 1);
+        $certificadosDisponibles = new LengthAwarePaginator(
+            $certificadosDisponibles->forPage($page, $perPage),
+            $certificadosDisponibles->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url()]
+        );
+
         return view('certificados.lab.certificados_disponibles', compact('certificadosDisponibles'));
     }
 
