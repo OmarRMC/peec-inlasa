@@ -757,30 +757,49 @@ Controla el tamano de las imagenes de firma dentro de cada columna.
 Las medidas de height estan en mm; width es porcentaje (%).
 
 PROPIEDADES:
-  height : Alto de la imagen en mm     (default: 18)
-  width  : Ancho de la imagen en %     (default: 85)
+  height  : Alto de la imagen en mm                    (default: 18)
+  width   : Ancho de la imagen en %                    (default: 85)
+  overlap : mm que la imagen se superpone sobre el     (default: 5)
+            nombre. La imagen siempre solapa el nombre.
+            Aumentar para mayor solapamiento.
+            Poner 0 para eliminar el solapamiento.
 
---- EJEMPLO: Firmas mas grandes ---
+NOTA: La imagen de firma SIEMPRE se superpone sobre el nombre por defecto
+      (overlap: 5). Esto replica el aspecto de una firma real sobre papel.
+
+--- EJEMPLO: Solapamiento estandar ---
+"signatures": {
+    "img": {
+        "height": 18,
+        "width": 85,
+        "overlap": 5
+    }
+}
+
+--- EJEMPLO: Mayor solapamiento (firma grande sobre nombre) ---
 "signatures": {
     "img": {
         "height": 25,
-        "width": 90
+        "width": 90,
+        "overlap": 8
     }
 }
 
---- EJEMPLO: Firmas mas pequenas ---
+--- EJEMPLO: Sin solapamiento (imagen separada del nombre) ---
+"signatures": {
+    "img": {
+        "height": 18,
+        "width": 85,
+        "overlap": 0
+    }
+}
+
+--- EJEMPLO: Firmas pequenas ---
 "signatures": {
     "img": {
         "height": 12,
-        "width": 70
-    }
-}
-
---- EJEMPLO: Firma cuadrada ---
-"signatures": {
-    "img": {
-        "height": 20,
-        "width": 100
+        "width": 70,
+        "overlap": 4
     }
 }
 

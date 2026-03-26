@@ -355,8 +355,9 @@ use App\Models\Certificado;
             $colWidth = 50 / $count;
             @endphp
             @php
-            $sigImgHeight = $signaturesConfig['img']['height'] ?? 18;
-            $sigImgWidth  = $signaturesConfig['img']['width']  ?? 85;
+            $sigImgHeight  = $signaturesConfig['img']['height']  ?? 18;
+            $sigImgWidth   = $signaturesConfig['img']['width']   ?? 85;
+            $sigImgOverlap = $signaturesConfig['img']['overlap'] ?? 5;
             $sigOrgLabel  = $signaturesConfig['org'] ?? 'INLASA';
 
             $sigTable        = $signaturesConfig['firmas'] ?? [];
@@ -384,9 +385,9 @@ use App\Models\Certificado;
                     @else
                     @foreach($sig as $f)
                     <td align="center" valign="bottom" style="width:{{ $colWidth }}% !important;">
-                        <div style="height: {{ $sigImgHeight }}mm;">
+                        <div style="height: {{ $sigImgHeight }}mm; margin-bottom: -{{ $sigImgOverlap }}mm; overflow: visible;">
                             @if(!empty($f['firma_data_uri']))
-                            <img class="sig-img" src="{{ $f['firma_data_uri'] }}" style="height: {{ $sigImgHeight }}mm; width:{{ $sigImgWidth }}%;" alt="Firma">
+                            <img class="sig-img" src="{{ $f['firma_data_uri'] }}" style="display: block; margin: 0 auto; height: {{ $sigImgHeight }}mm; width:{{ $sigImgWidth }}%;" alt="Firma">
                             @endif
                         </div>
                         <div class="sig-name">{{ $f['nombre'] ?? '' }}</div>
