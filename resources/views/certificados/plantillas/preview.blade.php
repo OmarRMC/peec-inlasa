@@ -73,7 +73,7 @@ use App\Models\Certificado;
             font-size: 20pt;
             font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-weight: bold;
-            margin-left: 20mm;
+            margin-left: 28mm;
         }
 
         .lab {
@@ -167,31 +167,35 @@ use App\Models\Certificado;
         .signatures {
             width: 100%;
             position: absolute;
-            /* deja espacio QR */
-            bottom: 25mm;
+            bottom: {{ $signaturesConfig['position']['bottom'] ?? 25 }}mm;
+            @if(isset($signaturesConfig['position']['left']))
+            left: {{ $signaturesConfig['position']['left'] }}mm;
+            @endif
+            @if(isset($signaturesConfig['position']['right']))
+            right: {{ $signaturesConfig['position']['right'] }}mm;
+            @endif
             text-align: center;
             font-family: 'Raleway', 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            @if(isset($signaturesConfig['style']))
+            {{ \App\Models\PlantillaCertificado::toInlineCss($signaturesConfig['style']) }}
+            @endif
         }
 
         .sig-name {
-            font-size: 9pt;
+            font-size: {{ $signaturesConfig['text']['font-size'] ?? '9pt' }};
             font-style: italic;
-            /* font-weight: 400; */
         }
 
         .sig-role {
-            font-size: 9pt;
+            font-size: {{ $signaturesConfig['text']['font-size'] ?? '9pt' }};
             font-weight: bold;
-            /* padding: 0mm 20mm; */
             font-style: italic;
-
-
         }
 
         .sig-org {
-            font-size: 9pt;
+            font-size: {{ $signaturesConfig['text']['font-size'] ?? '9pt' }};
             font-weight: bold;
-        }   
+        }
 
         /* QR - valores dinámicos desde $qrConfig */
         .qr {
@@ -264,18 +268,31 @@ use App\Models\Certificado;
 </head>
 
 <body>
+    @php
+    $headerLines    = $headerConfig['lines'] ?? [
+        'INSTITUTO NACIONAL DE LABORATORIOS DE SALUD - INLASA',
+        '”DR. NÉSTOR MORALES VILLAZÓN”',
+        'PROGRAMA DE EVALUACION EXTERNA DE LA CALIDAD',
+    ];
+    $headerStyleCss = PlantillaCertificado::toInlineCss($headerConfig['style'] ?? []);
+
+    $confiereTxt  = $tituloConfig['confiere']['text']  ?? 'Confiere el presente:';
+    $confiereStyleCss  = PlantillaCertificado::toInlineCss($tituloConfig['confiere']['style']  ?? []);
+    $certTituloStyleCss = PlantillaCertificado::toInlineCss($tituloConfig['certTitulo']['style'] ?? []);
+    @endphp
+
     @foreach(($areas ?? [[]]) as $paginaArea)
     <div class="page">
 
-        <div class="block-header center upper">
-            <div>MINISTERIO DE SALUD Y DEPORTES</div>
-            <div>INSTITUTO NACIONAL DE LABORATORIOS DE SALUD</div>
-            <div>“DR. NÉSTOR MORALES VILLAZÓN”</div>
+        <div class="block-header center upper" style="{{ $headerStyleCss }}">
+            @foreach($headerLines as $headerLine)
+            <div>{{ $headerLine }}</div>
+            @endforeach
         </div>
 
         <div class="block-title center">
-            <div class="confiere">Confiere el presente:</div>
-            <div class="cert-title upper"><b>CERTIFICADO DE
+            <div class="confiere" style="{{ $confiereStyleCss }}">{{ $confiereTxt }}</div>
+            <div class="cert-title upper" style="{{ $certTituloStyleCss }}"><b>CERTIFICADO DE
                 @if( $type == Certificado::TYPE_PARTICIPACION)
                 PARTICIPACIÓN
                 @else
@@ -337,26 +354,44 @@ use App\Models\Certificado;
             $count = max($sig->count(), 1);
             $colWidth = 50 / $count;
             @endphp
-            <table width="100%" cellspacing="0" cellpadding="0" style="padding: 0mm 30mm;">
+            @php
+            $sigImgHeight = $signaturesConfig['img']['height'] ?? 18;
+            $sigImgWidth  = $signaturesConfig['img']['width']  ?? 85;
+            $sigOrgLabel  = $signaturesConfig['org'] ?? 'INLASA';
+
+            $sigTable        = $signaturesConfig['firmas'] ?? [];
+            $sigTableWidth   = $sigTable['width']       ?? '100%';
+            $sigTableSpacing = $sigTable['cellspacing']  ?? '0';
+            $sigTablePadding = $sigTable['cellpadding']  ?? '0';
+            // style de la tabla: si no hay firmas.style, usa el fallback legacy 'padding'
+            $sigTableStyleArr = $sigTable['style'] ?? [];
+            if (empty($sigTableStyleArr) && isset($signaturesConfig['padding'])) {
+                $sigTableStyleArr = ['padding' => $signaturesConfig['padding']];
+            }
+            if (empty($sigTableStyleArr)) {
+                $sigTableStyleArr = ['padding' => '0mm 30mm'];
+            }
+            $sigTableStyleCss = \App\Models\PlantillaCertificado::toInlineCss($sigTableStyleArr);
+            @endphp
+            <table width="{{ $sigTableWidth }}" cellspacing="{{ $sigTableSpacing }}" cellpadding="{{ $sigTablePadding }}" style="{{ $sigTableStyleCss }}">
                 <tr>
                     @if($sig->isEmpty())
-                    {{-- Placeholder opcional (si NO quieres placeholder, elimina este bloque completo) --}}
                     <td align="center" valign="bottom" style="width: 100%;">
                         <div class="sig-name">FIRMANTE</div>
                         <div class="sig-role upper">CARGO</div>
-                        <div class="sig-org upper">INLASA</div>
+                        <div class="sig-org upper">{{ $sigOrgLabel }}</div>
                     </td>
                     @else
                     @foreach($sig as $f)
-                    <td align="center" valign="bottom" style="width:{{ $colWidth }}% !important;; background: red;">
-                        <div style="height: 10mm;">
+                    <td align="center" valign="bottom" style="width:{{ $colWidth }}% !important;">
+                        <div style="height: {{ $sigImgHeight }}mm;">
                             @if(!empty($f['firma_data_uri']))
-                            <img class="sig-img"src="{{ $f['firma_data_uri'] }}" style="height: 18mm; width:85%;" alt="Firma">
+                            <img class="sig-img" src="{{ $f['firma_data_uri'] }}" style="height: {{ $sigImgHeight }}mm; width:{{ $sigImgWidth }}%;" alt="Firma">
                             @endif
                         </div>
                         <div class="sig-name">{{ $f['nombre'] ?? '' }}</div>
                         <div class="sig-role upper">{{ $f['cargo'] ?? '' }}</div>
-                        <div class="sig-org upper">INLASA</div>
+                        <div class="sig-org upper">{{ $sigOrgLabel }}</div>
                     </td>
                     @endforeach
                     @endif

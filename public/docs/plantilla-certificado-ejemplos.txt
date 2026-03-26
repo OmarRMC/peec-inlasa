@@ -9,7 +9,7 @@ de las plantillas de certificados.
 CAMPOS DISPONIBLES:
   - descripcion_desmp : Texto principal del certificado (ej: "Por su desempeno...")
   - descripcion_part  : Nota/disclaimer del certificado
-  - diseno            : Configuracion visual completa (QR, nota, elementos)
+  - diseno            : Configuracion visual completa (QR, nota, firmas, elementos)
 
 ================================================================================
                     TABLA DE CONTENIDOS
@@ -22,10 +22,16 @@ CAMPOS DISPONIBLES:
    4.1 Elemento tipo TEXTO
    4.2 Elemento tipo QR
    4.3 Elemento tipo IMAGEN
-5. PROPIEDADES CSS DISPONIBLES
-6. PROPIEDADES DE POSICION Y TAMANO
-7. EJEMPLOS COMPLETOS POR CASO DE USO
-8. ERRORES COMUNES Y SOLUCIONES
+5. SIGNATURES - Configuracion de firmas (signatures)
+   5.1 Posicion del bloque de firmas
+   5.2 Tabla de firmas (firmas)
+   5.3 Imagen de firma (img)
+   5.4 Texto de firma (text)
+   5.5 Estilos adicionales del bloque (style)
+6. PROPIEDADES CSS DISPONIBLES
+7. PROPIEDADES DE POSICION Y TAMANO
+8. EJEMPLOS COMPLETOS POR CASO DE USO
+9. ERRORES COMUNES Y SOLUCIONES
 
 
 ================================================================================
@@ -170,6 +176,7 @@ ESTRUCTURA BASICA:
     "unit": "mm",
     "qr": { ... },
     "nota": { ... },
+    "signatures": { ... },
     "elements": [ ... ]
 }
 
@@ -622,7 +629,248 @@ NOTAS IMPORTANTES SOBRE IMAGENES:
 
 
 ================================================================================
-5. PROPIEDADES CSS DISPONIBLES
+5. SIGNATURES - CONFIGURACION DE FIRMAS
+================================================================================
+
+El campo "signatures" dentro de "diseno" permite personalizar completamente
+el bloque de firmas: posicion, tamano de imagenes, estilos de texto y
+propiedades de la tabla interior.
+
+ESTRUCTURA COMPLETA:
+{
+    "signatures": {
+        "position": {
+            "bottom": 25
+        },
+        "firmas": {
+            "width": "100%",
+            "cellspacing": "0",
+            "cellpadding": "0",
+            "style": {
+                "padding": "0mm 30mm"
+            }
+        },
+        "img": {
+            "height": 18,
+            "width": 85
+        },
+        "text": {
+            "font-size": "9pt"
+        },
+        "org": "INLASA",
+        "style": {
+            "font-family": "'Raleway', sans-serif"
+        }
+    }
+}
+
+NOTA: Todos los campos son opcionales. Si no se define "signatures",
+      se aplican los valores por defecto indicados en cada propiedad.
+
+
+--------------------------------------------------------------------------------
+5.1 POSICION DEL BLOQUE DE FIRMAS (position)
+--------------------------------------------------------------------------------
+
+Controla donde se ubica el bloque completo de firmas dentro de la pagina.
+Todas las medidas en mm.
+
+PROPIEDADES:
+  bottom : Distancia desde el borde inferior  (default: 25)
+  left   : Distancia desde el borde izquierdo (opcional)
+  right  : Distancia desde el borde derecho   (opcional)
+
+--- EJEMPLO: Firmas mas arriba ---
+"signatures": {
+    "position": {
+        "bottom": 35
+    }
+}
+
+--- EJEMPLO: Firmas desplazadas a la derecha ---
+"signatures": {
+    "position": {
+        "bottom": 25,
+        "left": 30
+    }
+}
+
+
+--------------------------------------------------------------------------------
+5.2 TABLA DE FIRMAS (firmas)
+--------------------------------------------------------------------------------
+
+Controla los atributos y estilos del elemento <table> que contiene
+las columnas de firmas.
+
+PROPIEDADES:
+  width       : Ancho de la tabla           (default: "100%")
+  cellspacing : Separacion entre celdas     (default: "0")
+  cellpadding : Relleno interno de celdas   (default: "0")
+  style       : Objeto CSS para la tabla    (default: padding 0mm 30mm)
+
+PROPIEDADES UTILES EN style:
+  padding          : Espacio interno de la tabla (ej: "0mm 20mm")
+  border-collapse  : Colapsar bordes (ej: "collapse")
+  width            : Ancho como CSS (ej: "80%")
+
+--- EJEMPLO: Tabla centrada con menos margen lateral ---
+"signatures": {
+    "firmas": {
+        "width": "100%",
+        "cellspacing": "0",
+        "cellpadding": "0",
+        "style": {
+            "padding": "0mm 15mm"
+        }
+    }
+}
+
+--- EJEMPLO: Tabla mas angosta (firmas agrupadas al centro) ---
+"signatures": {
+    "firmas": {
+        "width": "60%",
+        "cellspacing": "0",
+        "cellpadding": "0",
+        "style": {
+            "padding": "0mm 0mm",
+            "margin": "0 auto"
+        }
+    }
+}
+
+--- EJEMPLO: Tabla sin margen ---
+"signatures": {
+    "firmas": {
+        "style": {
+            "padding": "0mm 5mm"
+        }
+    }
+}
+
+
+--------------------------------------------------------------------------------
+5.3 IMAGEN DE FIRMA (img)
+--------------------------------------------------------------------------------
+
+Controla el tamano de las imagenes de firma dentro de cada columna.
+Las medidas de height estan en mm; width es porcentaje (%).
+
+PROPIEDADES:
+  height : Alto de la imagen en mm     (default: 18)
+  width  : Ancho de la imagen en %     (default: 85)
+
+--- EJEMPLO: Firmas mas grandes ---
+"signatures": {
+    "img": {
+        "height": 25,
+        "width": 90
+    }
+}
+
+--- EJEMPLO: Firmas mas pequenas ---
+"signatures": {
+    "img": {
+        "height": 12,
+        "width": 70
+    }
+}
+
+--- EJEMPLO: Firma cuadrada ---
+"signatures": {
+    "img": {
+        "height": 20,
+        "width": 100
+    }
+}
+
+
+--------------------------------------------------------------------------------
+5.4 TEXTO DE FIRMA (text)
+--------------------------------------------------------------------------------
+
+Controla el tamano de fuente del nombre, cargo y organizacion
+que aparecen debajo de cada imagen de firma.
+
+PROPIEDADES:
+  font-size : Tamano de fuente para nombre/cargo/org  (default: "9pt")
+
+--- EJEMPLO: Texto mas grande ---
+"signatures": {
+    "text": {
+        "font-size": "10pt"
+    }
+}
+
+--- EJEMPLO: Texto mas pequeno ---
+"signatures": {
+    "text": {
+        "font-size": "7pt"
+    }
+}
+
+
+--------------------------------------------------------------------------------
+5.5 ORGANIZACION (org)
+--------------------------------------------------------------------------------
+
+Texto que aparece como tercer renglon bajo la firma (institucion).
+
+PROPIEDADES:
+  org : Texto de la organizacion  (default: "INLASA")
+
+--- EJEMPLO: Cambiar organizacion ---
+"signatures": {
+    "org": "PEEC INLASA"
+}
+
+
+--------------------------------------------------------------------------------
+5.6 ESTILOS ADICIONALES DEL BLOQUE (style)
+--------------------------------------------------------------------------------
+
+CSS adicional que se aplica al div contenedor de todo el bloque de firmas.
+
+--- EJEMPLO: Cambiar fuente del bloque completo ---
+"signatures": {
+    "style": {
+        "font-family": "'DejaVu Sans', sans-serif",
+        "color": "#222222"
+    }
+}
+
+
+--------------------------------------------------------------------------------
+EJEMPLO COMPLETO - signatures con todas las opciones
+--------------------------------------------------------------------------------
+"signatures": {
+    "position": {
+        "bottom": 28
+    },
+    "firmas": {
+        "width": "100%",
+        "cellspacing": "0",
+        "cellpadding": "0",
+        "style": {
+            "padding": "0mm 25mm"
+        }
+    },
+    "img": {
+        "height": 20,
+        "width": 85
+    },
+    "text": {
+        "font-size": "9pt"
+    },
+    "org": "INLASA",
+    "style": {
+        "font-family": "'DejaVu Sans', sans-serif"
+    }
+}
+
+
+================================================================================
+6. PROPIEDADES CSS DISPONIBLES (en campos "style")
 ================================================================================
 
 Estas propiedades se usan dentro del objeto "style" de cada elemento.
@@ -689,7 +937,7 @@ Verde            : "#276749", "#38a169"
 
 
 ================================================================================
-6. PROPIEDADES DE POSICION Y TAMANO
+7. PROPIEDADES DE POSICION Y TAMANO
 ================================================================================
 
 Todas las medidas estan en MILIMETROS (mm).
@@ -785,7 +1033,7 @@ EJEMPLOS DE POSICIONAMIENTO
 
 
 ================================================================================
-7. EJEMPLOS COMPLETOS POR CASO DE USO
+8. EJEMPLOS COMPLETOS POR CASO DE USO
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -1073,8 +1321,76 @@ CASO 5: Diseno minimalista
 }
 
 
+--------------------------------------------------------------------------------
+CASO 6: Certificado con firmas personalizadas
+--------------------------------------------------------------------------------
+{
+    "schemaVersion": 1,
+    "unit": "mm",
+    "qr": {
+        "position": {
+            "right": 6,
+            "bottom": 6
+        },
+        "size": {
+            "width": 20,
+            "height": 20
+        }
+    },
+    "nota": {
+        "text": "El PEEC INLASA extiende el presente Certificado unicamente a los Laboratorios Clinicos que cumplieron con el porcentaje exigido.",
+        "position": {
+            "left": 48,
+            "bottom": 6,
+            "width": 75
+        },
+        "style": {
+            "font-size": "5pt",
+            "text-align": "justify"
+        }
+    },
+    "signatures": {
+        "position": {
+            "bottom": 30
+        },
+        "firmas": {
+            "width": "100%",
+            "cellspacing": "0",
+            "cellpadding": "0",
+            "style": {
+                "padding": "0mm 20mm"
+            }
+        },
+        "img": {
+            "height": 20,
+            "width": 85
+        },
+        "text": {
+            "font-size": "8pt"
+        },
+        "org": "INLASA"
+    },
+    "elements": [
+        {
+            "type": "text",
+            "text": "Gestion {{ gestion }}",
+            "position": {
+                "left": 0,
+                "right": 0,
+                "bottom": 18
+            },
+            "style": {
+                "text-align": "center",
+                "font-size": "12pt",
+                "font-weight": "bold"
+            }
+        }
+    ]
+}
+
+
 ================================================================================
-8. ERRORES COMUNES Y SOLUCIONES
+9. ERRORES COMUNES Y SOLUCIONES
 ================================================================================
 
 ERROR: JSON invalido
@@ -1102,5 +1418,5 @@ SOLUCION: Usar exactamente {{ gestion }}, {{ area }}, {{ nombreLaboratorio }}
 
 ================================================================================
                          FIN DEL DOCUMENTO
-                    PEEC INLASA - Documentacion v2.0
+                    PEEC INLASA - Documentacion v3.0
 ================================================================================

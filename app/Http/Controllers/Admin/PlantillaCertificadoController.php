@@ -151,8 +151,11 @@ class PlantillaCertificadoController extends Controller
         $descripcion = $plantilla->descripcion_desmp;
         // Extraer configuración de diseño (QR, nota, elements, etc.)
         $diseno = $plantilla->diseno ?? [];
-        $qrConfig = $diseno['qr'] ?? [];
-        $notaConfig = $diseno['nota'] ?? [];
+        $qrConfig         = $diseno['qr']         ?? [];
+        $notaConfig       = $diseno['nota']        ?? [];
+        $headerConfig     = $diseno['header']      ?? [];
+        $tituloConfig     = $diseno['titulo']      ?? [];
+        $signaturesConfig = $diseno['signatures']  ?? [];
 
         // Procesar elements y convertir imágenes a data-uri (local o externa)
         $elements = $plantilla->getElementos();
@@ -166,8 +169,10 @@ class PlantillaCertificadoController extends Controller
             'qr' => $qrDataUri,
             'qrConfig' => $qrConfig,
             'notaConfig' => $notaConfig,
+            'headerConfig' => $headerConfig,
+            'tituloConfig' => $tituloConfig,
+            'signaturesConfig' => $signaturesConfig,
             'elements' => $elements,
-
             'nombreLaboratorio' => $nombreLaboratorio,
             'gestion' => $gestion,
             'areas' => $areasPaginadas,

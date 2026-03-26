@@ -198,7 +198,7 @@ class Laboratorio extends Model
             foreach (array_chunk($data['detalles'], $perPage) as $chunk) {
                 $paginas[] = [
                     'area'        => $area,
-                    'certificado' => $data['certificado']?? '',
+                    'certificado' => $data['certificado'] ?? '',
                     'detalles'    => $chunk,
                 ];
             }
@@ -405,8 +405,11 @@ class Laboratorio extends Model
         $descripcion = $plantilla->descripcion_part ?? ($plantilla->descripcion ?? '');
 
         $diseno = $plantilla->diseno ?? [];
-        $qrConfig = $diseno['qr'] ?? [];
-        $notaConfig = $diseno['nota'] ?? [];
+        $qrConfig         = $diseno['qr']         ?? [];
+        $notaConfig       = $diseno['nota']        ?? [];
+        $headerConfig     = $diseno['header']      ?? [];
+        $tituloConfig     = $diseno['titulo']      ?? [];
+        $signaturesConfig = $diseno['signatures']  ?? [];
         $elements = $plantilla->getElementos();
 
         $pdf = Pdf::loadView('certificados.plantillas.preview', [
@@ -417,6 +420,9 @@ class Laboratorio extends Model
             'qr' => $qrDataUri,
             'qrConfig' => $qrConfig,
             'notaConfig' => $notaConfig,
+            'headerConfig' => $headerConfig,
+            'tituloConfig' => $tituloConfig,
+            'signaturesConfig' => $signaturesConfig,
             'elements' => $elements,
 
             'nombreLaboratorio' => $nombreLaboratorio,
@@ -515,8 +521,11 @@ class Laboratorio extends Model
         $descripcion = $plantilla->descripcion_desmp;
 
         $diseno = $plantilla->diseno ?? [];
-        $qrConfig = $diseno['qr'] ?? [];
-        $notaConfig = $diseno['nota'] ?? [];
+        $qrConfig         = $diseno['qr']         ?? [];
+        $notaConfig       = $diseno['nota']        ?? [];
+        $headerConfig     = $diseno['header']      ?? [];
+        $tituloConfig     = $diseno['titulo']      ?? [];
+        $signaturesConfig = $diseno['signatures']  ?? [];
 
         $elements = $plantilla->getElementos();
         $areasPaginadas = self::paginarAreasCertificado($dataPorArea);
@@ -529,6 +538,9 @@ class Laboratorio extends Model
             'qr' => $qrDataUri,
             'qrConfig' => $qrConfig,
             'notaConfig' => $notaConfig,
+            'headerConfig' => $headerConfig,
+            'tituloConfig' => $tituloConfig,
+            'signaturesConfig' => $signaturesConfig,
             'elements' => $elements,
             'nombreLaboratorio' => $nombreLaboratorio,
             'gestion' => $gestion,
