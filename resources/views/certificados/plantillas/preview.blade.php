@@ -352,28 +352,16 @@ use App\Models\Certificado;
             $labFontSize = '10pt';
         }
 
-        $labelATxt      = $labelAConfig['text']     ?? 'A:';
+        $labelATxt      = $labelAConfig['text']     ?? '';
         $labelAStyleCss = PlantillaCertificado::toInlineCss($labelAConfig['style'] ?? []);
-        $labelAPos      = $labelAConfig['position'] ?? [];
-        $labelASize     = $labelAConfig['size']     ?? [];
-
-        $blockACss  = 'position: absolute; width: 100%;';
-        $blockACss .= ' top: ' . ($labelAPos['top'] ?? 65) . 'mm;';
-        if (isset($labelAPos['left']))   $blockACss .= ' left: '   . $labelAPos['left']   . 'mm;';
-        if (isset($labelAPos['right']))  $blockACss .= ' right: '  . $labelAPos['right']  . 'mm;';
-        if (isset($labelAPos['bottom'])) $blockACss .= ' bottom: ' . $labelAPos['bottom'] . 'mm;';
-
-        $labelASizeCss = '';
-        if (isset($labelASize['width']))  $labelASizeCss .= 'width: '   . $labelASize['width']  . 'mm;';
-        if (isset($labelASize['height'])) $labelASizeCss .= ' height: ' . $labelASize['height'] . 'mm;';
 
         $labelNombreLabStyleCss = PlantillaCertificado::toInlineCss($labelNombreLabConfig['style'] ?? []);
         $labelNombreLabSize     = $labelNombreLabConfig['size'] ?? [];
         $labWidthCss  = isset($labelNombreLabSize['width'])  ? ('width: '  . $labelNombreLabSize['width']  . 'mm;') : 'width: 70%;';
         $labHeightCss = isset($labelNombreLabSize['height']) ? ('height: ' . $labelNombreLabSize['height'] . 'mm;') : '';
         @endphp
-        <div style="{{ $blockACss }}">
-            <div class="label-a upper" style="height: 12px; {{ $labelASizeCss }} {{ $labelAStyleCss }}">{{ $labelATxt }}</div>
+        <div class="block-a">
+            <div class="label-a upper" style="{{ $labelAStyleCss }}">{{ $labelATxt }}</div>
             <div class="upper lab" style="text-align: center; font-size: {{ $labFontSize }}; word-break: break-word; {{ $labWidthCss }} {{ $labHeightCss }} margin:auto; {{ $labelNombreLabStyleCss }}">{{ $nombreLaboratorio }}</div>
         </div>
 

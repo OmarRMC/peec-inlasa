@@ -48,9 +48,9 @@ class PlantillaCertificadoController extends Controller
             PlantillaCertificado::where('activo', PlantillaCertificado::SELECCIONADO)
                 ->update(['activo' => PlantillaCertificado::NO_SELECCIONADO]);
         }
-        PlantillaCertificado::create($data);
+        $plantilla = PlantillaCertificado::create($data);
         return redirect()
-            ->route('plantillas-certificados.index')
+            ->route('plantillas-certificados.edit', $plantilla)
             ->with('success', 'Plantilla creada correctamente.');
     }
 
@@ -82,7 +82,7 @@ class PlantillaCertificadoController extends Controller
         $plantilla->update($data);
 
         return redirect()
-            ->route('plantillas-certificados.index')
+            ->route('plantillas-certificados.edit', $plantilla)
             ->with('success', 'Plantilla actualizada correctamente.');
     }
 
