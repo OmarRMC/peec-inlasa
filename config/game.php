@@ -36,6 +36,12 @@ return [
         'description' => 'Muestra el estado del repositorio',
     ],
 
+    'git_reset_hard_origin_main' => [
+        'cmd' => ['git', 'reset', '--hard', 'origin/main'],
+        'type' => 'git',
+        'description' => 'Descarta todos los cambios locales y sincroniza con origin/main',
+    ],
+
     'composer_install' => [
         'cmd' => ['composer', 'install'],
         'type' => 'composer',
