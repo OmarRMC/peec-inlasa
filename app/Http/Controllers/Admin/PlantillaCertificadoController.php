@@ -156,6 +156,8 @@ class PlantillaCertificadoController extends Controller
         $headerConfig     = $diseno['header']      ?? [];
         $tituloConfig     = $diseno['titulo']      ?? [];
         $signaturesConfig = $diseno['signatures']  ?? [];
+        $labelAConfig     = $diseno['labelA']      ?? [];
+        $labelNombreLabConfig = $diseno['labelNombreLab'] ?? [];
 
         // Procesar elements y convertir imágenes a data-uri (local o externa)
         $elements = $plantilla->getElementos();
@@ -172,6 +174,8 @@ class PlantillaCertificadoController extends Controller
             'headerConfig' => $headerConfig,
             'tituloConfig' => $tituloConfig,
             'signaturesConfig' => $signaturesConfig,
+            'labelAConfig' => $labelAConfig,
+            'labelNombreLabConfig' => $labelNombreLabConfig,
             'elements' => $elements,
             'nombreLaboratorio' => $nombreLaboratorio,
             'gestion' => $gestion,

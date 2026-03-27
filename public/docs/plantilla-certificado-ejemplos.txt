@@ -15,23 +15,30 @@ CAMPOS DISPONIBLES:
                     TABLA DE CONTENIDOS
 ================================================================================
 
-1. DESCRIPCION DESMP (descripcion_desmp)
-2. DESCRIPCION PART (descripcion_part)
-3. DISENO - Estructura general
-4. ELEMENTOS DINAMICOS (elements)
-   4.1 Elemento tipo TEXTO
-   4.2 Elemento tipo QR
-   4.3 Elemento tipo IMAGEN
-5. SIGNATURES - Configuracion de firmas (signatures)
-   5.1 Posicion del bloque de firmas
-   5.2 Tabla de firmas (firmas)
-   5.3 Imagen de firma (img)
-   5.4 Texto de firma (text)
-   5.5 Estilos adicionales del bloque (style)
-6. PROPIEDADES CSS DISPONIBLES
-7. PROPIEDADES DE POSICION Y TAMANO
-8. EJEMPLOS COMPLETOS POR CASO DE USO
-9. ERRORES COMUNES Y SOLUCIONES
+1.  DESCRIPCION DESMP (descripcion_desmp)
+2.  DESCRIPCION PART (descripcion_part)
+3.  DISENO - Estructura general
+4.  QR (qr)
+5.  NOTA / DISCLAIMER (nota)
+6.  HEADER - Encabezado institucional (header)
+7.  TITULO - Confiere y tipo de certificado (titulo)
+8.  SIGNATURES - Configuracion de firmas (signatures)
+    8.1 Posicion del bloque de firmas
+    8.2 Tabla de firmas (firmas)
+    8.3 Imagen de firma (img)
+    8.4 Texto de firma (text)
+    8.5 Estilos adicionales del bloque (style)
+9.  LABEL A y LABEL NOMBRE LAB (labelA / labelNombreLab)
+    9.1 labelA - Etiqueta "A:"
+    9.2 labelNombreLab - Nombre del laboratorio
+10. ELEMENTOS DINAMICOS (elements)
+    10.1 Elemento tipo TEXTO
+    10.2 Elemento tipo QR
+    10.3 Elemento tipo IMAGEN
+11. PROPIEDADES CSS DISPONIBLES
+12. PROPIEDADES DE POSICION Y TAMANO
+13. EJEMPLOS COMPLETOS POR CASO DE USO
+14. ERRORES COMUNES Y SOLUCIONES
 
 
 ================================================================================
@@ -165,23 +172,120 @@ EJEMPLO 2.4 - Nota minimalista
 3. DISENO - ESTRUCTURA GENERAL
 ================================================================================
 
-El campo "diseno" es el mas completo y permite configurar:
-- Posicion y tamano del codigo QR
-- Nota/disclaimer con posicion personalizada
-- Elementos dinamicos adicionales (textos, imagenes, QRs extras)
+El campo "diseno" controla todos los elementos visuales del certificado.
+Se guarda como JSON y contiene las siguientes claves:
 
-ESTRUCTURA BASICA:
-{
-    "schemaVersion": 1,
-    "unit": "mm",
-    "qr": { ... },
-    "nota": { ... },
-    "signatures": { ... },
-    "elements": [ ... ]
-}
+  qr            : Codigo QR de verificacion
+  nota          : Texto legal / disclaimer al pie
+  header        : Encabezado institucional (lineas de texto superiores)
+  titulo        : Bloque "Confiere el presente" + tipo de certificado
+  signatures    : Bloque de firmas
+  labelA        : Etiqueta "A:" antes del nombre del laboratorio
+  labelNombreLab: Nombre del laboratorio
+  elements      : Elementos dinamicos adicionales (textos, imagenes, QRs)
+
+REGLA GENERAL (aplica a todos los bloques):
+  position : Donde se ubica el bloque. Propiedades: top, left, right, bottom (en mm).
+             REGLA AUTO-ABSOLUTE: Si defines "position" en cualquier bloque,
+             el bloque se convierte automaticamente en position: absolute.
+             Si no defines "position", el bloque mantiene su comportamiento por defecto.
+  size     : Dimensiones del bloque. Propiedades: width, height (en mm).
+             Si no se define, el bloque mantiene su tamano por defecto.
+  style    : Estilos CSS del contenido del bloque (font-size, color, etc.).
+             Si no se define, se aplican los estilos base de la plantilla.
 
 --------------------------------------------------------------------------------
-EJEMPLO 3.1 - Estructura minima
+DESCRIPCION DE CADA CLAVE
+--------------------------------------------------------------------------------
+
+  Clave JSON      Clave PHP                              Descripcion
+  --------------- -------------------------------------- ----------------------
+  "qr"            $qrConfig = $diseno['qr'] ?? []        Codigo QR
+  "nota"          $notaConfig = $diseno['nota'] ?? []     Texto pie / disclaimer
+  "header"        $headerConfig = $diseno['header'] ?? [] Encabezado institucional
+  "titulo"        $tituloConfig = $diseno['titulo'] ?? [] Confiere + tipo certif.
+  "signatures"    $signaturesConfig = $diseno['signatures'] ?? []  Bloque firmas
+  "labelA"        $labelAConfig = $diseno['labelA'] ?? [] Etiqueta "A:"
+  "labelNombreLab" $labelNombreLabConfig = $diseno['labelNombreLab'] ?? []  Nombre lab
+  "elements"      (array)                                Elementos adicionales
+
+--------------------------------------------------------------------------------
+SOPORTE DE POSITION POR BLOQUE
+--------------------------------------------------------------------------------
+
+REGLA UNIVERSAL: Si defines "position" en cualquier bloque, ese bloque se
+convierte automaticamente en position: absolute. Si no defines "position",
+el bloque mantiene su comportamiento por defecto (flujo normal o valores CSS base).
+
+  Bloque          Sin position                   Con position (auto absolute)
+  --------------- ------------------------------ -----------------------------------------
+  qr              flujo CSS base (sin absolute)  top, left, right, bottom (default: right:6, bottom:6)
+  nota            flujo CSS base (sin absolute)  top, left, right, bottom (default: left:45, bottom:14)
+  signatures      flujo CSS base (sin absolute)  top, left, right, bottom (default: bottom:25)
+  labelA          absolute top:65mm (siempre)    top, left, right, bottom libres
+  header          relative top:28mm              pasa a absolute: top,left,right,bottom libres
+  titulo          relative top:30mm              pasa a absolute: top,left,right,bottom libres
+  labelNombreLab  (sin position propia, depende de labelA.position)
+  elements        absolute (siempre)             top, left, right, bottom (segun elemento)
+
+IMPORTANTE: Para qr, nota y signatures se recomienda siempre definir "position"
+            para que el bloque quede correctamente posicionado en el certificado.
+
+--------------------------------------------------------------------------------
+DESCRIPCION DETALLADA DE CADA CLAVE
+--------------------------------------------------------------------------------
+
+  "qr"
+      Controla el codigo QR de verificacion del certificado.
+      Si defines position -> se convierte en absolute. Soporta top, left, right, bottom.
+      Defaults cuando position esta definida: right: 6mm, bottom: 6mm.
+      Defaults de tamano: width: 20mm, height: 20mm.
+      Ver seccion 4 para ejemplos detallados.
+
+  "nota"
+      Texto legal o disclaimer al pie del certificado. Acepta Markdown.
+      Si defines position -> se convierte en absolute. Soporta top, left, right, bottom.
+      Defaults cuando position esta definida: left: 45mm, bottom: 14mm, width: 70mm.
+      Ver seccion 5 para ejemplos detallados.
+
+  "header"
+      Encabezado institucional con una o varias lineas de texto.
+      Sin position: relative con top: 28mm por defecto.
+      Con position: se convierte en absolute, top/left/right/bottom libres.
+      Ver seccion 6 para ejemplos detallados.
+
+  "titulo"
+      Bloque "Confiere el presente:" + "CERTIFICADO DE PARTICIPACION/DESEMPENO".
+      Sin position: relative con top: 30mm por defecto.
+      Con position: se convierte en absolute, top/left/right/bottom libres.
+      Ver seccion 7 para ejemplos detallados.
+
+  "signatures"
+      Bloque de firmas con imagen, nombre, cargo y organizacion.
+      Si defines position -> se convierte en absolute. Soporta top, left, right, bottom.
+      Default cuando position esta definida: bottom: 25mm.
+      Ver seccion 8 para ejemplos detallados.
+
+  "labelA"
+      Etiqueta "A:" antes del nombre del laboratorio.
+      Posicion: absolute. Soporta top, left, right, bottom.
+      Su position controla todo el bloque (etiqueta + nombre del lab).
+      Default top: 65mm. Si no defines position, el bloque queda en 65mm.
+      Ver seccion 9 para ejemplos detallados.
+
+  "labelNombreLab"
+      Nombre del laboratorio (no tiene position propia).
+      Su posicion depende de labelA.position.
+      Solo acepta size y style.
+      Ver seccion 9 para ejemplos detallados.
+
+  "elements"
+      Array de elementos adicionales (textos, imagenes, QRs).
+      Cada elemento define su propia position absolute.
+      Ver seccion 10 para ejemplos detallados.
+
+--------------------------------------------------------------------------------
+EJEMPLO 3.1 - Estructura minima (solo QR)
 --------------------------------------------------------------------------------
 {
     "schemaVersion": 1,
@@ -194,7 +298,8 @@ EJEMPLO 3.1 - Estructura minima
         "size": {
             "width": 20,
             "height": 20
-        }
+        },
+        "style": {}
     }
 }
 
@@ -212,7 +317,8 @@ EJEMPLO 3.2 - Con QR y nota
         "size": {
             "width": 22,
             "height": 22
-        }
+        },
+        "style": {}
     },
     "nota": {
         "text": "Certificado oficial del PEEC INLASA",
@@ -221,7 +327,8 @@ EJEMPLO 3.2 - Con QR y nota
             "bottom": 10
         },
         "size": {
-            "width": 100
+            "width": 100,
+            "height": 15
         },
         "style": {
             "font-size": "6pt",
@@ -232,35 +339,140 @@ EJEMPLO 3.2 - Con QR y nota
 }
 
 --------------------------------------------------------------------------------
-EJEMPLO 3.3 - Completo con elementos
+EJEMPLO 3.3 - Todas las claves (estructura completa)
 --------------------------------------------------------------------------------
 {
     "schemaVersion": 1,
     "unit": "mm",
+
     "qr": {
         "position": {
-            "right": 10,
-            "bottom": 10
+            "right": 6,
+            "bottom": 6
         },
         "size": {
-            "width": 25,
-            "height": 25
-        }
+            "width": 20,
+            "height": 20
+        },
+        "style": {}
     },
+
     "nota": {
-        "text": "El PEEC INLASA extiende el presente Certificado...",
+        "text": "El PEEC INLASA extiende el presente Certificado unicamente a los Laboratorios Clinicos que cumplieron con el porcentaje de participacion y/o desempeno exigido.",
         "position": {
-            "left": 30,
-            "bottom": 12
+            "left": 45,
+            "bottom": 14
         },
         "size": {
-            "width": 120
+            "width": 70,
+            "height": 20
         },
         "style": {
             "font-size": "5pt",
+            "color": "#333333",
             "text-align": "justify"
         }
     },
+
+    "header": {
+        "lines": [
+            "INSTITUTO NACIONAL DE LABORATORIOS DE SALUD - INLASA",
+            "\"DR. NESTOR MORALES VILLAZON\"",
+            "PROGRAMA DE EVALUACION EXTERNA DE LA CALIDAD"
+        ],
+        "position": {
+            "top": 28
+        },
+        "size": {
+            "width": 297
+        },
+        "style": {
+            "font-size": "14pt",
+            "font-weight": "bold",
+            "color": "#000000"
+        }
+    },
+
+    "titulo": {
+        "position": {
+            "top": 30
+        },
+        "size": {
+            "width": 297
+        },
+        "confiere": {
+            "text": "Confiere el presente:",
+            "style": {
+                "font-size": "15pt",
+                "color": "#6b7280"
+            }
+        },
+        "certTitulo": {
+            "style": {
+                "font-size": "18pt",
+                "color": "#6b7280"
+            }
+        }
+    },
+
+    "signatures": {
+        "position": {
+            "bottom": 25
+        },
+        "size": {
+            "width": 297,
+            "height": 30
+        },
+        "firmas": {
+            "width": "100%",
+            "cellspacing": "0",
+            "cellpadding": "0",
+            "style": {
+                "padding": "0mm 30mm"
+            }
+        },
+        "img": {
+            "height": 18,
+            "width": 85,
+            "overlap": 5
+        },
+        "text": {
+            "font-size": "9pt"
+        },
+        "org": "INLASA",
+        "style": {
+            "font-family": "'DejaVu Sans', sans-serif"
+        }
+    },
+
+    "labelA": {
+        "text": "A:",
+        "position": {
+            "top": 65
+        },
+        "size": {
+            "width": 20,
+            "height": 12
+        },
+        "style": {
+            "font-size": "20pt",
+            "font-weight": "bold",
+            "color": "#000000"
+        }
+    },
+
+    "labelNombreLab": {
+        "size": {
+            "width": 185,
+            "height": 20
+        },
+        "style": {
+            "font-size": "14pt",
+            "font-weight": "700",
+            "color": "#000000"
+        }
+    },
+
     "elements": [
         {
             "type": "text",
@@ -268,7 +480,10 @@ EJEMPLO 3.3 - Completo con elementos
             "position": {
                 "left": 0,
                 "right": 0,
-                "bottom": 25
+                "bottom": 20
+            },
+            "size": {
+                "width": 297
             },
             "style": {
                 "text-align": "center",
@@ -281,7 +496,406 @@ EJEMPLO 3.3 - Completo con elementos
 
 
 ================================================================================
-4. ELEMENTOS DINAMICOS (elements)
+4. QR (qr)
+================================================================================
+
+Controla la posicion, tamano y estilo del codigo QR principal del certificado.
+
+PROPIEDADES:
+  position.right  : Distancia desde el borde derecho   (default: 6mm)
+  position.bottom : Distancia desde el borde inferior  (default: 6mm)
+  position.left   : Distancia desde el borde izquierdo (opcional)
+  position.top    : Distancia desde el borde superior  (opcional)
+  size.width      : Ancho del QR en mm                  (default: 20mm)
+  size.height     : Alto del QR en mm                   (default: 20mm)
+  style           : CSS adicional del contenedor del QR  (opcional)
+
+--- EJEMPLO 4.1: QR minimo (valores por defecto) ---
+"qr": {
+    "position": {
+        "right": 6,
+        "bottom": 6
+    },
+    "size": {
+        "width": 20,
+        "height": 20
+    },
+    "style": {}
+}
+
+--- EJEMPLO 4.2: QR mas grande en esquina inferior derecha ---
+"qr": {
+    "position": {
+        "right": 8,
+        "bottom": 8
+    },
+    "size": {
+        "width": 28,
+        "height": 28
+    },
+    "style": {}
+}
+
+--- EJEMPLO 4.3: QR en esquina inferior izquierda ---
+"qr": {
+    "position": {
+        "left": 8,
+        "bottom": 8
+    },
+    "size": {
+        "width": 22,
+        "height": 22
+    },
+    "style": {}
+}
+
+--- EJEMPLO 4.4: QR en esquina superior derecha ---
+"qr": {
+    "position": {
+        "right": 6,
+        "top": 6
+    },
+    "size": {
+        "width": 20,
+        "height": 20
+    },
+    "style": {}
+}
+
+--- EJEMPLO 4.5: QR pequeno con borde redondeado ---
+"qr": {
+    "position": {
+        "right": 5,
+        "bottom": 5
+    },
+    "size": {
+        "width": 15,
+        "height": 15
+    },
+    "style": {
+        "border-radius": "2mm",
+        "opacity": "0.9"
+    }
+}
+
+
+================================================================================
+5. NOTA / DISCLAIMER (nota)
+================================================================================
+
+Controla el texto legal o disclaimer que aparece al pie del certificado.
+
+PROPIEDADES:
+  text            : Texto del disclaimer (acepta Markdown)
+  position.left   : Distancia desde el borde izquierdo  (default: 45mm)
+  position.bottom : Distancia desde el borde inferior   (default: 14mm)
+  position.right  : Distancia desde el borde derecho    (opcional)
+  position.top    : Distancia desde el borde superior   (opcional)
+  size.width      : Ancho del bloque en mm               (default: 70mm)
+  size.height     : Alto del bloque en mm                (opcional)
+  style           : CSS del texto (font-size, color, etc.)
+
+--- EJEMPLO 5.1: Nota estandar ---
+"nota": {
+    "text": "El PEEC INLASA extiende el presente Certificado unicamente a los Laboratorios Clinicos que cumplieron con el porcentaje de participacion y/o desempeno exigido.",
+    "position": {
+        "left": 45,
+        "bottom": 14
+    },
+    "size": {
+        "width": 70,
+        "height": 20
+    },
+    "style": {
+        "font-size": "5pt",
+        "color": "#333333",
+        "text-align": "justify"
+    }
+}
+
+--- EJEMPLO 5.2: Nota mas ancha centrada ---
+"nota": {
+    "text": "Certificado valido unicamente con codigo QR de verificacion.",
+    "position": {
+        "left": 30,
+        "bottom": 10
+    },
+    "size": {
+        "width": 120,
+        "height": 15
+    },
+    "style": {
+        "font-size": "6pt",
+        "color": "#666666",
+        "font-style": "italic",
+        "text-align": "center"
+    }
+}
+
+--- EJEMPLO 5.3: Nota legal extendida con Markdown ---
+"nota": {
+    "text": "**NOTA:** Este documento es un reconocimiento oficial emitido por el PEEC INLASA. Cualquier alteracion no autorizada sera sancionada conforme a ley.",
+    "position": {
+        "left": 40,
+        "bottom": 8
+    },
+    "size": {
+        "width": 110,
+        "height": 18
+    },
+    "style": {
+        "font-size": "5.5pt",
+        "color": "#444444",
+        "text-align": "justify",
+        "line-height": "1.3"
+    }
+}
+
+--- EJEMPLO 5.4: Nota con gestion dinamica ---
+"nota": {
+    "text": "Gestion {{ gestion }} - La Paz, Bolivia",
+    "position": {
+        "left": 0,
+        "right": 0,
+        "bottom": 8
+    },
+    "size": {
+        "width": 180,
+        "height": 12
+    },
+    "style": {
+        "font-size": "7pt",
+        "color": "#888888",
+        "text-align": "center"
+    }
+}
+
+
+================================================================================
+6. HEADER - Encabezado institucional (header)
+================================================================================
+
+Controla las lineas de texto del encabezado y su posicion dentro del certificado.
+
+COMPORTAMIENTO DE POSICION:
+  - Sin "position" : el bloque usa position:relative y se ubica en top:28mm por defecto.
+  - Con "position" : el bloque pasa automaticamente a position:absolute y acepta
+                     top, left, right y bottom con total libertad de ubicacion.
+
+PROPIEDADES:
+  lines           : Array de strings, cada uno es una linea del encabezado
+  position.top    : Distancia desde el borde superior  (default sin position: 28mm)
+  position.left   : Distancia desde el borde izquierdo (solo si defines position)
+  position.right  : Distancia desde el borde derecho   (solo si defines position)
+  position.bottom : Distancia desde el borde inferior  (solo si defines position)
+  size.width      : Ancho del bloque en mm              (opcional)
+  size.height     : Alto del bloque en mm               (opcional)
+  style           : CSS del texto (font-size, color, font-family, etc.)
+
+--- EJEMPLO 6.1: Header estandar INLASA ---
+"header": {
+    "lines": [
+        "INSTITUTO NACIONAL DE LABORATORIOS DE SALUD - INLASA",
+        "\"DR. NESTOR MORALES VILLAZON\"",
+        "PROGRAMA DE EVALUACION EXTERNA DE LA CALIDAD"
+    ],
+    "position": {
+        "top": 28
+    },
+    "size": {
+        "width": 297
+    },
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "bold",
+        "color": "#000000"
+    }
+}
+
+--- EJEMPLO 6.2: Header con color institucional y mas arriba ---
+"header": {
+    "lines": [
+        "INSTITUTO NACIONAL DE LABORATORIOS DE SALUD - INLASA",
+        "PROGRAMA DE EVALUACION EXTERNA DE LA CALIDAD"
+    ],
+    "position": {
+        "top": 22
+    },
+    "size": {
+        "width": 297
+    },
+    "style": {
+        "font-size": "13pt",
+        "font-weight": "bold",
+        "color": "#1a365d"
+    }
+}
+
+--- EJEMPLO 6.3: Header con una sola linea ---
+"header": {
+    "lines": [
+        "PROGRAMA DE EVALUACION EXTERNA DE LA CALIDAD - PEEC INLASA"
+    ],
+    "position": {
+        "top": 30
+    },
+    "size": {
+        "width": 297
+    },
+    "style": {
+        "font-size": "16pt",
+        "font-weight": "900",
+        "color": "#003366",
+        "letter-spacing": "0.5pt"
+    }
+}
+
+--- EJEMPLO 6.4: Header compacto con fuente pequena ---
+"header": {
+    "lines": [
+        "MINISTERIO DE SALUD Y DEPORTES",
+        "INSTITUTO NACIONAL DE LABORATORIOS DE SALUD - INLASA",
+        "\"DR. NESTOR MORALES VILLAZON\"",
+        "PROGRAMA DE EVALUACION EXTERNA DE LA CALIDAD"
+    ],
+    "position": {
+        "top": 20
+    },
+    "size": {
+        "width": 297
+    },
+    "style": {
+        "font-size": "11pt",
+        "font-weight": "bold",
+        "color": "#222222",
+        "line-height": "1.4"
+    }
+}
+
+
+================================================================================
+7. TITULO - Confiere y tipo de certificado (titulo)
+================================================================================
+
+Controla el bloque que contiene el texto "Confiere el presente:" y el titulo
+"CERTIFICADO DE PARTICIPACION / DESEMPENO".
+
+COMPORTAMIENTO DE POSICION:
+  - Sin "position" : el bloque usa position:relative y se ubica en top:30mm por defecto.
+  - Con "position" : el bloque pasa automaticamente a position:absolute y acepta
+                     top, left, right y bottom con total libertad de ubicacion.
+
+PROPIEDADES:
+  position.top    : Distancia desde el borde superior  (default sin position: 30mm)
+  position.left   : Distancia desde el borde izquierdo (solo si defines position)
+  position.right  : Distancia desde el borde derecho   (solo si defines position)
+  position.bottom : Distancia desde el borde inferior  (solo si defines position)
+  size.width      : Ancho del bloque en mm              (opcional)
+  size.height     : Alto del bloque en mm               (opcional)
+  confiere.text   : Texto de la linea superior          (default: "Confiere el presente:")
+  confiere.style  : CSS de la linea "confiere"
+  certTitulo.style: CSS del titulo "CERTIFICADO DE ..."
+
+--- EJEMPLO 7.1: Titulo estandar ---
+"titulo": {
+    "position": {
+        "top": 30
+    },
+    "size": {
+        "width": 297
+    },
+    "confiere": {
+        "text": "Confiere el presente:",
+        "style": {
+            "font-size": "15pt",
+            "color": "#6b7280"
+        }
+    },
+    "certTitulo": {
+        "style": {
+            "font-size": "18pt",
+            "color": "#6b7280"
+        }
+    }
+}
+
+--- EJEMPLO 7.2: Titulo desplazado y con colores corporativos ---
+"titulo": {
+    "position": {
+        "top": 35
+    },
+    "size": {
+        "width": 297
+    },
+    "confiere": {
+        "text": "Con orgullo confiere el presente:",
+        "style": {
+            "font-size": "14pt",
+            "color": "#888888",
+            "font-style": "italic"
+        }
+    },
+    "certTitulo": {
+        "style": {
+            "font-size": "20pt",
+            "color": "#1a365d",
+            "font-weight": "900",
+            "letter-spacing": "1pt"
+        }
+    }
+}
+
+--- EJEMPLO 7.3: Titulo compacto mas arriba ---
+"titulo": {
+    "position": {
+        "top": 25
+    },
+    "size": {
+        "width": 297
+    },
+    "confiere": {
+        "text": "Otorga el presente:",
+        "style": {
+            "font-size": "13pt",
+            "color": "#999999"
+        }
+    },
+    "certTitulo": {
+        "style": {
+            "font-size": "16pt",
+            "color": "#333333",
+            "font-weight": "800"
+        }
+    }
+}
+
+--- EJEMPLO 7.4: Solo cambiar estilos sin mover posicion ---
+"titulo": {
+    "position": {
+        "top": 30
+    },
+    "size": {
+        "width": 297
+    },
+    "confiere": {
+        "text": "Confiere el presente:",
+        "style": {
+            "font-size": "15pt",
+            "color": "#b8860b"
+        }
+    },
+    "certTitulo": {
+        "style": {
+            "font-size": "18pt",
+            "color": "#b8860b",
+            "font-weight": "900"
+        }
+    }
+}
+
+
+================================================================================
+10. ELEMENTOS DINAMICOS (elements)
 ================================================================================
 
 Los elementos son componentes adicionales que puedes agregar al certificado.
@@ -629,7 +1243,7 @@ NOTAS IMPORTANTES SOBRE IMAGENES:
 
 
 ================================================================================
-5. SIGNATURES - CONFIGURACION DE FIRMAS
+8. SIGNATURES - CONFIGURACION DE FIRMAS
 ================================================================================
 
 El campo "signatures" dentro de "diseno" permite personalizar completamente
@@ -641,6 +1255,10 @@ ESTRUCTURA COMPLETA:
     "signatures": {
         "position": {
             "bottom": 25
+        },
+        "size": {
+            "width": 297,
+            "height": 30
         },
         "firmas": {
             "width": "100%",
@@ -669,7 +1287,7 @@ NOTA: Todos los campos son opcionales. Si no se define "signatures",
 
 
 --------------------------------------------------------------------------------
-5.1 POSICION DEL BLOQUE DE FIRMAS (position)
+8.1 POSICION DEL BLOQUE DE FIRMAS (position)
 --------------------------------------------------------------------------------
 
 Controla donde se ubica el bloque completo de firmas dentro de la pagina.
@@ -697,7 +1315,7 @@ PROPIEDADES:
 
 
 --------------------------------------------------------------------------------
-5.2 TABLA DE FIRMAS (firmas)
+8.2 TABLA DE FIRMAS (firmas)
 --------------------------------------------------------------------------------
 
 Controla los atributos y estilos del elemento <table> que contiene
@@ -750,7 +1368,7 @@ PROPIEDADES UTILES EN style:
 
 
 --------------------------------------------------------------------------------
-5.3 IMAGEN DE FIRMA (img)
+8.3 IMAGEN DE FIRMA (img)
 --------------------------------------------------------------------------------
 
 Controla el tamano de las imagenes de firma dentro de cada columna.
@@ -805,7 +1423,7 @@ NOTA: La imagen de firma SIEMPRE se superpone sobre el nombre por defecto
 
 
 --------------------------------------------------------------------------------
-5.4 TEXTO DE FIRMA (text)
+8.4 TEXTO DE FIRMA (text)
 --------------------------------------------------------------------------------
 
 Controla el tamano de fuente del nombre, cargo y organizacion
@@ -830,7 +1448,7 @@ PROPIEDADES:
 
 
 --------------------------------------------------------------------------------
-5.5 ORGANIZACION (org)
+8.5 ORGANIZACION (org)
 --------------------------------------------------------------------------------
 
 Texto que aparece como tercer renglon bajo la firma (institucion).
@@ -845,7 +1463,7 @@ PROPIEDADES:
 
 
 --------------------------------------------------------------------------------
-5.6 ESTILOS ADICIONALES DEL BLOQUE (style)
+8.6 ESTILOS ADICIONALES DEL BLOQUE (style)
 --------------------------------------------------------------------------------
 
 CSS adicional que se aplica al div contenedor de todo el bloque de firmas.
@@ -865,6 +1483,10 @@ EJEMPLO COMPLETO - signatures con todas las opciones
 "signatures": {
     "position": {
         "bottom": 28
+    },
+    "size": {
+        "width": 297,
+        "height": 30
     },
     "firmas": {
         "width": "100%",
@@ -889,7 +1511,364 @@ EJEMPLO COMPLETO - signatures con todas las opciones
 
 
 ================================================================================
-6. PROPIEDADES CSS DISPONIBLES (en campos "style")
+9. LABEL A y LABEL NOMBRE LAB (labelA / labelNombreLab)
+================================================================================
+
+Estas dos claves dentro de "diseno" permiten personalizar por separado:
+  - "labelA"         : La etiqueta "A:" que precede al nombre del laboratorio.
+  - "labelNombreLab" : El nombre del laboratorio en si mismo.
+
+Son objetos independientes; puedes definir uno, ambos o ninguno.
+Si no se definen, se aplican los estilos por defecto de la plantilla.
+
+ESTRUCTURA ESTANDAR (igual que los demas elementos):
+{
+    "labelA": {
+        "text": "A:",
+        "position": {
+            "top": 65
+        },
+        "size": {
+            "width": 20,
+            "height": 12
+        },
+        "style": {
+            "propiedad-css": "valor"
+        }
+    },
+    "labelNombreLab": {
+        "size": {
+            "width": 180,
+            "height": 20
+        },
+        "style": {
+            "propiedad-css": "valor"
+        }
+    }
+}
+
+NOTAS:
+  - Todas las medidas de position y size estan en MILIMETROS (mm).
+  - labelA.position controla donde se ubica el bloque completo (etiqueta + nombre).
+    Si no se define, el bloque se ubica en top: 65mm por defecto.
+  - labelA.position acepta: top, left, right, bottom.
+  - labelNombreLab no tiene position propia; su posicion depende de labelA.position.
+  - labelNombreLab.size.width sobreescribe el ancho por defecto (70% del contenedor).
+  - El font-size del nombre se ajusta automaticamente segun longitud del texto
+    (hasta 80 chars: normal, hasta 120: 12pt, mas de 120: 10pt). Puedes
+    sobreescribirlo con "font-size" en labelNombreLab.style.
+
+
+--------------------------------------------------------------------------------
+9.1 labelA - Etiqueta "A:"
+--------------------------------------------------------------------------------
+
+Controla el texto, la posicion del bloque completo y los estilos de la etiqueta.
+
+PROPIEDADES:
+  text            : Texto de la etiqueta                (default: "A:")
+  position.top    : Distancia desde el borde superior   (default: 65mm)
+  position.left   : Distancia desde el borde izquierdo  (opcional)
+  position.right  : Distancia desde el borde derecho    (opcional)
+  position.bottom : Distancia desde el borde inferior   (opcional)
+  size.width      : Ancho del elemento "A:" en mm        (opcional)
+  size.height     : Alto del elemento "A:" en mm         (opcional)
+  style           : Objeto CSS aplicado al texto "A:"
+
+--- EJEMPLO 6.1.1: Solo color, posicion y tamano por defecto ---
+"labelA": {
+    "text": "A:",
+    "position": {
+        "top": 65
+    },
+    "size": {
+        "width": 20,
+        "height": 12
+    },
+    "style": {
+        "font-size": "20pt",
+        "font-weight": "800",
+        "color": "#1a365d"
+    }
+}
+
+--- EJEMPLO 6.1.2: Fuente grande y negrita, bloque mas arriba ---
+"labelA": {
+    "text": "A:",
+    "position": {
+        "top": 60
+    },
+    "size": {
+        "width": 25,
+        "height": 14
+    },
+    "style": {
+        "font-size": "24pt",
+        "font-weight": "900",
+        "color": "#000000"
+    }
+}
+
+--- EJEMPLO 6.1.3: Texto personalizado "PARA:" ---
+"labelA": {
+    "text": "PARA:",
+    "position": {
+        "top": 65
+    },
+    "size": {
+        "width": 40,
+        "height": 12
+    },
+    "style": {
+        "font-size": "20pt",
+        "font-weight": "800",
+        "color": "#333333"
+    }
+}
+
+--- EJEMPLO 6.1.4: Etiqueta en dorado corporativo ---
+"labelA": {
+    "text": "A:",
+    "position": {
+        "top": 65
+    },
+    "size": {
+        "width": 20,
+        "height": 12
+    },
+    "style": {
+        "font-size": "22pt",
+        "font-weight": "900",
+        "color": "#b8860b",
+        "letter-spacing": "1pt"
+    }
+}
+
+--- EJEMPLO 6.1.5: Estilo minimalista con texto largo ---
+"labelA": {
+    "text": "Otorgado a:",
+    "position": {
+        "top": 68
+    },
+    "size": {
+        "width": 60,
+        "height": 12
+    },
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "400",
+        "color": "#666666",
+        "font-style": "italic"
+    }
+}
+
+
+--------------------------------------------------------------------------------
+9.2 labelNombreLab - Nombre del laboratorio
+--------------------------------------------------------------------------------
+
+Controla el tamano y los estilos del nombre del laboratorio.
+El texto mostrado siempre es el nombre real del laboratorio.
+
+PROPIEDADES:
+  size.width  : Ancho del elemento en mm  (default: 70% del contenedor)
+  size.height : Alto del elemento en mm   (opcional)
+  style       : Objeto CSS aplicado al nombre del laboratorio
+
+--- EJEMPLO 6.2.1: Ancho y color basico ---
+"labelNombreLab": {
+    "size": {
+        "width": 180,
+        "height": 20
+    },
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "700",
+        "color": "#1a365d"
+    }
+}
+
+--- EJEMPLO 6.2.2: Fuente fija sobreescribiendo el ajuste automatico ---
+"labelNombreLab": {
+    "size": {
+        "width": 200,
+        "height": 22
+    },
+    "style": {
+        "font-size": "16pt",
+        "font-weight": "800",
+        "color": "#000000"
+    }
+}
+
+--- EJEMPLO 6.2.3: Estilo dorado con espaciado ---
+"labelNombreLab": {
+    "size": {
+        "width": 190,
+        "height": 20
+    },
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "bold",
+        "color": "#b8860b",
+        "letter-spacing": "0.5pt"
+    }
+}
+
+--- EJEMPLO 6.2.4: Azul corporativo con interlineado ---
+"labelNombreLab": {
+    "size": {
+        "width": 185,
+        "height": 24
+    },
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "700",
+        "color": "#1a365d",
+        "line-height": "1.3"
+    }
+}
+
+--- EJEMPLO 6.2.5: Texto claro para fondos oscuros ---
+"labelNombreLab": {
+    "size": {
+        "width": 180,
+        "height": 20
+    },
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "900",
+        "color": "#f5f5f5",
+        "letter-spacing": "0.3pt"
+    }
+}
+
+
+--------------------------------------------------------------------------------
+EJEMPLOS COMPLETOS - labelA y labelNombreLab combinados
+--------------------------------------------------------------------------------
+
+--- CASO 1: Estilo corporativo azul ---
+"labelA": {
+    "text": "A:",
+    "position": {
+        "top": 65
+    },
+    "size": {
+        "width": 20,
+        "height": 12
+    },
+    "style": {
+        "font-size": "22pt",
+        "font-weight": "900",
+        "color": "#1a365d"
+    }
+},
+"labelNombreLab": {
+    "size": {
+        "width": 185,
+        "height": 20
+    },
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "700",
+        "color": "#1a365d",
+        "letter-spacing": "0.3pt"
+    }
+}
+
+--- CASO 2: Etiqueta dorada, nombre oscuro ---
+"labelA": {
+    "text": "A:",
+    "position": {
+        "top": 65
+    },
+    "size": {
+        "width": 20,
+        "height": 12
+    },
+    "style": {
+        "font-size": "22pt",
+        "font-weight": "900",
+        "color": "#b8860b"
+    }
+},
+"labelNombreLab": {
+    "size": {
+        "width": 190,
+        "height": 20
+    },
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "800",
+        "color": "#111111"
+    }
+}
+
+--- CASO 3: Texto personalizado con bloque desplazado ---
+"labelA": {
+    "text": "CERTIFICADO PARA:",
+    "position": {
+        "top": 62
+    },
+    "size": {
+        "width": 80,
+        "height": 12
+    },
+    "style": {
+        "font-size": "16pt",
+        "font-weight": "700",
+        "color": "#444444",
+        "letter-spacing": "0.5pt"
+    }
+},
+"labelNombreLab": {
+    "size": {
+        "width": 180,
+        "height": 22
+    },
+    "style": {
+        "font-size": "13pt",
+        "font-weight": "600",
+        "color": "#222222"
+    }
+}
+
+--- CASO 4: Solo personalizar el nombre (etiqueta "A:" por defecto) ---
+"labelNombreLab": {
+    "size": {
+        "width": 185,
+        "height": 20
+    },
+    "style": {
+        "font-size": "14pt",
+        "font-weight": "900",
+        "color": "#2c5282",
+        "letter-spacing": "0.4pt"
+    }
+}
+
+--- CASO 5: Solo personalizar la etiqueta (nombre por defecto) ---
+"labelA": {
+    "text": "Para:",
+    "position": {
+        "top": 65
+    },
+    "size": {
+        "width": 35,
+        "height": 12
+    },
+    "style": {
+        "font-size": "18pt",
+        "font-weight": "600",
+        "color": "#333333",
+        "font-style": "italic"
+    }
+}
+
+
+================================================================================
+11. PROPIEDADES CSS DISPONIBLES (en campos "style")
 ================================================================================
 
 Estas propiedades se usan dentro del objeto "style" de cada elemento.
@@ -956,7 +1935,7 @@ Verde            : "#276749", "#38a169"
 
 
 ================================================================================
-7. PROPIEDADES DE POSICION Y TAMANO
+12. PROPIEDADES DE POSICION Y TAMANO
 ================================================================================
 
 Todas las medidas estan en MILIMETROS (mm).
@@ -1052,7 +2031,7 @@ EJEMPLOS DE POSICIONAMIENTO
 
 
 ================================================================================
-8. EJEMPLOS COMPLETOS POR CASO DE USO
+13. EJEMPLOS COMPLETOS POR CASO DE USO
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -1409,7 +2388,7 @@ CASO 6: Certificado con firmas personalizadas
 
 
 ================================================================================
-9. ERRORES COMUNES Y SOLUCIONES
+14. ERRORES COMUNES Y SOLUCIONES
 ================================================================================
 
 ERROR: JSON invalido
@@ -1437,5 +2416,5 @@ SOLUCION: Usar exactamente {{ gestion }}, {{ area }}, {{ nombreLaboratorio }}
 
 ================================================================================
                          FIN DEL DOCUMENTO
-                    PEEC INLASA - Documentacion v3.0
+                    PEEC INLASA - Documentacion v4.0
 ================================================================================

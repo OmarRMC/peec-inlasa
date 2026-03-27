@@ -410,6 +410,10 @@ class Laboratorio extends Model
         $headerConfig     = $diseno['header']      ?? [];
         $tituloConfig     = $diseno['titulo']      ?? [];
         $signaturesConfig = $diseno['signatures']  ?? [];
+        $labelAConfig     = $diseno['labelA']      ?? [];
+        $labelNombreLabConfig = $diseno['labelNombreLab'] ?? [];
+        \Log::info('$labelAConfig');
+        \Log::info($labelAConfig);
         $elements = $plantilla->getElementos();
 
         $pdf = Pdf::loadView('certificados.plantillas.preview', [
@@ -423,6 +427,8 @@ class Laboratorio extends Model
             'headerConfig' => $headerConfig,
             'tituloConfig' => $tituloConfig,
             'signaturesConfig' => $signaturesConfig,
+            'labelAConfig' => $labelAConfig,
+            'labelNombreLabConfig' => $labelNombreLabConfig,
             'elements' => $elements,
 
             'nombreLaboratorio' => $nombreLaboratorio,
@@ -526,6 +532,8 @@ class Laboratorio extends Model
         $headerConfig     = $diseno['header']      ?? [];
         $tituloConfig     = $diseno['titulo']      ?? [];
         $signaturesConfig = $diseno['signatures']  ?? [];
+        $labelAConfig     = $diseno['labelA']      ?? [];
+        $labelNombreLabConfig = $diseno['labelNombreLab'] ?? [];
 
         $elements = $plantilla->getElementos();
         $areasPaginadas = self::paginarAreasCertificado($dataPorArea);
@@ -541,6 +549,8 @@ class Laboratorio extends Model
             'headerConfig' => $headerConfig,
             'tituloConfig' => $tituloConfig,
             'signaturesConfig' => $signaturesConfig,
+            'labelAConfig' => $labelAConfig,
+            'labelNombreLabConfig' => $labelNombreLabConfig,
             'elements' => $elements,
             'nombreLaboratorio' => $nombreLaboratorio,
             'gestion' => $gestion,

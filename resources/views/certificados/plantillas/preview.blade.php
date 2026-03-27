@@ -165,14 +165,24 @@ use App\Models\Certificado;
 
         /* Firmas (3 columnas) */
         .signatures {
-            width: 100%;
             position: absolute;
             bottom: {{ $signaturesConfig['position']['bottom'] ?? 25 }}mm;
+            @if(isset($signaturesConfig['position']['top']))
+            top: {{ $signaturesConfig['position']['top'] }}mm;
+            @endif
             @if(isset($signaturesConfig['position']['left']))
             left: {{ $signaturesConfig['position']['left'] }}mm;
             @endif
             @if(isset($signaturesConfig['position']['right']))
             right: {{ $signaturesConfig['position']['right'] }}mm;
+            @endif
+            @if(isset($signaturesConfig['size']['width']))
+            width: {{ $signaturesConfig['size']['width'] }}mm;
+            @else
+            width: 100%;
+            @endif
+            @if(isset($signaturesConfig['size']['height']))
+            height: {{ $signaturesConfig['size']['height'] }}mm;
             @endif
             text-align: center;
             font-family: 'Raleway', 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
@@ -226,6 +236,9 @@ use App\Models\Certificado;
             @else
             height: 20mm;
             @endif
+            @if(isset($qrConfig['style']))
+            {{ \App\Models\PlantillaCertificado::toInlineCss($qrConfig['style']) }}
+            @endif
         }
 
         .qr img {
@@ -252,10 +265,15 @@ use App\Models\Certificado;
             @if(isset($notaConfig['position']['top']))
             top: {{ $notaConfig['position']['top'] }}mm;
             @endif
-            @if(isset($notaConfig['position']['width']))
+            @if(isset($notaConfig['size']['width']))
+            width: {{ $notaConfig['size']['width'] }}mm;
+            @elseif(isset($notaConfig['position']['width']))
             width: {{ $notaConfig['position']['width'] }}mm;
             @else
             width: 70mm;
+            @endif
+            @if(isset($notaConfig['size']['height']))
+            height: {{ $notaConfig['size']['height'] }}mm;
             @endif
             @if(isset($notaConfig['style']))
             {{ \App\Models\PlantillaCertificado::toInlineCss($notaConfig['style']) }}
@@ -263,34 +281,54 @@ use App\Models\Certificado;
             font-size: 5pt;
             color: #111;
             @endif
-        }   
+        }
     </style>
 </head>
 
 <body>
     @php
-    $headerLines    = $headerConfig['lines'] ?? [
+    $headerLines = $headerConfig['lines'] ?? [
         'INSTITUTO NACIONAL DE LABORATORIOS DE SALUD - INLASA',
         '”DR. NÉSTOR MORALES VILLAZÓN”',
         'PROGRAMA DE EVALUACION EXTERNA DE LA CALIDAD',
     ];
+    $headerPos  = $headerConfig['position'] ?? [];
+    $headerSize = $headerConfig['size']     ?? [];
+    $headerPosCss = !empty($headerPos) ? 'position: absolute;' : '';
+    if (isset($headerPos['top']))    $headerPosCss .= ' top: '    . $headerPos['top']    . 'mm;';
+    if (isset($headerPos['left']))   $headerPosCss .= ' left: '   . $headerPos['left']   . 'mm;';
+    if (isset($headerPos['right']))  $headerPosCss .= ' right: '  . $headerPos['right']  . 'mm;';
+    if (isset($headerPos['bottom'])) $headerPosCss .= ' bottom: ' . $headerPos['bottom'] . 'mm;';
+    $headerSizeCss = '';
+    if (isset($headerSize['width']))  $headerSizeCss .= 'width: '   . $headerSize['width']  . 'mm;';
+    if (isset($headerSize['height'])) $headerSizeCss .= ' height: ' . $headerSize['height'] . 'mm;';
     $headerStyleCss = PlantillaCertificado::toInlineCss($headerConfig['style'] ?? []);
 
-    $confiereTxt  = $tituloConfig['confiere']['text']  ?? 'Confiere el presente:';
-    $confiereStyleCss  = PlantillaCertificado::toInlineCss($tituloConfig['confiere']['style']  ?? []);
+    $tituloPos  = $tituloConfig['position'] ?? [];
+    $tituloSize = $tituloConfig['size']     ?? [];
+    $tituloPosCss = !empty($tituloPos) ? 'position: absolute;' : '';
+    if (isset($tituloPos['top']))    $tituloPosCss .= ' top: '    . $tituloPos['top']    . 'mm;';
+    if (isset($tituloPos['left']))   $tituloPosCss .= ' left: '   . $tituloPos['left']   . 'mm;';
+    if (isset($tituloPos['right']))  $tituloPosCss .= ' right: '  . $tituloPos['right']  . 'mm;';
+    if (isset($tituloPos['bottom'])) $tituloPosCss .= ' bottom: ' . $tituloPos['bottom'] . 'mm;';
+    $tituloSizeCss = '';
+    if (isset($tituloSize['width']))  $tituloSizeCss .= 'width: '   . $tituloSize['width']  . 'mm;';
+    if (isset($tituloSize['height'])) $tituloSizeCss .= ' height: ' . $tituloSize['height'] . 'mm;';
+    $confiereTxt        = $tituloConfig['confiere']['text']    ?? 'Confiere el presente:';
+    $confiereStyleCss   = PlantillaCertificado::toInlineCss($tituloConfig['confiere']['style']   ?? []);
     $certTituloStyleCss = PlantillaCertificado::toInlineCss($tituloConfig['certTitulo']['style'] ?? []);
     @endphp
 
     @foreach(($areas ?? [[]]) as $paginaArea)
     <div class="page">
 
-        <div class="block-header center upper" style="{{ $headerStyleCss }}">
+        <div class="block-header center upper" style="{{ $headerPosCss }} {{ $headerSizeCss }} {{ $headerStyleCss }}">
             @foreach($headerLines as $headerLine)
             <div>{{ $headerLine }}</div>
             @endforeach
         </div>
 
-        <div class="block-title center">
+        <div class="block-title center" style="{{ $tituloPosCss }} {{ $tituloSizeCss }}">
             <div class="confiere" style="{{ $confiereStyleCss }}">{{ $confiereTxt }}</div>
             <div class="cert-title upper" style="{{ $certTituloStyleCss }}"><b>CERTIFICADO DE
                 @if( $type == Certificado::TYPE_PARTICIPACION)
@@ -313,10 +351,30 @@ use App\Models\Certificado;
         } else {
             $labFontSize = '10pt';
         }
+
+        $labelATxt      = $labelAConfig['text']     ?? 'A:';
+        $labelAStyleCss = PlantillaCertificado::toInlineCss($labelAConfig['style'] ?? []);
+        $labelAPos      = $labelAConfig['position'] ?? [];
+        $labelASize     = $labelAConfig['size']     ?? [];
+
+        $blockACss  = 'position: absolute; width: 100%;';
+        $blockACss .= ' top: ' . ($labelAPos['top'] ?? 65) . 'mm;';
+        if (isset($labelAPos['left']))   $blockACss .= ' left: '   . $labelAPos['left']   . 'mm;';
+        if (isset($labelAPos['right']))  $blockACss .= ' right: '  . $labelAPos['right']  . 'mm;';
+        if (isset($labelAPos['bottom'])) $blockACss .= ' bottom: ' . $labelAPos['bottom'] . 'mm;';
+
+        $labelASizeCss = '';
+        if (isset($labelASize['width']))  $labelASizeCss .= 'width: '   . $labelASize['width']  . 'mm;';
+        if (isset($labelASize['height'])) $labelASizeCss .= ' height: ' . $labelASize['height'] . 'mm;';
+
+        $labelNombreLabStyleCss = PlantillaCertificado::toInlineCss($labelNombreLabConfig['style'] ?? []);
+        $labelNombreLabSize     = $labelNombreLabConfig['size'] ?? [];
+        $labWidthCss  = isset($labelNombreLabSize['width'])  ? ('width: '  . $labelNombreLabSize['width']  . 'mm;') : 'width: 70%;';
+        $labHeightCss = isset($labelNombreLabSize['height']) ? ('height: ' . $labelNombreLabSize['height'] . 'mm;') : '';
         @endphp
-        <div class="block-a">
-            <div class="label-a upper" style="height: 12px;">A:</div>
-            <div class="upper lab" style="text-align: center; font-size: {{ $labFontSize }}; word-break: break-word; width: 70%; margin:auto;">{{ $nombreLaboratorio }}</div>
+        <div style="{{ $blockACss }}">
+            <div class="label-a upper" style="height: 12px; {{ $labelASizeCss }} {{ $labelAStyleCss }}">{{ $labelATxt }}</div>
+            <div class="upper lab" style="text-align: center; font-size: {{ $labFontSize }}; word-break: break-word; {{ $labWidthCss }} {{ $labHeightCss }} margin:auto; {{ $labelNombreLabStyleCss }}">{{ $nombreLaboratorio }}</div>
         </div>
 
         <div class="block-paragraph center">
