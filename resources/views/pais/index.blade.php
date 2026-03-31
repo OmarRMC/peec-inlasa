@@ -11,7 +11,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        @if($verIds)<th>Nro</th>@endif
                         <th>Nombre</th>
                         <th>Sigla</th>
                         <th>Código</th>
@@ -22,7 +22,7 @@
                 <tbody>
                     @forelse ($paises as $pais)
                         <tr>
-                            <td>{{ $pais->id }}</td>
+                            @if($verIds)<td>{{ $pais->id }}</td>@endif
                             <td>{{ $pais->nombre_pais }}</td>
                             <td>{{ $pais->sigla_pais }}</td>
                             <td>{{ $pais->cod_pais }}</td>

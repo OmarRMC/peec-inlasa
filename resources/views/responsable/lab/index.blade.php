@@ -3,8 +3,13 @@
 
         <!-- Encabezado -->
         <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
-            <h1 class="text-xl font-bold text-gray-800">Lista de inscripciones a
-                {{ $ensayosAptitud->descripcion }}</h1>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">
+                    <i class="fas fa-box mr-1"></i> Paquete: <span class="font-medium text-gray-700">{{ $ensayosAptitud->paquete->descripcion ?? 'N/D' }}</span>
+                </p>
+                <h1 class="text-xl font-bold text-gray-800">Lista de inscripciones a
+                    {{ $ensayosAptitud->descripcion }}</h1>
+            </div>
         </div>
 
         <!-- Filtros y Buscador -->

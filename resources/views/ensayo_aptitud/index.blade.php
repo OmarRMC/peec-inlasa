@@ -37,7 +37,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        @if($verIds)<th>Nro</th>@endif
                         <th>Area</th>
                         <th>Paquete</th>
                         <th>Ensayo A.</th>
@@ -48,7 +48,7 @@
                 <tbody>
                     @forelse ($ensayos as $ensayo)
                         <tr>
-                            <td>{{ $ensayo->id }}</td>
+                            @if($verIds)<td>{{ $ensayo->id }}</td>@endif
                             <td>{{ $ensayo->paquete->area->descripcion ?? 'N/D' }}</td>
                             <td>{{ $ensayo->paquete->descripcion ?? 'N/D' }}</td>
                             <td>{{ $ensayo->descripcion }}</td>

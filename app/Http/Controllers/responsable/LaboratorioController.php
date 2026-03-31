@@ -42,6 +42,7 @@ class LaboratorioController extends Controller
         if (!$ensayosAptitud) {
             return redirect('/')->with('error', 'No se tiene el ensayo de aptitud solicitado.');
         }
+        $ensayosAptitud->loadMissing('paquete');
         $laboratorios = InscripcionEA::with('inscripcion.laboratorio')
             ->where('id_ea', $idEa)
             ->whereHas('inscripcion', function ($q) {

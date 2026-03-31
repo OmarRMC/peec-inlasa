@@ -5,31 +5,10 @@ use App\Models\Configuracion;
 <!-- Navigation -->
 <nav class="flex-1 px-2 py-4 space-y-1 text-sm overflow-y-auto">
     @if (true || Gate::any([Permiso::ADMIN, Permiso::VER_ESCRITORIO, Permiso::LABORATORIO]))
-    <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+    <a href="{{ route('dashboard') }}" class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
         <i class="fas fa-home w-5 text-indigo-500"></i>
         <span>Escritorio</span>
     </a>
-    @endif
-    <!-- Gestión de Inscripciones -->
-    @if (Gate::any([Permiso::ADMIN]))
-    <div>
-        <button @click="openMenu !== 1 ? openMenu = 1 : openMenu = null"
-            class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
-            <i class="fas fa-file-signature w-5 text-indigo-500"></i>
-            <span>Inscripciones</span>
-            <i class="fas ml-auto" :class="openMenu === 1 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-        </button>
-        <div x-show="openMenu === 1" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-            {{-- <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                        class="fas fa-list"></i> Ver Inscripciones</a> --}}
-            <a href="{{ route('formularios.index') }}"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                <i class="fas fa-file-alt"></i> Formularios
-            </a>
-            {{-- <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                        class="fas fa-file-alt"></i> Documentos</a> --}}
-        </div>
-    </div>
     @endif
 
     @if (Gate::any([Permiso::LABORATORIO]))
@@ -204,19 +183,19 @@ use App\Models\Configuracion;
         </button>
         <div x-show="openMenu === 2" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
             <a href="{{ route('plantillas-certificados.index') }}"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
-                <i class="fas fa-award mr-2"></i> Plantillas de certificados
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-award"></i> Plantillas de certificados
             </a>
             <a href="{{ route('configuracion.cerfificado') }}"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
                 <i class="fas fa-sliders-h"></i> Configuración
             </a>
             <a href="{{ route('list.cert.participacion.desemp') }}"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
                 <i class="fas fa-bullhorn"></i> Publicar Certificados
             </a>
             <a href="{{ route('admin.certificado.index') }}"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded">
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
                 <i class="fas fa-file-alt"></i> Certificados
             </a>
         </div>
@@ -264,15 +243,20 @@ use App\Models\Configuracion;
         </button>
         <div x-show="openMenu === 900" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
             <a href="{{ route('configuracion.index') }}"
-                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
-                <i class="fas fa-cogs w-5 text-indigo-500"></i>
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-cogs"></i>
                 <span>Configuración</span>
             </a>
 
             <a href="{{ route('contratos.index') }}"
-                class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
-                <i class="fas fa-cogs w-5 text-indigo-500"></i>
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-cogs"></i>
                 <span>Configuración del contrato</span>
+            </a>
+            <a href="{{ route('formularios.index') }}"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-file-alt"></i>
+                <span>Boleta de inscripción</span>
             </a>
         </div>
     </div>
@@ -426,16 +410,17 @@ use App\Models\Configuracion;
         </button>
         <div x-show="openMenu === 5" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
             <a href="{{ route('usuario.index') }}"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                    class="fas fa-user"></i>
-                Usuarios</a>
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-user"></i> Usuarios
+            </a>
             <a href="{{ route('cargos.index') }}"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                    class="fas fa-user-tag"></i> Cargos</a>
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-user-tag"></i> Cargos
+            </a>
             <a href="{{ route('permiso.index') }}"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                    class="fas fa-key"></i>
-                Permisos</a>
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-key"></i> Permisos
+            </a>
         </div>
     </div>
     @endif
@@ -458,7 +443,7 @@ use App\Models\Configuracion;
 
     @if (Gate::any([Permiso::ADMIN]))
     <a href="{{ route('galeria.index') }}"
-        class="flex items-center gap-3 px-3 py-2 rounded hover:bg-indigo-50">
+        class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
         <i class="fas fa-images w-5 text-indigo-500"></i>
         <span>Galería de archivos</span>
     </a>

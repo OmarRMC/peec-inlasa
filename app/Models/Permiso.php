@@ -200,6 +200,9 @@ class Permiso extends Model
     public const IMPERSONAR_USUARIO = 'impersonar.usuario';
     public const IMPERSONAR_USUARIO_NAME = 'Impersonar usuario';
 
+    public const VER_IDS = 'ver.ids';
+    public const VER_IDS_NAME = 'Ver IDs en tablas';
+
     // ------------------------------
     // PERMISOS_HABILITADOS
     // ------------------------------

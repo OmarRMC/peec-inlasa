@@ -14,7 +14,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        @if($verIds)<th>Nro</th>@endif
                         <th>Nombre</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -23,7 +23,7 @@
                 <tbody>
                     @forelse ($tipos as $tipo)
                         <tr>
-                            <td>{{ $tipo->id }}</td>
+                            @if($verIds)<td>{{ $tipo->id }}</td>@endif
                             <td>{{ $tipo->descripcion }}</td>
                             <td>
                                 @if ($tipo->status)

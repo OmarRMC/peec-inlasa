@@ -43,7 +43,7 @@
             <table id="cargos-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="px-4 py-2 text-left">Id</th>
+                        @if($verIds)<th class="px-4 py-2 text-left">Nro</th>@endif
                         <th class="px-4 py-2 text-left">Nombre</th>
                         <th class="px-4 py-2 text-left">Descripción</th>
                         <th class="px-4 py-2 text-left">Estado</th>
@@ -69,10 +69,8 @@
                     lengthChange: false,
                     dom: 'rt',
                     // dom: 'tip',
-                    columns: [{
-                            data: 'id',
-                            name: 'id'
-                        },
+                    columns: [
+                        ...window.idColumn(),
                         {
                             data: 'nombre_cargo',
                             name: 'nombre_cargo'

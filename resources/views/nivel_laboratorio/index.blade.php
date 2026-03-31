@@ -15,7 +15,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        @if($verIds)<th>Nro</th>@endif
                         <th>Nombre</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -24,7 +24,7 @@
                 <tbody>
                     @forelse ($niveles as $nivel)
                         <tr>
-                            <td>{{ $nivel->id }}</td>
+                            @if($verIds)<td>{{ $nivel->id }}</td>@endif
                             <td>{{ $nivel->descripcion_nivel }}</td>
                             <td>
                                 @if ($nivel->status_nivel)

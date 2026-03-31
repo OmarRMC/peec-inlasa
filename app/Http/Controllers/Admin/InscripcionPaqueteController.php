@@ -575,7 +575,7 @@ class InscripcionPaqueteController extends Controller
         $gestiones = Inscripcion::rangoGestion([
             'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
         ]);
-        $ensayoA = EnsayoAptitud::findOrFail($idEA);
+        $ensayoA = EnsayoAptitud::with('paquete')->findOrFail($idEA);
         return view('certificados.desempeno.show', compact('idEA', 'gestiones', 'ensayoA'));
     }
 }

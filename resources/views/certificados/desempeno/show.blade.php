@@ -2,8 +2,13 @@
     <div class="px-4 max-w-7xl mx-auto">
         <!-- Encabezado -->
         <div class="flex justify-between items-center mb-1">
-            <h1 class="text-xl font-bold text-gray-800">Lista de Inscripciones al Ensayo de Aptitud:
-                {{ $ensayoA->descripcion }}</h1>
+            <div>
+                <p class="text-xs text-gray-500 mb-1">
+                    <i class="fas fa-box mr-1"></i> Paquete: <span class="font-medium text-gray-700">{{ $ensayoA->paquete->descripcion ?? 'N/D' }}</span>
+                </p>
+                <h1 class="text-xl font-bold text-gray-800">Lista de Inscripciones al Ensayo de Aptitud:
+                    {{ $ensayoA->descripcion }}</h1>
+            </div>
         </div>
 
         <div>

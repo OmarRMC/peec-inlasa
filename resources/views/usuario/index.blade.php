@@ -43,6 +43,7 @@
             <table id="usuarios-table" class="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
                 <thead class="bg-gray-100">
                     <tr>
+                        @if($verIds)<th class="px-4 py-2 text-left">Nro</th>@endif
                         <th class="px-4 py-2 text-left">Fecha hora</th>
                         <th class="px-4 py-2 text-left">Usuario</th>
                         <th class="px-4 py-2 text-left">Nombre</th>
@@ -72,7 +73,9 @@
                     lengthMenu: [10, 25, 50],
                     lengthChange: false,
                     dom: 'rt',
-                    columns: [{
+                    columns: [
+                        ...window.idColumn(),
+                        {
                             data: 'created_at',
                             name: 'created_at'
                         },
@@ -109,9 +112,7 @@
                             searchable: false
                         }
                     ],
-                    order: [
-                        [0, 'desc']
-                    ],
+                    order: [[window.VER_IDS ? 1 : 0, 'desc']],
                     language: {
                         url: "{{ asset('translation/es.json') }}"
                     },

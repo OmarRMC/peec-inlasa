@@ -156,7 +156,8 @@
                 <table id="inscripciones-table" class="min-w-full text-sm text-gray-800">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-4 py-2 text-left">Acciones</th>
+                            @if($verIds)<th class="px-4 py-2 text-left">Nro</th>@endif
+                        <th class="px-4 py-2 text-left">Acciones</th>
                             <th class="px-4 py-2 text-left">Fecha</th>
                             <th class="px-4 py-2 text-left">Laboratorio</th>
                             <th class="px-4 py-2 text-left">Código</th>
@@ -244,10 +245,10 @@
                                 d.paquetes = Array.from(filtrosPaquetes);
                             }
                         },
-                        order: [
-                            [1, 'desc']
-                        ],
-                        columns: [{
+                        order: [[window.VER_IDS ? 2 : 1, 'desc']],
+                        columns: [
+                            ...window.idColumn(),
+                            {
                                 data: 'acciones',
                                 orderable: false,
                                 searchable: false

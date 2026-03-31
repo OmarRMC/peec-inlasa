@@ -219,6 +219,18 @@
             </footer>
         </div>
     </div>
+    <script>
+        // Helper centralizado para columna ID en DataTables
+        // Cambiar aquí para afectar todas las tablas a la vez
+        window.VER_IDS = {{ $verIds ? 'true' : 'false' }};
+        window.idColumn = function () {
+            if (!window.VER_IDS) return [];
+            return [{ data: 'id', name: 'id', searchable: false, width: '55px' }];
+        };
+        window.idTh = window.VER_IDS
+            ? '<th class="px-4 py-2 text-left">Nro</th>'
+            : '';
+    </script>
     @stack('scripts')
     <x-shared.notificacion-lab />
 </body>

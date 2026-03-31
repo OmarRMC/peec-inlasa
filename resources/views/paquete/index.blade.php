@@ -39,6 +39,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        @if($verIds)<th>Nro</th>@endif
                         <th>Programa</th>
                         <th>Área</th>
                         <th>Paquete</th>
@@ -66,6 +67,7 @@
                         @foreach ($areasAgrupadas as $area => $paquetesPorArea)
                             @foreach ($paquetesPorArea as $index => $paquete)
                                 <tr>
+                                    @if($verIds)<td>{{ $paquete->id }}</td>@endif
                                     @if ($index === 0 && $loop->parent->first)
                                         <td rowspan="{{ $paquetesPorPrograma->count() }}">{{ $programa }}</td>
                                     @endif

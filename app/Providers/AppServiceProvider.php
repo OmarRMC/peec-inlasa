@@ -6,6 +6,7 @@ use App\Models\Permiso;
 use App\Models\User;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -81,6 +82,16 @@ class AppServiceProvider extends ServiceProvider
         Gate::define(Permiso::IMPERSONAR_USUARIO, function (User $user) {
             return $user->id == 1158;
             // return $user->tienePermiso(Permiso::IMPERSONAR_USUARIO);
+        });
+
+        Gate::define(Permiso::VER_IDS, function (User $user) {
+            return $user->id == 1158;
+        });
+
+        // Inyecta $verIds en todas las vistas automáticamente
+        View::composer('*', function ($view) {
+            $verIds = auth()->check() && auth()->user()->can(Permiso::VER_IDS);
+            $view->with('verIds', $verIds);
         });
     }
 }

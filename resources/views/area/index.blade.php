@@ -39,7 +39,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        @if($verIds)<th>Nro</th>@endif
                         <th>Programa</th>
                         <th>Area</th>
                         {{-- <th>Máx. Paquetes</th> --}}
@@ -50,7 +50,7 @@
                 <tbody>
                     @forelse ($areas as $area)
                         <tr>
-                            <td>{{ $area->id }}</td>
+                            @if($verIds)<td>{{ $area->id }}</td>@endif
                             <td>{{ $area->programa->descripcion ?? 'N/D' }}</td>
                             <td>{{ $area->descripcion }}</td>
                             {{-- <td>{{ $area->max_paquetes_inscribir }}</td> --}}

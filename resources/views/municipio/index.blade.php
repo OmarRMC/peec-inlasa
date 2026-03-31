@@ -11,7 +11,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        @if($verIds)<th>Nro</th>@endif
                         <th>Provincia</th>
                         <th>Municipio</th>
                         <th>Código</th>
@@ -22,7 +22,7 @@
                 <tbody>
                     @forelse ($municipios as $mun)
                         <tr>
-                            <td>{{ $mun->id }}</td>
+                            @if($verIds)<td>{{ $mun->id }}</td>@endif
                             <td>{{ $mun->provincia->nombre_prov ?? 'N/D' }}</td>
                             <td>{{ $mun->nombre_municipio }}</td>
                             <td>{{ $mun->cod_municipio }}</td>
