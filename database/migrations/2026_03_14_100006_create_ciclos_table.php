@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_ensayo')->nullable();
             $table->string('nombre');
-            $table->integer('numero');
 
             $table->date('fecha_inicio_envio_muestras')->nullable();
             $table->date('fecha_fin_envio_muestras')->nullable();

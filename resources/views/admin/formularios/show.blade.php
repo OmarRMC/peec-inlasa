@@ -21,7 +21,7 @@
                     </button>
                     <button onclick="document.getElementById('modalUsar').classList.remove('hidden')"
                         class="px-3 py-1 bg-indigo-600 text-white rounded shadow hover:bg-indigo-500 text-sm">
-                        <i class="fas fa-copy"></i> Usar Otro Formulario
+                        <i class="fas fa-link"></i> Vincular Formulario
                     </button>
                 </div>
             @endif
@@ -105,17 +105,35 @@
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
-                                    <form action="{{ route('admin.formularios.destroy', $formulario->id) }}"
-                                        method="POST" class="inline-block"
-                                        onsubmit="return confirm('¿Seguro de eliminar este formulario?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm"
-                                            data-tippy-content="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if ($formulario->ensayos_count > 1)
+                                        <form action="{{ route('admin.formularios.desvincular', [$formulario->id, $ensayo->id]) }}"
+                                            method="POST" class="inline-block swal-form">
+                                            @csrf @method('DELETE')
+                                            <button type="submit"
+                                                class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-2 py-1 rounded shadow-sm"
+                                                data-tippy-content="Desvincular del ensayo"
+                                                data-titulo="Desvincular formulario"
+                                                data-texto="&laquo;{{ $formulario->nombre }}&raquo; seguirá disponible en los otros ensayos a los que esté vinculado."
+                                                data-confirmar="Sí, desvincular"
+                                                data-icono="warning">
+                                                <i class="fas fa-unlink"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('admin.formularios.destroy', $formulario->id) }}"
+                                            method="POST" class="inline-block swal-form">
+                                            @csrf @method('DELETE')
+                                            <button type="submit"
+                                                class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm"
+                                                data-tippy-content="Eliminar"
+                                                data-titulo="Eliminar formulario"
+                                                data-texto="&laquo;{{ $formulario->nombre }}&raquo; será eliminado permanentemente. Esta acción no se puede deshacer."
+                                                data-confirmar="Sí, eliminar"
+                                                data-icono="error">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endif
                             </td>
                         </tr>
@@ -203,7 +221,8 @@
     </div>
     <div id="modalUsar" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
-            <h2 class="text-lg font-bold mb-4">Usar Formulario Existente</h2>
+            <h2 class="text-lg font-bold mb-1">Vincular Formulario al Ensayo</h2>
+            <p class="text-sm text-gray-500 mb-4">Selecciona un formulario existente para vincularlo a este ensayo.</p>
 
             <input type="text" id="buscarFormulario"
                 class="w-full border border-gray-300 rounded px-3 py-2 mb-4 text-sm"
@@ -219,7 +238,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- @foreach ($formulariosDisponibles as $f)
+                        @forelse ($formulariosDisponibles as $f)
                             <tr class="border-b">
                                 <td class="px-3 py-2">{{ $f->nombre }}</td>
                                 <td class="px-3 py-2">{{ $f->codigo ?? '-' }}</td>
@@ -229,12 +248,18 @@
                                         <input type="hidden" name="formulario_id" value="{{ $f->id }}">
                                         <button type="submit"
                                             class="px-3 py-1 bg-indigo-600 text-white rounded shadow hover:bg-indigo-500 text-sm">
-                                            Usar
+                                            <i class="fas fa-link"></i> Vincular
                                         </button>
                                     </form>
                                 </td>
                             </tr>
-                        @endforeach --}}
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-3 py-4 text-center text-gray-400 text-sm">
+                                    No hay formularios disponibles.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -325,6 +350,22 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Confirmación con mostrarAlertaConfirmacion (igual que inscripciones)
+            document.querySelectorAll('.swal-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('button[type="submit"]');
+                    mostrarAlertaConfirmacion(
+                        btn.dataset.titulo,
+                        btn.dataset.texto,
+                        btn.dataset.icono,
+                        btn.dataset.confirmar,
+                        () => form.submit()
+                    );
+                });
+            });
+
+            // Modal de edición
             const editModal = document.getElementById('modalEdit');
             const editForm = document.getElementById('formEdit');
             const baseUpdateUrl = "{{ route('admin.formularios.update', ['id' => '__ID__']) }}";

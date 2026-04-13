@@ -30,7 +30,7 @@ class CicloController extends Controller
 
         $ciclos = $ensayo->ciclos()
             ->where('gestion', $gestionActual)
-            ->orderBy('numero')
+            ->orderBy('fecha_inicio_envio_muestras', 'asc')
             ->get();
 
         return view('admin.ciclos.index', compact('ensayo', 'ciclos', 'gestiones', 'gestionActual'));
@@ -120,14 +120,6 @@ class CicloController extends Controller
         return $request->validate([
             'id_ensayo' => ['required', 'exists:ensayo_aptitud,id'],
             'nombre'            => ['required', 'string', 'max:100'],
-            'numero'            => [
-                'required',
-                'integer',
-                'min:1',
-                Rule::unique('ciclos', 'numero')
-                    ->where('id_ensayo', $request->id_ensayo)
-                    ->ignore($id)
-            ],
             'fecha_inicio_envio_muestras'   => ['required', 'date'],
             'fecha_fin_envio_muestras'      => ['required', 'date', 'after_or_equal:fecha_inicio_envio_muestras'],
             'fecha_inicio_envio_resultados' => ['required', 'date', 'after_or_equal:fecha_fin_envio_muestras'],
@@ -138,8 +130,6 @@ class CicloController extends Controller
             'id_ensayo.required' => 'El ensayo es obligatorio.',
             'id_ensayo.exists'   => 'El ensayo seleccionado no existe.',
             'nombre.required'            => 'El nombre del ciclo es obligatorio.',
-            'numero.required'            => 'El número es obligatorio.',
-            'numero.unique'              => 'Ese número ya está registrado para este ensayo.',
             'fecha_inicio_envio_muestras.required' => 'Debe indicar la fecha de inicio de envío de muestras.',
             'fecha_fin_envio_muestras.after_or_equal' => 'La fecha fin de envío de muestras no puede ser antes del inicio.',
             'fecha_inicio_envio_resultados.after_or_equal' => 'El inicio de resultados debe ser después del fin de muestras.',

@@ -3,11 +3,12 @@
 
         <x-shared.btn-volver :url="route('reportes.resultados.ensayos')" />
 
-        <h1 class="text-xl font-bold text-gray-800">Ensayo de aptitud : {{ $ensayo->descripcion }}</h1>
+        <div class="mb-3">
+            <h1 class="text-xl font-bold text-gray-800">{{ $ensayo->paquete->descripcion ?? '-' }}</h1>
+            <p class="text-sm text-gray-500">{{ $ensayo->descripcion }}</p>
+        </div>
         <div class="flex justify-between items-center mb-3">
-
-            <h1 class="text-xl font-bold text-gray-800">Resultados registrados por laboratorio
-            </h1>
+            <h1 class="text-xl font-bold text-gray-800">Resultados registrados por laboratorio</h1>
             <form method="GET" action="{{ route('reportes.resultados.registrados', $idEA) }}"
                 class="flex items-center gap-2">
                 <input type="hidden" name="idEA" value="{{ request('idEA') ?? '' }}">
@@ -26,7 +27,7 @@
                         class="text-xs py-1 px-2 w-fit border rounded-md shadow-sm min-w-[75px]">
                         @foreach ($ciclos as $c)
                             <option value="{{ $c->id }}" {{ $c->id == ($cicloId ?? null) ? 'selected' : '' }}>
-                                {{ $c->descripcion ?? 'Ciclo ' . $c->numero }}
+                                {{ $c->nombre }}
                             </option>
                         @endforeach
                     </select>

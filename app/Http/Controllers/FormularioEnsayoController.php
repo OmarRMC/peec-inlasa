@@ -51,12 +51,15 @@ class FormularioEnsayoController extends Controller
         }
         Log::info('$ensayo');
         Log::info($ensayo);
-        $formularios = $ensayo->formularios;
+        $formularios = $ensayo->formularios()->withCount('ensayos')->get();
         Log::info('$formularios');
         Log::info($formularios);
 
-        // $formulariosDisponibles = FormularioEnsayo::where('id_ensayo', '!=', $ensayo->id)->activo()->get();
-        $formulariosDisponibles = null;
+        $idsYaAsignados = $ensayo->formularios->pluck('id');
+        $formulariosDisponibles = FormularioEnsayo::whereNotIn('id', $idsYaAsignados)
+            ->where('estado', true)
+            ->orderBy('nombre')
+            ->get();
         return view('admin.formularios.show', compact('ensayo', 'formularios', 'formulariosDisponibles'));
     }
 
@@ -385,47 +388,44 @@ class FormularioEnsayoController extends Controller
     //         ->with('success', 'Formulario actualizado correctamente ✅');
     // }
 
+    public function desvincular($formularioId, $ensayoId)
+    {
+        $formulario = FormularioEnsayo::find($formularioId);
+        $ensayo = EnsayoAptitud::find($ensayoId);
+
+        if (!$formulario || !$ensayo) {
+            return redirect()->back()->with('error', 'Formulario o Ensayo no encontrado.');
+        }
+
+        if ($formulario->ensayos()->count() <= 1) {
+            return redirect()->back()->with('error', 'No se puede desvincular: el formulario solo pertenece a este ensayo. Use "Eliminar" si desea borrarlo.');
+        }
+
+        $ensayo->formularios()->detach($formularioId);
+
+        return redirect()->back()->with('success', 'Formulario desvinculado correctamente.');
+    }
+
     public function usar(Request $request, $id)
     {
         $request->validate([
             'formulario_id' => 'required|exists:formularios,id',
         ]);
-        $formularioBase = FormularioEnsayo::find($request->formulario_id);
+
+        $formulario = FormularioEnsayo::find($request->formulario_id);
         $ensayo = EnsayoAptitud::find($id);
 
-        if (!$ensayo) {
-            return redirect()->back()->with('error', 'Ensayo de Aptitud no encontrado.');
+        if (!$ensayo || !$formulario) {
+            return redirect()->back()->with('error', 'Formulario o Ensayo no encontrado.');
         }
 
-        if (!$formularioBase) {
-            return redirect()->back()->with('error', 'Formulario no encontrado.');
+        // Verificar que no esté ya vinculado
+        if ($ensayo->formularios()->where('formulario_id', $formulario->id)->exists()) {
+            return redirect()->back()->with('error', 'El formulario ya está vinculado a este ensayo.');
         }
-        $nuevoFormulario = $formularioBase->replicate();
-        $nuevoFormulario->id_ensayo = $ensayo->id;
-        $nuevoFormulario->save();
 
-        $formularioBase->load('secciones.parametros');
-        foreach ($formularioBase->secciones as $seccionBase) {
-            $nuevaSeccion = new Seccion();
-            $nuevaSeccion->id_formulario = $nuevoFormulario->id;
-            $nuevaSeccion->nombre = $seccionBase->nombre;
-            $nuevaSeccion->descripcion = $seccionBase->descripcion;
-            $nuevaSeccion->cantidad_parametros = $seccionBase->cantidad_parametros;
-            $nuevaSeccion->save();
+        $ensayo->formularios()->attach($formulario->id);
 
-
-            foreach ($seccionBase->parametros as $paramBase) {
-                $nuevoParametro = new Parametro();
-                $nuevoParametro->id_seccion = $nuevaSeccion->id;
-                $nuevoParametro->nombre = $paramBase->nombre;
-                $nuevoParametro->tipo = $paramBase->tipo;
-                $nuevoParametro->validacion = $paramBase->validacion;
-                $nuevoParametro->requerido = $paramBase->requerido;
-                $nuevoParametro->posicion = $paramBase->posicion;
-                $nuevoParametro->id_grupo_selector = $paramBase->id_grupo_selector;
-                $nuevoParametro->save();
-            }
-        }
-        return redirect()->back()->with('success', 'Formulario agregado correctamente con toda su estructura.');
+        return redirect()->back()->with('success', 'Formulario vinculado correctamente.');
     }
 }

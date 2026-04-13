@@ -12,7 +12,6 @@ class Ciclo extends Model
 
     protected $fillable = [
         'nombre',
-        'numero',
         'gestion',
         'fecha_inicio_envio_muestras',
         'fecha_fin_envio_muestras',

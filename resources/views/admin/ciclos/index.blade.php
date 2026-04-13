@@ -62,7 +62,6 @@
                 <table class="min-w-full text-sm text-gray-800">
                     <thead class="bg-gray-100 text-xs uppercase text-gray-500">
                         <tr>
-                            <th class="px-3 py-2 text-left w-8">#</th>
                             <th class="px-3 py-2 text-left">Nombre</th>
                             <th class="px-3 py-2 text-left">
                                 <span class="flex items-center gap-1">
@@ -86,7 +85,6 @@
                     <tbody>
                         @forelse ($ciclos as $c)
                             <tr class="border-b hover:bg-gray-50 transition">
-                                <td class="px-3 py-2.5 text-gray-400 text-xs font-mono">{{ $c->numero }}</td>
                                 <td class="px-3 py-2.5 font-semibold text-gray-800">
                                     {{ $c->nombre }}
                                     @if ($c->enPeriodoEnvioResultados())
@@ -143,7 +141,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-4 py-8 text-center text-gray-400">
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-400">
                                     <i class="fas fa-calendar-times text-2xl mb-2 block"></i>
                                     No hay ciclos registrados para la gestión {{ $gestionActual }}.
                                 </td>
@@ -176,22 +174,13 @@
                     </template>
                     <input type="hidden" name="id_ensayo" value="{{ $ensayo->id }}">
 
-                    {{-- Nombre y Número --}}
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <div class="col-span-2 sm:col-span-1">
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre del Ciclo</label>
-                            <input type="text" name="nombre"
-                                class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-blue-400 focus:outline-none"
-                                :value="isEdit ? ciclo.nombre : ''"
-                                placeholder="Ej. Ciclo 1 - Química" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Número</label>
-                            <input type="number" name="numero"
-                                class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-blue-400 focus:outline-none"
-                                :value="isEdit ? ciclo.numero : ''"
-                                min="1" required>
-                        </div>
+                    {{-- Nombre --}}
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre del Ciclo</label>
+                        <input type="text" name="nombre"
+                            class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-blue-400 focus:outline-none"
+                            :value="isEdit ? ciclo.nombre : ''"
+                            placeholder="Ej. Ciclo 1 - Química" required>
                     </div>
 
                     {{-- Fase 1: Muestras --}}
