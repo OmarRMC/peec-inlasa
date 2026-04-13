@@ -8,6 +8,7 @@ use App\Http\Controllers\PdfInscripcionController;
 use App\Mail\EnvioCodigoLab;
 use App\Mail\LaboratorioVerificacionDatos;
 use App\Models\CategoriaLaboratorio;
+use App\Models\RecursoLaboratorio;
 use App\Models\Configuracion;
 use App\Models\Departamento;
 use App\Models\Inscripcion;
@@ -170,6 +171,15 @@ class LabController extends Controller
         $backTo = route('lab.ins.index');
 
         return view('inscripcion_paquete.show', compact('inscripcion', 'backTo'));
+    }
+
+    public function recursos()
+    {
+        Gate::authorize(Permiso::LABORATORIO);
+
+        $recursos = RecursoLaboratorio::active()->latest('id')->get();
+
+        return view('lab.recursos', compact('recursos'));
     }
 
     public function certificadosDisponibles()

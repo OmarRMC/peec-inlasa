@@ -17,12 +17,14 @@
         function mostrarNotificacion(data) {
             const container = document.createElement('div');
             container.innerHTML = `
-            <div id="notificacion-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-white rounded-xl shadow-lg max-w-lg w-full p-6 relative">
-                    <button id="btn-cerrar" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
-                    <h2 class="text-xl font-bold mb-3">${data.titulo}</h2>
-                    <p class="mb-4 text-gray-600">${data.descripcion}</p>
-                    <div class="mb-6 text-gray-800" id="mensaje-notificacion"></div>
+            <div id="notificacion-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 sm:p-6">
+                <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full relative mx-auto overflow-y-auto max-h-[90vh]">
+                    <div class="p-5 sm:p-8">
+                        <button id="btn-cerrar" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+                        <h2 class="text-xl font-bold mb-3 pr-8">${data.titulo}</h2>
+                        <p class="mb-4 text-gray-600">${data.descripcion}</p>
+                        <div class="mb-6 text-gray-800" id="mensaje-notificacion"></div>
+                    </div>
                 </div>
             </div>
         `;

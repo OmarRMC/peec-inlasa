@@ -2,12 +2,6 @@
 use App\Models\Permiso;
 @endphp
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-700 flex items-center gap-2">
-            <i class="fas fa-home text-indigo-500"></i> Escritorio
-        </h2>
-    </x-slot>
-
     <div class="max-w-5xl mx-auto">
     @if ($tipo === 'laboratorio')
 
@@ -138,7 +132,7 @@ use App\Models\Permiso;
         </div>
 
         {{-- Accesos rápidos --}}
-        <div class="bg-white rounded-lg shadow-sm border p-5">
+        <div class="bg-white rounded-lg shadow-sm border p-5 mb-5">
             <h3 class="text-sm font-semibold text-gray-600 mb-4 flex items-center gap-2">
                 <i class="fas fa-bolt text-indigo-500"></i> Accesos rápidos
             </h3>

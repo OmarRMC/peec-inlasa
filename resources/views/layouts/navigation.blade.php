@@ -261,32 +261,18 @@ use App\Models\Configuracion;
         </div>
     </div>
     @endif
-    @if (Gate::any([Permiso::ADMIN, Permiso::LABORATORIO]))
+    @if (Gate::any([Permiso::LABORATORIO]))
+    @php
+        $recursosLabNav = \App\Models\RecursoLaboratorio::active()->exists();
+    @endphp
+    @if ($recursosLabNav)
     <!-- Recursos Laboratorio -->
-    <div>
-        <button @click="openMenu !== 3 ? openMenu = 3 : openMenu = null"
-            class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
-            <i class="fas fa-vials w-5 text-indigo-500"></i>
-            <span>Recursos Lab.</span>
-            <i class="fas ml-auto" :class="openMenu === 3 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-        </button>
-        <div x-show="openMenu === 3" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
-            {{-- <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                        class="fas fa-file-contract"></i> Contrato 2025</a> --}}
-            <a href="https://drive.google.com/file/d/1dXps5OmC_iOXUZAsR1kxAGFyP6vJytUm/view?usp=sharing"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded" target="_blank"><i
-                    class="fas fa-bullhorn"></i> Convocatoria</a>
-            <a href="https://drive.google.com/file/d/1iY9cjaeMwUp9OBr7gNIRjGQUBSrlKFDp/view?usp=sharing"
-                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded" target="_blank"><i
-                    class="fas fa-gavel"></i> Resolución</a>
-            {{-- <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                        class="fas fa-file-alt"></i> Protocolos</a>
-                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                        class="fas fa-exclamation-triangle"></i> Quejas</a>
-                <a href="#" class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded"><i
-                        class="fas fa-clipboard"></i> Formularios de Queja</a> --}}
-        </div>
-    </div>
+    <a href="{{ route('lab.recursos.index') }}"
+        class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
+        <i class="fas fa-folder-open w-5 text-indigo-500"></i>
+        <span>Recursos Lab.</span>
+    </a>
+    @endif
     @endif
     @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES, Permiso::GESTION_LABORATORIO]))
     <div>
@@ -446,6 +432,11 @@ use App\Models\Configuracion;
         class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
         <i class="fas fa-images w-5 text-indigo-500"></i>
         <span>Galería de archivos</span>
+    </a>
+    <a href="{{ route('recursos_lab.index') }}"
+        class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
+        <i class="fas fa-folder-open w-5 text-indigo-500"></i>
+        <span>Recursos Lab.</span>
     </a>
     @endif
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\GaleriaController;
+use App\Http\Controllers\Admin\RecursoLaboratorioController;
 use App\Http\Controllers\Admin\CategoriaLaboratorioController;
 use App\Http\Controllers\Admin\CommandController;
 use App\Http\Controllers\Admin\ConfiguracionController;
@@ -157,6 +158,12 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria.index');
     Route::post('/galeria/upload', [GaleriaController::class, 'upload'])->name('galeria.upload');
     Route::delete('/galeria/{filename}', [GaleriaController::class, 'destroy'])->name('galeria.destroy');
+
+    // Recursos de Laboratorio
+    Route::resource('recursos-lab', RecursoLaboratorioController::class)
+        ->except(['show'])
+        ->names('recursos_lab')
+        ->parameters(['recursos-lab' => 'recursos_lab']);
 });
 Route::middleware(['auth', 'usuario.activo', 'canany:' . Permiso::ADMIN . ',' . Permiso::GESTION_INSCRIPCIONES])->prefix('reporte')->group(function () {
     Route::get('/inscripcion-lab-paquetes-pdf/{id}', [PdfInscripcionController::class, 'generar'])->name('formulario_inscripcion_lab.pdf');
@@ -176,6 +183,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/formulario-ins/{id}', [LabController::class, 'generarFormularioIns'])->name('formulario_inscripcion');
     Route::put('/inscripcion/{id}/anular', [LabController::class, 'anularInscripcion'])->name('inscripciones.anular');
 
+    Route::get('/recursos', [LabController::class, 'recursos'])->name('lab.recursos.index');
     Route::get('/certificados', [LabController::class, 'certificadosDisponibles'])->name('lab.certificados.disponibles.index');
     Route::get('/certificados/ajax/data', [LabController::class, 'getCertificadosDisponibleData'])->name('certificados.ajax.data');
     Route::get('/certificados/participacion/{gestion}', [LabController::class, 'certificadoPartificacionPDF'])->name('lab.certificados.participacion.pdf');

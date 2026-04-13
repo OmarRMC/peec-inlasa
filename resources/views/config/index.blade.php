@@ -308,12 +308,14 @@
                                     </form>
 
                                     <!-- Modal de previsualización -->
-                                    <div id="preview-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-                                        <div class="bg-white rounded-xl shadow-lg max-w-lg w-full p-6 relative mx-4">
-                                            <button type="button" onclick="closePreviewModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
-                                            <h2 id="preview-titulo" class="text-xl font-bold mb-3"></h2>
-                                            <p id="preview-descripcion" class="mb-4 text-gray-600"></p>
-                                            <div id="preview-mensaje" class="mb-6 text-gray-800"></div>
+                                    <div id="preview-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4 sm:p-6">
+                                        <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full relative mx-auto overflow-y-auto max-h-[90vh]">
+                                            <div class="p-5 sm:p-8">
+                                                <button type="button" onclick="closePreviewModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+                                                <h2 id="preview-titulo" class="text-xl font-bold mb-3 pr-8"></h2>
+                                                <p id="preview-descripcion" class="mb-4 text-gray-600"></p>
+                                                <div id="preview-mensaje" class="mb-6 text-gray-800"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 @break
@@ -627,10 +629,21 @@
             syncToHidden();
             const mensaje = hiddenInput.value || '';
 
+            const modal = document.getElementById('preview-modal');
+
+            // Mover al body para que fixed inset-0 cubra toda la pantalla
+            // (el acordeón tiene overflow-hidden que recorta el overlay)
+            if (modal.parentElement !== document.body) {
+                document.body.appendChild(modal);
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) closePreviewModal();
+                });
+            }
+
             document.getElementById('preview-titulo').textContent = titulo;
             document.getElementById('preview-descripcion').textContent = descripcion;
             document.getElementById('preview-mensaje').innerHTML = mensaje;
-            document.getElementById('preview-modal').classList.remove('hidden');
+            modal.classList.remove('hidden');
         }
 
         function closePreviewModal() {
@@ -640,13 +653,6 @@
         // Cerrar modal con Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closePreviewModal();
-            }
-        });
-
-        // Cerrar modal al hacer clic fuera
-        document.getElementById('preview-modal')?.addEventListener('click', function(e) {
-            if (e.target === this) {
                 closePreviewModal();
             }
         });

@@ -130,4 +130,10 @@ return [
         'type' => 'artisan',
         'description' => 'Sincroniza los permisos del sistema en la base de datos (incluye nuevos permisos como impersonar.usuario).',
     ],
+
+    'seeder_recurso_laboratorio' => [
+        'cmd' => ['php', 'artisan', 'db:seed', '--class=RecursoLaboratorioSeeder'],
+        'type' => 'artisan',
+        'description' => 'Pobla los recursos de laboratorio iniciales (Convocatoria y Resolución).',
+    ],
 ];
