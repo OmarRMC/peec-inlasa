@@ -45,18 +45,21 @@ class FormularioEnsayoController extends Controller
 
     public function formulariosByEa($idEA)
     {
-        $ensayo = EnsayoAptitud::with(['formularios'])->find($idEA);
+        $ensayo = EnsayoAptitud::with(['paquete', 'formularios'])->find($idEA);
         if (!$ensayo) {
             return redirect()->route('admin.formularios.ea')->with('error', 'Ensayo de Aptitud no encontrado.');
         }
         Log::info('$ensayo');
         Log::info($ensayo);
-        $formularios = $ensayo->formularios;
+        $formularios = $ensayo->formularios()->withCount('ensayos')->get();
         Log::info('$formularios');
         Log::info($formularios);
 
-        // $formulariosDisponibles = FormularioEnsayo::where('id_ensayo', '!=', $ensayo->id)->activo()->get();
-        $formulariosDisponibles = null;
+        $idsYaAsignados = $ensayo->formularios->pluck('id');
+        $formulariosDisponibles = FormularioEnsayo::whereNotIn('id', $idsYaAsignados)
+            ->where('estado', true)
+            ->orderBy('nombre')
+            ->get();
         return view('admin.formularios.show', compact('ensayo', 'formularios', 'formulariosDisponibles'));
     }
 
@@ -66,8 +69,7 @@ class FormularioEnsayoController extends Controller
             [
                 'id_ensayo' => ['required', 'exists:ensayo_aptitud,id'],
                 'nombre'            => ['required', 'string', 'max:255'],
-                'codigo'            => ['nullable', 'string', 'max:80', 'unique:formularios,codigo'],
-                'nota'              => ['nullable', 'string'],
+                'descripcion'       => ['nullable', 'string'],
                 'color_primario'    => ['nullable', 'string', 'max:10'],
                 'color_secundario'  => ['nullable', 'string', 'max:10'],
                 'estado'            => ['nullable', 'boolean'],
@@ -78,9 +80,7 @@ class FormularioEnsayoController extends Controller
                 'id_ensayo.exists'   => 'El ensayo de aptitud seleccionado no existe.',
                 'nombre.required'            => 'El nombre del formulario es obligatorio.',
                 'nombre.max'                 => 'El nombre no puede superar los 255 caracteres.',
-                'codigo.max'                 => 'El código no puede superar los 80 caracteres.',
-                'codigo.unique'              => 'El código ya está en uso. Debe ser único.',
-                'nota.string'                => 'La nota debe ser una cadena de texto.',
+                'descripcion.string'         => 'La descripción debe ser una cadena de texto.',
                 'color_primario.max'         => 'El color primario no puede superar los 10 caracteres.',
                 'color_secundario.max'       => 'El color secundario no puede superar los 10 caracteres.',
                 'estado.boolean'             => 'El estado debe ser verdadero o falso.',
@@ -95,8 +95,7 @@ class FormularioEnsayoController extends Controller
 
         $formulario = new FormularioEnsayo();
         $formulario->nombre = $request->nombre;
-        $formulario->codigo = $request->codigo;
-        $formulario->nota = $request->nota;
+        $formulario->descripcion = $request->descripcion;
         $formulario->color_primario = $request->color_primario;
         $formulario->color_secundario = $request->color_secundario;
         $formulario->estado = $request->estado ?? false;
@@ -113,8 +112,7 @@ class FormularioEnsayoController extends Controller
         Log::info($id);
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'codigo' => 'nullable|string|max:80',
-            'nota' => 'nullable|string',
+            'descripcion' => 'nullable|string',
             'color_primario' => 'required|string|max:10',
             'color_secundario' => 'required|string|max:10',
         ]);
@@ -124,8 +122,7 @@ class FormularioEnsayoController extends Controller
         }
 
         $formulario->nombre = $request->nombre;
-        $formulario->codigo = $request->codigo;
-        $formulario->nota = $request->nota;
+        $formulario->descripcion = $request->descripcion;
         $formulario->color_primario = $request->color_primario;
         $formulario->color_secundario = $request->color_secundario;
         $formulario->estado = $request->estado;
@@ -193,6 +190,7 @@ class FormularioEnsayoController extends Controller
             'secciones.*.parametros.*.campos.*.placeholder' => 'nullable|string|max:255',
             'secciones.*.parametros.*.campos.*.requerido' => 'nullable',
             'secciones.*.parametros.*.campos.*.modificable' => 'nullable',
+            'secciones.*.parametros.*.campos.*.auto_guardar' => 'nullable',
             'secciones.*.parametros.*.campos.*.posicion' => 'nullable|integer|min:0',
             'secciones.*.parametros.*.campos.*.mensaje' => 'nullable|string|max:500',
             'secciones.*.parametros.*.campos.*.step' => 'nullable|string|max:50',
@@ -260,7 +258,8 @@ class FormularioEnsayoController extends Controller
                                 'tipo' => $campo['tipo'],
                                 'placeholder' => $campo['placeholder'] ?? null,
                                 'valor' => $campo['valor'] ?? null,
-                                'modificable' => $campo['modificable'] ?? false,                                
+                                'modificable' => $campo['modificable'] ?? false,
+                                'auto_guardar' => $campo['auto_guardar'] ?? false,
                                 'requerido' => isset($campo['requerido']),
                                 'posicion' => $campo['posicion'] ?? $campoIdx,
                                 'mensaje' => $campo['mensaje'] ?? null,
@@ -383,47 +382,44 @@ class FormularioEnsayoController extends Controller
     //         ->with('success', 'Formulario actualizado correctamente ✅');
     // }
 
+    public function desvincular($formularioId, $ensayoId)
+    {
+        $formulario = FormularioEnsayo::find($formularioId);
+        $ensayo = EnsayoAptitud::find($ensayoId);
+
+        if (!$formulario || !$ensayo) {
+            return redirect()->back()->with('error', 'Formulario o Ensayo no encontrado.');
+        }
+
+        if ($formulario->ensayos()->count() <= 1) {
+            return redirect()->back()->with('error', 'No se puede desvincular: el formulario solo pertenece a este ensayo. Use "Eliminar" si desea borrarlo.');
+        }
+
+        $ensayo->formularios()->detach($formularioId);
+
+        return redirect()->back()->with('success', 'Formulario desvinculado correctamente.');
+    }
+
     public function usar(Request $request, $id)
     {
         $request->validate([
             'formulario_id' => 'required|exists:formularios,id',
         ]);
-        $formularioBase = FormularioEnsayo::find($request->formulario_id);
+
+        $formulario = FormularioEnsayo::find($request->formulario_id);
         $ensayo = EnsayoAptitud::find($id);
 
-        if (!$ensayo) {
-            return redirect()->back()->with('error', 'Ensayo de Aptitud no encontrado.');
+        if (!$ensayo || !$formulario) {
+            return redirect()->back()->with('error', 'Formulario o Ensayo no encontrado.');
         }
 
-        if (!$formularioBase) {
-            return redirect()->back()->with('error', 'Formulario no encontrado.');
+        // Verificar que no esté ya vinculado
+        if ($ensayo->formularios()->where('formulario_id', $formulario->id)->exists()) {
+            return redirect()->back()->with('error', 'El formulario ya está vinculado a este ensayo.');
         }
-        $nuevoFormulario = $formularioBase->replicate();
-        $nuevoFormulario->id_ensayo = $ensayo->id;
-        $nuevoFormulario->save();
 
-        $formularioBase->load('secciones.parametros');
-        foreach ($formularioBase->secciones as $seccionBase) {
-            $nuevaSeccion = new Seccion();
-            $nuevaSeccion->id_formulario = $nuevoFormulario->id;
-            $nuevaSeccion->nombre = $seccionBase->nombre;
-            $nuevaSeccion->descripcion = $seccionBase->descripcion;
-            $nuevaSeccion->cantidad_parametros = $seccionBase->cantidad_parametros;
-            $nuevaSeccion->save();
+        $ensayo->formularios()->attach($formulario->id);
 
-
-            foreach ($seccionBase->parametros as $paramBase) {
-                $nuevoParametro = new Parametro();
-                $nuevoParametro->id_seccion = $nuevaSeccion->id;
-                $nuevoParametro->nombre = $paramBase->nombre;
-                $nuevoParametro->tipo = $paramBase->tipo;
-                $nuevoParametro->validacion = $paramBase->validacion;
-                $nuevoParametro->requerido = $paramBase->requerido;
-                $nuevoParametro->posicion = $paramBase->posicion;
-                $nuevoParametro->id_grupo_selector = $paramBase->id_grupo_selector;
-                $nuevoParametro->save();
-            }
-        }
-        return redirect()->back()->with('success', 'Formulario agregado correctamente con toda su estructura.');
+        return redirect()->back()->with('success', 'Formulario vinculado correctamente.');
     }
 }

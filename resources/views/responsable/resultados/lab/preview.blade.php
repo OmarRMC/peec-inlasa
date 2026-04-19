@@ -30,9 +30,9 @@
                     <span class="ml-1 font-semibold text-gray-800">{{ $laboratorio->cod_lab ?? '-' }}</span>
                 </div>
 
-                <div>
-                    <span class="font-medium text-gray-500">Ensayo:</span>
-                    <span class="ml-1 font-semibold text-gray-800">{{ $ensayo->descripcion ?? '-' }}</span>
+                <div class="flex flex-col pt-3 text-sm">
+                    <span class="font-bold text-gray-800">{{ $ensayo->paquete->descripcion ?? '-' }}</span>
+                    <span class="text-gray-500">{{ $ensayo->descripcion ?? '-' }}</span>
                 </div>
 
                 <div>
@@ -47,25 +47,19 @@
             </div>
         </div>
         {{-- Información del formulario --}}
-        <div class="grid grid-cols-2 gap-6 mb-4 text-center">
+        <div class="grid grid-cols-1 gap-6 mb-4 text-center">
             <div class="p-3 rounded-lg shadow-sm" style="background-color: {{ $primaryColor }}20;">
                 <span class="block text-xs text-gray-500">Nombre del formulario</span>
                 <span class="text-sm font-semibold" style="color: {{ $primaryColor }}">
                     {{ $formulario->nombre }}
                 </span>
             </div>
-            <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                <span class="block text-xs text-gray-500">Código del formulario</span>
-                <span class="text-sm font-semibold text-gray-800">
-                    {{ $formulario->codigo }}
-                </span>
-            </div>
         </div>
 
-        {{-- Nota --}}
-        @if (!empty($formulario->nota))
+        {{-- Descripción --}}
+        @if (!empty($formulario->descripcion))
             <div class="p-2 rounded-lg mb-4 bg-yellow-100 border border-yellow-300">
-                <span class="text-sm text-yellow-800">{{ $formulario->nota }}</span>
+                <span class="text-sm text-yellow-800">{{ $formulario->descripcion }}</span>
             </div>
         @endif
 

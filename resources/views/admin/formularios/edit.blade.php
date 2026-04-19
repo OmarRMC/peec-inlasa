@@ -26,11 +26,8 @@
                 <div>
                     <p><span class="font-semibold">Nombre:</span> {{ $formulario->nombre }}</p>
                 </div>
-                <div>
-                    <p><span class="font-semibold">Código:</span> {{ $formulario->codigo }}</p>
-                </div>
                 <div class="col-span-2">
-                    <p><span class="font-semibold">Nota:</span> {{ $formulario->nota }}</p>
+                    <p><span class="font-semibold">Descripción:</span> {{ $formulario->descripcion }}</p>
                 </div>
             </div>
         </div>
@@ -145,6 +142,7 @@
                                                             <th class="px-2 py-1 border">Rango</th>
                                                             <th class="px-2 py-1 border">Valor</th>
                                                             <th class="px-2 py-1 border text-center">Modificable</th>
+                                                            <th class="px-2 py-1 border text-center">Auto-guardar</th>
                                                             <th class="px-2 py-1 border">Grupo Selector</th>
                                                             <th class="px-2 py-1 border">Dependencia del campo</th>
                                                             <th class="px-2 py-1 border text-center">Acciones</th>
@@ -244,6 +242,12 @@
                                                                     <input type="checkbox"
                                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][modificable]"
                                                                         value="1" @checked($campo->modificable)
+                                                                        class="mx-auto">
+                                                                </td>
+                                                                <td class="px-2 py-1 border text-center">
+                                                                    <input type="checkbox"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][auto_guardar]"
+                                                                        value="1" @checked($campo->auto_guardar)
                                                                         class="mx-auto">
                                                                 </td>
                                                                 <td class="px-2 py-1 border">
@@ -392,6 +396,7 @@
                                     <th class="px-2 py-1 border">Rango</th>
                                     <th class="px-2 py-1 border">Valor</th>
                                     <th class="px-2 py-1 border text-center">Modificable</th>
+                                    <th class="px-2 py-1 border text-center">Auto-guardar</th>
                                     <th class="px-2 py-1 border">Grupo Selector</th>
                                     <th class="px-2 py-1 border">Dependencia del campo</th>
                                     <th class="px-2 py-1 border text-center">Acciones</th>
@@ -466,6 +471,12 @@
                     <input type="checkbox"
                     name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][modificable]"
                     value="1" checked
+                    class="mx-auto">
+                 </td>
+                <td class="px-2 py-1 border text-center">
+                    <input type="checkbox"
+                    name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][auto_guardar]"
+                    value="1"
                     class="mx-auto">
                  </td>
                 <td class="px-2 py-1 border">

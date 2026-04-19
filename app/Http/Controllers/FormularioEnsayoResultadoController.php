@@ -119,48 +119,55 @@ class FormularioEnsayoResultadoController extends Controller
 
     public function testAdmin(Request $request)
     {
-        $user = Auth::user();
-        // Simulación de "FormularioEnsayoResultado"
-        $formularioResultado = [
-            'id' => 0, // como es test, no se guarda en DB
-            'observaciones' => $request->observaciones ?? '',
-            'estado' => 1,
-            'id_ciclo' => 1,
-            'id_laboratorio' => 1,
-            'id_formulario' => $request->id_formulario,
-            'gestion' => now()->year,
-            'nombre_lab' => '$laboratorio->nombre_lab',
-            'departamento' => '$laboratorio->departamento->nombre_dep',
-            'estructura' => []
-        ];
+        // Los campos llegan bajo formularios[1][secciones]..., formularios[2][secciones]..., etc.
+        $formulariosData = $request->input('formularios', []);
 
-        $secciones = [];
-        foreach ($request->secciones as $seccionData) {
-            $sec = [
-                'id' => $seccionData['id'],
-                'nombre' => $seccionData['nombre'],
-                'parametros' => []
-            ];
-
-            foreach ($seccionData['parametros'] as $parametroData) {
-                $param = [
-                    'id' => $parametroData['id'],
-                    'nombre' => $parametroData['nombre'],
-                    'visible_nombre' => $parametroData['visible_nombre'] ?? false,
-                    'respuestas' => $parametroData['campos'] ?? []
-                ];
-                $sec['parametros'][] = $param;
-            }
-
-            $secciones[] = $sec;
+        if (empty($formulariosData)) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No se recibieron datos del formulario. Asegúrate de completar al menos un campo antes de ejecutar el test.',
+                'data' => null
+            ], 422);
         }
 
-        $formularioResultado['estructura'] = $secciones;
+        $resultados = [];
+
+        foreach ($formulariosData as $idx => $formularioData) {
+            $secciones = [];
+
+            foreach ($formularioData['secciones'] ?? [] as $seccionData) {
+                $sec = [
+                    'id'         => $seccionData['id'] ?? null,
+                    'nombre'     => $seccionData['nombre'] ?? null,
+                    'parametros' => []
+                ];
+
+                foreach ($seccionData['parametros'] ?? [] as $parametroData) {
+                    $sec['parametros'][] = [
+                        'id'            => $parametroData['id'] ?? null,
+                        'nombre'        => $parametroData['nombre'] ?? null,
+                        'visible_nombre' => $parametroData['visible_nombre'] ?? false,
+                        'campos'        => $parametroData['campos'] ?? []
+                    ];
+                }
+
+                $secciones[] = $sec;
+            }
+
+            $resultados[] = [
+                'formulario_idx' => $idx,
+                'id_formulario'  => $request->input('id_formulario'),
+                'id_ensayo'      => $request->input('id_ensayo'),
+                'cantidad'       => $request->input('cantidad', 1),
+                'observaciones'  => $formularioData['observaciones'] ?? '',
+                'secciones'      => $secciones,
+            ];
+        }
 
         return response()->json([
             'success' => true,
-            'mensaje' => 'Test Admin: datos simulados generados correctamente.',
-            'data' => $formularioResultado
+            'mensaje' => 'Test ejecutado correctamente. Revisa la estructura en "data".',
+            'data'    => $resultados
         ]);
     }
 
@@ -170,11 +177,9 @@ class FormularioEnsayoResultadoController extends Controller
         if (!Gate::any([Permiso::LABORATORIO])) {
             return redirect('/')->with('error', 'Acceso restringido. No dispones de los permisos requeridos para realizar esta operación.');
         }
+
         $user = Auth::user();
         $laboratorio = $user->laboratorio;
-        $formularioResultado = FormularioEnsayoResultado::find($request->id_formulario_ensayos_resultados);
-        $esActualizacion = false;
-
         $gestionActual = date('Y');
 
         $InscripcionEnsayo = InscripcionEA::whereHas('inscripcion', function ($q) use ($laboratorio, $gestionActual) {
@@ -184,60 +189,84 @@ class FormularioEnsayoResultadoController extends Controller
             ->where('id_ea', $request->id_ensayo)
             ->with('ensayoAptitud')
             ->first();
-        $ensayo  = $InscripcionEnsayo->ensayoAptitud;
+
+        $ensayo = $InscripcionEnsayo->ensayoAptitud;
         if (!$ensayo) {
             return redirect()->back()->with('error', 'No se encontró ningún registro de inscripción correspondiente a la gestión actual.');
         }
+
         $ciclo = $ensayo->getCicloEnPeriodoEnvioResultados();
         if (!$ciclo) {
-            return redirect()->back()->with('error', 'No  se tiene un ciclo activo');
-        }
-        if (!$formularioResultado) {
-            $formularioResultado = FormularioEnsayoResultado::create([
-                'estado' => 1,
-                'id_ciclo' => $ciclo->id,
-                'id_ensayo' => $ensayo->id,
-                'id_laboratorio' => $laboratorio->id,
-                'id_formulario' => $request->id_formulario,
-                'gestion' => now()->year,
-                'nombre_lab' => $laboratorio->nombre_lab,
-                'departamento' => $laboratorio->departamento->nombre_dep,
-                'fecha_envio' => now(),
-                'cod_lab' => $laboratorio->cod_lab
-            ]);
-        } else {
-            $formularioResultado->fecha_envio = now();
-            $formularioResultado->save();
-            $esActualizacion = true;
+            return redirect()->back()->with('error', 'No se tiene un ciclo activo');
         }
 
-        $secciones = [];
-        foreach ($request->secciones as $seccionData) {
-            $sec = new \stdClass();
-            $sec->nombre = $seccionData['nombre'];
-            $sec->id = $seccionData['id'];
-            $secciones['secciones'][] = $sec;
-            foreach ($seccionData['parametros'] as $parametroData) {
-                RespuestaFormulario::updateOrCreate(
-                    [
-                        'id_formulario_resultado' => $formularioResultado->id,
-                        'id_parametro' => $parametroData['id'],
-                    ],
-                    [
-                        'nombre' => $parametroData['nombre'],
-                        'visible_nombre' => $parametroData['visible_nombre'] ?? false,
-                        'respuestas' => $parametroData['campos']
-                    ]
-                );
+        $formulariosData = $request->formularios ?? [];
+        $cantidadProcesados = 0;
+        $cantidadActualizados = 0;
+
+        DB::beginTransaction();
+        try {
+            foreach ($formulariosData as $formIdx => $formData) {
+                $idResultadoExistente = $formData['id_formulario_ensayos_resultados'] ?? null;
+                $formularioResultado = $idResultadoExistente ? FormularioEnsayoResultado::find($idResultadoExistente) : null;
+
+                if (!$formularioResultado) {
+                    $formularioResultado = FormularioEnsayoResultado::create([
+                        'estado' => 1,
+                        'id_ciclo' => $ciclo->id,
+                        'id_ensayo' => $ensayo->id,
+                        'id_laboratorio' => $laboratorio->id,
+                        'id_formulario' => $request->id_formulario,
+                        'gestion' => now()->year,
+                        'nombre_lab' => $laboratorio->nombre_lab,
+                        'departamento' => $laboratorio->departamento->nombre_dep,
+                        'fecha_envio' => now(),
+                        'cod_lab' => $laboratorio->cod_lab
+                    ]);
+                } else {
+                    $formularioResultado->fecha_envio = now();
+                    $formularioResultado->save();
+                    $cantidadActualizados++;
+                }
+
+                $secciones = [];
+                foreach ($formData['secciones'] ?? [] as $seccionData) {
+                    $sec = new \stdClass();
+                    $sec->nombre = $seccionData['nombre'];
+                    $sec->id = $seccionData['id'];
+                    $secciones['secciones'][] = $sec;
+
+                    foreach ($seccionData['parametros'] ?? [] as $parametroData) {
+                        RespuestaFormulario::updateOrCreate(
+                            [
+                                'id_formulario_resultado' => $formularioResultado->id,
+                                'id_parametro' => $parametroData['id'],
+                            ],
+                            [
+                                'nombre' => $parametroData['nombre'],
+                                'visible_nombre' => $parametroData['visible_nombre'] ?? false,
+                                'respuestas' => $parametroData['campos']
+                            ]
+                        );
+                    }
+                }
+
+                $formularioResultado->estructura = $secciones;
+                $formularioResultado->save();
+                $cantidadProcesados++;
             }
+
+            DB::commit();
+
+            $mensaje = $cantidadProcesados > 1
+                ? "Se guardaron $cantidadProcesados formularios correctamente."
+                : ($cantidadActualizados > 0 ? 'Formulario actualizado correctamente.' : 'Formulario registrado correctamente.');
+
+             return redirect()->route('lab.inscritos-ensayos.formularios', $request->id_ensayo)->with('success', $mensaje); 
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al guardar formularios: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al guardar los formularios. Por favor, intente nuevamente.');
         }
-
-        $formularioResultado->estructura = $secciones;
-        $formularioResultado->save();
-        $mensaje = $esActualizacion
-            ? 'Formulario actualizado correctamente.'
-            : 'Formulario registrado correctamente.';
-
-        return redirect()->back()->with('success', $mensaje);
     }
 }

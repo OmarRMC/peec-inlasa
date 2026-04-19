@@ -12,7 +12,7 @@ class GrupoSelectorController extends Controller
 {
     public function index($ensayoId)
     {
-        $ensayo = EnsayoAptitud::with('gruposSelectores.opciones')->findOrFail($ensayoId);
+        $ensayo = EnsayoAptitud::with('paquete', 'gruposSelectores.opciones')->findOrFail($ensayoId);
 
         return view('admin.grupos.index', compact('ensayo'));
     }

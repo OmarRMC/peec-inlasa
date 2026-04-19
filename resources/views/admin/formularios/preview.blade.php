@@ -51,7 +51,7 @@
       })">
           {{-- Botón volver --}}
           <div class="mb-4">
-              <button @click="cantidad = 0; actual = 0"
+              <button onclick="window.close(); if(!window.closed) history.back();"
                   class="inline-flex items-center px-4 py-2 text-sm rounded-md transition"
                   style="background-color: {{ $primaryColor }}; color: #fff;">
                   <i class="fas fa-arrow-left mr-2"></i> Volver
@@ -59,25 +59,19 @@
           </div>
 
           {{-- Información del formulario --}}
-          <div class="grid grid-cols-2 gap-6 mb-4 text-center">
+          <div class="grid grid-cols-1 gap-6 mb-4 text-center">
               <div class="p-3 rounded-lg shadow-sm" style="background-color: {{ $primaryColor }}20;">
                   <span class="block text-xs text-gray-500">Nombre del formulario</span>
                   <span class="text-sm font-semibold" style="color: {{ $primaryColor }}">
                       {{ $formulario->nombre }}
                   </span>
               </div>
-              <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                  <span class="block text-xs text-gray-500">Código del formulario</span>
-                  <span class="text-sm font-semibold text-gray-800">
-                      {{ $formulario->codigo }}
-                  </span>
-              </div>
           </div>
 
-          {{-- Nota --}}
-          @if (!empty($formulario->nota))
+          {{-- Descripción --}}
+          @if (!empty($formulario->descripcion))
               <div class="p-2 rounded-lg mb-2 bg-yellow-100 border border-yellow-300">
-                  <span class="text-sm text-yellow-800">{{ $formulario->nota }}</span>
+                  <span class="text-sm text-yellow-800">{{ $formulario->descripcion }}</span>
               </div>
           @endif
 

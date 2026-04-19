@@ -34,7 +34,7 @@ class UserController extends Controller
         $permisos = Permiso::active()->listar()
             ->get();
         $areas = Area::listarConDescripcionUnica(true);
-        $ensayoA = EnsayoAptitud::active()->orderBy('descripcion')->get();
+        $ensayoA = EnsayoAptitud::with('paquete')->active()->orderBy('descripcion')->get();
         return view('usuario.create', compact('cargos', 'permisos', 'ensayoA', 'areas'));
     }
 
@@ -111,7 +111,7 @@ class UserController extends Controller
         ]);
         $cargos = Cargo::active()->get();
         $permisos = Permiso::active()->listar()->get();
-        $ensayoA = EnsayoAptitud::active()->get();
+        $ensayoA = EnsayoAptitud::with('paquete')->active()->get();
         $areas = Area::listarConDescripcionUnica(true);
         $responsablesEA = $usuario->responsablesEA->mapWithKeys(function ($ensayo) {
             $paquete = $ensayo->paquete;

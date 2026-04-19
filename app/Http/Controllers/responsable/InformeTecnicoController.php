@@ -74,7 +74,23 @@ class InformeTecnicoController extends Controller
         ]);
         $ciclos = $ensayosAptitud->ciclos()->gestionParaInforme($gestion)->activo()->get();
         if ($ciclos->isEmpty()) {
-            return redirect()->back()->with('error', 'No existen ciclos activos para el ensayo de aptitud en la gestión seleccionada.');
+            $primerCiclo = $ensayosAptitud->ciclos()
+                ->whereYear('fecha_inicio_envio_resultados', $gestion)
+                ->activo()
+                ->whereNotNull('fecha_inicio_envio_reporte')
+                ->orderBy('fecha_inicio_envio_reporte')
+                ->first();
+
+            if ($primerCiclo) {
+                $fechaInicio = formatDate($primerCiclo->fecha_inicio_envio_reporte, false);
+                return redirect()->back()->with('notice', [
+                    'title'   => 'Período no disponible',
+                    'message' => "El período para registrar el informe técnico aún no ha comenzado. Podrá registrarlo a partir del <strong>{$fechaInicio}</strong>.",
+                    'type'    => 'warning',
+                ]);
+            }
+
+            return redirect()->back()->with('error', 'No existen ciclos con período de envío de reporte configurado para la gestión seleccionada.');
         }
         $selectedCiclo = $ciclos->where('id', $selectedCiclo)->first()?->id;
         if (!$selectedCiclo) {

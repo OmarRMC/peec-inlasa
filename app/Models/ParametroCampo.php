@@ -44,6 +44,7 @@ class ParametroCampo extends Model
         'range',
         'valor',
         'modificable',
+        'auto_guardar',
         'id_campo_padre'
     ];
 
@@ -53,6 +54,7 @@ class ParametroCampo extends Model
     protected $casts = [
         'requerido'     => 'boolean',
         'modificable'   => 'boolean',
+        'auto_guardar'  => 'boolean',
         'reglas'        => 'array',
         'dependencias'  => 'array',
         'rangeNumber'   => 'array',

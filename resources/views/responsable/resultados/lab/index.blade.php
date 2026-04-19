@@ -6,9 +6,8 @@
         <div class="mb-4 space-y-1">
             <h1 class="text-lg font-semibold text-gray-800">Laboratorio: {{ $lab->nombre_lab }}</h1>
             <p class="text-sm text-gray-600 font-semibold">Código: {{ $lab->cod_lab ?? '-' }}</p>
-            <p class="text-sm text-gray-600 font-semibold">Nombre del ciclo / Numero:
-                {{ $ciclo->nombre ? $ciclo->nombre : ' ' }}
-                {{ $ciclo->numero ? ' / Ciclo ' . $ciclo->numero : '' }}
+            <p class="text-sm text-gray-600 font-semibold">Nombre del ciclo:
+                {{ $ciclo->nombre ?? ' ' }}
             </p>
         </div>
         <h2 class="text-lg font-semibold text-gray-800 mb-3">Resultados enviados</h2>

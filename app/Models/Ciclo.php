@@ -12,7 +12,7 @@ class Ciclo extends Model
 
     protected $fillable = [
         'nombre',
-        'numero',
+        'gestion',
         'fecha_inicio_envio_muestras',
         'fecha_fin_envio_muestras',
         'fecha_inicio_envio_resultados',
@@ -22,6 +22,21 @@ class Ciclo extends Model
         'id_ensayo',
         'estado',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        $callback = function ($ciclo) {
+            if ($ciclo->fecha_inicio_envio_resultados) {
+                $ciclo->gestion = Carbon::parse($ciclo->fecha_inicio_envio_resultados)->year;
+            }
+        };
+
+        static::creating($callback);
+        static::updating($callback);
+    }
+
     public function scopeActivo($query)
     {
         return $query->where('estado', 1);

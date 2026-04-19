@@ -7,7 +7,13 @@
 <x-app-layout>
     <div class="max-w-5xl mx-auto p-6 rounded shadow bg-white" style="border-top: 6px solid {{ $primaryColor }}">
 
-        <div class="mb-4">
+        {{-- Cabecera para laboratorio: Paquete / Ensayo / Ciclo --}}
+        <div class="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm -mx-6 px-6 -mt-6 pt-3 pb-3 flex flex-col text-sm mb-4" style="top: -24px;">
+            <span class="font-bold text-gray-800">{{ $ensayoAptitud->paquete->descripcion ?? '-' }}</span>
+            <span class="text-gray-500">{{ $ensayoAptitud->descripcion }}</span>
+            <span class="text-gray-500">{{ $cicloActivo->nombre ?? '-' }}</span>
+        </div>
+                <div class="mb-4">
             <a href="{{ route('lab.inscritos-ensayos.formularios', $idEA) }}"
                 class="inline-flex items-center px-4 py-2 text-sm rounded-md transition"
                 style="background-color: {{ $primaryColor }}; color: #fff;">
@@ -15,57 +21,49 @@
             </a>
         </div>
 
-        {{-- Información del formulario --}}
-        <div class="grid grid-cols-2 gap-6 mb-4 text-center">
-            <div class="p-3 rounded-lg shadow-sm" style="background-color: {{ $primaryColor }}20;">
-                <span class="block text-xs text-gray-500">Nombre del formulario</span>
-                <span class="text-sm font-semibold" style="color: {{ $primaryColor }}">
-                    {{ $formulario->nombre }}
-                </span>
-            </div>
-            <div class="p-3 bg-gray-50 rounded-lg shadow-sm">
-                <span class="block text-xs text-gray-500">Código del formulario</span>
-                <span class="text-sm font-semibold text-gray-800">
-                    {{ $formulario->codigo }}
-                </span>
-            </div>
-        </div>
 
-        {{-- Nota --}}
-        @if (!empty($formulario->nota))
+        {{-- Descripción --}}
+        @if (!empty($formulario->descripcion))
             <div class="p-2 rounded-lg mb-4 bg-yellow-100 border border-yellow-300">
-                <span class="text-sm text-yellow-800">{{ $formulario->nota }}</span>
+                <span class="text-sm text-yellow-800">{{ $formulario->descripcion }}</span>
             </div>
         @endif
 
         {{-- Formularios en lista --}}
-        @for ($i = 1; $i <= $cantidad; $i++)
-            <div class="space-y-4 mb-8 border-b pb-6">
-                <form method="POST" action="{{ route('lab.resultados.store') }}">
-                    <input type="hidden" value="{{ $formulario->id }}" name="id_formulario">
-                    @csrf
+        <form method="POST" action="{{ route('lab.resultados.store') }}">
+            @csrf
+            <input type="hidden" value="{{ $formulario->id }}" name="id_formulario">
+            <input type="hidden" name="id_ensayo" value="{{ $idEA }}">
+            <input type="hidden" name="cantidad" value="{{ $cantidad }}">
 
+            @for ($i = 1; $i <= $cantidad; $i++)
+                <div class="space-y-4 mb-8 {{ $i < $cantidad ? 'border-b pb-6' : '' }}">
                     <h2 class="font-bold text-lg mb-2" style="color: {{ $primaryColor }}">
                         Formulario {{ $i }} / {{ $cantidad }}
                     </h2>
-                    <input type="hidden" name="id_ensayo" value="{{ $idEA }}">
 
                     {{-- Secciones --}}
                     @include('admin.formularios.partials.preview')
-                    {{-- Acciones --}}
-                    <div class="flex justify-end gap-2">
-                        {{-- <a href="{{ route('lab.inscritos-ensayos.index') }}" class="px-3 py-1 text-white rounded"
-                            style="background-color: red;">
-                            Cancelar
-                        </a> --}}
-                        <button type="submit" class="px-3 py-1 text-white rounded"
-                            style="background-color: {{ $primaryColor }}">
-                            Guardar este formulario
-                        </button>
-                    </div>
-                </form>
+                </div>
+            @endfor
+
+            {{-- Botón único de guardar --}}
+            <div class="flex justify-end gap-2 mt-6 pt-4 border-t">
+                @if ($respuestas->isNotEmpty())
+                    <button type="submit" class="px-6 py-2 text-white rounded font-semibold"
+                        style="background-color: {{ $primaryColor }}">
+                        <i class="fas fa-rotate mr-2"></i>
+                        Actualizar {{ $cantidad > 1 ? 'todos los formularios' : 'formulario' }}
+                    </button>   
+                @else
+                    <button type="submit" class="px-6 py-2 text-white rounded font-semibold"
+                        style="background-color: {{ $primaryColor }}">
+                        <i class="fas fa-save mr-2"></i>
+                        Enviar {{ $cantidad > 1 ? 'todos los formularios' : 'formulario' }}
+                    </button>
+                @endif
             </div>
-        @endfor
+        </form>
     </div>
 
     @push('scripts')

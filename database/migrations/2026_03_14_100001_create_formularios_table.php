@@ -19,8 +19,7 @@ return new class extends Migration
             $table->boolean('editable_por_encargado')->default(false);
             $table->boolean('estado')->default(true);
             $table->string('nombre', 255);
-            $table->string('codigo', 80)->nullable();
-            $table->text('nota')->nullable();
+            $table->text('descripcion')->nullable();
             // $table->foreign('id_ensayo')->references('id')->on('ensayo_aptitud')->onDelete('cascade');
             $table->timestamps();
         });

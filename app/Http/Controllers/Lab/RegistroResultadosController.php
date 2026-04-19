@@ -7,6 +7,7 @@ use App\Models\EnsayoAptitud;
 use App\Models\Formulario;
 use App\Models\FormularioEnsayo;
 use App\Models\InscripcionEA;
+use App\Models\FormularioEnsayoResultado;
 use App\Models\InscripcionEAFormulario;
 use App\Models\Permiso;
 use Illuminate\Http\Request;
@@ -39,7 +40,7 @@ class RegistroResultadosController extends Controller
         if (!Gate::any([Permiso::LABORATORIO])) {
             return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
         }
-        $ensayo = EnsayoAptitud::find($id);
+        $ensayo = EnsayoAptitud::with('paquete')->find($id);
         if (!$ensayo) {
             return redirect('/')->with('error', 'Ensayo no encontrado.');
         }
@@ -48,7 +49,18 @@ class RegistroResultadosController extends Controller
         $cicloActivo = $ciclos['cicloActivo'];
         $cicloSiguiente = $ciclos['siguienteCiclo'];
         $estado = $ciclos['estado'];
-        return view('laboratorio.resultados.formularios', compact('formularios', 'ensayo', 'cicloActivo', 'cicloSiguiente', 'estado'));
+
+        $laboratorio = Auth::user()->laboratorio;
+        $resultadosEnviados = collect();
+        if ($cicloActivo && $laboratorio) {
+            $resultadosEnviados = FormularioEnsayoResultado::where('id_laboratorio', $laboratorio->id)
+                ->where('id_ensayo', $ensayo->id)
+                ->where('id_ciclo', $cicloActivo->id)
+                ->get()
+                ->keyBy('id_formulario');
+        }
+
+        return view('laboratorio.resultados.formularios', compact('formularios', 'ensayo', 'cicloActivo', 'cicloSiguiente', 'estado', 'resultadosEnviados'));
     }
 
     function formularioLlenar($id, $idEA)
@@ -68,10 +80,10 @@ class RegistroResultadosController extends Controller
         if (!$ensayo) {
             return redirect('/')->with('error', 'No se tiene el registro del ensayo');
         }
-        $ensayoAptitud = EnsayoAptitud::find($idEA);
+        $ensayoAptitud = EnsayoAptitud::with('paquete')->find($idEA);
         if (!$ensayoAptitud) {
             return redirect('/')->with('error', 'No se tiene el registro del ensayo');
-        }        
+        }
         $formulario = $ensayoAptitud->formularios()->with(['secciones.parametros.campos.grupoSelector.opciones'])->find($id);
         if (!$formulario) {
             return redirect('/')->with('error', 'No se tiene el registro del formulario activo');
@@ -80,14 +92,35 @@ class RegistroResultadosController extends Controller
             ->where('inscripcion_ea_id', $ensayo->id)
             ->first();
         $cantidad = $registro->cantidad ?? 1;
-        $cicloId = $ensayoAptitud->getCicloActivo()?->id;
+        $cicloActivo = $ensayoAptitud->getCicloActivo();
+        $cicloId = $cicloActivo?->id;
         if (!$cicloId) {
             return redirect('/')->with('error', 'No se tiene el ciclo activo');
         }
         $respuestas = $laboratorio->respuestas()->where('id_ciclo', $cicloId)->where('gestion', now()->year)->where('id_formulario', $formulario->id)->get();
         $respuestas->load(['respuestas']);
-        // return $respuestas;
-        return view('laboratorio.resultados.llenar', compact('formulario', 'laboratorio', 'cantidad', 'idEA', 'respuestas'));
+
+        // Buscar las respuestas anteriores del laboratorio para este formulario (para campos con auto_guardar)
+        // Obtiene todas las respuestas del ciclo anterior más reciente
+        $cicloAnteriorConRespuestas = $laboratorio->respuestas()
+            ->where('id_formulario', $formulario->id)
+            ->where('id_ciclo', '!=', $cicloId)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        $respuestasAnterioresList = collect([]);
+        if ($cicloAnteriorConRespuestas) {
+            // Obtener todas las respuestas del mismo ciclo anterior, reindexadas para acceso por índice
+            $respuestasAnterioresList = $laboratorio->respuestas()
+                ->where('id_formulario', $formulario->id)
+                ->where('id_ciclo', $cicloAnteriorConRespuestas->id_ciclo)
+                ->with('respuestas')
+                ->orderBy('id')
+                ->get()
+                ->values();
+        }
+
+        return view('laboratorio.resultados.llenar', compact('formulario', 'laboratorio', 'cantidad', 'idEA', 'respuestas', 'respuestasAnterioresList', 'ensayoAptitud', 'cicloActivo'));
     }
 
     function guardarResultados(Request $request, $id)
