@@ -110,7 +110,7 @@ use App\Models\Permiso;
 
         {{-- Pendientes de acción --}}
         @if ($pendientes->isNotEmpty())
-        <div class="bg-white rounded-lg shadow-sm border p-5 mb-6">
+        <!-- <div class="bg-white rounded-lg shadow-sm border p-5 mb-6">
             <h3 class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
                 <i class="fas fa-exclamation-circle text-amber-500"></i> Pendientes de acción
                 <span class="ml-auto bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">
@@ -156,7 +156,7 @@ use App\Models\Permiso;
                     </div>
                 @endforeach
             </div>
-        </div>
+        </div> -->
         @endif
 
         {{-- Ciclo activo o próximo por ensayo --}}

@@ -45,7 +45,7 @@ class FormularioEnsayoController extends Controller
 
     public function formulariosByEa($idEA)
     {
-        $ensayo = EnsayoAptitud::with(['formularios'])->find($idEA);
+        $ensayo = EnsayoAptitud::with(['paquete', 'formularios'])->find($idEA);
         if (!$ensayo) {
             return redirect()->route('admin.formularios.ea')->with('error', 'Ensayo de Aptitud no encontrado.');
         }
@@ -69,8 +69,7 @@ class FormularioEnsayoController extends Controller
             [
                 'id_ensayo' => ['required', 'exists:ensayo_aptitud,id'],
                 'nombre'            => ['required', 'string', 'max:255'],
-                'codigo'            => ['nullable', 'string', 'max:80', 'unique:formularios,codigo'],
-                'nota'              => ['nullable', 'string'],
+                'descripcion'       => ['nullable', 'string'],
                 'color_primario'    => ['nullable', 'string', 'max:10'],
                 'color_secundario'  => ['nullable', 'string', 'max:10'],
                 'estado'            => ['nullable', 'boolean'],
@@ -81,9 +80,7 @@ class FormularioEnsayoController extends Controller
                 'id_ensayo.exists'   => 'El ensayo de aptitud seleccionado no existe.',
                 'nombre.required'            => 'El nombre del formulario es obligatorio.',
                 'nombre.max'                 => 'El nombre no puede superar los 255 caracteres.',
-                'codigo.max'                 => 'El código no puede superar los 80 caracteres.',
-                'codigo.unique'              => 'El código ya está en uso. Debe ser único.',
-                'nota.string'                => 'La nota debe ser una cadena de texto.',
+                'descripcion.string'         => 'La descripción debe ser una cadena de texto.',
                 'color_primario.max'         => 'El color primario no puede superar los 10 caracteres.',
                 'color_secundario.max'       => 'El color secundario no puede superar los 10 caracteres.',
                 'estado.boolean'             => 'El estado debe ser verdadero o falso.',
@@ -98,8 +95,7 @@ class FormularioEnsayoController extends Controller
 
         $formulario = new FormularioEnsayo();
         $formulario->nombre = $request->nombre;
-        $formulario->codigo = $request->codigo;
-        $formulario->nota = $request->nota;
+        $formulario->descripcion = $request->descripcion;
         $formulario->color_primario = $request->color_primario;
         $formulario->color_secundario = $request->color_secundario;
         $formulario->estado = $request->estado ?? false;
@@ -116,8 +112,7 @@ class FormularioEnsayoController extends Controller
         Log::info($id);
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'codigo' => 'nullable|string|max:80',
-            'nota' => 'nullable|string',
+            'descripcion' => 'nullable|string',
             'color_primario' => 'required|string|max:10',
             'color_secundario' => 'required|string|max:10',
         ]);
@@ -127,8 +122,7 @@ class FormularioEnsayoController extends Controller
         }
 
         $formulario->nombre = $request->nombre;
-        $formulario->codigo = $request->codigo;
-        $formulario->nota = $request->nota;
+        $formulario->descripcion = $request->descripcion;
         $formulario->color_primario = $request->color_primario;
         $formulario->color_secundario = $request->color_secundario;
         $formulario->estado = $request->estado;

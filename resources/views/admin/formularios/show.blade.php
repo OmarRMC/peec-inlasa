@@ -10,9 +10,13 @@
             <x-shared.btn-volver :url="route('admin.formularios.ea')" />
         @endif
         <div class="flex justify-between items-center mb-4">
-            <h1 class="text-xl font-bold text-gray-800">
-                Formularios del Ensayo: {{ $ensayo->descripcion }}
-            </h1>
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">Formularios del Ensayo</h1>
+                <div class="flex flex-col pt-3 text-sm">
+                    <span class="font-bold text-gray-800">{{ $ensayo->paquete->descripcion ?? '-' }}</span>
+                    <span class="text-gray-500">{{ $ensayo->descripcion }}</span>
+                </div>
+            </div>
             @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
                 <div class="flex space-x-2">
                     <button onclick="document.getElementById('modalCrear').classList.remove('hidden')"
@@ -33,13 +37,12 @@
                 <thead class="bg-gray-100 text-xs uppercase">
                     <tr>
                         <th class="px-3 py-2">Nombre</th>
-                        <th class="px-3 py-2">Código</th>
-                        <th class="px-3 py-2">Nota</th>
-                        <th class="px-3 py-2">Color Primario</th>
-                        <th class="px-3 py-2">Color Secundario</th>
-                        <th class="px-3 py-2">Estado</th>
+                        <th class="px-3 py-2">Descripción</th>
+                        <th class="px-3 py-2 text-center">Color Primario</th>
+                        <th class="px-3 py-2 text-center">Color Secundario</th>
+                        <th class="px-3 py-2 text-center">Estado</th>
                         @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
-                            <th class="px-3 py-2">Editable por el Encargado</th>
+                            <th class="px-3 py-2 text-center">Editable por el Encargado</th>
                         @endif
                         <th class="px-3 py-2 text-center">Acciones</th>
                     </tr>
@@ -48,19 +51,18 @@
                     @forelse ($formularios as $formulario)
                         <tr class="border-b">
                             <td class="px-3 py-2 font-semibold">{{ $formulario->nombre }}</td>
-                            <td class="px-3 py-2 text-gray-600">{{ $formulario->codigo ?? '-' }}</td>
-                            <td class="px-3 py-2 text-gray-500">{{ Str::limit($formulario->nota, 50) }}</td>
-                            <td class="px-3 py-2">
+                            <td class="px-3 py-2 text-gray-500">{{ Str::limit($formulario->descripcion, 50) }}</td>
+                            <td class="px-3 py-2 text-center">
                                 <span class="inline-block w-6 h-6 rounded-full border"
                                     style="background-color: {{ $formulario->color_primario }}"></span>
                                 {{ $formulario->color_primario }}
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-3 py-2 text-center">
                                 <span class="inline-block w-6 h-6 rounded-full border"
                                     style="background-color: {{ $formulario->color_secundario }}"></span>
                                 {{ $formulario->color_secundario }}
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-3 py-2 text-center">
                                 @if ($formulario->estado)
                                     <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded">Activo</span>
                                 @else
@@ -68,7 +70,7 @@
                                 @endif
                             </td>
                             @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
-                                <td class="px-3 py-2">
+                                <td class="px-3 py-2 text-center">
                                     @if ($formulario->editable_por_encargado)
                                         <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">Sí</span>
                                     @else
@@ -76,7 +78,8 @@
                                     @endif
                                 </td>
                             @endif
-                            <td class="px-3 py-2 text-center flex gap-2 ">
+                            <td class="px-3 py-2">
+                                <div class="flex gap-2 justify-center">
                                 @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS) ||
                                         (Gate::any(Permiso::RESPONSABLE) && $formulario->editable_por_encargado))
                                     <a href="{{ route('admin.formularios.edit', ['id' => $formulario->id, 'idEa' => $ensayo->id]) }}"
@@ -110,13 +113,16 @@
                                             method="POST" class="inline-block swal-form">
                                             @csrf @method('DELETE')
                                             <button type="submit"
-                                                class="bg-orange-100 hover:bg-orange-200 text-orange-700 px-2 py-1 rounded shadow-sm"
+                                                class="relative bg-orange-100 hover:bg-orange-200 text-orange-700 px-2 py-1 rounded shadow-sm"
                                                 data-tippy-content="Desvincular del ensayo"
                                                 data-titulo="Desvincular formulario"
                                                 data-texto="&laquo;{{ $formulario->nombre }}&raquo; seguirá disponible en los otros ensayos a los que esté vinculado."
                                                 data-confirmar="Sí, desvincular"
                                                 data-icono="warning">
                                                 <i class="fas fa-unlink"></i>
+                                                <span class="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                                                    {{ $formulario->ensayos_count }}
+                                                </span>
                                             </button>
                                         </form>
                                     @else
@@ -135,6 +141,7 @@
                                         </form>
                                     @endif
                                 @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -171,13 +178,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="block text-sm font-medium">Código</label>
-                    <input type="text" name="codigo" class="w-full border-gray-300 rounded shadow-sm text-sm">
-                </div>
-
-                <div class="mb-3">
-                    <label class="block text-sm font-medium">Nota</label>
-                    <textarea name="nota" class="w-full border-gray-300 rounded shadow-sm text-sm"></textarea>
+                    <label class="block text-sm font-medium">Descripción</label>
+                    <textarea name="descripcion" class="w-full border-gray-300 rounded shadow-sm text-sm"></textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-3">
@@ -233,7 +235,6 @@
                     <thead class="bg-gray-100 text-xs uppercase">
                         <tr>
                             <th class="px-3 py-2">Nombre</th>
-                            <th class="px-3 py-2">Código</th>
                             <th class="px-3 py-2 text-center">Acción</th>
                         </tr>
                     </thead>
@@ -241,7 +242,6 @@
                         @forelse ($formulariosDisponibles as $f)
                             <tr class="border-b">
                                 <td class="px-3 py-2">{{ $f->nombre }}</td>
-                                <td class="px-3 py-2">{{ $f->codigo ?? '-' }}</td>
                                 <td class="px-3 py-2 text-center">
                                     <form method="POST" action="{{ route('admin.formularios.usar', $ensayo->id) }}">
                                         @csrf
@@ -289,13 +289,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="block text-sm font-medium">Código</label>
-                    <input type="text" name="codigo" class="w-full border-gray-300 rounded shadow-sm text-sm">
-                </div>
-
-                <div class="mb-3">
-                    <label class="block text-sm font-medium">Nota</label>
-                    <textarea name="nota" class="w-full border-gray-300 rounded shadow-sm text-sm"></textarea>
+                    <label class="block text-sm font-medium">Descripción</label>
+                    <textarea name="descripcion" class="w-full border-gray-300 rounded shadow-sm text-sm"></textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-3">
@@ -376,8 +371,7 @@
                     const data = JSON.parse(btn.dataset.formulario);
                     editForm.action = baseUpdateUrl.replace('__ID__', data.id);
                     editForm.querySelector('input[name="nombre"]').value = data.nombre ?? '';
-                    editForm.querySelector('input[name="codigo"]').value = data.codigo ?? '';
-                    editForm.querySelector('textarea[name="nota"]').value = data.nota ?? '';
+                    editForm.querySelector('textarea[name="descripcion"]').value = data.descripcion ?? '';
                     editForm.querySelector('input[name="color_primario"]').value = data
                         .color_primario ?? '#272AF5';
                     editForm.querySelector('input[name="color_secundario"]').value = data

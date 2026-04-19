@@ -58,7 +58,7 @@ class ResultadosEnviadosLabController extends Controller
         $idCiclo = $resultado->id_ciclo;
 
         if (Gate::allows(Permiso::JEFE_PEEC)) {
-            $ensayo = \App\Models\EnsayoAptitud::find($idEA);
+            $ensayo = \App\Models\EnsayoAptitud::with('paquete')->find($idEA);
         } else {
             $ensayo = Auth::user()->load(['responsablesEA', 'responsablesEA.paquete'])->responsablesEA()->find($idEA);
         }

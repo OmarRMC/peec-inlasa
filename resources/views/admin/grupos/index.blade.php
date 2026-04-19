@@ -9,9 +9,13 @@
         @if (Gate::any(Permiso::ADMIN, Permiso::GESTION_FORMULARIOS))
             <x-shared.btn-volver :url="route('admin.formularios.ea')" />
         @endif
-        <h2 class="text-sm font-semibold mb-4">
-            Grupos de Selectores <span class="text-gray-500">{{ $ensayo->descripcion }}</span>
-        </h2>
+        <div class="mb-4">
+            <h2 class="text-sm font-semibold">Grupos de Selectores</h2>
+            <div class="flex flex-col pt-3 text-sm">
+                <span class="font-bold text-gray-800">{{ $ensayo->paquete->descripcion ?? '' }}</span>
+                <span class="text-gray-500">{{ $ensayo->descripcion }}</span>
+            </div>
+        </div>
 
         {{-- Mensajes de éxito --}}
         @if (session('success'))

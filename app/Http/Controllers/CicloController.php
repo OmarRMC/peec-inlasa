@@ -14,7 +14,7 @@ class CicloController extends Controller
      */
     public function index(Request $request, $idEa)
     {
-        $ensayo = EnsayoAptitud::find($idEa);
+        $ensayo = EnsayoAptitud::with('paquete')->find($idEa);
         if (!$ensayo) {
             return redirect()->back()->with('error', 'Ensayo no encontrado.');
         }

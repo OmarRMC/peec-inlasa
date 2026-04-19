@@ -5,7 +5,10 @@
         <div class="flex justify-between items-center mb-4 mt-2">
             <div>
                 <h1 class="text-xl font-bold text-gray-800">Ciclos del Ensayo</h1>
-                <p class="text-sm text-gray-500 mt-0.5">{{ $ensayo->descripcion }}</p>
+                <div class="flex flex-col pt-3 text-sm">
+                    <span class="font-bold text-gray-800">{{ $ensayo->paquete->descripcion ?? '' }}</span>
+                    <span class="text-gray-500">{{ $ensayo->descripcion }}</span>
+                </div>
             </div>
             <button @click="openCreate()"
                 class="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-500 transition shadow text-xs flex items-center gap-1">

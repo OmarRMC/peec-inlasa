@@ -26,11 +26,8 @@
                 <div>
                     <p><span class="font-semibold">Nombre:</span> {{ $formulario->nombre }}</p>
                 </div>
-                <div>
-                    <p><span class="font-semibold">Código:</span> {{ $formulario->codigo }}</p>
-                </div>
                 <div class="col-span-2">
-                    <p><span class="font-semibold">Nota:</span> {{ $formulario->nota }}</p>
+                    <p><span class="font-semibold">Descripción:</span> {{ $formulario->descripcion }}</p>
                 </div>
             </div>
         </div>

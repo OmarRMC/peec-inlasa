@@ -4,7 +4,8 @@
     $observaciones = $respuestas[$formIdx - 1]['observaciones'] ?? '';
     $res = $respuestas[$formIdx - 1]['respuestas'] ?? [];
     $respuestasActuales = collect($res);
-    dump($fromRes['id'] ?? '');
+    // TODO: OMAR
+    //dump($fromRes['id'] ?? '');
     $readonly = $readonly ?? false;
 
     // Obtener las respuestas anteriores para este índice de formulario (para auto_guardar)
