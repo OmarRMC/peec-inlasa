@@ -309,10 +309,10 @@
 
                                     <!-- Modal de previsualización -->
                                     <div id="preview-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4 sm:p-6">
-                                        <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full relative mx-auto overflow-y-auto max-h-[90vh]">
-                                            <div class="p-5 sm:p-8">
+                                        <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full relative mx-auto overflow-y-auto" style="max-height:90vh; width: fit-content;">
+                                            <div class="p-6 sm:p-10">
                                                 <button type="button" onclick="closePreviewModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
-                                                <h2 id="preview-titulo" class="text-xl font-bold mb-3 pr-8"></h2>
+                                                <h2 id="preview-titulo" class="text-2xl font-bold mb-3 pr-8"></h2>
                                                 <p id="preview-descripcion" class="mb-4 text-gray-600"></p>
                                                 <div id="preview-mensaje" class="mb-6 text-gray-800"></div>
                                             </div>
