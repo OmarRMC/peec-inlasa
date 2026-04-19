@@ -42,94 +42,177 @@ use App\Models\Permiso;
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+        {{-- Inscripciones aprobadas última gestión --}}
+        <div class="bg-white rounded-lg shadow-sm border p-5 mb-6">
+            <h3 class="text-sm font-semibold text-gray-600 mb-4 flex items-center gap-2">
+                <i class="fas fa-file-signature text-indigo-500"></i> Inscripción aprobada
+                @if ($ultimaGestionAprobada)
+                    <span class="text-gray-400 font-normal">- Gestión {{ $ultimaGestionAprobada }}</span>
+                @endif
+            </h3>
 
-            {{-- Inscripción de la gestión actual --}}
-            <div class="bg-white rounded-lg shadow-sm border p-5">
-                <h3 class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
-                    <i class="fas fa-file-signature text-indigo-500"></i> Inscripción {{ $gestion }}
-                </h3>
-                @if ($inscripcionActual)
-                    @php
-                        $si = $inscripcionActual->status_inscripcion;
-                        $colorInsc = match($si) {
-                            \App\Models\Inscripcion::STATUS_APROBADO => 'bg-green-100 text-green-800',
-                            \App\Models\Inscripcion::STATUS_EN_REVISION  => 'bg-yellow-100 text-yellow-800',
-                            \App\Models\Inscripcion::STATUS_EN_OBSERVACION => 'bg-red-100 text-red-800',
-                            \App\Models\Inscripcion::STATUS_VENCIDO => 'bg-orange-100 text-orange-800',
-                            \App\Models\Inscripcion::STATUS_ANULADO => 'bg-gray-200 text-gray-600',
-                            default => 'bg-gray-100 text-gray-600',
-                        };
-                    @endphp
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorInsc }}">
-                            {{ \App\Models\Inscripcion::STATUS_INSCRIPCION[$si] ?? '—' }}
-                        </span>
-                    </div>
-                    @if ($inscripcionActual->detalleInscripciones->isNotEmpty())
-                        <p class="text-xs text-gray-500 mb-1 uppercase tracking-wide">Paquetes inscritos</p>
-                        <ul class="space-y-1 mb-3">
-                            @foreach ($inscripcionActual->detalleInscripciones as $detalle)
-                                <li class="text-sm text-gray-700 flex items-start gap-2">
-                                    <i class="fas fa-box-open text-indigo-400 mt-0.5 text-xs"></i>
-                                    {{ $detalle->descripcion_paquete }}
-                                </li>
-                            @endforeach
-                        </ul>
+            @if ($inscripcionesAprobadas->isEmpty())
+                <div class="flex flex-col items-center py-6 text-center text-gray-400">
+                    <i class="fas fa-inbox text-3xl mb-2"></i>
+                    <p class="text-sm">No tienes inscripciones aprobadas.</p>
+                    @if ($periodoInscripcion)
+                        <a href="{{ route('lab.ins.index') }}"
+                           class="mt-3 text-xs text-indigo-600 hover:underline font-medium">
+                            Ir a inscribirme &rarr;
+                        </a>
                     @endif
-                    <p class="text-xs text-gray-400">Fecha: {{ $inscripcionActual->fecha_inscripcion }}</p>
-                @else
-                    <div class="flex flex-col items-center py-4 text-center text-gray-400">
-                        <i class="fas fa-inbox text-3xl mb-2"></i>
-                        <p class="text-sm">Sin inscripción para la gestión <strong>{{ $gestion }}</strong></p>
-                        @if ($periodoInscripcion)
-                            <a href="{{ route('lab.ins.index') }}"
-                               class="mt-3 text-xs text-indigo-600 hover:underline font-medium">
-                                Ir a inscribirme &rarr;
+                </div>
+            @else
+                <div class="flex items-center justify-between mb-3">
+                    <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                        <i class="fas fa-check text-[10px]"></i> Aprobada
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-gray-900">
+                            Bs. {{ number_format($totalAprobado, 2) }}
+                        </span>
+                        @if ($pagadoAprobado)
+                            <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                <i class="fas fa-check text-[10px]"></i> Pagado
+                            </span>
+                        @else
+                            <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">
+                                <i class="fas fa-exclamation text-[10px]"></i> Saldo: Bs. {{ number_format($saldoTotal, 2) }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Paquetes inscritos</p>
+                <ul class="space-y-1">
+                    @foreach ($paquetesAprobados as $detalle)
+                        <li class="flex items-start gap-2 text-sm text-gray-700">
+                            <i class="fas fa-box-open text-indigo-400 mt-0.5 text-xs shrink-0"></i>
+                            {{ $detalle->descripcion_paquete }}
+                        </li>
+                    @endforeach
+                </ul>
+
+                @if (!$pagadoAprobado)
+                    <p class="text-xs text-red-500 mt-3 flex items-center gap-1">
+                        <i class="fas fa-info-circle"></i>
+                        Tienes un saldo pendiente de <strong>Bs. {{ number_format($saldoTotal, 2) }}</strong>. Regulariza tu pago para mantener tu inscripción activa.
+                    </p>
+                @endif
+            @endif
+        </div>
+
+        {{-- Pendientes de acción --}}
+        @if ($pendientes->isNotEmpty())
+        <!-- <div class="bg-white rounded-lg shadow-sm border p-5 mb-6">
+            <h3 class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+                <i class="fas fa-exclamation-circle text-amber-500"></i> Pendientes de acción
+                <span class="ml-auto bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {{ $pendientes->where('completado', false)->count() }} pendiente(s)
+                </span>
+            </h3>
+            <div class="space-y-2">
+                @foreach ($pendientes as $item)
+                    <div class="flex items-center justify-between rounded-lg px-3 py-2.5 border
+                        {{ $item['completado'] ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200' }}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0
+                                {{ $item['completado'] ? 'bg-green-100' : 'bg-amber-100' }}">
+                                @if ($item['completado'])
+                                    <i class="fas fa-check text-green-600 text-xs"></i>
+                                @elseif ($item['tipo'] === 'resultados')
+                                    <i class="fas fa-chart-bar text-amber-600 text-xs"></i>
+                                @else
+                                    <i class="fas fa-file-alt text-amber-600 text-xs"></i>
+                                @endif
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold {{ $item['completado'] ? 'text-green-700' : 'text-gray-800' }}">
+                                    {{ $item['tipo'] === 'resultados' ? 'Envío de resultados' : 'Informe técnico' }}
+                                    @if ($item['completado'])
+                                        <span class="font-normal text-green-600">- Completado</span>
+                                    @endif
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    {{ $item['ciclo']->ensayoAptitud?->descripcion }} · {{ $item['ciclo']->nombre }}
+                                    @if (!$item['completado'])
+                                        · <span class="text-amber-600 font-medium">Vence {{ $item['vence'] }}</span>
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                        @if (!$item['completado'])
+                            <a href="{{ $item['ruta'] }}"
+                               class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1 shrink-0 ml-2">
+                                Ir <i class="fas fa-arrow-right text-[10px]"></i>
                             </a>
                         @endif
                     </div>
-                @endif
+                @endforeach
             </div>
+        </div> -->
+        @endif
 
-            {{-- Estado de cuenta --}}
-            <div class="bg-white rounded-lg shadow-sm border p-5">
-                <h3 class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
-                    <i class="fas fa-wallet text-indigo-500"></i> Estado de cuenta
-                </h3>
-                @if ($inscripcionActual)
+        {{-- Ciclo activo o próximo por ensayo --}}
+        @if ($ensayosConCiclo->isNotEmpty())
+        <div class="bg-white rounded-lg shadow-sm border p-5 mb-6">
+            <h3 class="text-sm font-semibold text-gray-600 mb-4 flex items-center gap-2">
+                <i class="fas fa-calendar-alt text-indigo-500"></i> Estado de ciclos - Gestión {{ $gestion }}
+            </h3>
+            <div class="space-y-3">
+                @foreach ($ensayosConCiclo as $item)
                     @php
-                        $pagado = $inscripcionActual->status_cuenta === \App\Models\Inscripcion::STATUS_PAGADO;
+                        $ciclo        = $item['ciclo'];
+                        $ea           = $item['ensayo'];
+                        $estadoCiclo  = $item['estadoCiclo'];
+                        $hoy          = \Carbon\Carbon::today();
+                        $enMuestras   = $ciclo->fecha_inicio_envio_muestras && $ciclo->fecha_fin_envio_muestras
+                                        && $hoy->between($ciclo->fecha_inicio_envio_muestras, $ciclo->fecha_fin_envio_muestras);
+                        $enResultados = $ciclo->enPeriodoEnvioResultados();
                     @endphp
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $pagado ? 'bg-green-100' : 'bg-red-100' }}">
-                            <i class="fas {{ $pagado ? 'fa-check text-green-600' : 'fa-exclamation text-red-600' }}"></i>
+                    <div class="border rounded-lg p-3 {{ $estadoCiclo === 'activo' ? 'border-indigo-200 bg-indigo-50/30' : 'border-gray-200' }}">
+                        <div class="flex items-start justify-between mb-2 gap-2">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wide leading-none mb-0.5">{{ $ea->descripcion }}</p>
+                                <p class="text-sm font-semibold text-gray-800">{{ $ciclo->nombre }}</p>
+                            </div>
+                            @if ($estadoCiclo === 'activo')
+                                @if ($enMuestras)
+                                    <span class="shrink-0 px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+                                        <i class="fas fa-circle text-[6px]"></i> En curso · Muestras
+                                    </span>
+                                @elseif ($enResultados)
+                                    <span class="shrink-0 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                        <i class="fas fa-circle text-[6px]"></i> En curso · Resultados
+                                    </span>
+                                @endif
+                            @else
+                                <span class="shrink-0 px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full text-xs">
+                                    <i class="fas fa-clock text-[10px]"></i> Próximo
+                                </span>
+                            @endif
                         </div>
-                        <div>
-                            <p class="text-sm font-semibold {{ $pagado ? 'text-green-700' : 'text-red-700' }}">
-                                {{ $pagado ? 'Pago registrado' : 'Pago pendiente' }}
-                            </p>
-                            <p class="text-xs text-gray-400">Gestión {{ $gestion }}</p>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="flex flex-col gap-0.5 {{ $enMuestras ? 'text-indigo-700 font-semibold' : 'text-gray-500' }}">
+                                <span class="flex items-center gap-1">
+                                    <i class="fas fa-vial {{ $enMuestras ? 'text-indigo-400' : 'text-gray-300' }} text-[10px]"></i> Envío de muestras
+                                </span>
+                                <span>{{ $ciclo->fecha_inicio_envio_muestras_show }}</span>
+                                <span class="{{ $enMuestras ? 'text-indigo-400' : 'text-gray-400' }}">→ {{ $ciclo->fecha_fin_envio_muestras_show }}</span>
+                            </div>
+                            <div class="flex flex-col gap-0.5 {{ $enResultados ? 'text-blue-700 font-semibold' : 'text-gray-500' }}">
+                                <span class="flex items-center gap-1">
+                                    <i class="fas fa-chart-bar {{ $enResultados ? 'text-blue-400' : 'text-gray-300' }} text-[10px]"></i> Envío de resultados
+                                </span>
+                                <span>{{ $ciclo->fecha_inicio_envio_resultados_show }}</span>
+                                <span class="{{ $enResultados ? 'text-blue-400' : 'text-gray-400' }}">→ {{ $ciclo->fecha_fin_envio_resultados_show }}</span>
+                            </div>
                         </div>
                     </div>
-                    <p class="text-sm text-gray-700">
-                        Costo total:
-                        <span class="font-bold text-gray-900">Bs. {{ number_format($inscripcionActual->costo_total, 2) }}</span>
-                    </p>
-                    @if (!$pagado)
-                        <p class="text-xs text-red-500 mt-2">
-                            <i class="fas fa-info-circle"></i>
-                            Regulariza tu pago para mantener tu inscripción activa.
-                        </p>
-                    @endif
-                @else
-                    <div class="flex flex-col items-center py-4 text-center text-gray-400">
-                        <i class="fas fa-receipt text-3xl mb-2"></i>
-                        <p class="text-sm">No hay cuenta activa para {{ $gestion }}</p>
-                    </div>
-                @endif
+                @endforeach
             </div>
         </div>
+        @endif
 
         {{-- Accesos rápidos --}}
         <div class="bg-white rounded-lg shadow-sm border p-5 mb-5">
@@ -225,7 +308,57 @@ use App\Models\Permiso;
                                     <p class="text-sm font-semibold text-gray-800 leading-snug">{{ $ea->descripcion }}</p>
                                 </div>
                             </div>
-                            <div class="flex gap-2 mt-3 flex-wrap">
+                                {{-- Ciclo activo o próximo --}}
+                            @if ($ea->ciclo_dashboard)
+                                @php
+                                    $ciclo        = $ea->ciclo_dashboard;
+                                    $hoy          = \Carbon\Carbon::today();
+                                    $enMuestras   = $ciclo->fecha_inicio_envio_muestras && $ciclo->fecha_fin_envio_muestras
+                                                    && $hoy->between($ciclo->fecha_inicio_envio_muestras, $ciclo->fecha_fin_envio_muestras);
+                                    $enResultados = $ciclo->enPeriodoEnvioResultados();
+                                    $enReporte    = $ciclo->fecha_inicio_envio_reporte && $ciclo->fecha_fin_envio_reporte
+                                                    && $hoy->between($ciclo->fecha_inicio_envio_reporte, $ciclo->fecha_fin_envio_reporte);
+                                    $total        = $ea->total_inscritos ?? 0;
+                                    $recibidos    = $ciclo->resultados_recibidos ?? 0;
+                                    $informes     = $ciclo->informes_recibidos ?? 0;
+                                    $pct          = $total > 0 ? round(($recibidos / $total) * 100) : 0;
+                                @endphp
+                                <div class="mt-3 bg-gray-50 rounded-lg px-3 py-2.5 border border-gray-100">
+                                    {{-- Nombre + estado --}}
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-xs font-semibold text-gray-700">{{ $ciclo->nombre }}</span>
+                                        @if ($ea->estado_ciclo === 'activo')
+                                            @if ($enMuestras)
+                                                <span class="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-medium">Muestras · hasta {{ $ciclo->fecha_fin_envio_muestras_show }}</span>
+                                            @elseif ($enResultados)
+                                                <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-medium">Resultados · hasta {{ $ciclo->fecha_fin_envio_resultados_show }}</span>
+                                            @elseif ($enReporte)
+                                                <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-[10px] font-medium">Reporte · hasta {{ $ciclo->fecha_fin_envio_reporte_show }}</span>
+                                            @endif
+                                        @else
+                                            <span class="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded text-[10px]">
+                                                <i class="fas fa-clock text-[8px]"></i> Próximo · desde {{ $ciclo->fecha_inicio_envio_muestras_show }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    {{-- Fecha de reporte --}}
+                                    @if ($ciclo->fecha_inicio_envio_reporte && $ciclo->fecha_fin_envio_reporte)
+                                        <div class="flex items-center gap-1 text-[10px] text-gray-500 mb-2">
+                                            <i class="fas fa-file-alt text-green-400"></i>
+                                            Emisión de reporte: {{ $ciclo->fecha_inicio_envio_reporte_show }} → {{ $ciclo->fecha_fin_envio_reporte_show }}
+                                        </div>
+                                    @endif
+                                    {{-- Barra de progreso resultados --}}
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="flex-1 bg-gray-200 rounded-full h-1.5">
+                                            <div class="bg-blue-500 h-1.5 rounded-full" style="width: {{ $pct }}%"></div>
+                                        </div>
+                                        <span class="text-[10px] text-gray-500 shrink-0">{{ $recibidos }}/{{ $total }} resultados</span>
+                                    </div>
+                                </div>
+                            @endif
+
+                        <div class="flex gap-2 mt-3 flex-wrap">
                                 <a href="{{ route('ea.lab.inscritos', $ea->id) }}"
                                    class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
                                     <i class="fas fa-users"></i> Ver laboratorios inscritos
@@ -357,6 +490,111 @@ use App\Models\Permiso;
                 <div>
                     <p class="text-2xl font-bold text-gray-800">{{ $deudores }}</p>
                     <p class="text-xs text-gray-500">Con pago pendiente</p>
+                </div>
+            </div>
+
+        </div>
+        @endif
+
+        {{-- Actividad operativa --}}
+        @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_PROGRAMAS_AREAS_PAQUETES_EA]))
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+
+            {{-- Ciclos --}}
+            <div class="bg-white rounded-lg shadow-sm border p-5">
+                <h3 class="text-sm font-semibold text-gray-600 mb-4 flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-indigo-500"></i> Ciclos - Gestión {{ $gestion }}
+                </h3>
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-gray-800">{{ $totalCiclos }}</p>
+                        <p class="text-xs text-gray-500">Registrados</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-green-600">{{ $ciclosHabilitados }}</p>
+                        <p class="text-xs text-gray-500">Habilitados</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-blue-600">{{ $ciclosEnCurso }}</p>
+                        <p class="text-xs text-gray-500">En curso hoy</p>
+                    </div>
+                </div>
+                {{-- Lista ciclos activos hoy --}}
+                @if ($ciclosActivosHoy->isNotEmpty())
+                <div class="space-y-1.5 border-t pt-3">
+                    @foreach ($ciclosActivosHoy as $ca)
+                        @php
+                            $hoyC = \Carbon\Carbon::today();
+                            $enM  = $ca->fecha_inicio_envio_muestras && $ca->fecha_fin_envio_muestras
+                                    && $hoyC->between($ca->fecha_inicio_envio_muestras, $ca->fecha_fin_envio_muestras);
+                            $enR  = $ca->enPeriodoEnvioResultados();
+                            $enRp = $ca->fecha_inicio_envio_reporte && $ca->fecha_fin_envio_reporte
+                                    && $hoyC->between($ca->fecha_inicio_envio_reporte, $ca->fecha_fin_envio_reporte);
+                        @endphp
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-700 truncate max-w-[55%]">
+                                {{ $ca->ensayoAptitud?->descripcion }} · {{ $ca->nombre }}
+                            </span>
+                            @if ($enM)
+                                <span class="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-medium shrink-0">Muestras</span>
+                            @elseif ($enR)
+                                <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded font-medium shrink-0">Resultados</span>
+                            @elseif ($enRp)
+                                <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded font-medium shrink-0">Reporte</span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+                @else
+                    <p class="text-xs text-gray-400 italic">Ningún ciclo activo hoy.</p>
+                @endif
+                <div class="mt-3 pt-3 border-t">
+                    <a href="{{ route('admin.formularios.ea') }}"
+                       class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+                        <i class="fas fa-arrow-right text-[10px]"></i> Gestionar ensayos y ciclos
+                    </a>
+                </div>
+            </div>
+
+            {{-- Resultados e Informes --}}
+            <div class="bg-white rounded-lg shadow-sm border p-5">
+                <h3 class="text-sm font-semibold text-gray-600 mb-4 flex items-center gap-2">
+                    <i class="fas fa-inbox text-indigo-500"></i> Recepción - Gestión {{ $gestion }}
+                    @if (Gate::check(Permiso::ADMIN) && !Gate::check(Permiso::JEFE_PEEC))
+                        <span class="ml-auto text-[10px] text-gray-400 font-normal italic">solo lectura</span>
+                    @endif
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                            <i class="fas fa-chart-bar text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-2xl font-bold text-gray-800">{{ $totalResultados }}</p>
+                            <p class="text-xs text-gray-500">Resultados enviados por laboratorios</p>
+                        </div>
+                        @if (Gate::check(Permiso::JEFE_PEEC))
+                            <a href="{{ route('reportes.resultados.ensayos') }}"
+                               class="text-xs text-indigo-600 hover:text-indigo-800 font-medium shrink-0">
+                                Ver <i class="fas fa-arrow-right text-[10px]"></i>
+                            </a>
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                            <i class="fas fa-file-alt text-green-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-2xl font-bold text-gray-800">{{ $totalInformes }}</p>
+                            <p class="text-xs text-gray-500">Reportes emitidos por responsables de EA</p>
+                        </div>
+                        @if (Gate::check(Permiso::JEFE_PEEC))
+                            <a href="{{ route('informe.tecnico.ensayos') }}"
+                               class="text-xs text-indigo-600 hover:text-indigo-800 font-medium shrink-0">
+                                Ver <i class="fas fa-arrow-right text-[10px]"></i>
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
 

@@ -93,5 +93,8 @@ class AppServiceProvider extends ServiceProvider
             $verIds = auth()->check() && auth()->user()->can(Permiso::VER_IDS);
             $view->with('verIds', $verIds);
         });
+        Gate::define(Permiso::GESTION_FORMULARIOS, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_FORMULARIOS);
+        });
     }
 }
