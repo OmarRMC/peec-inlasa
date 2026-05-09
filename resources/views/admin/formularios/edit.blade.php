@@ -1,7 +1,11 @@
 <x-app-layout>
     <div class="max-w-6xl mx-auto p-6 bg-white rounded shadow">
-        <div class="mb-2">
+        <div class="mb-2 flex items-center justify-between">
             <x-shared.btn-volver :url="route('admin.formularios.show',$ensayo->id )" />
+            <a href="{{ route('admin.formularios.guia') }}" target="_blank"
+                class="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium rounded-lg border border-indigo-200 transition">
+                <i class="fas fa-book-open"></i> Guía rápida
+            </a>
         </div>
         @if ($errors->any())
             <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -117,8 +121,7 @@
                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][requerido_si_completa]"
                                                         value="1" @checked($parametro->requerido_si_completa)
                                                         class="border rounded">
-                                                    Los campos marcados como requeridos deben completarse si se llena al
-                                                    menos uno.
+                                                    Si el laboratorio llena cualquier campo de esta fila, los obligatorios también deben completarse.
                                                 </label>
                                                 <button type="button" data-tippy-content="Eliminar"
                                                     class="eliminar-parametro px-2 py-1 bg-red-500 text-white text-xs rounded"><i
@@ -131,20 +134,19 @@
                                                 <table class="text-xs border border-gray-300 rounded resultados-table">
                                                     <thead class="bg-gray-100 text-gray-600">
                                                         <tr>
-                                                            <th class="px-2 py-1 border">Clave</th>
-                                                            <th class="px-2 py-1 border">Tipo</th>
-                                                            <th class="px-2 py-1 border">Placeholder</th>
-                                                            <th class="px-2 py-1 border text-center">Requerido</th>
-                                                            <th class="px-2 py-1 border">Posición</th>
-                                                            {{-- <th class="px-2 py-1 border">Step</th> --}}
-                                                            <th class="px-2 py-1 border">Validación(ExpReg)</th>
-                                                            <th class="px-2 py-1 border w-[100px]">Nota</th>
-                                                            <th class="px-2 py-1 border">Rango</th>
-                                                            <th class="px-2 py-1 border">Valor</th>
-                                                            <th class="px-2 py-1 border text-center">Modificable</th>
-                                                            <th class="px-2 py-1 border text-center">Auto-guardar</th>
-                                                            <th class="px-2 py-1 border">Grupo Selector</th>
-                                                            <th class="px-2 py-1 border">Dependencia del campo</th>
+                                                            <th class="px-2 py-1 border">Etiqueta</th>
+                                                            <th class="px-2 py-1 border">Tipo de campo</th>
+                                                            <th class="px-2 py-1 border">Texto de ayuda</th>
+                                                            <th class="px-2 py-1 border text-center">Obligatorio</th>
+                                                            <th class="px-2 py-1 border">Orden</th>
+                                                            <th class="px-2 py-1 border">Formato</th>
+                                                            <th class="px-2 py-1 border w-[100px]">Mensaje de error</th>
+                                                            <th class="px-2 py-1 border">Rango (mín-máx)</th>
+                                                            <th class="px-2 py-1 border">Valor fijo</th>
+                                                            <th class="px-2 py-1 border text-center">Editable</th>
+                                                            <th class="px-2 py-1 border text-center">Recordar valor</th>
+                                                            <th class="px-2 py-1 border">Lista de opciones</th>
+                                                            <th class="px-2 py-1 border">Depende de</th>
                                                             <th class="px-2 py-1 border text-center">Acciones</th>
                                                         </tr>
                                                     </thead>
@@ -321,6 +323,213 @@
             </form>
         </div>
     </div>
+    {{-- Modal Guía rápida --}}
+    <div id="modal-guia" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-6 py-4 border-b">
+                <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-book-open text-indigo-500 mr-2"></i>Guía rápida del constructor de formularios</h2>
+                <button onclick="cerrarGuia()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+            </div>
+
+            {{-- Tabs --}}
+            <div class="flex border-b overflow-x-auto text-sm font-medium shrink-0">
+                @foreach ([
+                    ['id' => 'secciones',   'label' => '📦 Secciones'],
+                    ['id' => 'parametros',  'label' => '📋 Parámetros'],
+                    ['id' => 'campos',      'label' => '✏️ Campos'],
+                    ['id' => 'limites',     'label' => '🔒 Límites'],
+                    ['id' => 'opciones',    'label' => '📌 Listas de opciones'],
+                ] as $tab)
+                    <button type="button"
+                        onclick="cambiarTab('{{ $tab['id'] }}')"
+                        id="tab-btn-{{ $tab['id'] }}"
+                        class="tab-btn px-4 py-3 whitespace-nowrap border-b-2 border-transparent text-gray-500 hover:text-indigo-600 transition">
+                        {{ $tab['label'] }}
+                    </button>
+                @endforeach
+            </div>
+
+            {{-- Contenido --}}
+            <div class="overflow-y-auto p-6 text-sm text-gray-700 space-y-4">
+
+                {{-- Tab: Secciones --}}
+                <div id="tab-secciones" class="tab-content space-y-3">
+                    <p class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-indigo-800">
+                        Una sección es como un <strong>grupo de filas</strong> dentro del formulario. Por ejemplo: si el formulario tiene datos físicos y datos químicos, cada uno sería una sección diferente.
+                    </p>
+                    <table class="w-full border text-xs rounded overflow-hidden">
+                        <thead class="bg-gray-100 text-gray-600">
+                            <tr><th class="px-3 py-2 text-left">Elemento</th><th class="px-3 py-2 text-left">¿Para qué sirve?</th><th class="px-3 py-2 text-left">Ejemplo</th></tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr><td class="px-3 py-2 font-medium">Nombre</td><td class="px-3 py-2">El título que verá el laboratorio encima de la tabla</td><td class="px-3 py-2 text-indigo-600">"Datos Físicos"</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Descripción</td><td class="px-3 py-2">Una explicación breve de qué tiene que llenar en esta sección</td><td class="px-3 py-2 text-indigo-600">"Registre los valores del análisis físico"</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Encabezados</td><td class="px-3 py-2">Los títulos de las columnas de la tabla</td><td class="px-3 py-2 text-indigo-600">"Parámetro", "Unidad", "Resultado"</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="bg-gray-50 border rounded p-3 text-xs text-gray-500">
+                        <strong>Vista previa:</strong><br>
+                        <div class="mt-2 border rounded overflow-hidden">
+                            <div class="bg-indigo-600 text-white px-3 py-1 text-xs font-bold">Datos Físicos</div>
+                            <div class="px-3 py-1 text-gray-500 text-xs italic border-b">Registre los valores del análisis físico</div>
+                            <table class="w-full text-xs"><thead class="bg-gray-100"><tr><th class="px-2 py-1 border text-left">Parámetro</th><th class="px-2 py-1 border text-left">Unidad</th><th class="px-2 py-1 border text-left">Resultado</th></tr></thead><tbody><tr><td class="px-2 py-1 border text-gray-400 italic" colspan="3">filas aquí...</td></tr></tbody></table>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Tab: Parámetros --}}
+                <div id="tab-parametros" class="tab-content hidden space-y-3">
+                    <p class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-indigo-800">
+                        Un parámetro es una <strong>fila</strong> de la tabla. Representa algo que el laboratorio tiene que medir o registrar. Por ejemplo: Turbidez, pH, Temperatura.
+                    </p>
+                    <table class="w-full border text-xs rounded overflow-hidden">
+                        <thead class="bg-gray-100 text-gray-600">
+                            <tr><th class="px-3 py-2 text-left">Elemento</th><th class="px-3 py-2 text-left">¿Para qué sirve?</th></tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr><td class="px-3 py-2 font-medium">Nombre</td><td class="px-3 py-2">Cómo se llama lo que se mide. Ej: <span class="text-indigo-600">"Turbidez"</span></td></tr>
+                            <tr>
+                                <td class="px-3 py-2 font-medium">Mostrar nombre <i class="fas fa-eye text-blue-400"></i></td>
+                                <td class="px-3 py-2">Si está activo (<i class="fas fa-eye text-blue-500"></i>), el nombre del parámetro aparece como una columna visible en la tabla. Si está desactivado (<i class="fas fa-eye-slash text-gray-400"></i>), la fila no tiene etiqueta.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-3 py-2 font-medium">Si el laboratorio llena cualquier campo de esta fila, los obligatorios también deben completarse</td>
+                                <td class="px-3 py-2">Si el laboratorio escribe en <strong>algún campo</strong> de esta fila, todos los campos marcados como <em>Obligatorio</em> también se vuelven requeridos. Útil cuando los datos de una fila van siempre juntos.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="bg-gray-50 border rounded p-3 text-xs">
+                        <strong>Vista previa:</strong>
+                        <table class="w-full mt-2 text-xs"><thead class="bg-gray-100"><tr><th class="px-2 py-1 border">Parámetro</th><th class="px-2 py-1 border">Unidad</th><th class="px-2 py-1 border">Resultado</th></tr></thead>
+                        <tbody><tr><td class="px-2 py-1 border font-medium">Turbidez</td><td class="px-2 py-1 border text-gray-400">NTU</td><td class="px-2 py-1 border"><input type="text" class="border rounded px-1 w-full text-xs" placeholder="Ej: 0.5" disabled></td></tr>
+                        <tr><td class="px-2 py-1 border font-medium">pH</td><td class="px-2 py-1 border text-gray-400">—</td><td class="px-2 py-1 border"><input type="text" class="border rounded px-1 w-full text-xs" placeholder="Ej: 7.2" disabled></td></tr></tbody></table>
+                    </div>
+                </div>
+
+                {{-- Tab: Campos --}}
+                <div id="tab-campos" class="tab-content hidden space-y-3">
+                    <p class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-indigo-800">
+                        Un campo es una <strong>celda</strong> donde el laboratorio escribe o elige un valor. Una fila puede tener varios campos: por ejemplo, el valor numérico y la unidad.
+                    </p>
+                    <table class="w-full border text-xs rounded overflow-hidden">
+                        <thead class="bg-gray-100 text-gray-600">
+                            <tr><th class="px-3 py-2 text-left">Columna</th><th class="px-3 py-2 text-left">¿Para qué sirve?</th><th class="px-3 py-2 text-left">Ejemplo</th></tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr><td class="px-3 py-2 font-medium">Etiqueta</td><td class="px-3 py-2">El nombre de esa columna en la tabla</td><td class="px-3 py-2 text-indigo-600">"Resultado"</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Tipo de campo</td><td class="px-3 py-2">Qué tipo de dato ingresa el laboratorio</td><td class="px-3 py-2 text-indigo-600">Número, Texto, Fecha, Lista de opciones, Casilla</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Texto de ayuda</td><td class="px-3 py-2">Lo que aparece dentro del campo vacío como orientación al laboratorio</td><td class="px-3 py-2 text-indigo-600">"Ej: 7.5"</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Obligatorio</td><td class="px-3 py-2">El laboratorio no puede enviar el formulario sin llenar este campo</td><td class="px-3 py-2">✓ marcado</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Orden</td><td class="px-3 py-2">En qué posición aparece esta columna (1 = primera)</td><td class="px-3 py-2 text-indigo-600">1, 2, 3...</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Editable</td><td class="px-3 py-2">Si está marcado, el laboratorio puede modificar el valor. Si está desmarcado, solo lo puede ver.</td><td class="px-3 py-2">✓ marcado = el lab puede editar</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Recordar valor</td><td class="px-3 py-2">Se llena automáticamente con lo que el laboratorio escribió el ciclo anterior. Útil para datos que casi no cambian.</td><td class="px-3 py-2">✓ marcado</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Valor fijo</td><td class="px-3 py-2">Un valor que aparece por defecto en el campo. Si <em>Editable</em> está desmarcado, el laboratorio lo verá pero no podrá cambiarlo.</td><td class="px-3 py-2 text-indigo-600">"NTU", "mg/L"</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Tab: Límites --}}
+                <div id="tab-limites" class="tab-content hidden space-y-3">
+                    <p class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-indigo-800">
+                        Puedes poner reglas para que el laboratorio no ingrese valores incorrectos o fuera de rango.
+                    </p>
+                    <table class="w-full border text-xs rounded overflow-hidden">
+                        <thead class="bg-gray-100 text-gray-600">
+                            <tr><th class="px-3 py-2 text-left">Opción</th><th class="px-3 py-2 text-left">¿Para qué sirve?</th><th class="px-3 py-2 text-left">Ejemplo</th></tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr><td class="px-3 py-2 font-medium">Rango (mín-máx)</td><td class="px-3 py-2">El número tiene que estar entre dos valores. Se escribe como <strong>mínimo-máximo</strong></td><td class="px-3 py-2 text-indigo-600">0-14 → solo acepta del 0 al 14</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Formato</td><td class="px-3 py-2">Obliga a que el valor tenga una forma específica de escritura</td><td class="px-3 py-2">Ver tabla abajo</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Mensaje de error</td><td class="px-3 py-2">Lo que verá el laboratorio si escribe algo incorrecto</td><td class="px-3 py-2 text-indigo-600">"Solo valores entre 0 y 14"</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="font-semibold text-gray-700 mt-3">Formatos de validación más usados:</p>
+                    <table class="w-full border text-xs rounded overflow-hidden">
+                        <thead class="bg-gray-100 text-gray-600">
+                            <tr><th class="px-3 py-2 text-left">¿Qué quiero permitir?</th><th class="px-3 py-2 text-left">Código a poner</th></tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr><td class="px-3 py-2">Solo números enteros (sin decimales)</td><td class="px-3 py-2 font-mono text-indigo-600">^\d+$</td></tr>
+                            <tr><td class="px-3 py-2">Números con decimales (hasta 2 cifras)</td><td class="px-3 py-2 font-mono text-indigo-600">^\d+(\.\d{1,2})?$</td></tr>
+                            <tr><td class="px-3 py-2">Solo letras (sin números ni símbolos)</td><td class="px-3 py-2 font-mono text-indigo-600">^[a-zA-ZáéíóúÁÉÍÓÚ\s]+$</td></tr>
+                            <tr><td class="px-3 py-2">Número con signo negativo o positivo</td><td class="px-3 py-2 font-mono text-indigo-600">^-?\d+(\.\d+)?$</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-3 text-xs text-yellow-800">
+                        <i class="fas fa-lightbulb mr-1"></i> Si no necesitas un formato especial, deja ese campo vacío. El campo <strong>Rango (mín-máx)</strong> es suficiente para la mayoría de los casos.
+                    </div>
+                </div>
+
+                {{-- Tab: Listas de opciones --}}
+                <div id="tab-opciones" class="tab-content hidden space-y-3">
+                    <p class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-indigo-800">
+                        Si quieres que el laboratorio <strong>elija</strong> un valor de una lista en lugar de escribirlo, necesitas un Grupo de opciones.
+                    </p>
+                    <table class="w-full border text-xs rounded overflow-hidden">
+                        <thead class="bg-gray-100 text-gray-600">
+                            <tr><th class="px-3 py-2 text-left">Concepto</th><th class="px-3 py-2 text-left">¿Para qué sirve?</th></tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr><td class="px-3 py-2 font-medium">Grupo selector</td><td class="px-3 py-2">Es la lista de opciones que verá el laboratorio al desplegar el campo. Se crea en el módulo de <strong>Grupos de Selectores</strong>.</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Tipo del campo</td><td class="px-3 py-2">Para usar un grupo, el tipo del campo debe ser <span class="bg-indigo-100 text-indigo-700 px-1 rounded">Select</span> o <span class="bg-indigo-100 text-indigo-700 px-1 rounded">Lista con búsqueda</span>.</td></tr>
+                            <tr><td class="px-3 py-2 font-medium">Campo dependiente</td><td class="px-3 py-2">La lista de opciones de este campo cambia según lo que el laboratorio eligió en otro campo anterior.</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="bg-gray-50 border rounded p-3 text-xs">
+                        <strong>Ejemplo de campo dependiente:</strong>
+                        <div class="mt-2 space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-gray-200 px-2 py-1 rounded">Campo 1 → Departamento:</span>
+                                <select class="border rounded px-2 py-1 text-xs" disabled><option>La Paz</option></select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-gray-200 px-2 py-1 rounded">Campo 2 → Provincia:</span>
+                                <select class="border rounded px-2 py-1 text-xs" disabled><option>Cambia según Departamento</option></select>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 mt-2">En "Dependencia del campo", el Campo 2 apunta al Campo 1. Así, cuando el laboratorio elige un Departamento, las Provincias se actualizan automáticamente.</p>
+                    </div>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-3 text-xs text-yellow-800">
+                        <i class="fas fa-lightbulb mr-1"></i> Los grupos de opciones se administran desde el botón <strong>"Configurar Grupos de Selectores"</strong> en la página de formularios del ensayo.
+                    </div>
+                </div>
+
+            </div>{{-- /contenido --}}
+        </div>
+    </div>
+
+    <script>
+        function abrirGuia() {
+            document.getElementById('modal-guia').classList.remove('hidden');
+            cambiarTab(sessionStorage.getItem('guiaTab') || 'secciones');
+        }
+        function cerrarGuia() {
+            document.getElementById('modal-guia').classList.add('hidden');
+        }
+        function cambiarTab(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-indigo-600', 'text-indigo-600');
+                el.classList.add('border-transparent', 'text-gray-500');
+            });
+            document.getElementById('tab-' + id)?.classList.remove('hidden');
+            const btn = document.getElementById('tab-btn-' + id);
+            if (btn) {
+                btn.classList.add('border-indigo-600', 'text-indigo-600');
+                btn.classList.remove('border-transparent', 'text-gray-500');
+            }
+            sessionStorage.setItem('guiaTab', id);
+        }
+        document.getElementById('modal-guia').addEventListener('click', function(e) {
+            if (e.target === this) cerrarGuia();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') cerrarGuia();
+        });
+    </script>
+
     @push('scripts')
         <script>
             var seccionIndex = document.querySelectorAll('#secciones-wrapper .seccion').length ?? 0;
@@ -374,7 +583,7 @@
                               name="secciones[${seccionIdx}][parametros][${parametroIdx}][requerido_si_completa]"
                               value="1" checked
                               class="border rounded">
-                              Los campos marcados como requeridos deben completarse si se llena al menos uno.
+                              Si el laboratorio llena cualquier campo de esta fila, los obligatorios también deben completarse.
                         </label>
                         <button type="button" data-tippy-content="Eliminar" class="eliminar-parametro px-2 py-1 bg-red-500 text-white text-xs rounded"><i class="fas fa-trash-alt"></i></button>
                     </td>
@@ -386,19 +595,19 @@
                 <table class="w-full text-xs border border-gray-300 rounded resultados-table">
                         <thead class="bg-gray-100 text-gray-600">
                               <tr>
-                                    <th class="px-2 py-1 border">Clave</th>
-                                    <th class="px-2 py-1 border">Tipo</th>
-                                    <th class="px-2 py-1 border">Placeholder</th>
-                                    <th class="px-2 py-1 border text-center">Requerido</th>
-                                    <th class="px-2 py-1 border">Posición</th>
-                                    <th class="px-2 py-1 border">Validación(ExpReg)</th>
-                                    <th class="px-2 py-1 border  w-[50px]">Nota</th>
-                                    <th class="px-2 py-1 border">Rango</th>
-                                    <th class="px-2 py-1 border">Valor</th>
-                                    <th class="px-2 py-1 border text-center">Modificable</th>
-                                    <th class="px-2 py-1 border text-center">Auto-guardar</th>
-                                    <th class="px-2 py-1 border">Grupo Selector</th>
-                                    <th class="px-2 py-1 border">Dependencia del campo</th>
+                                    <th class="px-2 py-1 border">Etiqueta</th>
+                                    <th class="px-2 py-1 border">Tipo de campo</th>
+                                    <th class="px-2 py-1 border">Texto de ayuda</th>
+                                    <th class="px-2 py-1 border text-center">Obligatorio</th>
+                                    <th class="px-2 py-1 border">Orden</th>
+                                    <th class="px-2 py-1 border">Formato</th>
+                                    <th class="px-2 py-1 border w-[50px]">Mensaje de error</th>
+                                    <th class="px-2 py-1 border">Rango (mín-máx)</th>
+                                    <th class="px-2 py-1 border">Valor fijo</th>
+                                    <th class="px-2 py-1 border text-center">Editable</th>
+                                    <th class="px-2 py-1 border text-center">Recordar valor</th>
+                                    <th class="px-2 py-1 border">Lista de opciones</th>
+                                    <th class="px-2 py-1 border">Depende de</th>
                                     <th class="px-2 py-1 border text-center">Acciones</th>
                                </tr>
                         </thead>

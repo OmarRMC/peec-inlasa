@@ -32,6 +32,11 @@ class FormularioEnsayoController extends Controller
         return view('admin.formularios.index', compact('programas', 'search'));
     }
 
+    public function guia()
+    {
+        return view('admin.formularios.guia');
+    }
+
     public function preview($id)
     {
         $formulario = FormularioEnsayo::find($id);
