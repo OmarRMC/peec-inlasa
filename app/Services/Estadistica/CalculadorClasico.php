@@ -397,6 +397,70 @@ class CalculadorClasico
     }
 
     /**
+     * Consenso robusto via Algoritmo A ISO 13528.
+     *
+     * @return array{n:int, x_star:?float, s_star:?float, iteraciones:int, convergio:bool}
+     */
+    public static function consensoRobusto(int $idCiclo, int $idCampo): array
+    {
+        $valores = RespuestaCampo::query()
+            ->join('formulario_ensayos_resultados as r', 'r.id', '=', 'respuestas_campo.id_formulario_resultado')
+            ->where('r.id_ciclo', $idCiclo)
+            ->where('respuestas_campo.id_parametro_campo', $idCampo)
+            ->whereNotNull('respuestas_campo.valor_numero')
+            ->pluck('respuestas_campo.valor_numero')
+            ->map(fn ($v) => (float) $v)
+            ->all();
+
+        return AlgoritmoIsoA::calcular($valores);
+    }
+
+    /**
+     * Z-score robusto por laboratorio: usa x* y s* del Algoritmo A
+     * en lugar de media/desv clasicas. Reemplaza zScoreLabs() cuando
+     * se sospecha contaminacion por outliers.
+     *
+     * @return Collection<int, object{id_laboratorio:int, nombre_lab:string, cod_lab:?string, valor:float, z_score:?float, desempeno:string}>
+     */
+    public static function zScoreRobustoLabs(int $idCiclo, int $idCampo): Collection
+    {
+        $rob = self::consensoRobusto($idCiclo, $idCampo);
+        if ($rob['n'] === 0 || $rob['s_star'] === null || $rob['s_star'] == 0.0) {
+            return collect();
+        }
+
+        $xStar = $rob['x_star'];
+        $sStar = $rob['s_star'];
+
+        return RespuestaCampo::query()
+            ->join('formulario_ensayos_resultados as r', 'r.id', '=', 'respuestas_campo.id_formulario_resultado')
+            ->where('r.id_ciclo', $idCiclo)
+            ->where('respuestas_campo.id_parametro_campo', $idCampo)
+            ->whereNotNull('respuestas_campo.valor_numero')
+            ->select([
+                'r.id_laboratorio',
+                'r.nombre_lab',
+                'r.cod_lab',
+                'respuestas_campo.valor_numero as valor',
+            ])
+            ->orderBy('r.id_laboratorio')
+            ->get()
+            ->map(function ($row) use ($xStar, $sStar) {
+                $z = ((float) $row->valor - $xStar) / $sStar;
+                return (object) [
+                    'id_laboratorio' => (int) $row->id_laboratorio,
+                    'nombre_lab'     => $row->nombre_lab,
+                    'cod_lab'        => $row->cod_lab,
+                    'valor'          => (float) $row->valor,
+                    'z_score'        => round($z, 4),
+                    'desempeno'      => self::clasificar(abs($z)),
+                ];
+            })
+            ->sortByDesc(fn ($r) => abs($r->z_score))
+            ->values();
+    }
+
+    /**
      * Heatmap ensayos × ciclos de una gestion: para cada celda, el % de
      * satisfactorios. Util para V9 del Jefe PEEC.
      *

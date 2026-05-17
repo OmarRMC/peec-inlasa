@@ -33,6 +33,9 @@ class DashboardEnsayoController extends Controller
                 ->with('error', 'Ensayo no encontrado o sin permisos.');
         }
 
+        // Modo de calculo de z-scores: clasico (default) o robusto (ISO 13528)
+        $modo = $request->input('modo') === 'robusto' ? 'robusto' : 'clasico';
+
         // Listado de ciclos para el selector (ordenados desc)
         $ciclos = $ensayo->ciclos->sortByDesc('id')->values();
 
@@ -47,6 +50,7 @@ class DashboardEnsayoController extends Controller
                 'ensayo'            => $ensayo,
                 'ciclos'            => $ciclos,
                 'cicloSeleccionado' => null,
+                'modo'              => $modo,
                 'kpis'              => null,
                 'campos'            => collect(),
             ]);
@@ -76,25 +80,29 @@ class DashboardEnsayoController extends Controller
         }
 
         // Por cada campo evaluable: consenso + z-scores + histograma + box-plot + tendencia
-        $statsCampos = $camposEvaluables->map(function ($item) use ($cicloSeleccionado) {
+        $statsCampos = $camposEvaluables->map(function ($item) use ($cicloSeleccionado, $modo) {
             $idCampo = $item->campo->id;
-            $cons    = CalculadorClasico::consenso($cicloSeleccionado->id, $idCampo);
-            $zs      = CalculadorClasico::zScoreLabs($cicloSeleccionado->id, $idCampo);
-            $hist    = CalculadorClasico::histograma($cicloSeleccionado->id, $idCampo, 12);
-            $box     = CalculadorClasico::boxPlot($cicloSeleccionado->id, $idCampo);
-            $tend    = CalculadorClasico::tendenciaConsenso($idCampo, 6);
+            $cons      = CalculadorClasico::consenso($cicloSeleccionado->id, $idCampo);
+            $consRob   = CalculadorClasico::consensoRobusto($cicloSeleccionado->id, $idCampo);
+            $zs        = $modo === 'robusto'
+                ? CalculadorClasico::zScoreRobustoLabs($cicloSeleccionado->id, $idCampo)
+                : CalculadorClasico::zScoreLabs($cicloSeleccionado->id, $idCampo);
+            $hist      = CalculadorClasico::histograma($cicloSeleccionado->id, $idCampo, 12);
+            $box       = CalculadorClasico::boxPlot($cicloSeleccionado->id, $idCampo);
+            $tend      = CalculadorClasico::tendenciaConsenso($idCampo, 6);
 
             return (object) [
-                'id_campo'   => $idCampo,
-                'label'      => $item->campo->label ?: $item->campo->nombre,
-                'parametro'  => $item->parametro->nombre,
-                'seccion'    => $item->seccion->nombre,
-                'consenso'   => $cons,
-                'zscores'    => $zs,
-                'outliers'   => $zs->filter(fn ($z) => $z->desempeno === CalculadorClasico::DESEMPENO_NO_SATISFACTORIO)->values(),
-                'histograma' => $hist,
-                'boxplot'    => $box,
-                'tendencia'  => $tend,
+                'id_campo'        => $idCampo,
+                'label'           => $item->campo->label ?: $item->campo->nombre,
+                'parametro'       => $item->parametro->nombre,
+                'seccion'         => $item->seccion->nombre,
+                'consenso'        => $cons,
+                'consenso_robusto'=> $consRob,
+                'zscores'         => $zs,
+                'outliers'        => $zs->filter(fn ($z) => $z->desempeno === CalculadorClasico::DESEMPENO_NO_SATISFACTORIO)->values(),
+                'histograma'      => $hist,
+                'boxplot'         => $box,
+                'tendencia'       => $tend,
             ];
         });
 
@@ -102,6 +110,7 @@ class DashboardEnsayoController extends Controller
             'ensayo'            => $ensayo,
             'ciclos'            => $ciclos,
             'cicloSeleccionado' => $cicloSeleccionado,
+            'modo'              => $modo,
             'kpis'              => [
                 'tasa' => $tasa,
                 'pct'  => $pct,

@@ -15,8 +15,8 @@
             </p>
         </div>
 
-        {{-- Selector de ciclo --}}
-        <form method="GET" class="bg-white border rounded p-3 mb-4 flex items-center gap-3">
+        {{-- Selector de ciclo y modo --}}
+        <form method="GET" class="bg-white border rounded p-3 mb-4 flex items-center gap-3 flex-wrap">
             <label class="text-sm font-medium text-gray-700">Ciclo:</label>
             <select name="ciclo" onchange="this.form.submit()"
                 class="text-sm border rounded px-2 py-1 min-w-[200px]">
@@ -27,8 +27,16 @@
                     </option>
                 @endforeach
             </select>
+
+            <label class="text-sm font-medium text-gray-700 ml-2">Modo:</label>
+            <select name="modo" onchange="this.form.submit()"
+                class="text-sm border rounded px-2 py-1">
+                <option value="clasico" @if ($modo === 'clasico') selected @endif>Clásico (media/σ)</option>
+                <option value="robusto" @if ($modo === 'robusto') selected @endif>Robusto (ISO 13528)</option>
+            </select>
+
             @if ($cicloSeleccionado)
-                <span class="text-xs text-gray-500">
+                <span class="text-xs text-gray-500 ml-auto">
                     Envío: {{ \Carbon\Carbon::parse($cicloSeleccionado->fecha_inicio_envio_resultados)->format('d/m/Y') }}
                     – {{ \Carbon\Carbon::parse($cicloSeleccionado->fecha_fin_envio_resultados)->format('d/m/Y') }}
                 </span>
@@ -111,29 +119,57 @@
                         </p>
                     </div>
 
-                    {{-- V2: Tabla de stats --}}
+                    {{-- V2: Tabla de stats clasicas + comparativa robusta --}}
                     <div class="overflow-x-auto mb-4">
                         <table class="w-full text-xs">
                             <thead class="bg-gray-50 text-gray-600 uppercase">
                                 <tr>
+                                    <th class="px-2 py-1 text-left">Método</th>
                                     <th class="px-2 py-1 text-left">N</th>
-                                    <th class="px-2 py-1 text-left">Media</th>
-                                    <th class="px-2 py-1 text-left">Mediana</th>
-                                    <th class="px-2 py-1 text-left">σ</th>
+                                    <th class="px-2 py-1 text-left">Tendencia central</th>
+                                    <th class="px-2 py-1 text-left">Dispersión</th>
                                     <th class="px-2 py-1 text-left">CV %</th>
                                     <th class="px-2 py-1 text-left">Mín</th>
                                     <th class="px-2 py-1 text-left">Máx</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="border-t">
+                                <tr class="border-t {{ $modo === 'clasico' ? 'bg-indigo-50' : '' }}">
+                                    <td class="px-2 py-1 font-medium">Clásico (media / σ)</td>
                                     <td class="px-2 py-1 font-semibold">{{ $c->consenso['n'] }}</td>
-                                    <td class="px-2 py-1">{{ $c->consenso['media'] }}</td>
-                                    <td class="px-2 py-1">{{ $c->consenso['mediana'] }}</td>
+                                    <td class="px-2 py-1">{{ $c->consenso['media'] }} <span class="text-gray-400">(med: {{ $c->consenso['mediana'] }})</span></td>
                                     <td class="px-2 py-1">{{ $c->consenso['desv'] }}</td>
                                     <td class="px-2 py-1">{{ $c->consenso['cv_pct'] }}</td>
                                     <td class="px-2 py-1">{{ $c->consenso['minimo'] }}</td>
                                     <td class="px-2 py-1">{{ $c->consenso['maximo'] }}</td>
+                                </tr>
+                                <tr class="border-t {{ $modo === 'robusto' ? 'bg-indigo-50' : '' }}">
+                                    <td class="px-2 py-1 font-medium">
+                                        Robusto (ISO 13528)
+                                        @if ($c->consenso_robusto['convergio'])
+                                            <span class="text-green-600" title="Convergió en {{ $c->consenso_robusto['iteraciones'] }} iteraciones">
+                                                <i class="fas fa-check-circle"></i>
+                                            </span>
+                                        @elseif ($c->consenso_robusto['iteraciones'] > 0)
+                                            <span class="text-yellow-600" title="No convergió en {{ $c->consenso_robusto['iteraciones'] }} iteraciones">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-2 py-1 font-semibold">{{ $c->consenso_robusto['n'] }}</td>
+                                    <td class="px-2 py-1">{{ $c->consenso_robusto['x_star'] ?? '—' }} <span class="text-gray-400">(x*)</span></td>
+                                    <td class="px-2 py-1">{{ $c->consenso_robusto['s_star'] ?? '—' }} <span class="text-gray-400">(s*)</span></td>
+                                    <td class="px-2 py-1" colspan="3">
+                                        @if ($c->consenso_robusto['s_star'] && $c->consenso['desv'])
+                                            <span class="text-xs text-gray-500">
+                                                σ clásica vs s* robusta: ratio
+                                                <strong>{{ round($c->consenso['desv'] / $c->consenso_robusto['s_star'], 2) }}</strong>
+                                                @if ($c->consenso['desv'] / $c->consenso_robusto['s_star'] > 1.5)
+                                                    <span class="text-orange-600">— posible contaminación por outliers</span>
+                                                @endif
+                                            </span>
+                                        @endif
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
