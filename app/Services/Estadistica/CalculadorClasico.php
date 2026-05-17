@@ -355,6 +355,76 @@ class CalculadorClasico
         });
     }
 
+    /**
+     * Tasa de respuesta por ensayo en una gestion (usa el ciclo mas reciente
+     * de cada ensayo en esa gestion). Util para V6 bar chart del Jefe PEEC.
+     *
+     * @return Collection<int, object{id_ensayo:int, descripcion:string, id_ciclo:?int, labs_enviaron:int, labs_inscritos:int, porcentaje:?float}>
+     */
+    public static function tasasPorEnsayoGestion(string|int $gestion): Collection
+    {
+        $ensayos = DB::table('ensayo_aptitud as ea')
+            ->leftJoin('ciclos as c', function ($j) use ($gestion) {
+                $j->on('c.id_ensayo', '=', 'ea.id')
+                  ->where('c.gestion', $gestion);
+            })
+            ->select('ea.id as id_ensayo', 'ea.descripcion', DB::raw('MAX(c.id) as id_ciclo'))
+            ->groupBy('ea.id', 'ea.descripcion')
+            ->orderBy('ea.descripcion')
+            ->get();
+
+        return $ensayos->map(function ($e) {
+            if (!$e->id_ciclo) {
+                return (object) [
+                    'id_ensayo'     => (int) $e->id_ensayo,
+                    'descripcion'   => $e->descripcion,
+                    'id_ciclo'      => null,
+                    'labs_enviaron' => 0,
+                    'labs_inscritos'=> 0,
+                    'porcentaje'    => null,
+                ];
+            }
+            $tasa = self::tasaRespuesta((int) $e->id_ciclo);
+            return (object) [
+                'id_ensayo'     => (int) $e->id_ensayo,
+                'descripcion'   => $e->descripcion,
+                'id_ciclo'      => (int) $e->id_ciclo,
+                'labs_enviaron' => $tasa['labs_enviaron'],
+                'labs_inscritos'=> $tasa['labs_inscritos'],
+                'porcentaje'    => $tasa['porcentaje'],
+            ];
+        });
+    }
+
+    /**
+     * % satisfactorios agregado a nivel gestion completa (todos los ciclos,
+     * todos los campos evaluables). Util para V5 donut del Jefe PEEC.
+     *
+     * @return array{n:int, satisfactorios:int, cuestionables:int, no_satisfactorios:int, pct_satisfactorios:?float}
+     */
+    public static function porcentajeSatisfactoriosGestion(string|int $gestion): array
+    {
+        $idsCiclo = DB::table('ciclos')->where('gestion', $gestion)->pluck('id');
+
+        $totals = ['n' => 0, 'sat' => 0, 'cuest' => 0, 'no_sat' => 0];
+
+        foreach ($idsCiclo as $idCiclo) {
+            $pct = self::porcentajeSatisfactorios((int) $idCiclo);
+            $totals['n']      += $pct['n'];
+            $totals['sat']    += $pct['satisfactorios'];
+            $totals['cuest']  += $pct['cuestionables'];
+            $totals['no_sat'] += $pct['no_satisfactorios'];
+        }
+
+        return [
+            'n'                  => $totals['n'],
+            'satisfactorios'     => $totals['sat'],
+            'cuestionables'      => $totals['cuest'],
+            'no_satisfactorios'  => $totals['no_sat'],
+            'pct_satisfactorios' => $totals['n'] > 0 ? round($totals['sat'] * 100 / $totals['n'], 2) : null,
+        ];
+    }
+
     // --- Helpers privados ---
 
     /** Desviacion estandar muestral (Bessel) — divide por n-1. */

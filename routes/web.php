@@ -45,6 +45,7 @@ use App\Http\Controllers\ReporteResultadosEvaluacioneController;
 use App\Http\Controllers\responsable\GestionFormulariosController;
 use App\Http\Controllers\responsable\InformeTecnicoController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
+use App\Http\Controllers\admin\DashboardPEECController;
 use App\Http\Controllers\responsable\DashboardEnsayoController;
 use App\Http\Controllers\responsable\ReporteResultadosController;
 use App\Http\Controllers\responsable\ResultadosEnviadosLabController;
@@ -89,6 +90,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function () {
+    Route::get('/dashboard-peec', [DashboardPEECController::class, 'index'])
+        ->name('admin.dashboard-peec');
     Route::get('/plantillas-certificados/{plantilla}/preview', [PlantillaCertificadoController::class, 'preview'])
         ->name('plantillas-certificados.preview');
     Route::resource('plantillas-certificados', PlantillaCertificadoController::class)
