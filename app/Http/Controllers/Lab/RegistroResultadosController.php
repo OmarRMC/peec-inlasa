@@ -54,7 +54,7 @@ class RegistroResultadosController extends Controller
         $resultadosEnviados = collect();
         if ($cicloActivo && $laboratorio) {
             $resultadosEnviados = FormularioEnsayoResultado::where('id_laboratorio', $laboratorio->id)
-                ->where('id_ensayo', $ensayo->id)
+                // ->where('id_ensayo', $ensayo->id)
                 ->where('id_ciclo', $cicloActivo->id)
                 ->get()
                 ->keyBy('id_formulario');

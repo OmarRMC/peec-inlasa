@@ -38,7 +38,7 @@ class ResultadosEnviadosLabController extends Controller
         $resultados = FormularioEnsayoResultado::with('respuestas', 'formulario')
             ->where('id_laboratorio', $idLab)
             ->where('id_ciclo', $idCiclo)
-            ->where('id_ensayo', $ensayo->id)
+            // ->where('id_ensayo', $ensayo->id)
             ->get();
 
         // return $resultados; 
@@ -56,6 +56,7 @@ class ResultadosEnviadosLabController extends Controller
         $resultado  = $resultados->first();
         $idEA = $resultado->id_ensayo;
         $idCiclo = $resultado->id_ciclo;
+        //El idEnsayo de puede opteener del cicloj
 
         if (Gate::allows(Permiso::JEFE_PEEC)) {
             $ensayo = \App\Models\EnsayoAptitud::with('paquete')->find($idEA);
