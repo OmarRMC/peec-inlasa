@@ -625,6 +625,12 @@ use App\Models\Configuracion;
                 <i class="fas fa-file-alt"></i> Reporte de resultados
             </a>
             @endif
+            @if (Gate::any([Permiso::ADMIN, Permiso::JEFE_PEEC]))
+            <a href="{{ route('admin.dashboard-peec') }}"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-chart-pie"></i> Dashboard PEEC
+            </a>
+            @endif
         </div>
     </div>
     @endif
