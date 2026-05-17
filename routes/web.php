@@ -45,6 +45,7 @@ use App\Http\Controllers\ReporteResultadosEvaluacioneController;
 use App\Http\Controllers\responsable\GestionFormulariosController;
 use App\Http\Controllers\responsable\InformeTecnicoController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
+use App\Http\Controllers\responsable\DashboardEnsayoController;
 use App\Http\Controllers\responsable\ReporteResultadosController;
 use App\Http\Controllers\responsable\ResultadosEnviadosLabController;
 use App\Http\Controllers\ResultadoController;
@@ -286,6 +287,8 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
         ->name('ea.formulario.actualizarCantidad');
     Route::get('reportes/ensayos', [ReporteResultadosController::class, 'reporteEnsayos'])
         ->name('reportes.resultados.ensayos');
+    Route::get('ensayos/{idEA}/dashboard', [DashboardEnsayoController::class, 'index'])
+        ->name('responsable.ensayo.dashboard');
     Route::get('reportes/resultados/{idEA}/registrados', [ReporteResultadosController::class, 'resultadosRegistradosPorLab'])
         ->name('reportes.resultados.registrados');
     Route::get('reportes/ensayo/{idEA}/export/{ciclo}', [ReporteResultadosEvaluacioneController::class, 'exportEnsayoResultados'])

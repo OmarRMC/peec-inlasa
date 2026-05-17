@@ -36,6 +36,11 @@
                                             data-tippy-content="Ver detalles">
                                             <i class="fas fa-eye"></i> Ver
                                         </a>
+                                        <a href="{{ route('responsable.ensayo.dashboard', $ensayo->id) }}"
+                                            class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded shadow-sm"
+                                            data-tippy-content="Dashboard de estadísticas">
+                                            <i class="fas fa-chart-line"></i> Dashboard
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
