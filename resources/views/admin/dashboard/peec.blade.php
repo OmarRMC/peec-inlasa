@@ -86,6 +86,118 @@
             </div>
         </div>
 
+        {{-- V9: Heatmap ensayos x ciclos --}}
+        @if (count($heatmap['ensayos']) > 0 && count($heatmap['ciclos']) > 0)
+            <div class="bg-white border rounded p-4 mb-6">
+                <h3 class="text-sm font-semibold text-gray-700 mb-1">
+                    Heatmap ensayos × ciclos
+                </h3>
+                <p class="text-xs text-gray-500 mb-3">
+                    Color por % de evaluaciones satisfactorias por ciclo. Gris = sin datos numéricos.
+                </p>
+                <div class="overflow-x-auto">
+                    <table class="text-xs border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="px-2 py-1 text-left bg-gray-50 sticky left-0 z-10">Ensayo</th>
+                                @foreach ($heatmap['ciclos'] as $c)
+                                    <th class="px-2 py-1 text-center bg-gray-50 min-w-[80px]" title="{{ $c['nombre'] }}">
+                                        {{ Str::limit($c['nombre'], 12, '…') }}
+                                    </th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($heatmap['ensayos'] as $e)
+                                <tr>
+                                    <td class="px-2 py-1 bg-white sticky left-0 z-10 font-medium border-r"
+                                        title="{{ $e['descripcion'] }}">
+                                        {{ Str::limit($e['descripcion'], 35, '…') }}
+                                    </td>
+                                    @foreach ($heatmap['ciclos'] as $c)
+                                        @php
+                                            // Solo dibujar celda si el ciclo pertenece a este ensayo
+                                            $perteneceCiclo = $c['id_ensayo'] === $e['id'];
+                                            $pct = $perteneceCiclo ? ($heatmap['celdas'][$e['id']][$c['id']] ?? null) : null;
+                                            if (!$perteneceCiclo) {
+                                                $bg = 'transparent';
+                                                $color = 'transparent';
+                                                $text = '';
+                                            } elseif ($pct === null) {
+                                                $bg = '#e5e7eb';
+                                                $color = '#9ca3af';
+                                                $text = '—';
+                                            } elseif ($pct >= 80) {
+                                                $bg = 'rgba(34,197,94,0.85)';
+                                                $color = 'white';
+                                                $text = $pct . '%';
+                                            } elseif ($pct >= 50) {
+                                                $bg = 'rgba(234,179,8,0.85)';
+                                                $color = '#78350f';
+                                                $text = $pct . '%';
+                                            } else {
+                                                $bg = 'rgba(239,68,68,0.85)';
+                                                $color = 'white';
+                                                $text = $pct . '%';
+                                            }
+                                        @endphp
+                                        <td class="text-center font-semibold"
+                                            style="background:{{ $bg }}; color:{{ $color }}; padding:6px;"
+                                            @if ($perteneceCiclo && $pct !== null) title="Ensayo: {{ $e['descripcion'] }} | Ciclo: {{ $c['nombre'] }} | Satisfactorios: {{ $pct }}%" @endif>
+                                            {{ $text }}
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex items-center gap-3 mt-3 text-xs text-gray-600">
+                    <span class="inline-flex items-center gap-1"><span class="inline-block w-3 h-3" style="background:rgba(34,197,94,0.85)"></span> ≥80%</span>
+                    <span class="inline-flex items-center gap-1"><span class="inline-block w-3 h-3" style="background:rgba(234,179,8,0.85)"></span> 50-79%</span>
+                    <span class="inline-flex items-center gap-1"><span class="inline-block w-3 h-3" style="background:rgba(239,68,68,0.85)"></span> &lt;50%</span>
+                    <span class="inline-flex items-center gap-1"><span class="inline-block w-3 h-3 bg-gray-300"></span> Sin datos</span>
+                </div>
+            </div>
+        @endif
+
+        {{-- V11: Labs con problema persistente --}}
+        @if ($labsProblematicos->isNotEmpty())
+            <div class="bg-white border rounded p-4 mb-6">
+                <h3 class="text-sm font-semibold text-gray-700 mb-1">
+                    <i class="fas fa-exclamation-triangle text-red-500 mr-1"></i>
+                    Laboratorios con desempeño problemático persistente
+                </h3>
+                <p class="text-xs text-gray-500 mb-3">
+                    Labs con 2 o más respuestas no satisfactorias (|z| ≥ 3) en los últimos 6 ciclos.
+                </p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead class="bg-red-50 text-gray-700 uppercase">
+                            <tr>
+                                <th class="px-2 py-1 text-left">Código</th>
+                                <th class="px-2 py-1 text-left">Laboratorio</th>
+                                <th class="px-2 py-1 text-right">No-satisfactorios</th>
+                                <th class="px-2 py-1 text-right">Total evaluaciones</th>
+                                <th class="px-2 py-1 text-right">% No-sat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($labsProblematicos as $lab)
+                                <tr class="border-t hover:bg-red-50">
+                                    <td class="px-2 py-1 font-mono">{{ $lab->cod_lab ?? '—' }}</td>
+                                    <td class="px-2 py-1">{{ $lab->nombre_lab }}</td>
+                                    <td class="px-2 py-1 text-right font-bold text-red-700">{{ $lab->total_no_sat }}</td>
+                                    <td class="px-2 py-1 text-right">{{ $lab->total_evaluaciones }}</td>
+                                    <td class="px-2 py-1 text-right font-bold text-red-700">{{ $lab->pct_no_sat }}%</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+
         {{-- Tabla detalle de tasas --}}
         @if ($tasasPorEnsayo->isNotEmpty())
             <div class="bg-white border rounded p-4">

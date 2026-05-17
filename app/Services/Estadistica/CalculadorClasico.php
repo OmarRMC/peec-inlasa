@@ -397,6 +397,106 @@ class CalculadorClasico
     }
 
     /**
+     * Heatmap ensayos × ciclos de una gestion: para cada celda, el % de
+     * satisfactorios. Util para V9 del Jefe PEEC.
+     *
+     * @return array{ensayos:array<int,array{id:int,descripcion:string}>, ciclos:array<int,array{id:int,nombre:string}>, celdas:array<int,array<int,?float>>}
+     *   `celdas[id_ensayo][id_ciclo] = pct_satisfactorios | null`
+     */
+    public static function heatmapEnsayosCiclos(string|int $gestion): array
+    {
+        $ensayos = DB::table('ensayo_aptitud as ea')
+            ->join('ciclos as c', 'c.id_ensayo', '=', 'ea.id')
+            ->where('c.gestion', $gestion)
+            ->select('ea.id', 'ea.descripcion')
+            ->distinct()
+            ->orderBy('ea.descripcion')
+            ->get();
+
+        $ciclos = DB::table('ciclos')
+            ->where('gestion', $gestion)
+            ->orderBy('id')
+            ->select('id', 'nombre', 'id_ensayo')
+            ->get();
+
+        $celdas = [];
+        foreach ($ciclos as $c) {
+            $pct = self::porcentajeSatisfactorios((int) $c->id);
+            $celdas[(int) $c->id_ensayo][(int) $c->id] = $pct['pct_satisfactorios'];
+        }
+
+        return [
+            'ensayos' => $ensayos->map(fn ($e) => ['id' => (int) $e->id, 'descripcion' => $e->descripcion])->all(),
+            'ciclos'  => $ciclos->map(fn ($c) => ['id' => (int) $c->id, 'nombre' => $c->nombre, 'id_ensayo' => (int) $c->id_ensayo])->all(),
+            'celdas'  => $celdas,
+        ];
+    }
+
+    /**
+     * Detecta laboratorios con desempeño "persistentemente problemático":
+     * labs con al menos $minNoSat respuestas no satisfactorias (|z|>=3)
+     * en los últimos $nCiclos ciclos de la gestión. Útil para V11.
+     *
+     * @return Collection<int, object{id_laboratorio:int, nombre_lab:string, cod_lab:?string, total_no_sat:int, total_evaluaciones:int, pct_no_sat:float}>
+     */
+    public static function labsProblematicos(string|int $gestion, int $nCiclos = 6, int $minNoSat = 2): Collection
+    {
+        // Ultimos N ciclos de la gestion
+        $idsCiclo = DB::table('ciclos')
+            ->where('gestion', $gestion)
+            ->orderByDesc('id')
+            ->limit($nCiclos)
+            ->pluck('id');
+
+        if ($idsCiclo->isEmpty()) {
+            return collect();
+        }
+
+        // Acumulador por lab: total evaluaciones y total no satisfactorias
+        $acum = []; // [id_lab => ['nombre' => ..., 'cod' => ..., 'total' => N, 'nosat' => N]]
+
+        foreach ($idsCiclo as $idCiclo) {
+            $idsCampos = DB::table('respuestas_campo as rc')
+                ->join('formulario_ensayos_resultados as r', 'r.id', '=', 'rc.id_formulario_resultado')
+                ->where('r.id_ciclo', $idCiclo)
+                ->whereNotNull('rc.valor_numero')
+                ->distinct()
+                ->pluck('rc.id_parametro_campo');
+
+            foreach ($idsCampos as $idCampo) {
+                foreach (self::zScoreLabs((int) $idCiclo, (int) $idCampo) as $z) {
+                    $id = $z->id_laboratorio;
+                    if (!isset($acum[$id])) {
+                        $acum[$id] = [
+                            'nombre' => $z->nombre_lab,
+                            'cod'    => $z->cod_lab,
+                            'total'  => 0,
+                            'nosat'  => 0,
+                        ];
+                    }
+                    $acum[$id]['total']++;
+                    if ($z->desempeno === self::DESEMPENO_NO_SATISFACTORIO) {
+                        $acum[$id]['nosat']++;
+                    }
+                }
+            }
+        }
+
+        return collect($acum)
+            ->filter(fn ($a) => $a['nosat'] >= $minNoSat)
+            ->map(fn ($a, $id) => (object) [
+                'id_laboratorio'      => (int) $id,
+                'nombre_lab'          => $a['nombre'],
+                'cod_lab'             => $a['cod'],
+                'total_no_sat'        => $a['nosat'],
+                'total_evaluaciones'  => $a['total'],
+                'pct_no_sat'          => round($a['nosat'] * 100 / $a['total'], 2),
+            ])
+            ->sortByDesc('pct_no_sat')
+            ->values();
+    }
+
+    /**
      * % satisfactorios agregado a nivel gestion completa (todos los ciclos,
      * todos los campos evaluables). Util para V5 donut del Jefe PEEC.
      *
