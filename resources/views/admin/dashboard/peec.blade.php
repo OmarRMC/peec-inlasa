@@ -99,7 +99,7 @@
                     <table class="text-xs border-collapse">
                         <thead>
                             <tr>
-                                <th class="px-2 py-1 text-left bg-gray-50 sticky left-0 z-10">Ensayo</th>
+                                <th class="px-2 py-1 text-left bg-gray-50 sticky left-0 z-10">Paquete / Ensayo</th>
                                 @foreach ($heatmap['ciclos'] as $c)
                                     <th class="px-2 py-1 text-center bg-gray-50 min-w-[80px]" title="{{ $c['nombre'] }}">
                                         {{ Str::limit($c['nombre'], 12, '…') }}
@@ -110,9 +110,14 @@
                         <tbody>
                             @foreach ($heatmap['ensayos'] as $e)
                                 <tr>
-                                    <td class="px-2 py-1 bg-white sticky left-0 z-10 font-medium border-r"
-                                        title="{{ $e['descripcion'] }}">
-                                        {{ Str::limit($e['descripcion'], 35, '…') }}
+                                    <td class="px-2 py-1 bg-white sticky left-0 z-10 border-r"
+                                        title="{{ ($e['paquete'] ?? 'Sin paquete') . ' — ' . $e['descripcion'] }}">
+                                        <div class="text-[10px] text-gray-500 uppercase leading-tight">
+                                            {{ Str::limit($e['paquete'] ?? 'Sin paquete', 30, '…') }}
+                                        </div>
+                                        <div class="font-medium leading-tight">
+                                            {{ Str::limit($e['descripcion'], 35, '…') }}
+                                        </div>
                                     </td>
                                     @foreach ($heatmap['ciclos'] as $c)
                                         @php
@@ -143,7 +148,7 @@
                                         @endphp
                                         <td class="text-center font-semibold"
                                             style="background:{{ $bg }}; color:{{ $color }}; padding:6px;"
-                                            @if ($perteneceCiclo && $pct !== null) title="Ensayo: {{ $e['descripcion'] }} | Ciclo: {{ $c['nombre'] }} | Satisfactorios: {{ $pct }}%" @endif>
+                                            @if ($perteneceCiclo && $pct !== null) title="{{ ($e['paquete'] ?? 'Sin paquete') . ' — ' . $e['descripcion'] }} | Ciclo: {{ $c['nombre'] }} | Satisfactorios: {{ $pct }}%" @endif>
                                             {{ $text }}
                                         </td>
                                     @endforeach
@@ -206,6 +211,7 @@
                     <table class="w-full text-xs">
                         <thead class="bg-gray-50 text-gray-600 uppercase">
                             <tr>
+                                <th class="px-2 py-1 text-left">Paquete</th>
                                 <th class="px-2 py-1 text-left">Ensayo</th>
                                 <th class="px-2 py-1 text-right">Labs enviaron</th>
                                 <th class="px-2 py-1 text-right">Labs inscritos</th>
@@ -215,6 +221,7 @@
                         <tbody>
                             @foreach ($tasasPorEnsayo as $t)
                                 <tr class="border-t">
+                                    <td class="px-2 py-1 text-gray-500 text-[11px]">{{ $t->paquete ?? '—' }}</td>
                                     <td class="px-2 py-1">{{ $t->descripcion }}</td>
                                     <td class="px-2 py-1 text-right">{{ $t->labs_enviaron }}</td>
                                     <td class="px-2 py-1 text-right">{{ $t->labs_inscritos }}</td>
@@ -256,10 +263,18 @@
         @if ($tasasPorEnsayo->isNotEmpty())
         (function () {
             const tasas = @json($tasasPorEnsayo->all());
+            // Label: "Paquete - Ensayo" en 2 lineas (Chart.js soporta array como label)
+            const labels = tasas.map(t => {
+                const paq = (t.paquete || 'Sin paquete');
+                const ens = t.descripcion;
+                const paqShort = paq.length > 30 ? paq.slice(0,30)+'...' : paq;
+                const ensShort = ens.length > 35 ? ens.slice(0,35)+'...' : ens;
+                return [paqShort, ensShort];
+            });
             new Chart(document.getElementById('tasasPorEnsayo'), {
                 type: 'bar',
                 data: {
-                    labels: tasas.map(t => t.descripcion.length > 40 ? t.descripcion.slice(0,40)+'...' : t.descripcion),
+                    labels: labels,
                     datasets: [{
                         label: '% Respuesta',
                         data: tasas.map(t => t.porcentaje ?? 0),
@@ -278,13 +293,17 @@
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
+                                title: items => {
+                                    const t = tasas[items[0].dataIndex];
+                                    return (t.paquete || 'Sin paquete') + ' — ' + t.descripcion;
+                                },
                                 afterLabel: ctx => 'Enviaron: ' + tasas[ctx.dataIndex].labs_enviaron + ' / Inscritos: ' + tasas[ctx.dataIndex].labs_inscritos
                             }
                         }
                     },
                     scales: {
                         x: { beginAtZero: true, max: 100, title: { display: true, text: '%' }},
-                        y: { ticks: { font: { size: 10 }}}
+                        y: { ticks: { font: { size: 9 }, autoSkip: false }}
                     }
                 }
             });

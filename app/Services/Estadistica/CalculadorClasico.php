@@ -359,17 +359,27 @@ class CalculadorClasico
      * Tasa de respuesta por ensayo en una gestion (usa el ciclo mas reciente
      * de cada ensayo en esa gestion). Util para V6 bar chart del Jefe PEEC.
      *
-     * @return Collection<int, object{id_ensayo:int, descripcion:string, id_ciclo:?int, labs_enviaron:int, labs_inscritos:int, porcentaje:?float}>
+     * Incluye paquete porque el nombre del ensayo puede repetirse entre
+     * paquetes distintos.
+     *
+     * @return Collection<int, object{id_ensayo:int, descripcion:string, paquete:?string, id_ciclo:?int, labs_enviaron:int, labs_inscritos:int, porcentaje:?float}>
      */
     public static function tasasPorEnsayoGestion(string|int $gestion): Collection
     {
         $ensayos = DB::table('ensayo_aptitud as ea')
+            ->leftJoin('paquete as p', 'p.id', '=', 'ea.id_paquete')
             ->leftJoin('ciclos as c', function ($j) use ($gestion) {
                 $j->on('c.id_ensayo', '=', 'ea.id')
                   ->where('c.gestion', $gestion);
             })
-            ->select('ea.id as id_ensayo', 'ea.descripcion', DB::raw('MAX(c.id) as id_ciclo'))
-            ->groupBy('ea.id', 'ea.descripcion')
+            ->select(
+                'ea.id as id_ensayo',
+                'ea.descripcion',
+                'p.descripcion as paquete',
+                DB::raw('MAX(c.id) as id_ciclo'),
+            )
+            ->groupBy('ea.id', 'ea.descripcion', 'p.descripcion')
+            ->orderBy('p.descripcion')
             ->orderBy('ea.descripcion')
             ->get();
 
@@ -378,6 +388,7 @@ class CalculadorClasico
                 return (object) [
                     'id_ensayo'     => (int) $e->id_ensayo,
                     'descripcion'   => $e->descripcion,
+                    'paquete'       => $e->paquete,
                     'id_ciclo'      => null,
                     'labs_enviaron' => 0,
                     'labs_inscritos'=> 0,
@@ -388,6 +399,7 @@ class CalculadorClasico
             return (object) [
                 'id_ensayo'     => (int) $e->id_ensayo,
                 'descripcion'   => $e->descripcion,
+                'paquete'       => $e->paquete,
                 'id_ciclo'      => (int) $e->id_ciclo,
                 'labs_enviaron' => $tasa['labs_enviaron'],
                 'labs_inscritos'=> $tasa['labs_inscritos'],
@@ -464,16 +476,21 @@ class CalculadorClasico
      * Heatmap ensayos × ciclos de una gestion: para cada celda, el % de
      * satisfactorios. Util para V9 del Jefe PEEC.
      *
-     * @return array{ensayos:array<int,array{id:int,descripcion:string}>, ciclos:array<int,array{id:int,nombre:string}>, celdas:array<int,array<int,?float>>}
+     * Incluye paquete porque el nombre del ensayo puede repetirse entre
+     * paquetes distintos.
+     *
+     * @return array{ensayos:array<int,array{id:int,descripcion:string,paquete:?string}>, ciclos:array<int,array{id:int,nombre:string,id_ensayo:int}>, celdas:array<int,array<int,?float>>}
      *   `celdas[id_ensayo][id_ciclo] = pct_satisfactorios | null`
      */
     public static function heatmapEnsayosCiclos(string|int $gestion): array
     {
         $ensayos = DB::table('ensayo_aptitud as ea')
             ->join('ciclos as c', 'c.id_ensayo', '=', 'ea.id')
+            ->leftJoin('paquete as p', 'p.id', '=', 'ea.id_paquete')
             ->where('c.gestion', $gestion)
-            ->select('ea.id', 'ea.descripcion')
+            ->select('ea.id', 'ea.descripcion', 'p.descripcion as paquete')
             ->distinct()
+            ->orderBy('p.descripcion')
             ->orderBy('ea.descripcion')
             ->get();
 
@@ -490,7 +507,11 @@ class CalculadorClasico
         }
 
         return [
-            'ensayos' => $ensayos->map(fn ($e) => ['id' => (int) $e->id, 'descripcion' => $e->descripcion])->all(),
+            'ensayos' => $ensayos->map(fn ($e) => [
+                'id'          => (int) $e->id,
+                'descripcion' => $e->descripcion,
+                'paquete'     => $e->paquete,
+            ])->all(),
             'ciclos'  => $ciclos->map(fn ($c) => ['id' => (int) $c->id, 'nombre' => $c->nombre, 'id_ensayo' => (int) $c->id_ensayo])->all(),
             'celdas'  => $celdas,
         ];
