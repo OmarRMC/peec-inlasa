@@ -66,9 +66,8 @@ class ReporteResultadosController extends Controller
         $search = trim($request->input('search', ''));
 
         $labsQuery = Laboratorio::query()
-            ->whereHas('respuestas', function ($query) use ($ensayo, $cicloId, $gestion) {
-                $query->where('id_ensayo', $ensayo->id)
-                    ->where('id_ciclo', $cicloId)
+            ->whereHas('respuestas', function ($query) use ($cicloId, $gestion) {
+                $query->where('id_ciclo', $cicloId)
                     ->where('gestion', $gestion);
             });
 

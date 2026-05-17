@@ -157,7 +157,6 @@ class FormularioEnsayoResultadoController extends Controller
             $resultados[] = [
                 'formulario_idx' => $idx,
                 'id_formulario'  => $request->input('id_formulario'),
-                'id_ensayo'      => $request->input('id_ensayo'),
                 'cantidad'       => $request->input('cantidad', 1),
                 'observaciones'  => $formularioData['observaciones'] ?? '',
                 'secciones'      => $secciones,
@@ -214,7 +213,6 @@ class FormularioEnsayoResultadoController extends Controller
                     $formularioResultado = FormularioEnsayoResultado::create([
                         'estado' => 1,
                         'id_ciclo' => $ciclo->id,
-                        'id_ensayo' => $ensayo->id,
                         'id_laboratorio' => $laboratorio->id,
                         'id_formulario' => $request->id_formulario,
                         'gestion' => now()->year,

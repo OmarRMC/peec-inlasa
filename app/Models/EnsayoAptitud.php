@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class EnsayoAptitud extends Model
 {
@@ -42,9 +43,16 @@ class EnsayoAptitud extends Model
     {
         return $this->hasMany(GrupoSelector::class, 'ensayo_id');
     }
-    public function resultados(): HasMany
+    public function resultados(): HasManyThrough
     {
-        return $this->hasMany(FormularioEnsayoResultado::class, 'id_ensayo');
+        return $this->hasManyThrough(
+            FormularioEnsayoResultado::class,
+            Ciclo::class,
+            'id_ensayo',   // FK en ciclos (apunta a ensayo_aptitud.id)
+            'id_ciclo',    // FK en formulario_ensayos_resultados (apunta a ciclos.id)
+            'id',          // local key en ensayo_aptitud
+            'id'           // local key en ciclos
+        );
     }
 
     public function getCicloEnPeriodoEnvioResultados()

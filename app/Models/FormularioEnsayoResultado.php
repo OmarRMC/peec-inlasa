@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class FormularioEnsayoResultado extends Model
 {
@@ -22,9 +23,8 @@ class FormularioEnsayoResultado extends Model
         'nombre_lab',
         'departamento',
         'id_ciclo',
-        'id_ensayo', 
-        'cod_lab', 
-        'fecha_envio', 
+        'cod_lab',
+        'fecha_envio',
     ];
     protected $casts = [
         'estructura' => 'array'
@@ -45,8 +45,20 @@ class FormularioEnsayoResultado extends Model
         return $this->hasMany(RespuestaFormulario::class, 'id_formulario_resultado');
     }
 
-    public function ensayo(): BelongsTo
+    public function ciclo(): BelongsTo
     {
-        return $this->belongsTo(EnsayoAptitud::class, 'id_ensayo');
+        return $this->belongsTo(Ciclo::class, 'id_ciclo');
+    }
+
+    public function ensayoAptitud(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            EnsayoAptitud::class,
+            Ciclo::class,
+            'id',          // PK en ciclos
+            'id',          // PK en ensayo_aptitud
+            'id_ciclo',    // local key en formulario_ensayos_resultados
+            'id_ensayo'    // local key en ciclos
+        );
     }
 }
