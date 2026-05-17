@@ -14,7 +14,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use App\Models\FormularioEnsayo;
 use App\Models\FormularioEnsayoResultado;
-use App\Models\RespuestaFormulario;
+use App\Models\RespuestaCampo;
 use Carbon\Carbon;
 
 class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, WithEvents, ShouldAutoSize
@@ -23,7 +23,7 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
     protected $formRanges = []; // rangos por formulario (para merge y color)
     protected $maxEnviosPorForm = []; // [form_id => maxEnvios]
     protected $ordenCamposPorForm = []; // [form_id => array de campoIds en el orden de columnas]
-    protected $respuestasIndex = []; // [resultado_id => [parametro_id => respuestasArray]]
+    protected $respuestasIndex = []; // [resultado_id => [campo_id => RespuestaCampo]]
     protected $labsIndex = []; // [lab_id => ['gestion'=>..,'id_ciclo'=>..,'nombre_lab'=>..,...]]
 
     protected $sinDato;
@@ -77,21 +77,21 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
             }
             $this->ordenCamposPorForm[$form->id] = $camposOrder;
 
-            // 2) Por cada resultado del formulario indexar las respuestas y contar envíos por laboratorio
+            // 2) Indexar respuestas tipadas: una query por formulario en lugar de iterar JSON
+            $resultadoIds = $form->resultados->pluck('id');
+            $respuestasCampo = RespuestaCampo::whereIn('id_formulario_resultado', $resultadoIds)
+                ->get([
+                    'id_formulario_resultado', 'id_parametro_campo', 'tipo_campo',
+                    'valor_texto', 'valor_numero', 'valor_fecha', 'valor_booleano',
+                    'id_opcion_seleccionada', 'valor_texto_opcion',
+                ]);
+            foreach ($respuestasCampo as $r) {
+                $this->respuestasIndex[$r->id_formulario_resultado][$r->id_parametro_campo] = $r;
+            }
+
+            // 3) Iterar resultados solo para metadata administrativa de labs
             $countsByLab = [];
             foreach ($form->resultados as $resultado) {
-                // asegurar que relaciones respuestas estén cargadas
-                if (!isset($resultado->respuestas)) {
-                    $resultado = FormularioEnsayoResultado::with('respuestas')->find($resultado->id) ?? $resultado;
-                }
-                // indexar respuestas por parametro
-                $paramMap = [];
-                foreach ($resultado->respuestas as $resp) {
-                    // resp->respuestas es un array JSON con elementos {id, valor, ...}
-                    $paramMap[$resp->id_parametro] = $resp->respuestas ?? [];
-                }
-                $this->respuestasIndex[$resultado->id] = $paramMap;
-
                 // indexar labs unico y datos administrativos (usamos la última info disponible)
                 $labId = $resultado->id_laboratorio;
                 $this->labsIndex[$labId] = [
@@ -184,24 +184,22 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
     }
 
     /**
-     * Busca en $this->respuestasIndex el valor para un determinado resultado, parametro y campo.
-     * Devuelve el valor (string) o null si no existe.
+     * Busca el valor tipado en respuestasIndex y lo formatea para la celda.
+     * O(1): acceso directo por [resultado_id][campo_id].
+     * $parametroId queda sin uso pero se mantiene la firma para no tocar el llamador.
      */
     protected function getValorParaCampo($resultadoId, $parametroId, $campoId)
     {
-        $paramMap = $this->respuestasIndex[$resultadoId] ?? [];
-        $arr = $paramMap[$parametroId] ?? [];
-        if (!is_array($arr)) return null;
-        foreach ($arr as $item) {
-            // item puede tener keys 'id','valor' (según tu ejemplo)
-            if ((string)($item['id'] ?? '') === (string)$campoId  && (string)($item['tipo'] ?? '') == 'select') {
-                return $item['valorTexto'] ?? $item['valor'];
-            }
-            if ((string)($item['id'] ?? '') === (string)$campoId) {
-                return $item['valor'] ?? null;
-            }
-        }
-        return null;
+        $r = $this->respuestasIndex[$resultadoId][$campoId] ?? null;
+        if (!$r) return null;
+
+        return match ($r->tipo_campo) {
+            'number'   => $r->valor_numero,
+            'date'     => optional($r->valor_fecha)->format('Y-m-d'),
+            'checkbox' => $r->valor_booleano ? 'Sí' : 'No',
+            'select', 'radio' => $r->valor_texto_opcion ?? $r->valor_texto,
+            default    => $r->valor_texto,
+        };
     }
 
     /**

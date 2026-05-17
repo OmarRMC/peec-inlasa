@@ -96,8 +96,13 @@ class RegistroResultadosController extends Controller
         if (!$cicloId) {
             return redirect('/')->with('error', 'No se tiene el ciclo activo');
         }
-        $respuestas = $laboratorio->respuestas()->where('id_ciclo', $cicloId)->where('gestion', now()->year)->where('id_formulario', $formulario->id)->get();
-        $respuestas->load(['respuestas']);
+        $respuestas = $laboratorio->respuestas()
+            ->where('id_ciclo', $cicloId)
+            ->where('gestion', now()->year)
+            ->where('id_formulario', $formulario->id)
+            ->with('respuestasCampo.parametroCampo')
+            ->get();
+        $respuestas->each(fn ($r) => $r->setRelation('respuestas', $r->respuestas_compat));
 
         // Buscar las respuestas anteriores del laboratorio para este formulario (para campos con auto_guardar)
         // Obtiene todas las respuestas del ciclo anterior más reciente
@@ -113,10 +118,11 @@ class RegistroResultadosController extends Controller
             $respuestasAnterioresList = $laboratorio->respuestas()
                 ->where('id_formulario', $formulario->id)
                 ->where('id_ciclo', $cicloAnteriorConRespuestas->id_ciclo)
-                ->with('respuestas')
+                ->with('respuestasCampo.parametroCampo')
                 ->orderBy('id')
                 ->get()
                 ->values();
+            $respuestasAnterioresList->each(fn ($r) => $r->setRelation('respuestas', $r->respuestas_compat));
         }
 
         return view('laboratorio.resultados.llenar', compact('formulario', 'laboratorio', 'cantidad', 'idEA', 'respuestas', 'respuestasAnterioresList', 'ensayoAptitud', 'cicloActivo'));
