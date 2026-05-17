@@ -49,59 +49,54 @@
             </div>
         @else
 
-            {{-- V1: Cards KPI --}}
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                <div class="bg-white border rounded p-3">
-                    <div class="text-xs text-gray-500 uppercase">Labs que enviaron</div>
-                    <div class="text-2xl font-bold text-indigo-600 mt-1">
-                        {{ $kpis['tasa']['labs_enviaron'] }}
-                        <span class="text-sm text-gray-400 font-normal">/ {{ $kpis['tasa']['labs_inscritos'] }}</span>
+            {{-- V1: Cards KPI compactos --}}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                <div class="bg-white border rounded p-2">
+                    <div class="text-[10px] text-gray-500 uppercase">Labs enviaron</div>
+                    <div class="text-lg font-bold text-indigo-600">
+                        {{ $kpis['tasa']['labs_enviaron'] }}<span class="text-xs text-gray-400 font-normal"> / {{ $kpis['tasa']['labs_inscritos'] }}</span>
                     </div>
                 </div>
-                <div class="bg-white border rounded p-3">
-                    <div class="text-xs text-gray-500 uppercase">Tasa de respuesta</div>
-                    <div class="text-2xl font-bold text-indigo-600 mt-1">
+                <div class="bg-white border rounded p-2">
+                    <div class="text-[10px] text-gray-500 uppercase">Tasa respuesta</div>
+                    <div class="text-lg font-bold text-indigo-600">
                         {{ $kpis['tasa']['porcentaje'] !== null ? $kpis['tasa']['porcentaje'] . '%' : '—' }}
                     </div>
                 </div>
-                <div class="bg-white border rounded p-3">
-                    <div class="text-xs text-gray-500 uppercase">Total evaluaciones</div>
-                    <div class="text-2xl font-bold text-indigo-600 mt-1">
-                        {{ $kpis['pct']['n'] }}
-                    </div>
+                <div class="bg-white border rounded p-2">
+                    <div class="text-[10px] text-gray-500 uppercase">Evaluaciones</div>
+                    <div class="text-lg font-bold text-indigo-600">{{ $kpis['pct']['n'] }}</div>
                 </div>
-                <div class="bg-white border rounded p-3">
-                    <div class="text-xs text-gray-500 uppercase">% Satisfactorios</div>
-                    <div class="text-2xl font-bold text-green-600 mt-1">
+                <div class="bg-white border rounded p-2">
+                    <div class="text-[10px] text-gray-500 uppercase">% Satisfactorios</div>
+                    <div class="text-lg font-bold text-green-600">
                         {{ $kpis['pct']['pct_satisfactorios'] !== null ? $kpis['pct']['pct_satisfactorios'] . '%' : '—' }}
                     </div>
                 </div>
             </div>
 
-            {{-- V5: Donut de desempeno global --}}
+            {{-- V5: Donut de desempeno global (compacto) --}}
             @if ($kpis['pct']['n'] > 0)
-                <div class="bg-white border rounded p-4 mb-6">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Desempeño global del ciclo</h3>
-                    <div class="flex flex-col md:flex-row items-center gap-6">
-                        <div class="w-full md:w-1/3 max-w-xs">
+                <div class="bg-white border rounded p-3 mb-4">
+                    <h3 class="text-xs font-semibold text-gray-700 mb-2 uppercase">Desempeño global del ciclo</h3>
+                    <div class="flex items-center gap-4">
+                        <div style="width:120px; height:120px;">
                             <canvas id="donutDesempeno"></canvas>
                         </div>
-                        <div class="flex-1 text-sm">
-                            <ul class="space-y-2">
-                                <li class="flex items-center gap-2">
-                                    <span class="inline-block w-3 h-3 bg-green-500 rounded-full"></span>
-                                    Satisfactorios: <strong>{{ $kpis['pct']['satisfactorios'] }}</strong>
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="inline-block w-3 h-3 bg-yellow-500 rounded-full"></span>
-                                    Cuestionables: <strong>{{ $kpis['pct']['cuestionables'] }}</strong>
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span>
-                                    No satisfactorios: <strong>{{ $kpis['pct']['no_satisfactorios'] }}</strong>
-                                </li>
-                            </ul>
-                        </div>
+                        <ul class="flex-1 text-xs space-y-1">
+                            <li class="flex items-center gap-2">
+                                <span class="inline-block w-3 h-3 bg-green-500 rounded-full"></span>
+                                Satisfactorios: <strong>{{ $kpis['pct']['satisfactorios'] }}</strong>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="inline-block w-3 h-3 bg-yellow-500 rounded-full"></span>
+                                Cuestionables: <strong>{{ $kpis['pct']['cuestionables'] }}</strong>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span>
+                                No satisfactorios: <strong>{{ $kpis['pct']['no_satisfactorios'] }}</strong>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             @endif
@@ -111,61 +106,56 @@
                 @if ($c->consenso['n'] === 0)
                     @continue
                 @endif
-                <div class="bg-white border rounded p-4 mb-6">
-                    <div class="border-b pb-2 mb-3">
+                <div class="bg-white border rounded p-3 mb-3">
+                    <div class="border-b pb-1 mb-2">
                         <h3 class="text-sm font-bold text-gray-800">{{ $c->label }}</h3>
-                        <p class="text-xs text-gray-500">
+                        <p class="text-[11px] text-gray-500">
                             {{ $c->seccion }} → {{ $c->parametro }}
                         </p>
                     </div>
 
-                    {{-- V2: Tabla de stats clasicas + comparativa robusta --}}
-                    <div class="overflow-x-auto mb-4">
-                        <table class="w-full text-xs">
+                    {{-- V2: Tabla de stats clasicas + comparativa robusta (compacta) --}}
+                    <div class="overflow-x-auto mb-2">
+                        <table class="w-full text-[11px]">
                             <thead class="bg-gray-50 text-gray-600 uppercase">
                                 <tr>
-                                    <th class="px-2 py-1 text-left">Método</th>
-                                    <th class="px-2 py-1 text-left">N</th>
-                                    <th class="px-2 py-1 text-left">Tendencia central</th>
-                                    <th class="px-2 py-1 text-left">Dispersión</th>
-                                    <th class="px-2 py-1 text-left">CV %</th>
-                                    <th class="px-2 py-1 text-left">Mín</th>
-                                    <th class="px-2 py-1 text-left">Máx</th>
+                                    <th class="px-2 py-0.5 text-left">Método</th>
+                                    <th class="px-2 py-0.5 text-right">N</th>
+                                    <th class="px-2 py-0.5 text-right">Tendencia</th>
+                                    <th class="px-2 py-0.5 text-right">Dispersión</th>
+                                    <th class="px-2 py-0.5 text-right">CV %</th>
+                                    <th class="px-2 py-0.5 text-right">Mín</th>
+                                    <th class="px-2 py-0.5 text-right">Máx</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr class="border-t {{ $modo === 'clasico' ? 'bg-indigo-50' : '' }}">
-                                    <td class="px-2 py-1 font-medium">Clásico (media / σ)</td>
-                                    <td class="px-2 py-1 font-semibold">{{ $c->consenso['n'] }}</td>
-                                    <td class="px-2 py-1">{{ $c->consenso['media'] }} <span class="text-gray-400">(med: {{ $c->consenso['mediana'] }})</span></td>
-                                    <td class="px-2 py-1">{{ $c->consenso['desv'] }}</td>
-                                    <td class="px-2 py-1">{{ $c->consenso['cv_pct'] }}</td>
-                                    <td class="px-2 py-1">{{ $c->consenso['minimo'] }}</td>
-                                    <td class="px-2 py-1">{{ $c->consenso['maximo'] }}</td>
+                                    <td class="px-2 py-0.5 font-medium">Clásico</td>
+                                    <td class="px-2 py-0.5 text-right font-semibold">{{ $c->consenso['n'] }}</td>
+                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso['media'] }} <span class="text-gray-400">/{{ $c->consenso['mediana'] }}</span></td>
+                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso['desv'] }}</td>
+                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso['cv_pct'] }}</td>
+                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso['minimo'] }}</td>
+                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso['maximo'] }}</td>
                                 </tr>
                                 <tr class="border-t {{ $modo === 'robusto' ? 'bg-indigo-50' : '' }}">
-                                    <td class="px-2 py-1 font-medium">
-                                        Robusto (ISO 13528)
+                                    <td class="px-2 py-0.5 font-medium">
+                                        Robusto
                                         @if ($c->consenso_robusto['convergio'])
-                                            <span class="text-green-600" title="Convergió en {{ $c->consenso_robusto['iteraciones'] }} iteraciones">
-                                                <i class="fas fa-check-circle"></i>
-                                            </span>
+                                            <span class="text-green-600" title="Convergió en {{ $c->consenso_robusto['iteraciones'] }} it"><i class="fas fa-check-circle"></i></span>
                                         @elseif ($c->consenso_robusto['iteraciones'] > 0)
-                                            <span class="text-yellow-600" title="No convergió en {{ $c->consenso_robusto['iteraciones'] }} iteraciones">
-                                                <i class="fas fa-exclamation-circle"></i>
-                                            </span>
+                                            <span class="text-yellow-600" title="No convergió"><i class="fas fa-exclamation-circle"></i></span>
                                         @endif
                                     </td>
-                                    <td class="px-2 py-1 font-semibold">{{ $c->consenso_robusto['n'] }}</td>
-                                    <td class="px-2 py-1">{{ $c->consenso_robusto['x_star'] ?? '—' }} <span class="text-gray-400">(x*)</span></td>
-                                    <td class="px-2 py-1">{{ $c->consenso_robusto['s_star'] ?? '—' }} <span class="text-gray-400">(s*)</span></td>
-                                    <td class="px-2 py-1" colspan="3">
+                                    <td class="px-2 py-0.5 text-right font-semibold">{{ $c->consenso_robusto['n'] }}</td>
+                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso_robusto['x_star'] ?? '—' }}<span class="text-gray-400 text-[10px]"> x*</span></td>
+                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso_robusto['s_star'] ?? '—' }}<span class="text-gray-400 text-[10px]"> s*</span></td>
+                                    <td class="px-2 py-0.5 text-right" colspan="3">
                                         @if ($c->consenso_robusto['s_star'] && $c->consenso['desv'])
-                                            <span class="text-xs text-gray-500">
-                                                σ clásica vs s* robusta: ratio
-                                                <strong>{{ round($c->consenso['desv'] / $c->consenso_robusto['s_star'], 2) }}</strong>
+                                            <span class="text-[10px] text-gray-500">
+                                                σ/s* = <strong>{{ round($c->consenso['desv'] / $c->consenso_robusto['s_star'], 2) }}</strong>
                                                 @if ($c->consenso['desv'] / $c->consenso_robusto['s_star'] > 1.5)
-                                                    <span class="text-orange-600">— posible contaminación por outliers</span>
+                                                    <span class="text-orange-600">⚠ outliers</span>
                                                 @endif
                                             </span>
                                         @endif
@@ -175,63 +165,66 @@
                         </table>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-3">
                         {{-- V7: Histograma --}}
                         <div>
-                            <p class="text-xs font-semibold text-gray-600 mb-1">Distribución</p>
-                            <canvas id="hist_{{ $c->id_campo }}" height="180"></canvas>
+                            <p class="text-[11px] font-semibold text-gray-600 mb-1 uppercase">Distribución</p>
+                            <div style="position:relative; height:140px;">
+                                <canvas id="hist_{{ $c->id_campo }}"></canvas>
+                            </div>
                         </div>
                         {{-- V10: Tendencia inter-ciclos --}}
                         <div>
-                            <p class="text-xs font-semibold text-gray-600 mb-1">Tendencia (últimos {{ $c->tendencia->count() }} ciclos)</p>
+                            <p class="text-[11px] font-semibold text-gray-600 mb-1 uppercase">Tendencia (últ. {{ $c->tendencia->count() }} ciclos)</p>
                             @if ($c->tendencia->count() >= 2)
-                                <canvas id="tend_{{ $c->id_campo }}" height="180"></canvas>
+                                <div style="position:relative; height:140px;">
+                                    <canvas id="tend_{{ $c->id_campo }}"></canvas>
+                                </div>
                             @else
-                                <p class="text-xs text-gray-400 italic">Insuficientes ciclos para tendencia.</p>
+                                <p class="text-[11px] text-gray-400 italic">Insuficientes ciclos.</p>
                             @endif
                         </div>
-                    </div>
-
-                    {{-- V3: Bar chart z-scores --}}
-                    @if ($c->zscores->isNotEmpty())
-                        <div class="mb-4">
-                            <p class="text-xs font-semibold text-gray-600 mb-1">Z-score por laboratorio</p>
-                            <div style="position:relative; height:{{ max(180, $c->zscores->count() * 22) }}px;">
-                                <canvas id="z_{{ $c->id_campo }}"></canvas>
+                        {{-- V3: Bar chart z-scores --}}
+                        @if ($c->zscores->isNotEmpty())
+                            <div>
+                                <p class="text-[11px] font-semibold text-gray-600 mb-1 uppercase">Z-score por laboratorio</p>
+                                <div style="position:relative; height:{{ max(140, min(280, $c->zscores->count() * 16)) }}px; overflow-y:auto;">
+                                    <canvas id="z_{{ $c->id_campo }}"></canvas>
+                                </div>
                             </div>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
 
                     {{-- V4: Tabla outliers --}}
                     @if ($c->outliers->isNotEmpty())
-                        <div class="mb-2">
-                            <p class="text-xs font-semibold text-red-600 mb-1">
+                        <details class="mb-2" open>
+                            <summary class="text-[11px] font-semibold text-red-600 cursor-pointer uppercase">
                                 <i class="fas fa-exclamation-triangle"></i>
                                 Outliers ({{ $c->outliers->count() }})
-                            </p>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-xs border">
+                            </summary>
+                            <div class="overflow-x-auto mt-1">
+                                <table class="w-full text-[11px] border">
                                     <thead class="bg-red-50">
                                         <tr>
-                                            <th class="px-2 py-1 text-left">Código</th>
-                                            <th class="px-2 py-1 text-left">Laboratorio</th>
-                                            <th class="px-2 py-1 text-right">Valor</th>
-                                            <th class="px-2 py-1 text-right">Z-score</th>
+                                            <th class="px-2 py-0.5 text-left">Código</th>
+                                            <th class="px-2 py-0.5 text-left">Laboratorio</th>
+                                            <th class="px-2 py-0.5 text-right">Valor</th>
+                                            <th class="px-2 py-0.5 text-right">Z</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach ($c->outliers as $o)
                                             <tr class="border-t">
-                                                <td class="px-2 py-1">{{ $o->cod_lab ?? '—' }}</td>
-                                                <td class="px-2 py-1">{{ $o->nombre_lab }}</td>
-                                                <td class="px-2 py-1 text-right">{{ $o->valor }}</td>
-                                                <td class="px-2 py-1 text-right font-bold text-red-700">{{ $o->z_score }}</td>
+                                                <td class="px-2 py-0.5">{{ $o->cod_lab ?? '—' }}</td>
+                                                <td class="px-2 py-0.5">{{ Str::limit($o->nombre_lab, 50) }}</td>
+                                                <td class="px-2 py-0.5 text-right">{{ $o->valor }}</td>
+                                                <td class="px-2 py-0.5 text-right font-bold text-red-700">{{ $o->z_score }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                        </details>
                     @endif
 
                     {{-- V8: Box-plot (sin libreria extra: dibujo simple en canvas) --}}
@@ -288,9 +281,10 @@
                 datasets: [{
                     data: [{{ $kpis['pct']['satisfactorios'] }}, {{ $kpis['pct']['cuestionables'] }}, {{ $kpis['pct']['no_satisfactorios'] }}],
                     backgroundColor: [COLOR_SAT, COLOR_CUE, COLOR_NS],
+                    borderWidth: 1,
                 }]
             },
-            options: { responsive: true, plugins: { legend: { display: false }}}
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }}, cutout: '60%' }
         });
         @endif
 
@@ -311,7 +305,10 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false }},
-                    scales: { x: { ticks: { font: { size: 9 }, maxRotation: 45 }}, y: { beginAtZero: true }}
+                    scales: {
+                        x: { ticks: { font: { size: 8 }, maxRotation: 45, autoSkip: true }},
+                        y: { beginAtZero: true, ticks: { font: { size: 8 }}}
+                    }
                 }
             });
 
@@ -327,13 +324,17 @@
                         borderColor: COLOR_LINE,
                         backgroundColor: 'rgba(99,102,241,0.15)',
                         fill: true,
-                        tension: 0.3
+                        tension: 0.3,
+                        pointRadius: 3,
                     }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false }},
-                    scales: { x: { ticks: { font: { size: 9 }}}}
+                    scales: {
+                        x: { ticks: { font: { size: 8 }}},
+                        y: { ticks: { font: { size: 8 }}}
+                    }
                 }
             });
             @endif
@@ -347,9 +348,10 @@
                     data: {
                         labels: zs.map(z => z.cod_lab || '(' + z.id_laboratorio + ')'),
                         datasets: [{
-                            label: 'Z-score',
+                            label: 'Z',
                             data: zs.map(z => z.z_score),
                             backgroundColor: zs.map(z => colorZ(z.z_score)),
+                            barThickness: 10,
                         }]
                     },
                     options: {
@@ -359,16 +361,13 @@
                             legend: { display: false },
                             tooltip: {
                                 callbacks: {
-                                    afterLabel: ctx => 'Lab: ' + zs[ctx.dataIndex].nombre_lab + ' | Valor: ' + zs[ctx.dataIndex].valor + ' | ' + zs[ctx.dataIndex].desempeno
+                                    afterLabel: ctx => zs[ctx.dataIndex].nombre_lab + ' | val: ' + zs[ctx.dataIndex].valor + ' | ' + zs[ctx.dataIndex].desempeno
                                 }
                             }
                         },
                         scales: {
-                            x: {
-                                ticks: { font: { size: 10 }},
-                                title: { display: true, text: 'Z-score' }
-                            },
-                            y: { ticks: { font: { size: 9 }}}
+                            x: { ticks: { font: { size: 8 }}, title: { display: false }},
+                            y: { ticks: { font: { size: 8 }, autoSkip: false }}
                         }
                     }
                 });
