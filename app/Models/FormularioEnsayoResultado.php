@@ -45,6 +45,11 @@ class FormularioEnsayoResultado extends Model
         return $this->hasMany(RespuestaFormulario::class, 'id_formulario_resultado');
     }
 
+    public function respuestasCampo()
+    {
+        return $this->hasMany(RespuestaCampo::class, 'id_formulario_resultado');
+    }
+
     public function ciclo(): BelongsTo
     {
         return $this->belongsTo(Ciclo::class, 'id_ciclo');
