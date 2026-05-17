@@ -41,11 +41,6 @@ class FormularioEnsayoResultado extends Model
         return $this->belongsTo(Laboratorio::class, 'id_laboratorio');
     }
 
-    public function respuestas()
-    {
-        return $this->hasMany(RespuestaFormulario::class, 'id_formulario_resultado');
-    }
-
     public function respuestasCampo()
     {
         return $this->hasMany(RespuestaCampo::class, 'id_formulario_resultado');
@@ -69,10 +64,10 @@ class FormularioEnsayoResultado extends Model
     }
 
     /**
-     * Accessor de compatibilidad: reconstruye el shape de RespuestaFormulario
-     * (collection de objetos con id_parametro, nombre, visible_nombre, respuestas[])
-     * a partir de las filas tipadas en respuestas_campo. Permite que los lectores
-     * y Blade existentes funcionen sin cambios durante la transicion.
+     * Reconstruye una collection de objetos con id_parametro, nombre,
+     * visible_nombre y respuestas[] a partir de las filas tipadas en
+     * respuestas_campo. Los lectores la inyectan en la relacion "respuestas"
+     * via setRelation() para mantener el shape que espera el Blade.
      */
     protected function respuestasCompat(): Attribute
     {

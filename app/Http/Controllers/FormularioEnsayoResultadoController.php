@@ -7,7 +7,6 @@ use App\Models\FormularioEnsayoResultado;
 use App\Models\InscripcionEA;
 use App\Models\Permiso;
 use App\Models\RespuestaCampo;
-use App\Models\RespuestaFormulario;
 use App\Services\MapeadorValorRespuesta;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -237,20 +236,6 @@ class FormularioEnsayoResultadoController extends Controller
                     $secciones['secciones'][] = $sec;
 
                     foreach ($seccionData['parametros'] ?? [] as $parametroData) {
-                        // (A) Escritura legacy: JSON por parametro
-                        RespuestaFormulario::updateOrCreate(
-                            [
-                                'id_formulario_resultado' => $formularioResultado->id,
-                                'id_parametro' => $parametroData['id'],
-                            ],
-                            [
-                                'nombre' => $parametroData['nombre'],
-                                'visible_nombre' => $parametroData['visible_nombre'] ?? false,
-                                'respuestas' => $parametroData['campos']
-                            ]
-                        );
-
-                        // (B) Escritura nueva: una fila tipada por campo
                         foreach ($parametroData['campos'] ?? [] as $campoData) {
                             if (empty($campoData['id'])) {
                                 continue;
