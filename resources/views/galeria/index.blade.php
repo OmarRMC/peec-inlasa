@@ -141,7 +141,7 @@
 
     </div>
 
-    {{-- ===== MODAL DE SUBIDA — dentro del mismo x-data ===== --}}
+    {{-- ===== MODAL DE SUBIDA - dentro del mismo x-data ===== --}}
     <div x-show="modalAbierto" x-cloak
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
         @keydown.escape.window="cerrarModal()">

@@ -141,7 +141,7 @@
                                         {{ Str::limit($recurso->url, 55) }}
                                     </a>
                                 @else
-                                    <span class="text-gray-400">—</span>
+                                    <span class="text-gray-400">-</span>
                                 @endif
                             </td>
                             <td class="text-center">

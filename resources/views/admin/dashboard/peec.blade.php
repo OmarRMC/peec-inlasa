@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="px-4 max-w-7xl mx-auto">
         <div class="mb-4">
-            <h1 class="text-xl font-bold text-gray-800">Dashboard PEEC — Panorama global</h1>
+            <h1 class="text-xl font-bold text-gray-800">Dashboard PEEC - Panorama global</h1>
             <p class="text-sm text-gray-500">
                 Estadísticas agregadas de todos los ensayos de aptitud y laboratorios participantes en la gestión seleccionada.
             </p>
@@ -37,7 +37,7 @@
             <div class="bg-white border rounded p-3">
                 <div class="text-xs text-gray-500 uppercase">% Aptitud global</div>
                 <div class="text-2xl font-bold text-green-600 mt-1">
-                    {{ $kpis['pct_aptitud'] !== null ? $kpis['pct_aptitud'] . '%' : '—' }}
+                    {{ $kpis['pct_aptitud'] !== null ? $kpis['pct_aptitud'] . '%' : '-' }}
                 </div>
             </div>
         </div>
@@ -111,7 +111,7 @@
                             @foreach ($heatmap['ensayos'] as $e)
                                 <tr>
                                     <td class="px-2 py-1 bg-white sticky left-0 z-10 border-r"
-                                        title="{{ ($e['paquete'] ?? 'Sin paquete') . ' — ' . $e['descripcion'] }}">
+                                        title="{{ ($e['paquete'] ?? 'Sin paquete') . ' - ' . $e['descripcion'] }}">
                                         <div class="text-[10px] text-gray-500 uppercase leading-tight">
                                             {{ Str::limit($e['paquete'] ?? 'Sin paquete', 30, '…') }}
                                         </div>
@@ -131,7 +131,7 @@
                                             } elseif ($pct === null) {
                                                 $bg = '#e5e7eb';
                                                 $color = '#9ca3af';
-                                                $text = '—';
+                                                $text = '-';
                                             } elseif ($pct >= 80) {
                                                 $bg = 'rgba(34,197,94,0.85)';
                                                 $color = 'white';
@@ -148,7 +148,7 @@
                                         @endphp
                                         <td class="text-center font-semibold"
                                             style="background:{{ $bg }}; color:{{ $color }}; padding:6px;"
-                                            @if ($perteneceCiclo && $pct !== null) title="{{ ($e['paquete'] ?? 'Sin paquete') . ' — ' . $e['descripcion'] }} | Ciclo: {{ $c['nombre'] }} | Satisfactorios: {{ $pct }}%" @endif>
+                                            @if ($perteneceCiclo && $pct !== null) title="{{ ($e['paquete'] ?? 'Sin paquete') . ' - ' . $e['descripcion'] }} | Ciclo: {{ $c['nombre'] }} | Satisfactorios: {{ $pct }}%" @endif>
                                             {{ $text }}
                                         </td>
                                     @endforeach
@@ -190,7 +190,7 @@
                         <tbody>
                             @foreach ($labsProblematicos as $lab)
                                 <tr class="border-t hover:bg-red-50">
-                                    <td class="px-2 py-1 font-mono">{{ $lab->cod_lab ?? '—' }}</td>
+                                    <td class="px-2 py-1 font-mono">{{ $lab->cod_lab ?? '-' }}</td>
                                     <td class="px-2 py-1">{{ $lab->nombre_lab }}</td>
                                     <td class="px-2 py-1 text-right font-bold text-red-700">{{ $lab->total_no_sat }}</td>
                                     <td class="px-2 py-1 text-right">{{ $lab->total_evaluaciones }}</td>
@@ -221,7 +221,7 @@
                         <tbody>
                             @foreach ($tasasPorEnsayo as $t)
                                 <tr class="border-t">
-                                    <td class="px-2 py-1 text-gray-500 text-[11px]">{{ $t->paquete ?? '—' }}</td>
+                                    <td class="px-2 py-1 text-gray-500 text-[11px]">{{ $t->paquete ?? '-' }}</td>
                                     <td class="px-2 py-1">{{ $t->descripcion }}</td>
                                     <td class="px-2 py-1 text-right">{{ $t->labs_enviaron }}</td>
                                     <td class="px-2 py-1 text-right">{{ $t->labs_inscritos }}</td>
@@ -231,7 +231,7 @@
                                         @elseif ($t->porcentaje >= 50) text-yellow-600
                                         @else text-red-600
                                         @endif">
-                                        {{ $t->porcentaje !== null ? $t->porcentaje . '%' : '—' }}
+                                        {{ $t->porcentaje !== null ? $t->porcentaje . '%' : '-' }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -295,7 +295,7 @@
                             callbacks: {
                                 title: items => {
                                     const t = tasas[items[0].dataIndex];
-                                    return (t.paquete || 'Sin paquete') + ' — ' + t.descripcion;
+                                    return (t.paquete || 'Sin paquete') + ' - ' + t.descripcion;
                                 },
                                 afterLabel: ctx => 'Enviaron: ' + tasas[ctx.dataIndex].labs_enviaron + ' / Inscritos: ' + tasas[ctx.dataIndex].labs_inscritos
                             }

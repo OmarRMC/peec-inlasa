@@ -404,7 +404,7 @@
                         <strong>Vista previa:</strong>
                         <table class="w-full mt-2 text-xs"><thead class="bg-gray-100"><tr><th class="px-2 py-1 border">Parámetro</th><th class="px-2 py-1 border">Unidad</th><th class="px-2 py-1 border">Resultado</th></tr></thead>
                         <tbody><tr><td class="px-2 py-1 border font-medium">Turbidez</td><td class="px-2 py-1 border text-gray-400">NTU</td><td class="px-2 py-1 border"><input type="text" class="border rounded px-1 w-full text-xs" placeholder="Ej: 0.5" disabled></td></tr>
-                        <tr><td class="px-2 py-1 border font-medium">pH</td><td class="px-2 py-1 border text-gray-400">—</td><td class="px-2 py-1 border"><input type="text" class="border rounded px-1 w-full text-xs" placeholder="Ej: 7.2" disabled></td></tr></tbody></table>
+                        <tr><td class="px-2 py-1 border font-medium">pH</td><td class="px-2 py-1 border text-gray-400">-</td><td class="px-2 py-1 border"><input type="text" class="border rounded px-1 w-full text-xs" placeholder="Ej: 7.2" disabled></td></tr></tbody></table>
                     </div>
                 </div>
 

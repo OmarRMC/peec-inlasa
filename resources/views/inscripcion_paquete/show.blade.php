@@ -232,17 +232,20 @@
                                 !$inscripcion->estaAprobado() &&
                                     Gate::any([Permiso::LABORATORIO]) &&
                                     configuracion(Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION))
-                                <a class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
-                                    href="https://forms.gle/PbGcRxwtBxCceV9FA" target="_blank">Subir documentos</a>
-                                {{-- <button onclick="document.getElementById('modalSubirDocumentos').showModal()"
-                                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
-                                    aria-label="Subir documentos" title="Subir documentos">
-                                    @if ($actualizarDocumentos)
-                                        Actualizar documentos
-                                    @else
-                                        Subir documentos
-                                    @endif
-                                </button> --}}
+                                @if (config('settings.subida_docs_inscripcion_local'))
+                                    <button onclick="document.getElementById('modalSubirDocumentos').showModal()"
+                                        class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
+                                        aria-label="Subir documentos" title="Subir documentos">
+                                        @if ($actualizarDocumentos)
+                                            Actualizar documentos
+                                        @else
+                                            Subir documentos
+                                        @endif
+                                    </button>
+                                @else
+                                    <a class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition duration-200"
+                                        href="https://forms.gle/PbGcRxwtBxCceV9FA" target="_blank">Subir documentos</a>
+                                @endif
                             @endif
                         </div>
                     @endif
@@ -255,7 +258,8 @@
                         <h3 class="text-base font-bold mb-3 text-blue-700">📝 Observaciones por Documento</h3>
 
                         <form method="POST"
-                            action="{{ route('inscripcion-paquetes.obserbaciones', $inscripcion->id) }}">
+                            action="{{ route('inscripcion-paquetes.obserbaciones', $inscripcion->id) }}"
+                            onsubmit="this.querySelector('button[type=submit]').disabled = true; this.querySelector('button[type=submit]').innerText = 'Enviando...';">
                             @csrf
                             @php
                                 $categoria = $inscripcion->laboratorio->categoria->descripcion ?? '-';
@@ -286,6 +290,39 @@
                                     @endforeach
                                 </tbody>
                             </table>
+
+                            <div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded space-y-2"
+                                 x-data="{ inapp: true }">
+                                <p class="text-xs font-semibold text-gray-700 mb-1">Canales de envío</p>
+
+                                <label class="flex items-center gap-2 text-sm text-gray-700">
+                                    <input type="checkbox" name="canal_email" value="1" checked
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <i class="fas fa-envelope text-blue-500"></i>
+                                    Enviar por correo electrónico
+                                </label>
+
+                                <label class="flex items-center gap-2 text-sm text-gray-700">
+                                    <input type="checkbox" name="canal_inapp" value="1" checked x-model="inapp"
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                    <i class="fas fa-bell text-blue-500"></i>
+                                    Notificar en la plataforma (pop-up + bandeja)
+                                </label>
+
+                                <div x-show="inapp" x-transition class="ml-6 pt-1 space-y-1">
+                                    <p class="text-xs font-semibold text-gray-600">Modo de la notificación in-app:</p>
+                                    <label class="flex items-center gap-2 text-xs text-gray-700">
+                                        <input type="radio" name="modo_inapp" value="una_vez"
+                                            class="text-blue-600 focus:ring-blue-500">
+                                        Una vez (al confirmar deja de mostrarse)
+                                    </label>
+                                    <label class="flex items-center gap-2 text-xs text-gray-700">
+                                        <input type="radio" name="modo_inapp" value="persistente" checked
+                                            class="text-blue-600 focus:ring-blue-500">
+                                        Persistente (se muestra hasta que se subsane la observación)
+                                    </label>
+                                </div>
+                            </div>
 
                             <div class="mt-4 flex justify-end space-x-2">
                                 <button type="button"

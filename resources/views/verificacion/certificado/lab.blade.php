@@ -35,13 +35,13 @@
                 <div class="rounded-[5px] bg-slate-50 px-4 py-2 ring-1 ring-slate-200">
                     <dt class="text-xs font-medium uppercase tracking-wide text-slate-500">Laboratorio</dt>
                     <dd class="mt-1 text-sm font-semibold text-slate-800">
-                        {{ $laboratorio->nombre_lab ?? '—' }}
+                        {{ $laboratorio->nombre_lab ?? '-' }}
                     </dd>
                 </div>
                 <div class="rounded-[5px] bg-slate-50 px-4 py-2 ring-1 ring-slate-200">
                     <dt class="text-xs font-medium uppercase tracking-wide text-slate-500">Código</dt>
                     <dd class="mt-1 text-sm font-semibold text-slate-800">
-                        {{ $laboratorio->cod_lab ?? '—' }}
+                        {{ $laboratorio->cod_lab ?? '-' }}
                     </dd>
                 </div>
                 <div class="rounded-[5px] bg-slate-50 px-4 py-2 ring-1 ring-slate-200">
@@ -53,7 +53,7 @@
                 <div class="rounded-[5px] bg-slate-50 px-4 py-2 ring-1 ring-slate-200">
                     <dt class="text-xs font-medium uppercase tracking-wide text-slate-500">Gestión</dt>
                     <dd class="mt-1 text-sm font-semibold text-slate-800">
-                        {{ $gestion ?? '—' }}
+                        {{ $gestion ?? '-' }}
                     </dd>
                 </div>
             </div>
@@ -90,13 +90,13 @@
                                                 </td>
                                             @endif
                                             <td class="px-4 py-2 text-sm text-slate-700">
-                                                {{ $row['ensayo'] ?? '—' }}
+                                                {{ $row['ensayo'] ?? '-' }}
                                             </td>
                                             <td class="px-4 py-2 text-sm">
                                                 {{-- Píldora visual para la ponderación --}}
                                                 <span
                                                     class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">
-                                                    {{ $row['ponderacion'] ?? '—' }}
+                                                    {{ $row['ponderacion'] ?? '-' }}
                                                 </span>
                                             </td>
                                         </tr>

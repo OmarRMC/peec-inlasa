@@ -190,7 +190,7 @@
                     <div class="mb-4">
                         <div class="flex items-center gap-2 mb-2">
                             <i class="fas fa-vial text-indigo-500 text-xs"></i>
-                            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Fase 1 — Envío de Muestras</span>
+                            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Fase 1 - Envío de Muestras</span>
                         </div>
                         <div class="grid grid-cols-2 gap-3 pl-4 border-l-2 border-indigo-200">
                             <div>
@@ -212,7 +212,7 @@
                     <div class="mb-4">
                         <div class="flex items-center gap-2 mb-2">
                             <i class="fas fa-chart-bar text-blue-500 text-xs"></i>
-                            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Fase 2 — Envío de Resultados</span>
+                            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Fase 2 - Envío de Resultados</span>
                             <span class="text-xs text-gray-400 italic">(define la gestión/año)</span>
                         </div>
                         <div class="grid grid-cols-2 gap-3 pl-4 border-l-2 border-blue-200">
@@ -235,7 +235,7 @@
                     <div class="mb-5">
                         <div class="flex items-center gap-2 mb-2">
                             <i class="fas fa-file-alt text-green-500 text-xs"></i>
-                            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Fase 3 — Envío de Reporte</span>
+                            <span class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Fase 3 - Envío de Reporte</span>
                         </div>
                         <div class="grid grid-cols-2 gap-3 pl-4 border-l-2 border-green-200">
                             <div>

@@ -612,7 +612,7 @@ class CalculadorClasico
 
     // --- Helpers privados ---
 
-    /** Desviacion estandar muestral (Bessel) — divide por n-1. */
+    /** Desviacion estandar muestral (Bessel) - divide por n-1. */
     private static function desviacionEstandarMuestral(array $valores, float $media): float
     {
         $n = count($valores);

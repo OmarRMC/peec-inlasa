@@ -137,7 +137,7 @@ use App\Models\Inscripcion;
                             @endforeach
                         </ul>
                         @else
-                        <span class="text-sm text-gray-500">—</span>
+                        <span class="text-sm text-gray-500">-</span>
                         @endif
                     </td>
 

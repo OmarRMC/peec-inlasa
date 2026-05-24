@@ -3,9 +3,17 @@
         <!-- Título -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Detalles del Laboratorio</h1>
-            @if (!isset($backTo) || $backTo != false)
-                <x-shared.btn-volver :url="route('laboratorio.index')" />
-            @endif
+            <div class="flex items-center gap-2">
+                @if (Gate::any([\App\Models\Permiso::ADMIN, \App\Models\Permiso::GESTION_NOTIFICACIONES, \App\Models\Permiso::JEFE_PEEC]))
+                <a href="{{ route('admin.notificaciones.create', ['id_lab' => $laboratorio->id]) }}"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm">
+                    <i class="fas fa-paper-plane"></i> Notificar
+                </a>
+                @endif
+                @if (!isset($backTo) || $backTo != false)
+                    <x-shared.btn-volver :url="route('laboratorio.index')" />
+                @endif
+            </div>
         </div>
 
         <!-- Contenedor principal -->

@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Inscripcion;
 use App\Models\Permiso;
 use App\Models\User;
 use App\Policies\UserPolicy;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +26,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Mapa de alias polimórficos: las filas guardan slugs cortos
+        // ('inscripcion', etc.) pero Eloquent resuelve a la clase del modelo.
+        // Agregar aquí cuando se sumen nuevos tipos (certificado, pago, ...).
+        Relation::morphMap([
+            'inscripcion' => Inscripcion::class,
+        ]);
+
         Gate::define(Permiso::LABORATORIO, function (User $user) {
             return $user->isLaboratorio();
         });
@@ -95,6 +104,9 @@ class AppServiceProvider extends ServiceProvider
         });
         Gate::define(Permiso::GESTION_FORMULARIOS, function (User $user) {
             return $user->tienePermiso(Permiso::GESTION_FORMULARIOS);
+        });
+        Gate::define(Permiso::GESTION_NOTIFICACIONES, function (User $user) {
+            return $user->tienePermiso(Permiso::GESTION_NOTIFICACIONES);
         });
     }
 }

@@ -190,7 +190,7 @@ class FormularioEnsayoResultadoController extends Controller
             ->with('ensayoAptitud')
             ->first();
 
-        $ensayo = $InscripcionEnsayo->ensayoAptitud;
+        $ensayo = $InscripcionEnsayo?->ensayoAptitud;
         if (!$ensayo) {
             return redirect()->back()->with('error', 'No se encontró ningún registro de inscripción correspondiente a la gestión actual.');
         }

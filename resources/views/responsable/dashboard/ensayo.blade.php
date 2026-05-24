@@ -11,7 +11,7 @@
                 Dashboard de estadísticas
             </h1>
             <p class="text-sm text-gray-500">
-                {{ $ensayo->paquete->descripcion ?? '' }} — {{ $ensayo->descripcion }}
+                {{ $ensayo->paquete->descripcion ?? '' }} - {{ $ensayo->descripcion }}
             </p>
         </div>
 
@@ -60,7 +60,7 @@
                 <div class="bg-white border rounded p-2">
                     <div class="text-[10px] text-gray-500 uppercase">Tasa respuesta</div>
                     <div class="text-lg font-bold text-indigo-600">
-                        {{ $kpis['tasa']['porcentaje'] !== null ? $kpis['tasa']['porcentaje'] . '%' : '—' }}
+                        {{ $kpis['tasa']['porcentaje'] !== null ? $kpis['tasa']['porcentaje'] . '%' : '-' }}
                     </div>
                 </div>
                 <div class="bg-white border rounded p-2">
@@ -70,7 +70,7 @@
                 <div class="bg-white border rounded p-2">
                     <div class="text-[10px] text-gray-500 uppercase">% Satisfactorios</div>
                     <div class="text-lg font-bold text-green-600">
-                        {{ $kpis['pct']['pct_satisfactorios'] !== null ? $kpis['pct']['pct_satisfactorios'] . '%' : '—' }}
+                        {{ $kpis['pct']['pct_satisfactorios'] !== null ? $kpis['pct']['pct_satisfactorios'] . '%' : '-' }}
                     </div>
                 </div>
             </div>
@@ -148,8 +148,8 @@
                                         @endif
                                     </td>
                                     <td class="px-2 py-0.5 text-right font-semibold">{{ $c->consenso_robusto['n'] }}</td>
-                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso_robusto['x_star'] ?? '—' }}<span class="text-gray-400 text-[10px]"> x*</span></td>
-                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso_robusto['s_star'] ?? '—' }}<span class="text-gray-400 text-[10px]"> s*</span></td>
+                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso_robusto['x_star'] ?? '-' }}<span class="text-gray-400 text-[10px]"> x*</span></td>
+                                    <td class="px-2 py-0.5 text-right">{{ $c->consenso_robusto['s_star'] ?? '-' }}<span class="text-gray-400 text-[10px]"> s*</span></td>
                                     <td class="px-2 py-0.5 text-right" colspan="3">
                                         @if ($c->consenso_robusto['s_star'] && $c->consenso['desv'])
                                             <span class="text-[10px] text-gray-500">
@@ -215,7 +215,7 @@
                                     <tbody>
                                         @foreach ($c->outliers as $o)
                                             <tr class="border-t">
-                                                <td class="px-2 py-0.5">{{ $o->cod_lab ?? '—' }}</td>
+                                                <td class="px-2 py-0.5">{{ $o->cod_lab ?? '-' }}</td>
                                                 <td class="px-2 py-0.5">{{ Str::limit($o->nombre_lab, 50) }}</td>
                                                 <td class="px-2 py-0.5 text-right">{{ $o->valor }}</td>
                                                 <td class="px-2 py-0.5 text-right font-bold text-red-700">{{ $o->z_score }}</td>
