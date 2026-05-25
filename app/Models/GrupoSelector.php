@@ -10,7 +10,7 @@ class GrupoSelector extends Model
     use HasFactory;
 
     protected $table = 'grupos_selectores';
-    protected $fillable = ['nombre', 'descripcion', 'ensayo_id'];
+    protected $fillable = ['nombre', 'ensayo_id'];
 
     // public function parametros()
     // {

@@ -18,8 +18,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_campo_padre')->nullable();
 
-            $table->string('nombre');
-            $table->string('label')->nullable();
+            $table->string('etiqueta')->nullable();
             $table->enum('tipo', [
                 'text',
                 'number',
@@ -46,7 +45,7 @@ return new class extends Migration
             // $table->integer('maxlength')->nullable();
             // Validaciones avanzadas
             $table->string('pattern')->nullable();        // Expresión regular
-            $table->string('valor')->nullable();
+            $table->string('valor_defecto')->nullable();
             $table->boolean('modificable')->default(true);
             $table->boolean('auto_guardar')->default(false);
 

@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('grupos_selectores', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->text('descripcion')->nullable();
             $table->unsignedBigInteger('ensayo_id');
             $table->foreign('ensayo_id')->references('id')->on('ensayo_aptitud')->onDelete('cascade');
             $table->timestamps();

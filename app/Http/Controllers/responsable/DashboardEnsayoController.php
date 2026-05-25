@@ -93,7 +93,7 @@ class DashboardEnsayoController extends Controller
 
             return (object) [
                 'id_campo'        => $idCampo,
-                'label'           => $item->campo->label ?: $item->campo->nombre,
+                'label'           => $item->campo->etiqueta,
                 'parametro'       => $item->parametro->nombre,
                 'seccion'         => $item->seccion->nombre,
                 'consenso'        => $cons,

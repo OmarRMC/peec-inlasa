@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use App\Models\Ciclo;
 use App\Models\FormularioEnsayo;
 use App\Models\FormularioEnsayoResultado;
 use App\Models\RespuestaCampo;
@@ -24,7 +25,8 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
     protected $maxEnviosPorForm = []; // [form_id => maxEnvios]
     protected $ordenCamposPorForm = []; // [form_id => array de campoIds en el orden de columnas]
     protected $respuestasIndex = []; // [resultado_id => [campo_id => RespuestaCampo]]
-    protected $labsIndex = []; // [lab_id => ['gestion'=>..,'id_ciclo'=>..,'nombre_lab'=>..,...]]
+    protected $labsIndex = []; // [lab_id => ['gestion'=>..,'id_ciclo'=>..,'ciclo_nombre'=>..,'nombre_lab'=>..,...]]
+    protected $ciclosNombresIndex = []; // [id_ciclo => nombre]
 
     protected $sinDato;
     /**
@@ -103,6 +105,11 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
                     'fecha_envio' => $resultado->fecha_envio,
                 ];
 
+                // Resolver nombre del ciclo (cache por id_ciclo)
+                if ($resultado->id_ciclo && !isset($this->ciclosNombresIndex[$resultado->id_ciclo])) {
+                    $this->ciclosNombresIndex[$resultado->id_ciclo] = Ciclo::where('id', $resultado->id_ciclo)->value('nombre');
+                }
+
                 if (isset($this->labsIndex[$labId])) {
                     $fechaNueva = $resultado->fecha_envio ? Carbon::parse($resultado->fecha_envio) : null;
                     $fechaGuardada = $this->labsIndex[$labId]['fecha_envio']
@@ -146,7 +153,7 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
 
             // 6 columnas administrativas (una sola vez)
             $row[] = $labMeta['gestion'] ?? null;
-            $row[] = $labMeta['id_ciclo'] ?? null;
+            $row[] = $this->ciclosNombresIndex[$labMeta['id_ciclo'] ?? null] ?? null;
             $row[] = $labMeta['nombre_lab'] ?? null;
             $row[] = $labMeta['departamento'] ?? null;
             $row[] = $labMeta['cod_lab'] ?? null;
@@ -249,9 +256,7 @@ class ResultadosEvaluacionLabExport implements FromCollection, WithHeadings, Wit
                             $topRow[] = $labelTop;
                             $row1[]   = $seccion->nombre;
                             $row2[]   = $parametro->nombre;
-                            // usar label de campo si existe, o id
-                            //$row3[]   = $campo->nombre ?? ("Campo {$campo->id}");
-                            $row3[]   = $campo->label ?? ("Campo {$campo->id}");
+                            $row3[]   = $campo->etiqueta ?? ("Campo {$campo->id}");
                         }
                     }
                 }

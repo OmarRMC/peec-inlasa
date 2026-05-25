@@ -26,8 +26,8 @@ class Notificacion extends Model
 
     const TITULOS = [
         self::TIPO_OBSERVACION_INSCRIPCION => 'Su inscripción tiene observaciones',
-        // self::TIPO_CERTIFICADO_DISPONIBLE  => 'Certificado disponible',  // no integrado aún — ocultar de filtros
-        // self::TIPO_DEUDA_PENDIENTE         => 'Tiene una deuda pendiente', // no integrado aún — ocultar de filtros
+        // self::TIPO_CERTIFICADO_DISPONIBLE  => 'Certificado disponible',  // no integrado aún ocultar de filtros
+        // self::TIPO_DEUDA_PENDIENTE         => 'Tiene una deuda pendiente', // no integrado aún ocultar de filtros
         self::TIPO_GENERAL                 => 'Notificación',
     ];
 

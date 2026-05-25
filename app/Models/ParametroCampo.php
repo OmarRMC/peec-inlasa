@@ -22,8 +22,7 @@ class ParametroCampo extends Model
     protected $fillable = [
         'id_parametro',
         'id_grupo_selector',
-        'nombre',
-        'label',
+        'etiqueta',
         'tipo',
         'placeholder',
         'posicion',
@@ -32,7 +31,7 @@ class ParametroCampo extends Model
         'pattern',
         'modificable',
         'range',
-        'valor',
+        'valor_defecto',
         'auto_guardar',
         'id_campo_padre'
     ];

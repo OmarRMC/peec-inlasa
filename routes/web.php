@@ -46,6 +46,7 @@ use App\Http\Controllers\responsable\GestionFormulariosController;
 use App\Http\Controllers\responsable\InformeTecnicoController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
 use App\Http\Controllers\admin\DashboardPEECController;
+use App\Http\Controllers\Estadistica\ExploradorRespuestasController;
 use App\Http\Controllers\responsable\DashboardEnsayoController;
 use App\Http\Controllers\responsable\ReporteResultadosController;
 use App\Http\Controllers\responsable\ResultadosEnviadosLabController;
@@ -327,6 +328,27 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
         ->name('informe.tecnico.eliminar');
 });
 Route::get('/exportar-resultados/{id}', [ResultadoController::class, 'export'])->name('formularios.resultados.export');
+
+// Explorador descriptivo de respuestas (autorizacion interna por Gate: RESPONSABLE / JEFE_PEEC / ADMIN)
+Route::middleware(['auth', 'usuario.activo'])
+    ->prefix('explorador-respuestas')
+    ->name('explorador-respuestas.')
+    ->group(function () {
+        Route::get('ensayos/{idEA}',
+            [ExploradorRespuestasController::class, 'ensayo'])->name('ensayo');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/formularios/{idFormulario}',
+            [ExploradorRespuestasController::class, 'formulario'])->name('formulario');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/parametros/{idParametro}',
+            [ExploradorRespuestasController::class, 'parametro'])->name('parametro');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/campos/{idCampo}',
+            [ExploradorRespuestasController::class, 'campo'])->name('campo');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/formularios/{idFormulario}/export/excel',
+            [ExploradorRespuestasController::class, 'exportarFormulario'])->name('formulario.export');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/parametros/{idParametro}/export/pdf',
+            [ExploradorRespuestasController::class, 'exportarParametro'])->name('parametro.export');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/campos/{idCampo}/export/pdf',
+            [ExploradorRespuestasController::class, 'exportarCampo'])->name('campo.export');
+    });
 
 
 // Iniciar impersonación - solo usuarios con permiso

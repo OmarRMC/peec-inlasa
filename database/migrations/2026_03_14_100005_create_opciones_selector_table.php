@@ -14,16 +14,14 @@ return new class extends Migration
         Schema::create('opciones_selector', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_grupo_selector');
-            $table->unsignedBigInteger('id_grupo_hijo')->nullable();
+            $table->unsignedBigInteger('id_subgrupo')->nullable();
             $table->string('valor', 255);
-            $table->string('etiqueta', 255)->nullable();
-            $table->integer('posicion')->default(0);
             $table->foreign('id_grupo_selector')
                 ->references('id')
                 ->on('grupos_selectores')
                 ->onDelete('cascade');
 
-            $table->foreign('id_grupo_hijo')
+            $table->foreign('id_subgrupo')
                 ->references('id')
                 ->on('grupos_selectores')
                 ->nullOnDelete();

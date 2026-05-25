@@ -17,6 +17,7 @@
             <table class="min-w-full text-sm text-gray-800">
                 <thead class="bg-gray-100 text-xs uppercase">
                     <tr>
+                        @if ($verIds)<th class="px-3 py-2 text-left">Nro</th>@endif
                         <th class="px-3 py-2 text-left">Formulario</th>
                         <th class="px-3 py-2 text-center">Fecha envío</th>
                         <th class="px-3 py-2 text-center">Acciones</th>
@@ -26,6 +27,7 @@
                     @forelse ($resultados as $resultado)
                         {{-- @dump($resultado) --}}
                         <tr class="border-b hover:bg-gray-50">
+                            @if ($verIds)<td class="px-3 py-2 align-top font-mono text-gray-500">{{ $resultado->id }}</td>@endif
                             <td class="px-3 py-2 align-top">
                                 {{ $resultado->formulario->nombre ?? 'Formulario #' . $resultado->id }}</td>
                             <td class="px-3 py-2 align-top text-center">
@@ -43,7 +45,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-4 py-4 text-center text-gray-500">No se encontraron resultados
+                            <td colspan="{{ $verIds ? 4 : 3 }}" class="px-4 py-4 text-center text-gray-500">No se encontraron resultados
                                 enviados.</td>
                         </tr>
                     @endforelse

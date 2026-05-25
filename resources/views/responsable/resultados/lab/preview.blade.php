@@ -23,6 +23,9 @@
                 <div>
                     <span class="font-medium text-gray-500">Laboratorio:</span>
                     <span class="ml-1 font-semibold text-gray-800">{{ $laboratorio->nombre_lab ?? '-' }}</span>
+                    @if ($verIds)
+                        <span class="ml-1 text-[10px] font-mono text-gray-400">[Nro: {{ $laboratorio->id ?? '-' }}]</span>
+                    @endif
                 </div>
 
                 <div>
@@ -32,7 +35,12 @@
 
                 <div class="flex flex-col pt-3 text-sm">
                     <span class="font-bold text-gray-800">{{ $ensayo->paquete->descripcion ?? '-' }}</span>
-                    <span class="text-gray-500">{{ $ensayo->descripcion ?? '-' }}</span>
+                    <span class="text-gray-500">
+                        {{ $ensayo->descripcion ?? '-' }}
+                        @if ($verIds)
+                            <span class="ml-1 text-[10px] font-mono text-gray-400">[Nro: {{ $ensayo->id ?? '-' }}]</span>
+                        @endif
+                    </span>
                 </div>
 
                 <div>
@@ -44,12 +52,24 @@
                     <span class="font-medium text-gray-500">Fecha del último envío:</span>
                     <span class="ml-1 font-semibold text-gray-800">{{ $fechaActualizacion ?? '-' }}</span>
                 </div>
+
+                @if ($verIds)
+                    <div>
+                        <span class="font-medium text-gray-500">Nro del envío:</span>
+                        <span class="ml-1 font-mono text-gray-800">{{ $respuestas->first()->id ?? '-' }}</span>
+                    </div>
+                @endif
             </div>
         </div>
         {{-- Información del formulario --}}
         <div class="grid grid-cols-1 gap-6 mb-4 text-center">
             <div class="p-3 rounded-lg shadow-sm" style="background-color: {{ $primaryColor }}20;">
-                <span class="block text-xs text-gray-500">Nombre del formulario</span>
+                <span class="block text-xs text-gray-500">
+                    Nombre del formulario
+                    @if ($verIds)
+                        <span class="font-mono text-gray-400">[Nro: {{ $formulario->id }}]</span>
+                    @endif
+                </span>
                 <span class="text-sm font-semibold" style="color: {{ $primaryColor }}">
                     {{ $formulario->nombre }}
                 </span>

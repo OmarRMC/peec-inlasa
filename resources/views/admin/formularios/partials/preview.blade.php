@@ -58,11 +58,11 @@
                             </td>
                         @endif
                         @foreach ($parametro->campos as $campoIdx => $campo)
-                            @if ($campoAnterior != $campo->label)
+                            @if ($campoAnterior != $campo->etiqueta)
                                 <td class="border px-2 py-1">
                                     <div class="flex flex-wrap gap-[2px] justify-center">
                                         @php
-                                            $campoAnterior = $campo->label;
+                                            $campoAnterior = $campo->etiqueta;
                                         @endphp
                             @endif
                             @php
@@ -106,7 +106,7 @@
 
                             @if ($campo->tipo === 'text' || $campo->tipo === 'number' || $campo->tipo === 'date')
                                 <input type="{{ $campo->tipo }}" name="{{ $inputName }}"
-                                    value="{{ old($inputName, $campo->valor ?? $valorCampo) }}"
+                                    value="{{ old($inputName, $campo->valor_defecto ?? $valorCampo) }}"
                                     placeholder="{{ $campo->placeholder }}"
                                     data-es-requerido={{ $campo->requerido ? 1 : 0 }}
                                     @if (!$parametro->requerido_si_completa) @if ($campo->requerido) required @endif
@@ -203,8 +203,8 @@
                                 name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][id]"
                                 value="{{ $campo->id }}">
                             <input type="hidden"
-                                name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][label]"
-                                value="{{ $campo->label }}">
+                                name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][etiqueta]"
+                                value="{{ $campo->etiqueta }}">
                             <input type="hidden"
                                 name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][tipo]"
                                 value="{{ $campo->tipo }}">
@@ -213,7 +213,7 @@
                                     name="{{ $namePrefix }}[secciones][{{ $secIdx }}][parametros][{{ $paramIdx }}][campos][{{ $campoIdx }}][unidad]"
                                     value="{{ $campo->unidad }}">
                             @endif
-                            @if ($campoAnterior != $campo->label)
+                            @if ($campoAnterior != $campo->etiqueta)
     </div>
     </td>
 @endif

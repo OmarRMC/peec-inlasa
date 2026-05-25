@@ -13,9 +13,7 @@ class OpcionSelector extends Model
     protected $fillable = [
         'id_grupo_selector',
         'valor',
-        'etiqueta',
-        'posicion',
-        'id_grupo_hijo'
+        'id_subgrupo'
     ];
 
     public function grupo()
@@ -23,8 +21,8 @@ class OpcionSelector extends Model
         return $this->belongsTo(GrupoSelector::class, 'id_grupo_selector');
     }
 
-    public function grupoHijo()
+    public function subgrupo()
     {
-        return $this->belongsTo(GrupoSelector::class, 'id_grupo_hijo');
+        return $this->belongsTo(GrupoSelector::class, 'id_subgrupo');
     }
 }

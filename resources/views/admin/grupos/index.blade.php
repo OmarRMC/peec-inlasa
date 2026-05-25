@@ -27,14 +27,27 @@
         {{-- Crear nuevo grupo --}}
         <form method="POST" action="{{ route('admin.grupos.store', $ensayo->id) }}" class="mb-4 flex gap-2 text-xs">
             @csrf
-            <input type="text" name="nombre" placeholder="Nombre del grupo"
-                class="border rounded px-2 py-1 w-1/3 text-xs">
-            <input type="text" name="descripcion" placeholder="Descripción"
-                class="border rounded px-2 py-1 w-1/3 text-xs">
+            <input type="text" name="nombre" placeholder="Nombre del grupo" required
+                class="border rounded px-2 py-1 flex-1 text-xs">
             <button class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm text-xs">
                 <i class="fas fa-plus"></i>
             </button>
         </form>
+
+        {{-- Nota explicativa de selectores dependientes --}}
+        @if ($ensayo->gruposSelectores->isNotEmpty())
+            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+                <div class="font-semibold mb-1">
+                    <i class="fas fa-info-circle mr-1"></i> Sobre el "Subgrupo a mostrar"
+                </div>
+                <p class="leading-relaxed">
+                    Cada opción puede activar un <strong>selector dependiente</strong>: si el laboratorio elige
+                    una opción que tenga un subgrupo asignado, aparecerá automáticamente un segundo selector
+                    con las opciones de ese subgrupo. Útil para listas en cascada (ej: "Categoría" → muestra
+                    opciones específicas de esa categoría).
+                </p>
+            </div>
+        @endif
 
         {{-- Listado de grupos --}}
         @foreach ($ensayo->gruposSelectores as $grupo)
@@ -46,10 +59,8 @@
                         <form method="POST" action="{{ route('admin.grupos.update', $grupo->id) }}"
                             class="flex gap-1 items-center text-xs">
                             @csrf @method('PUT')
-                            <input type="text" name="nombre" value="{{ $grupo->nombre }}"
-                                class="border px-2 py-1 rounded text-xs w-24">
-                            <input type="text" name="descripcion" value="{{ $grupo->descripcion }}"
-                                class="border px-2 py-1 rounded text-xs w-32">
+                            <input type="text" name="nombre" value="{{ $grupo->nombre }}" required
+                                class="border px-2 py-1 rounded text-xs w-40">
                             <button type="submit" data-tippy-content="Actualizar"
                                 class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm text-xs">
                                 <i class="fas fa-edit"></i>
@@ -73,7 +84,12 @@
                     <thead class="bg-gray-100 text-xs">
                         <tr>
                             <th class="border px-2 py-1 text-left">Valor</th>
-                            <th class="border px-2 py-1 text-left">Grupo Hijo</th>
+                            <th class="border px-2 py-1 text-left"
+                                data-tippy-content="Si esta opción es elegida por el lab, se despliega un segundo selector con las opciones del subgrupo seleccionado aquí.">
+                                <i class="fas fa-arrow-turn-down text-gray-400 mr-1"></i>
+                                Subgrupo a mostrar
+                                <i class="fas fa-info-circle text-gray-400 ml-1 text-[10px]"></i>
+                            </th>
                             <th class="border px-2 py-1 text-left">Acciones</th>
                         </tr>
                     </thead>
@@ -88,16 +104,21 @@
                                             class="border px-2 py-1 rounded w-full text-xs">
                                     </td>
                                     <td class="border px-2 py-1">
-                                        <select name="id_grupo_hijo" class="border px-2 py-1 rounded w-full text-xs">
-                                            <option value="">Ningún</option>
-                                            @foreach ($ensayo->gruposSelectores as $grupoHijo)
-                                                @if ($grupoHijo->id !== $grupo->id)
-                                                    <option value="{{ $grupoHijo->id }}" @selected($opcion->id_grupo_hijo == $grupoHijo->id)>
-                                                        {{ $grupoHijo->nombre }}
-                                                    </option>
-                                                @endif
-                                            @endforeach
-                                        </select>
+                                        <div class="flex items-center gap-1">
+                                            @if ($opcion->id_subgrupo)
+                                                <i class="fas fa-link text-indigo-500" data-tippy-content="Esta opción activa un subselector"></i>
+                                            @endif
+                                            <select name="id_subgrupo" class="border px-2 py-1 rounded w-full text-xs">
+                                                <option value="">Sin subgrupo</option>
+                                                @foreach ($ensayo->gruposSelectores as $subgrupo)
+                                                    @if ($subgrupo->id !== $grupo->id)
+                                                        <option value="{{ $subgrupo->id }}" @selected($opcion->id_subgrupo == $subgrupo->id)>
+                                                            {{ $subgrupo->nombre }}
+                                                        </option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </td>
                                     <td class="border px-2 py-1 flex gap-2">
                                         <button type="submit" data-tippy-content="Actualizar"
@@ -127,17 +148,18 @@
                 <form method="POST" action="{{ route('admin.opciones.store', $grupo->id) }}"
                     class="mt-2 flex gap-2 items-center justify-center text-xs">
                     @csrf
-                    <input type="text" name="valor" placeholder="Valor"
-                        class="border rounded px-2 py-1 text-xs w-32">
-                    <select name="id_grupo_hijo" class="border px-2 py-1 rounded text-xs">
-                        <option value="">Ningún</option>
-                        @foreach ($ensayo->gruposSelectores as $grupoHijo)
-                            @if ($grupoHijo->id !== $grupo->id)
-                                <option value="{{ $grupoHijo->id }}">{{ $grupoHijo->nombre }}</option>
+                    <input type="text" name="valor" placeholder="Valor de la opción" required
+                        class="border rounded px-2 py-1 text-xs w-40">
+                    <select name="id_subgrupo" class="border px-2 py-1 rounded text-xs"
+                        data-tippy-content="Subgrupo que se desplegará si el lab elige esta opción (opcional)">
+                        <option value="">Sin subgrupo</option>
+                        @foreach ($ensayo->gruposSelectores as $subgrupo)
+                            @if ($subgrupo->id !== $grupo->id)
+                                <option value="{{ $subgrupo->id }}">↳ {{ $subgrupo->nombre }}</option>
                             @endif
                         @endforeach
                     </select>
-                    <button type="submit" data-tippy-content="Agregar Opción"
+                    <button type="submit" data-tippy-content="Agregar opción"
                         class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm text-xs">
                         <i class="fas fa-plus"></i>
                     </button>

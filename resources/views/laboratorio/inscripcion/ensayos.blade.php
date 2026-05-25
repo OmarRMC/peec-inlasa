@@ -35,8 +35,8 @@
                                     <div class="flex space-x-1">
                                         <a href="{{ route('lab.inscritos-ensayos.formularios', $ensayo->ensayoAptitud->id) }}"
                                             class="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded shadow-sm"
-                                            data-tippy-content="Llenar">
-                                            <i class="fas fa-pen"></i> Llenar
+                                            data-tippy-content="Registrar">
+                                            <i class="fas fa-pen"></i> Registrar
                                         </a>
                                     </div>
                                 </td>
