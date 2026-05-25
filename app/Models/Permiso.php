@@ -202,6 +202,9 @@ class Permiso extends Model
     public const GESTION_FORMULARIOS = 'gestion.formularios';
     public const GESTION_FORMULARIOS_NAME = 'Gestión Formularios';
 
+    public const GESTION_NOTIFICACIONES = 'gestion.notificaciones';
+    public const GESTION_NOTIFICACIONES_NAME = 'Gestión de notificaciones';
+
     public const VER_IDS = 'ver.ids';
     public const VER_IDS_NAME = 'Ver IDs en tablas';
 
@@ -223,6 +226,7 @@ class Permiso extends Model
         self::GESTION_CERTIFICADOS => self::GESTION_CERTIFICADOS_NAME,
         self::JEFE_PEEC => self::JEFE_PEEC_NAME,
         self::GESTION_FORMULARIOS => self::GESTION_FORMULARIOS_NAME,
+        self::GESTION_NOTIFICACIONES => self::GESTION_NOTIFICACIONES_NAME,
     ];
 
     protected $table = 'permiso';

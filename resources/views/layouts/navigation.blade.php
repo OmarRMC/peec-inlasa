@@ -12,6 +12,23 @@ use App\Models\Configuracion;
     @endif
 
     @if (Gate::any([Permiso::LABORATORIO]))
+    @php
+        $notifNoLeidas = \App\Models\NotificacionLab::query()
+            ->paraLaboratorio(Auth::user()->laboratorio?->id ?? 0)
+            ->pendientes()
+            ->count();
+    @endphp
+    <a href="{{ route('lab.notificaciones.bandeja') }}"
+        class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 relative">
+        <i class="fas fa-bell w-5 text-indigo-500"></i>
+        <span>Mis notificaciones</span>
+        @if ($notifNoLeidas > 0)
+            <span class="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-600 rounded-full h-5 min-w-[1.25rem] px-1">
+                {{ $notifNoLeidas }}
+            </span>
+        @endif
+    </a>
+
     <div>
         <button @click="openMenu !== 102 ? openMenu = 102 : openMenu = null"
             class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
@@ -409,6 +426,14 @@ use App\Models\Configuracion;
     </a>
     @endif
     @endif
+    @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_NOTIFICACIONES, Permiso::JEFE_PEEC]))
+    <a href="{{ route('admin.notificaciones.index') }}"
+        class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50">
+        <i class="fas fa-paper-plane w-5 text-indigo-500"></i>
+        <span>Notificaciones enviadas</span>
+    </a>
+    @endif
+
     @if (Gate::any([Permiso::ADMIN, Permiso::GESTION_INSCRIPCIONES, Permiso::GESTION_LABORATORIO]))
     <div>
         <button @click="openMenu !== 7 ? openMenu = 7 : openMenu = null"
@@ -623,6 +648,12 @@ use App\Models\Configuracion;
             <a href="{{ route('reportes.resultados.ensayos') }}"
                 class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
                 <i class="fas fa-file-alt"></i> Reporte de resultados
+            </a>
+            @endif
+            @if (Gate::any([Permiso::ADMIN, Permiso::JEFE_PEEC]))
+            <a href="{{ route('admin.dashboard-peec') }}"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-chart-pie"></i> Dashboard PEEC
             </a>
             @endif
         </div>

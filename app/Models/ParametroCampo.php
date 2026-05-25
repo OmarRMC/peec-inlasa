@@ -22,28 +22,16 @@ class ParametroCampo extends Model
     protected $fillable = [
         'id_parametro',
         'id_grupo_selector',
-        'nombre',
-        'label',
+        'etiqueta',
         'tipo',
         'placeholder',
-        'unidad',
         'posicion',
         'mensaje',
         'requerido',
-        'min',
-        'max',
-        'minlength',
-        'maxlength',
-        'step',
         'pattern',
-        'reglas',
         'modificable',
-        'dependencias',
-        'rangeNumber',
-        'rangeLength',
         'range',
-        'valor',
-        'modificable',
+        'valor_defecto',
         'auto_guardar',
         'id_campo_padre'
     ];
@@ -52,13 +40,9 @@ class ParametroCampo extends Model
      * Cast automáticos para JSON y booleanos.
      */
     protected $casts = [
-        'requerido'     => 'boolean',
-        'modificable'   => 'boolean',
-        'auto_guardar'  => 'boolean',
-        'reglas'        => 'array',
-        'dependencias'  => 'array',
-        'rangeNumber'   => 'array',
-        'rangeLength'   => 'array',
+        'requerido'   => 'boolean',
+        'modificable' => 'boolean',
+        'auto_guardar' => 'boolean',
     ];
 
     /**

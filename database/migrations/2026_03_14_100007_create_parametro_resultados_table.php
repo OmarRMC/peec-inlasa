@@ -18,8 +18,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_campo_padre')->nullable();
 
-            $table->string('nombre');
-            $table->string('label')->nullable();
+            $table->string('etiqueta')->nullable();
             $table->enum('tipo', [
                 'text',
                 'number',
@@ -44,17 +43,11 @@ return new class extends Migration
             // $table->integer('max')->nullable();
             // $table->integer('minlength')->nullable();
             // $table->integer('maxlength')->nullable();
-            $table->string('step')->nullable();           // Para number/decimal
-
             // Validaciones avanzadas
             $table->string('pattern')->nullable();        // Expresión regular
-            // $table->json('reglas')->nullable();           // Validaciones extra en JSON
-            $table->string('valor')->nullable();
+            $table->string('valor_defecto')->nullable();
             $table->boolean('modificable')->default(true);
             $table->boolean('auto_guardar')->default(false);
-
-            // Dependencias
-            $table->json('dependencias')->nullable();     // Ej: mostrar si otro input = X
 
             // Rango específico
             // $table->json('rangeNumber')->nullable();      // valores predefinidos para numeric

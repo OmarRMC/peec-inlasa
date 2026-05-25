@@ -21,12 +21,11 @@ class GrupoSelectorController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
         ]);
 
         EnsayoAptitud::findOrFail($ensayoId)
             ->gruposSelectores()
-            ->create($request->only('nombre', 'descripcion'));
+            ->create($request->only('nombre'));
 
         return back()->with('success', 'Grupo creado correctamente.');
     }
@@ -35,10 +34,9 @@ class GrupoSelectorController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
         ]);
 
-        $grupo->update($request->only('nombre', 'descripcion'));
+        $grupo->update($request->only('nombre'));
 
         return back()->with('success', 'Grupo actualizado correctamente.');
     }
@@ -70,16 +68,13 @@ class GrupoSelectorController extends Controller
 
         $grupo = GrupoSelector::create([
             'nombre' => $request->nombre,
-            'descripcion' => $request->descripcion
         ]);
 
         if ($request->filled('opciones')) {
-            foreach ($request->opciones as $i => $opcion) {
+            foreach ($request->opciones as $opcion) {
                 OpcionSelector::create([
                     'id_grupo_selector' => $grupo->id,
-                    'valor' => strtolower($opcion),
-                    'etiqueta' => $opcion,
-                    'posicion' => $i
+                    'valor' => $opcion,
                 ]);
             }
         }
@@ -126,8 +121,8 @@ class GrupoSelectorController extends Controller
         }
 
         $opciones = [];
-        if ($opcion->grupoHijo) {
-            $opciones = $opcion->grupoHijo?->opciones()
+        if ($opcion->subgrupo) {
+            $opciones = $opcion->subgrupo?->opciones()
                 ->get(['id', 'valor']) ?? [];
         }
 

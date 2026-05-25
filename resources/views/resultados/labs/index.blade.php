@@ -71,6 +71,7 @@
             <table class="min-w-full text-sm text-gray-800">
                 <thead class="bg-gray-100 text-xs uppercase">
                     <tr>
+                        @if ($verIds)<th class="px-3 py-2 text-left">Nro</th>@endif
                         <th class="px-3 py-2 text-left">Código</th>
                         <th class="px-3 py-2 text-left">Laboratorio</th>
                         <th class="px-3 py-2 text-center ">Acciones</th>
@@ -79,6 +80,7 @@
                 <tbody>
                     @forelse ($labs as $lab)
                         <tr class="border-b hover:bg-gray-50">
+                            @if ($verIds)<td class="px-3 py-2 align-top font-mono text-gray-500">{{ $lab->id }}</td>@endif
                             <td class="px-3 py-2 align-top font-medium">{{ $lab->cod_lab ?? '-' }}</td>
                             <td class="px-3 py-2 align-top">{{ $lab->nombre_lab }}</td>
                             {{-- <td class="px-3 py-2 align-top text-gray-500 text-xs">
@@ -118,7 +120,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-4 text-center text-gray-500">No se encontraron
+                            <td colspan="{{ $verIds ? 4 : 3 }}" class="px-4 py-4 text-center text-gray-500">No se encontraron
                                 laboratorios con resultados.</td>
                         </tr>
                     @endforelse

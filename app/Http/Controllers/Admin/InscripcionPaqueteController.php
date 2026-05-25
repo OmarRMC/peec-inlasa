@@ -20,10 +20,12 @@ use App\Models\Formulario;
 use App\Models\Inscripcion;
 use App\Models\InscripcionEA;
 use App\Models\NivelLaboratorio;
+use App\Models\NotificacionLab;
 use App\Models\Pais;
 use App\Models\Permiso;
 use App\Models\TipoLaboratorio;
 use App\Models\VigenciaInscripcion;
+use App\Services\NotificacionLabService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -293,6 +295,7 @@ class InscripcionPaqueteController extends Controller
         $ins->updated_by = Auth::user()->id;
         $ins->updated_at = now();
         $ins->save();
+        $this->resolverNotificacionesObservacion($ins->id);
         $lab =  $ins->laboratorio;
         $user = $lab->usuario;
         $gestion = $ins->gestion;
@@ -321,6 +324,7 @@ class InscripcionPaqueteController extends Controller
         $ins->updated_by = Auth::user()->id;
         $ins->updated_at = now();
         $ins->save();
+        $this->resolverNotificacionesObservacion($ins->id);
 
         return back()->with('success', 'La inscripción fue aprobada correctamente (sin envío de correo).');
     }
@@ -332,6 +336,7 @@ class InscripcionPaqueteController extends Controller
         $ins->updated_by = Auth::user()->id;
         $ins->updated_at = now();
         $ins->save();
+        $this->resolverNotificacionesObservacion($ins->id);
         return back()->with('success', 'Se anulo la Inscripcion.');
     }
     public function enRevision(Request $request,  $id)
@@ -341,42 +346,74 @@ class InscripcionPaqueteController extends Controller
         $ins->updated_by = Auth::user()->id;
         $ins->updated_at = now();
         $ins->save();
+        $this->resolverNotificacionesObservacion($ins->id);
         return back()->with('success', 'La inscripción esta en revision.');
     }
 
 
     public function obsInscripcion(Request $request,  $id)
     {
-        // $ins = Inscripcion::findOrFail($id);
-        // $ins->status_inscripcion = Inscripcion::STATUS_APROBADO;
-        // $ins->updated_by = Auth::user()->id;
-        // $ins->updated_at = now();
-        // $ins->save();
+        $request->validate([
+            'canal_email' => 'nullable|boolean',
+            'canal_inapp' => 'nullable|boolean',
+            'modo_inapp'  => 'nullable|in:' . NotificacionLab::MODO_UNA_VEZ . ',' . NotificacionLab::MODO_PERSISTENTE,
+        ]);
+
+        $canalEmail = $request->boolean('canal_email');
+        $canalInapp = $request->boolean('canal_inapp');
+        $modoInapp  = $request->input('modo_inapp', NotificacionLab::MODO_PERSISTENTE);
+
+        if (!$canalEmail && !$canalInapp) {
+            return back()->with('warning', 'Debe seleccionar al menos un canal (email o in-app).');
+        }
+
         $ins = Inscripcion::findOrFail($id);
         $ins->status_inscripcion = Inscripcion::STATUS_EN_OBSERVACION;
         $ins->updated_by = Auth::user()->id;
         $ins->updated_at = now();
         $ins->save();
-        $lab =  $ins->laboratorio;
-        $user = $lab->usuario;
-        $obs = $request->observacion;
-        Log::info('$obs');
-        Log::info($obs);
-        $titulo =  $request->titulo;
 
-        $observaciones = array_combine($titulo, $obs);
-        $observaciones = array_filter($observaciones, function ($valor) {
-            return !empty(trim($valor));
-        });
-        Log::info($observaciones);
-        try {
-            Mail::to($user->email)->send(new EnvioObsLab($user, $lab, $observaciones));
-        } catch (\Throwable $th) {
-            Log::info($th->getMessage());
-            return back()->with('warning', 'Las observaciones no se pudo enviar el correo de notificación.');
+        $lab = $ins->laboratorio;
+        $user = $lab->usuario;
+
+        $observaciones = array_combine($request->input('titulo', []), $request->input('observacion', []));
+        $observaciones = array_filter($observaciones, fn($v) => !empty(trim($v)));
+
+        $errores = [];
+
+        if ($canalEmail) {
+            try {
+                Mail::to($user->email)->send(new EnvioObsLab($user, $lab, $observaciones));
+            } catch (\Throwable $th) {
+                Log::error('Error enviando email de observaciones: ' . $th->getMessage());
+                $errores[] = 'no se pudo enviar el correo';
+            }
+        }
+
+        if ($canalInapp) {
+            try {
+                $this->resolverNotificacionesObservacion($ins->id);
+                NotificacionLabService::notificarObservacionInscripcion($ins, $observaciones, $modoInapp);
+            } catch (\Throwable $th) {
+                Log::error('Error creando notificación in-app: ' . $th->getMessage());
+                $errores[] = 'no se pudo crear la notificación in-app';
+            }
+        }
+
+        if (!empty($errores)) {
+            return back()->with('warning', 'Las observaciones se registraron pero ' . implode(' y ', $errores) . '.');
         }
 
         return back()->with('success', 'Las observaciones fueron enviadas.');
+    }
+
+    private function resolverNotificacionesObservacion(int $idInscripcion): void
+    {
+        NotificacionLabService::resolver(
+            NotificacionLab::TIPO_OBSERVACION_INSCRIPCION,
+            NotificacionLab::ENTIDAD_INSCRIPCION,
+            $idInscripcion
+        );
     }
     public function show($id)
     {

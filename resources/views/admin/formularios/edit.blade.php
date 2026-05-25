@@ -159,9 +159,9 @@
                                                                         hidden value="{{ $campo->id }}"
                                                                         class="w-full border border-gray-300 rounded text-xs px-2 py-1">
                                                                     <input type="text"
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][label]"
-                                                                        value="{{ $campo->label }}"
-                                                                        placeholder="Label"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][etiqueta]"
+                                                                        value="{{ $campo->etiqueta }}"
+                                                                        placeholder="Etiqueta"
                                                                         class="w-full text-xs border rounded px-1 py-0.5">
                                                                 </td>
                                                                 <td class="px-2 py-1 border">
@@ -235,9 +235,9 @@
                                                                 </td>
                                                                 <td class="px-2 py-1 border">
                                                                     <input type="text"
-                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][valor]"
-                                                                        value="{{ $campo->valor }}"
-                                                                        placeholder="Valor"
+                                                                        name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][valor_defecto]"
+                                                                        value="{{ $campo->valor_defecto }}"
+                                                                        placeholder="Valor por defecto"
                                                                         class="w-full text-xs border rounded px-1 py-0.5">
                                                                 </td>
                                                                 <td class="px-2 py-1 border text-center">
@@ -278,7 +278,7 @@
                                                                             @if ($campoBD->id !== $campo->id)
                                                                                 <option value="{{ $campoBD->id }}"
                                                                                     {{ $campo->id_campo_padre == $campoBD->id ? 'selected' : '' }}>
-                                                                                    {{ $campoBD->id . ' - ' . $campoBD->label }}
+                                                                                    {{ $campoBD->id . ' - ' . $campoBD->etiqueta }}
                                                                                 </option>
                                                                             @endif
                                                                         @endforeach
@@ -404,7 +404,7 @@
                         <strong>Vista previa:</strong>
                         <table class="w-full mt-2 text-xs"><thead class="bg-gray-100"><tr><th class="px-2 py-1 border">Parámetro</th><th class="px-2 py-1 border">Unidad</th><th class="px-2 py-1 border">Resultado</th></tr></thead>
                         <tbody><tr><td class="px-2 py-1 border font-medium">Turbidez</td><td class="px-2 py-1 border text-gray-400">NTU</td><td class="px-2 py-1 border"><input type="text" class="border rounded px-1 w-full text-xs" placeholder="Ej: 0.5" disabled></td></tr>
-                        <tr><td class="px-2 py-1 border font-medium">pH</td><td class="px-2 py-1 border text-gray-400">—</td><td class="px-2 py-1 border"><input type="text" class="border rounded px-1 w-full text-xs" placeholder="Ej: 7.2" disabled></td></tr></tbody></table>
+                        <tr><td class="px-2 py-1 border font-medium">pH</td><td class="px-2 py-1 border text-gray-400">-</td><td class="px-2 py-1 border"><input type="text" class="border rounded px-1 w-full text-xs" placeholder="Ej: 7.2" disabled></td></tr></tbody></table>
                     </div>
                 </div>
 
@@ -630,8 +630,8 @@
 
                 tr.innerHTML = `
                 <td class="px-2 py-1 border">
-                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][label]"
-                        placeholder="Label" class="w-full text-xs border rounded px-1 py-0.5">
+                    <input type="text" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][etiqueta]"
+                        placeholder="Etiqueta" class="w-full text-xs border rounded px-1 py-0.5">
                 </td>
                 <td class="px-2 py-1 border">
                     <select name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][tipo]"
@@ -672,8 +672,8 @@
                 </td>
                 <td class="px-2 py-1 border">
                 <input type="text"
-                    name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][valor]"
-                    placeholder="Valor"
+                    name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][valor_defecto]"
+                    placeholder="Valor por defecto"
                     class="w-full text-xs border rounded px-1 py-0.5">
                 </td>
                 <td class="px-2 py-1 border text-center">

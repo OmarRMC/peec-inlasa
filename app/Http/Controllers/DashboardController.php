@@ -121,8 +121,7 @@ class DashboardController extends Controller
                 $ea->estado_ciclo     = $estadoCiclo['estado'];
 
                 if ($ciclo) {
-                    $ciclo->resultados_recibidos = FormularioEnsayoResultado::where('id_ensayo', $ea->id)
-                        ->where('id_ciclo', $ciclo->id)
+                    $ciclo->resultados_recibidos = FormularioEnsayoResultado::where('id_ciclo', $ciclo->id)
                         ->count();
                 }
             }

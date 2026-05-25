@@ -6,7 +6,8 @@ use App\Models\EnsayoAptitud;
 use App\Models\FormularioEnsayoResultado;
 use App\Models\InscripcionEA;
 use App\Models\Permiso;
-use App\Models\RespuestaFormulario;
+use App\Models\RespuestaCampo;
+use App\Services\MapeadorValorRespuesta;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -157,7 +158,6 @@ class FormularioEnsayoResultadoController extends Controller
             $resultados[] = [
                 'formulario_idx' => $idx,
                 'id_formulario'  => $request->input('id_formulario'),
-                'id_ensayo'      => $request->input('id_ensayo'),
                 'cantidad'       => $request->input('cantidad', 1),
                 'observaciones'  => $formularioData['observaciones'] ?? '',
                 'secciones'      => $secciones,
@@ -190,7 +190,7 @@ class FormularioEnsayoResultadoController extends Controller
             ->with('ensayoAptitud')
             ->first();
 
-        $ensayo = $InscripcionEnsayo->ensayoAptitud;
+        $ensayo = $InscripcionEnsayo?->ensayoAptitud;
         if (!$ensayo) {
             return redirect()->back()->with('error', 'No se encontró ningún registro de inscripción correspondiente a la gestión actual.');
         }
@@ -214,7 +214,6 @@ class FormularioEnsayoResultadoController extends Controller
                     $formularioResultado = FormularioEnsayoResultado::create([
                         'estado' => 1,
                         'id_ciclo' => $ciclo->id,
-                        'id_ensayo' => $ensayo->id,
                         'id_laboratorio' => $laboratorio->id,
                         'id_formulario' => $request->id_formulario,
                         'gestion' => now()->year,
@@ -237,17 +236,22 @@ class FormularioEnsayoResultadoController extends Controller
                     $secciones['secciones'][] = $sec;
 
                     foreach ($seccionData['parametros'] ?? [] as $parametroData) {
-                        RespuestaFormulario::updateOrCreate(
-                            [
-                                'id_formulario_resultado' => $formularioResultado->id,
-                                'id_parametro' => $parametroData['id'],
-                            ],
-                            [
-                                'nombre' => $parametroData['nombre'],
-                                'visible_nombre' => $parametroData['visible_nombre'] ?? false,
-                                'respuestas' => $parametroData['campos']
-                            ]
-                        );
+                        foreach ($parametroData['campos'] ?? [] as $campoData) {
+                            if (empty($campoData['id'])) {
+                                continue;
+                            }
+                            $mapped = MapeadorValorRespuesta::mapear(
+                                $campoData,
+                                $parametroData['nombre'] ?? null
+                            );
+                            RespuestaCampo::updateOrCreate(
+                                [
+                                    'id_formulario_resultado' => $formularioResultado->id,
+                                    'id_parametro_campo'      => (int) $campoData['id'],
+                                ],
+                                $mapped
+                            );
+                        }
                     }
                 }
 

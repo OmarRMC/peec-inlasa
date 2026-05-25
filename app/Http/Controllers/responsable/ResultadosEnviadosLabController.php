@@ -35,11 +35,11 @@ class ResultadosEnviadosLabController extends Controller
 
         $lab = Laboratorio::find($idLab); // Necesitas traer los datos del laboratorio
 
-        $resultados = FormularioEnsayoResultado::with('respuestas', 'formulario')
+        $resultados = FormularioEnsayoResultado::with('respuestasCampo.parametroCampo', 'formulario')
             ->where('id_laboratorio', $idLab)
             ->where('id_ciclo', $idCiclo)
-            ->where('id_ensayo', $ensayo->id)
             ->get();
+        $resultados->each(fn ($r) => $r->setRelation('respuestas', $r->respuestas_compat));
 
         // return $resultados; 
         return view('responsable.resultados.lab.index', compact('ensayo', 'ciclo', 'lab', 'resultados'));
@@ -52,10 +52,11 @@ class ResultadosEnviadosLabController extends Controller
             return redirect('/')->with('error', 'Acceso restringido.');
         }
 
-        $resultados = FormularioEnsayoResultado::with(['respuestas', 'formulario'])->where('id', $id)->get();
+        $resultados = FormularioEnsayoResultado::with(['respuestasCampo.parametroCampo', 'formulario', 'ciclo'])->where('id', $id)->get();
+        $resultados->each(fn ($r) => $r->setRelation('respuestas', $r->respuestas_compat));
         $resultado  = $resultados->first();
-        $idEA = $resultado->id_ensayo;
         $idCiclo = $resultado->id_ciclo;
+        $idEA = $resultado->ciclo?->id_ensayo;
 
         if (Gate::allows(Permiso::JEFE_PEEC)) {
             $ensayo = \App\Models\EnsayoAptitud::with('paquete')->find($idEA);
