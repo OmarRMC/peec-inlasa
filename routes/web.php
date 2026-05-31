@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\PaqueteController;
 use App\Http\Controllers\Admin\PlantillaCertificadoController;
 use App\Http\Controllers\Admin\ProgramaController;
 use App\Http\Controllers\Admin\ProvinciaController;
+use App\Http\Controllers\Admin\ReporteCertificadosController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\TipoLaboratorioController;
 use App\Http\Controllers\Admin\UserController;
@@ -230,6 +231,13 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/certificados/desempeno-participacion', [CertificadoController::class,  'certificadoDesempenoParticionListLabs'])->name('list.cert.participacion.desemp');
 
     Route::post('/certificados/publicar/{gestion}', [CertificadoController::class,  'publicarCertificado'])->name('certificados.publicar');
+
+    Route::prefix('reportes')->name('admin.reportes.')->group(function () {
+        Route::get('distribucion-ensayos', [ReporteCertificadosController::class, 'distribucionEnsayos'])->name('distribucion');
+        Route::get('distribucion-ensayos/data', [ReporteCertificadosController::class, 'distribucionEnsayosData'])->name('distribucion.data');
+        Route::get('distribucion-ensayos/drill', [ReporteCertificadosController::class, 'distribucionEnsayosDrill'])->name('distribucion.drill');
+        Route::get('distribucion-ensayos/export', [ReporteCertificadosController::class, 'distribucionEnsayosExport'])->name('distribucion.export');
+    });
     Route::prefix('inscripcion')->group(function () {
         Route::get('reportes/inscripciones', [ReporteController::class, 'inscripciones'])
             ->name('reportes.inscripciones.index');
@@ -291,6 +299,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
+    Route::get('/mis-ensayos', [ResponsableLaboratorioController::class, 'misEnsayos'])->name('responsable.mis-ensayos');
     Route::get('/ea/{id}/labs', [ResponsableLaboratorioController::class, 'index'])->name('ea.lab.inscritos');
     Route::get('/ea/{id}/certificados', [ResponsableLaboratorioController::class, 'showUploadCertificado'])->name('ea.lab.certificados');
     Route::post('/ea/{id}/subir_ponderaciones', [ResponsableLaboratorioController::class, 'uploadCertificadoData'])->name('ea.lab.subir.ponderaciones');

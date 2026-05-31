@@ -27,7 +27,7 @@
     <h1>{{ $campo->etiqueta }}</h1>
     <div class="meta">
         <strong>Ensayo:</strong> {{ $ensayo->descripcion }}<br>
-        <strong>Paquete:</strong> {{ $ensayo->paquete->descripcion ?? '—' }}<br>
+        <strong>Paquete:</strong> {{ $ensayo->paquete->descripcion ?? '-' }}<br>
         <strong>Ciclo:</strong> {{ $ciclo->nombre }} (gestión {{ $ciclo->gestion }})<br>
         @if ($formulario)
             <strong>Formulario:</strong> {{ $formulario->nombre }}<br>
@@ -55,7 +55,7 @@
                     </tr>
                     <tr>
                         <td><div class="card"><div class="label">σ</div><div class="value">{{ $descriptivo['desv'] }}</div></div></td>
-                        <td><div class="card"><div class="label">CV %</div><div class="value">{{ $descriptivo['cv_pct'] ?? '—' }}</div></div></td>
+                        <td><div class="card"><div class="label">CV %</div><div class="value">{{ $descriptivo['cv_pct'] ?? '-' }}</div></div></td>
                         <td><div class="card"><div class="label">Mínimo</div><div class="value">{{ $descriptivo['minimo'] }}</div></div></td>
                         <td><div class="card"><div class="label">Máximo</div><div class="value">{{ $descriptivo['maximo'] }}</div></div></td>
                     </tr>
@@ -94,7 +94,7 @@
                     <tbody>
                         @foreach ($valoresLab as $v)
                             <tr>
-                                <td>{{ $v->cod_lab ?? '—' }}</td>
+                                <td>{{ $v->cod_lab ?? '-' }}</td>
                                 <td>{{ $v->nombre_lab }}</td>
                                 <td class="num">{{ $v->valor }}</td>
                             </tr>
