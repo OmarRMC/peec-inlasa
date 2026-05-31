@@ -29,6 +29,49 @@ class LaboratorioController extends Controller
         $this->middleware('can:' . Permiso::RESPONSABLE)->only(['create', 'update', 'destroy', 'show', 'edit']);
     }
 
+    public function misEnsayos(Request $request)
+    {
+        $responsable = Auth::user();
+        $gestion = (int) $request->query('gestion', now()->year);
+
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayos = EnsayoAptitud::with('paquete.area')->orderBy('descripcion')->get();
+        } else {
+            $ensayos = $responsable->load('responsablesEA.paquete.area')->responsablesEA->sortBy('descripcion')->values();
+        }
+
+        $idsEa = $ensayos->pluck('id')->all();
+        $estadosActivos = [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO];
+
+        $conteoPorEa = InscripcionEA::whereIn('id_ea', $idsEa)
+            ->whereHas('inscripcion', fn($q) => $q->where('gestion', $gestion)->whereIn('status_inscripcion', $estadosActivos))
+            ->join('inscripcion', 'inscripcion.id', '=', 'inscripcion_ea.id_inscripcion')
+            ->selectRaw('inscripcion_ea.id_ea, COUNT(DISTINCT inscripcion.id_lab) as inscritos')
+            ->groupBy('inscripcion_ea.id_ea')
+            ->pluck('inscritos', 'id_ea');
+
+        $totalLabsUnicos = InscripcionEA::whereIn('id_ea', $idsEa)
+            ->whereHas('inscripcion', fn($q) => $q->where('gestion', $gestion)->whereIn('status_inscripcion', $estadosActivos))
+            ->join('inscripcion', 'inscripcion.id', '=', 'inscripcion_ea.id_inscripcion')
+            ->distinct('inscripcion.id_lab')
+            ->count('inscripcion.id_lab');
+
+        $totalInscritos = $conteoPorEa->sum();
+
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => $estadosActivos,
+        ]);
+
+        return view('responsable.lab.mis-ensayos', [
+            'ensayos' => $ensayos,
+            'conteoPorEa' => $conteoPorEa,
+            'totalLabsUnicos' => $totalLabsUnicos,
+            'totalInscritos' => $totalInscritos,
+            'gestion' => $gestion,
+            'gestiones' => $gestiones,
+        ]);
+    }
+
     public function index(Request $request, $idEa)
     {
         $responsable = Auth::user();

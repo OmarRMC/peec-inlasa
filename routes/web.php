@@ -299,6 +299,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
+    Route::get('/mis-ensayos', [ResponsableLaboratorioController::class, 'misEnsayos'])->name('responsable.mis-ensayos');
     Route::get('/ea/{id}/labs', [ResponsableLaboratorioController::class, 'index'])->name('ea.lab.inscritos');
     Route::get('/ea/{id}/certificados', [ResponsableLaboratorioController::class, 'showUploadCertificado'])->name('ea.lab.certificados');
     Route::post('/ea/{id}/subir_ponderaciones', [ResponsableLaboratorioController::class, 'uploadCertificadoData'])->name('ea.lab.subir.ponderaciones');
