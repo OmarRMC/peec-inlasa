@@ -218,10 +218,10 @@
                     <tbody>
                         @forelse ($valoresLab as $row)
                             <tr class="border-t hover:bg-gray-50">
-                                <td class="px-2 py-1 font-mono whitespace-nowrap">{{ $row->cod_lab ?? '—' }}</td>
+                                <td class="px-2 py-1 font-mono whitespace-nowrap">{{ $row->cod_lab ?? '-' }}</td>
                                 <td class="px-2 py-1 whitespace-nowrap">{{ $row->nombre_lab }}</td>
                                 @foreach ($campos as $c)
-                                    <td class="px-2 py-1">{{ $row->valores[$c->id_campo] ?? '—' }}</td>
+                                    <td class="px-2 py-1">{{ $row->valores[$c->id_campo] ?? '-' }}</td>
                                 @endforeach
                             </tr>
                         @empty
@@ -301,7 +301,7 @@
                         responsive: true, maintainAspectRatio: false,
                         plugins: {
                             tooltip: { callbacks: {
-                                label: ctx => `${ctx.raw._lab} (${ctx.raw._cod || '—'}): (${ctx.raw.x}, ${ctx.raw.y})`
+                                label: ctx => `${ctx.raw._lab} (${ctx.raw._cod || '-'}): (${ctx.raw.x}, ${ctx.raw.y})`
                             }}
                         },
                         scales: {

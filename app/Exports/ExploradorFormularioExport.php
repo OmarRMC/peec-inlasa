@@ -29,7 +29,7 @@ class ExploradorFormularioExport implements FromArray, WithEvents, ShouldAutoSiz
         // Bloque 1: metadata
         $rows[] = ['EXPLORADOR DESCRIPTIVO DE RESPUESTAS'];
         $rows[] = ['Ensayo:', $this->ensayo->descripcion];
-        $rows[] = ['Paquete:', $this->ensayo->paquete->descripcion ?? '—'];
+        $rows[] = ['Paquete:', $this->ensayo->paquete->descripcion ?? '-'];
         $rows[] = ['Ciclo:', $this->ciclo->nombre, 'Gestión:', $this->ciclo->gestion];
         $rows[] = ['Formulario:', $this->formulario->nombre];
         $rows[] = ['Generado:', now()->format('Y-m-d H:i')];

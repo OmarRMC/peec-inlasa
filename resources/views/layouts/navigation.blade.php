@@ -659,6 +659,23 @@ use App\Models\Configuracion;
         </div>
     </div>
     @endif
+
+    @if (Gate::any([Permiso::ADMIN, Permiso::JEFE_PEEC, Permiso::GESTION_CERTIFICADOS, Permiso::RESPONSABLE]))
+    <div>
+        <button @click="openMenu !== 610 ? openMenu = 610 : openMenu = null"
+            class="w-full flex items-center gap-3 px-2 py-2 rounded hover:bg-indigo-50 text-left">
+            <i class="fas fa-chart-column w-5 text-indigo-500"></i>
+            <span>Reportes de certificados</span>
+            <i class="fas ml-auto" :class="openMenu === 610 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        </button>
+        <div x-show="openMenu === 610" x-collapse.duration.200ms class="ml-4 mt-1 space-y-1">
+            <a href="{{ route('admin.reportes.distribucion') }}"
+                class="block px-3 py-1 text-sm text-gray-600 hover:bg-indigo-100 rounded flex items-center gap-2">
+                <i class="fas fa-chart-bar"></i> Distribución por ensayo
+            </a>
+        </div>
+    </div>
+    @endif
     @if (Gate::any([Permiso::RESPONSABLE]))
     <div class="ml-0 mt-1 space-y-1">
         <a href="{{ route('informe.tecnico.ensayos') }}"

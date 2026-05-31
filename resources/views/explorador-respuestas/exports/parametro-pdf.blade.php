@@ -22,7 +22,7 @@
     <h1>{{ $parametro->nombre }}</h1>
     <div class="meta">
         <strong>Ensayo:</strong> {{ $ensayo->descripcion }} &nbsp;|&nbsp;
-        <strong>Paquete:</strong> {{ $ensayo->paquete->descripcion ?? '—' }}<br>
+        <strong>Paquete:</strong> {{ $ensayo->paquete->descripcion ?? '-' }}<br>
         <strong>Ciclo:</strong> {{ $ciclo->nombre }} (gestión {{ $ciclo->gestion }}) &nbsp;|&nbsp;
         @if ($formulario)
             <strong>Formulario:</strong> {{ $formulario->nombre }} &nbsp;|&nbsp;
@@ -46,10 +46,10 @@
         <tbody>
             @forelse ($valoresLab as $row)
                 <tr>
-                    <td>{{ $row->cod_lab ?? '—' }}</td>
+                    <td>{{ $row->cod_lab ?? '-' }}</td>
                     <td>{{ $row->nombre_lab }}</td>
                     @foreach ($campos as $c)
-                        <td>{{ $row->valores[$c->id_campo] ?? '—' }}</td>
+                        <td>{{ $row->valores[$c->id_campo] ?? '-' }}</td>
                     @endforeach
                 </tr>
             @empty
@@ -77,7 +77,7 @@
                             <td class="num">{{ $sc->stats['media'] }}</td>
                             <td class="num">{{ $sc->stats['mediana'] }}</td>
                             <td class="num">{{ $sc->stats['desv'] }}</td>
-                            <td class="num">{{ $sc->stats['cv_pct'] ?? '—' }}</td>
+                            <td class="num">{{ $sc->stats['cv_pct'] ?? '-' }}</td>
                             <td class="num">{{ $sc->stats['minimo'] }}</td>
                             <td class="num">{{ $sc->stats['q1'] }}</td>
                             <td class="num">{{ $sc->stats['q3'] }}</td>

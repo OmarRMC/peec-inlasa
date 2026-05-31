@@ -29,7 +29,7 @@
         </div>
         <div class="bg-white border rounded p-3">
             <div class="text-[10px] text-gray-500 uppercase">CV%</div>
-            <div class="text-2xl font-bold text-gray-800 mt-1">{{ $descriptivo['cv_pct'] ?? '—' }}</div>
+            <div class="text-2xl font-bold text-gray-800 mt-1">{{ $descriptivo['cv_pct'] ?? '-' }}</div>
         </div>
     </div>
 
@@ -109,7 +109,7 @@
                 <tbody>
                     @foreach ($valoresLab as $v)
                         <tr class="border-t hover:bg-gray-50">
-                            <td class="px-2 py-1 font-mono whitespace-nowrap">{{ $v->cod_lab ?? '—' }}</td>
+                            <td class="px-2 py-1 font-mono whitespace-nowrap">{{ $v->cod_lab ?? '-' }}</td>
                             <td class="px-2 py-1 whitespace-nowrap">{{ $v->nombre_lab }}</td>
                             <td class="px-2 py-1 text-right font-mono">{{ $v->valor }}</td>
                         </tr>

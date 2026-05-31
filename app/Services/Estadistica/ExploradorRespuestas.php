@@ -1225,7 +1225,7 @@ class ExploradorRespuestas
 
     private static function fmt(?float $v): string
     {
-        if ($v === null) return '—';
+        if ($v === null) return '-';
         return (string) round($v, 3);
     }
 }
