@@ -55,7 +55,7 @@ class NotificacionController extends Controller
                 'url_accion'  => $n->url_accion,
                 'modo'        => $n->modo,
                 'recurrente'  => $n->es_recurrente,
-                'leida'       => !is_null($n->read_at),
+                'leida'       => !is_null($n->leido_en),
                 'html'        => NotificacionLabService::renderMensaje($n),
                 'created_at'  => $n->created_at?->format('d/m/Y H:i'),
             ];
@@ -144,8 +144,8 @@ class NotificacionController extends Controller
             return response()->json(['ok' => false, 'error' => 'not_found'], 404);
         }
 
-        if (is_null($notif->read_at)) {
-            $notif->read_at = now();
+        if (is_null($notif->leido_en)) {
+            $notif->leido_en = now();
             $notif->save();
         }
 
@@ -168,14 +168,9 @@ class NotificacionController extends Controller
 
         if ($estado = $request->input('estado')) {
             match ($estado) {
-                'no_leidas' => $query->whereNull('read_at')->whereNull('resuelta_at')
-                                    ->whereHas('notificacion', fn($q) => $q->whereNull('resuelta_at')),
-                'leidas'    => $query->whereNotNull('read_at')->whereNull('resuelta_at')
-                                    ->whereHas('notificacion', fn($q) => $q->whereNull('resuelta_at')),
-                'resueltas' => $query->where(function ($q) {
-                    $q->whereNotNull('resuelta_at')
-                      ->orWhereHas('notificacion', fn($n) => $n->whereNotNull('resuelta_at'));
-                }),
+                'no_leidas' => $query->whereNull('leido_en')->whereNull('resuelta_en'),
+                'leidas'    => $query->whereNotNull('leido_en')->whereNull('resuelta_en'),
+                'resueltas' => $query->whereNotNull('resuelta_en'),
                 default     => null,
             };
         }

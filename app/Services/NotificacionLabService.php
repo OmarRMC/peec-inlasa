@@ -44,8 +44,8 @@ class NotificacionLabService
                 $filas = array_map(fn($id) => [
                     'id_notificacion' => $notificacion->id,
                     'id_lab'          => $id,
-                    'read_at'         => null,
-                    'resuelta_at'     => null,
+                    'leido_en'        => null,
+                    'resuelta_en'     => null,
                     'created_at'      => $ahora,
                     'updated_at'      => $ahora,
                 ], $idLabs);
@@ -72,7 +72,7 @@ class NotificacionLabService
 
         $reciente = Notificacion::deTipo(Notificacion::TIPO_OBSERVACION_INSCRIPCION)
             ->deEntidad(Notificacion::ENTIDAD_INSCRIPCION, $ins->id)
-            ->whereNull('resuelta_at')
+            ->whereHas('recepciones', fn($q) => $q->whereNull('resuelta_en'))
             ->where('created_at', '>=', now()->subSeconds(10))
             ->orderByDesc('id')
             ->first();
@@ -173,29 +173,38 @@ class NotificacionLabService
     }
 
     /**
-     * Resuelve globalmente todas las notificaciones pendientes que matcheen tipo+entidad.
-     * Setea notificacion.resuelta_at = now(). Las recepciones de todos los labs
-     * dejan de aparecer.
+     * Resuelve todas las recepciones pendientes de las notificaciones que matcheen
+     * tipo+entidad. Setea notificacion_lab.resuelta_en = now() en cada lab afectado,
+     * por lo que dejan de aparecer como pendientes. Devuelve la cantidad de
+     * recepciones resueltas.
      */
     public static function resolver(string $tipo, string $entidadTipo, int $entidadId): int
     {
-        return Notificacion::deTipo($tipo)
+        $ids = Notificacion::deTipo($tipo)
             ->deEntidad($entidadTipo, $entidadId)
-            ->whereNull('resuelta_at')
-            ->update(['resuelta_at' => now()]);
+            ->pluck('id');
+
+        if ($ids->isEmpty()) return 0;
+
+        return NotificacionLab::whereIn('id_notificacion', $ids)
+            ->whereNull('resuelta_en')
+            ->update(['resuelta_en' => now()]);
     }
 
     /**
-     * Resuelve una notificación globalmente para todos sus destinatarios.
+     * Resuelve una notificación para TODOS sus destinatarios.
      * Para el botón "Resolver para todos" en la vista edit.
      */
     public static function resolverParaTodos(int $idNotificacion): bool
     {
         $n = Notificacion::find($idNotificacion);
         if (!$n) return false;
-        if (!is_null($n->resuelta_at)) return true;
-        $n->resuelta_at = now();
-        return (bool) $n->save();
+
+        NotificacionLab::where('id_notificacion', $n->id)
+            ->whereNull('resuelta_en')
+            ->update(['resuelta_en' => now()]);
+
+        return true;
     }
 
     /**
@@ -206,8 +215,8 @@ class NotificacionLabService
     {
         $r = NotificacionLab::find($idRecepcion);
         if (!$r) return false;
-        if (!is_null($r->resuelta_at)) return true;
-        $r->resuelta_at = now();
+        if (!is_null($r->resuelta_en)) return true;
+        $r->resuelta_en = now();
         return (bool) $r->save();
     }
 

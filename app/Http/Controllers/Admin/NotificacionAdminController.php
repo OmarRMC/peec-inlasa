@@ -45,12 +45,8 @@ class NotificacionAdminController extends Controller
         if ($estado = $request->input('estado')) {
             match ($estado) {
                 'pendiente' => $query->pendientes(),
-                'leida'     => $query->whereNotNull('read_at')->whereNull('resuelta_at')
-                                    ->whereHas('notificacion', fn($q) => $q->whereNull('resuelta_at')),
-                'resuelta'  => $query->where(function ($q) {
-                    $q->whereNotNull('resuelta_at')
-                      ->orWhereHas('notificacion', fn($n) => $n->whereNotNull('resuelta_at'));
-                }),
+                'leida'     => $query->whereNotNull('leido_en')->whereNull('resuelta_en'),
+                'resuelta'  => $query->whereNotNull('resuelta_en'),
                 default     => null,
             };
         }
@@ -179,7 +175,7 @@ class NotificacionAdminController extends Controller
             return back()->with('warning', 'Solo se pueden resolver notificaciones persistentes.');
         }
 
-        if (!is_null($recepcion->resuelta_at)) {
+        if (!is_null($recepcion->resuelta_en)) {
             return back()->with('info', 'La notificación ya estaba resuelta para este laboratorio.');
         }
 
@@ -233,7 +229,11 @@ class NotificacionAdminController extends Controller
     {
         $notificacion = Notificacion::findOrFail($id);
 
-        if (!is_null($notificacion->resuelta_at)) {
+        $hayPendientes = NotificacionLab::where('id_notificacion', $notificacion->id)
+            ->whereNull('resuelta_en')
+            ->exists();
+
+        if (!$hayPendientes) {
             return back()->with('info', 'La notificación ya estaba resuelta para todos.');
         }
 

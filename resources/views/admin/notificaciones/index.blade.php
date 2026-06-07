@@ -99,8 +99,8 @@
                 @forelse ($notificaciones as $n)
                     @php
                         $estadoBadge = match (true) {
-                            !is_null($n->resuelta_at) => ['Resuelta', 'bg-gray-300 text-gray-800'],
-                            !is_null($n->read_at)     => ['Leída', 'bg-blue-200 text-blue-800'],
+                            !is_null($n->resuelta_en) => ['Resuelta', 'bg-gray-300 text-gray-800'],
+                            !is_null($n->leido_en)    => ['Leída', 'bg-blue-200 text-blue-800'],
                             default                   => ['Pendiente', 'bg-yellow-300 text-yellow-900 font-semibold'],
                         };
                     @endphp
@@ -138,7 +138,7 @@
                                     →
                                     {{ $n->fecha_fin?->format('d/m/Y') ?? '-' }}
                                 </div>
-                                @if ($n->modo === 'persistente' && is_null($n->resuelta_at))
+                                @if ($n->modo === 'persistente' && is_null($n->resuelta_en))
                                     @if ($n->esta_vigente)
                                         <span class="inline-block mt-0.5 px-1.5 py-0.5 bg-green-100 text-green-800 rounded text-[10px]">Vigente</span>
                                     @else
@@ -166,7 +166,7 @@
                             @endif
                         </td>
                         <td class="p-2 text-center whitespace-nowrap">
-                            @if ($n->modo === 'persistente' && is_null($n->resuelta_at) && is_null($n->notificacion?->resuelta_at))
+                            @if ($n->modo === 'persistente' && is_null($n->resuelta_en))
                                 <form method="POST" action="{{ route('admin.notificaciones.resolver', $n->id) }}"
                                     onsubmit="return confirm('¿Marcar como resuelta para este laboratorio?');"
                                     class="inline">

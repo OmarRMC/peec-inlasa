@@ -49,8 +49,8 @@
                 @forelse ($notificaciones as $n)
                     @php
                         $estadoBadge = match (true) {
-                            !is_null($n->resuelta_at) => ['Resuelta', 'bg-gray-300 text-gray-800'],
-                            !is_null($n->read_at)     => ['Leída', 'bg-blue-200 text-blue-800'],
+                            !is_null($n->resuelta_en) => ['Resuelta', 'bg-gray-300 text-gray-800'],
+                            !is_null($n->leido_en)    => ['Leída', 'bg-blue-200 text-blue-800'],
                             default                   => ['No leída', 'bg-yellow-300 text-yellow-900 font-semibold'],
                         };
                     @endphp

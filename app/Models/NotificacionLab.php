@@ -9,8 +9,8 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * Pivote entre Notificacion (plantilla) y Laboratorio (destinatario).
- * Mantiene el seguimiento por lab: read_at (cuando el lab cerró el popup)
- * y resuelta_at (cuando se cerró específicamente para este lab).
+ * Mantiene el seguimiento por lab: leido_en (cuando el lab cerró el popup)
+ * y resuelta_en (cuando se cerró/resolvió para este lab).
  *
  * Accessors delegados: cuando una vista usa $recepcion->titulo, $recepcion->html, etc.,
  * la propiedad se obtiene de la plantilla relacionada - así las vistas no necesitan
@@ -39,13 +39,13 @@ class NotificacionLab extends Model implements AuditableContract
     protected $fillable = [
         'id_notificacion',
         'id_lab',
-        'read_at',
-        'resuelta_at',
+        'leido_en',
+        'resuelta_en',
     ];
 
     protected $casts = [
-        'read_at'     => 'datetime',
-        'resuelta_at' => 'datetime',
+        'leido_en'    => 'datetime',
+        'resuelta_en' => 'datetime',
     ];
 
     public function notificacion(): BelongsTo
@@ -68,7 +68,7 @@ class NotificacionLab extends Model implements AuditableContract
      *   - notificacion no resuelta globalmente
      *   - notificacion vigente por fechas
      *   - recepción no resuelta para este lab
-     *   - si modo=una_vez: no leída (read_at IS NULL); si persistente: ignora read_at
+     *   - si modo=una_vez: no leída (leido_en IS NULL); si persistente: ignora leido_en
      */
     public function scopePendientes($query)
     {
@@ -76,17 +76,16 @@ class NotificacionLab extends Model implements AuditableContract
 
         return $query
             ->whereHas('notificacion', function ($q) use ($hoy) {
-                $q->whereNull('resuelta_at')
-                  ->where(function ($qq) use ($hoy) {
+                $q->where(function ($qq) use ($hoy) {
                       $qq->whereNull('fecha_inicio')->orWhereDate('fecha_inicio', '<=', $hoy);
                   })
                   ->where(function ($qq) use ($hoy) {
                       $qq->whereNull('fecha_fin')->orWhereDate('fecha_fin', '>=', $hoy);
                   });
             })
-            ->whereNull('resuelta_at')
+            ->whereNull('resuelta_en')
             ->where(function ($q) {
-                $q->whereNull('read_at')
+                $q->whereNull('leido_en')
                   ->orWhereHas('notificacion', fn($n) => $n->where('modo', Notificacion::MODO_PERSISTENTE));
             });
     }

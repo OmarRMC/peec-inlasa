@@ -12,14 +12,14 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_notificacion');
             $table->unsignedBigInteger('id_lab');
-            $table->timestamp('read_at')->nullable();
-            $table->timestamp('resuelta_at')->nullable();
+            $table->timestamp('leido_en')->nullable();
+            $table->timestamp('resuelta_en')->nullable();
             $table->timestamps();
 
             $table->foreign('id_notificacion')->references('id')->on('notificacion')->cascadeOnDelete();
             $table->foreign('id_lab')->references('id')->on('laboratorio');
             $table->unique(['id_notificacion', 'id_lab'], 'notif_lab_unico');
-            $table->index(['id_lab', 'read_at', 'resuelta_at'], 'notif_lab_pendientes_idx');
+            $table->index(['id_lab', 'leido_en', 'resuelta_en'], 'notif_lab_pendientes_idx');
         });
     }
 

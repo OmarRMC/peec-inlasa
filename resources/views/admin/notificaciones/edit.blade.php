@@ -167,7 +167,7 @@
                 Destinatarios ({{ $notificacion->recepciones->count() }})
             </h2>
 
-            @if (is_null($notificacion->resuelta_at))
+            @if ($notificacion->recepciones->whereNull('resuelta_en')->isNotEmpty())
                 <form method="POST" action="{{ route('admin.notificaciones.resolverTodos', $notificacion->id) }}"
                     onsubmit="return confirm('¿Resolver para TODOS los destinatarios? Ninguno volverá a ver esta notificación.');">
                     @csrf
@@ -179,7 +179,7 @@
             @else
                 <div class="p-2 bg-gray-100 text-gray-700 text-xs rounded text-center">
                     <i class="fas fa-check-double"></i>
-                    Resuelta para todos el {{ $notificacion->resuelta_at->format('d/m/Y H:i') }}
+                    Resuelta para todos el {{ optional($notificacion->recepciones->max('resuelta_en'))->format('d/m/Y H:i') }}
                 </div>
             @endif
 
@@ -190,8 +190,8 @@
             <div class="border border-gray-200 rounded overflow-y-auto" style="height: 400px;">
                 @foreach ($notificacion->recepciones as $r)
                     @php
-                        $estado = !is_null($r->resuelta_at) ? ['Resuelta', 'bg-gray-200 text-gray-700']
-                            : (!is_null($r->read_at) ? ['Leída', 'bg-blue-100 text-blue-800']
+                        $estado = !is_null($r->resuelta_en) ? ['Resuelta', 'bg-gray-200 text-gray-700']
+                            : (!is_null($r->leido_en) ? ['Leída', 'bg-blue-100 text-blue-800']
                             : ['Pendiente', 'bg-yellow-200 text-yellow-900']);
                         $nombreLab = strtolower(($r->laboratorio?->nombre_lab ?? '') . ' ' . ($r->laboratorio?->cod_lab ?? ''));
                     @endphp

@@ -57,7 +57,6 @@ class Notificacion extends Model implements AuditableContract
         'modo',
         'fecha_inicio',
         'fecha_fin',
-        'resuelta_at',
         'created_by',
     ];
 
@@ -65,7 +64,6 @@ class Notificacion extends Model implements AuditableContract
         'mensaje'      => 'array',
         'fecha_inicio' => 'date',
         'fecha_fin'    => 'date',
-        'resuelta_at'  => 'datetime',
     ];
 
     public function recepciones(): HasMany
@@ -76,7 +74,7 @@ class Notificacion extends Model implements AuditableContract
     public function laboratorios(): BelongsToMany
     {
         return $this->belongsToMany(Laboratorio::class, 'notificacion_lab', 'id_notificacion', 'id_lab')
-            ->withPivot(['read_at', 'resuelta_at'])
+            ->withPivot(['leido_en', 'resuelta_en'])
             ->withTimestamps();
     }
 
@@ -99,11 +97,6 @@ class Notificacion extends Model implements AuditableContract
     {
         return $query->where('entidad_tipo', $entidadTipo)
                      ->where('entidad_id', $entidadId);
-    }
-
-    public function scopeNoResueltas($query)
-    {
-        return $query->whereNull('resuelta_at');
     }
 
     public function scopeVigentes($query)
