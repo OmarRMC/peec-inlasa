@@ -108,5 +108,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::define(Permiso::GESTION_NOTIFICACIONES, function (User $user) {
             return $user->tienePermiso(Permiso::GESTION_NOTIFICACIONES);
         });
+        Gate::define(Permiso::VER_AUDITORIA, function (User $user) {
+            return $user->tienePermiso(Permiso::VER_AUDITORIA);
+        });
     }
 }

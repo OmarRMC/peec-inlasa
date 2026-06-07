@@ -33,6 +33,7 @@
     $verUsuarios = Gate::any([Permiso::ADMIN, Permiso::GESTION_USUARIO]);
     $verConfiguracionGeneral = Gate::any([Permiso::ADMIN, Permiso::CONFIGURACION]);
     $verRecursos = Gate::any([Permiso::ADMIN]);
+    $verAuditoria = Gate::allows(Permiso::VER_AUDITORIA);
 
     $nombreEnsayoConPaquete = function ($ea) {
         $paquete = $ea->paquete;
@@ -196,7 +197,7 @@
 @endif
 
 {{-- ============ CONFIGURACIÓN ============ --}}
-@if ($verUsuarios || $verConfiguracionGeneral || $verRecursos)
+@if ($verUsuarios || $verConfiguracionGeneral || $verRecursos || $verAuditoria)
     <div class="space-y-1 mt-4">
         @if ($verUsuarios)
             <x-nav.dropdown icon="fa-users" label="Usuarios"
@@ -230,6 +231,11 @@
                 <x-nav.sublink href="{{ route('recursos_lab.index') }}" icon="fa-folder-open"
                     label="Recursos de laboratorio" route="recursos_lab.*" />
             </x-nav.dropdown>
+        @endif
+
+        @if ($verAuditoria)
+            <x-nav.link href="{{ route('admin.auditoria.index') }}" icon="fa-history"
+                label="Historial de acciones" route="admin.auditoria.*" />
         @endif
     </div>
 @endif

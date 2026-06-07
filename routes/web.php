@@ -108,6 +108,10 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
         ->name('admin.notificaciones.resolverTodos');
     Route::get('/dashboard-peec', [DashboardPEECController::class, 'index'])
         ->name('admin.dashboard-peec');
+    Route::get('/auditoria/data', [\App\Http\Controllers\Admin\AuditoriaController::class, 'getData'])
+        ->name('admin.auditoria.data');
+    Route::get('/auditoria', [\App\Http\Controllers\Admin\AuditoriaController::class, 'index'])
+        ->name('admin.auditoria.index');
     Route::get('/plantillas-certificados/{plantilla}/preview', [PlantillaCertificadoController::class, 'preview'])
         ->name('plantillas-certificados.preview');
     Route::resource('plantillas-certificados', PlantillaCertificadoController::class)

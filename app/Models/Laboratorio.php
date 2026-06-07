@@ -9,10 +9,13 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Laboratorio extends Model
+class Laboratorio extends Model implements AuditableContract
 {
     use HasFactory;
+    use Auditable;
     const ACTIVE_STATUS = 1;
     const INACTIVE_STATUS = 0;
 

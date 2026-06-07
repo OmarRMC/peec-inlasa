@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * Pivote entre Notificacion (plantilla) y Laboratorio (destinatario).
@@ -14,8 +16,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * la propiedad se obtiene de la plantilla relacionada - así las vistas no necesitan
  * saber si están leyendo de la plantilla o del pivote.
  */
-class NotificacionLab extends Model
+class NotificacionLab extends Model implements AuditableContract
 {
+    use Auditable;
+
     protected $table = 'notificacion_lab';
 
     // Re-export de constantes para compatibilidad con código que las usa por NotificacionLab::

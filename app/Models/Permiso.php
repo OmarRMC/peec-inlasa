@@ -6,10 +6,13 @@ use App\Traits\General;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Permiso extends Model
+class Permiso extends Model implements AuditableContract
 {
     use General;
+    use Auditable;
 
     // ------------------------------
     // Claves
@@ -208,6 +211,9 @@ class Permiso extends Model
     public const VER_IDS = 'ver.ids';
     public const VER_IDS_NAME = 'Ver IDs en tablas';
 
+    public const VER_AUDITORIA = 'ver.auditoria';
+    public const VER_AUDITORIA_NAME = 'Ver auditoría';
+
     // ------------------------------
     // PERMISOS_HABILITADOS
     // ------------------------------
@@ -227,6 +233,7 @@ class Permiso extends Model
         self::JEFE_PEEC => self::JEFE_PEEC_NAME,
         self::GESTION_FORMULARIOS => self::GESTION_FORMULARIOS_NAME,
         self::GESTION_NOTIFICACIONES => self::GESTION_NOTIFICACIONES_NAME,
+        self::VER_AUDITORIA => self::VER_AUDITORIA_NAME,
     ];
 
     protected $table = 'permiso';

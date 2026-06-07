@@ -73,7 +73,8 @@ class UserController extends Controller
         ]);
 
         // $usuario->notify(new VerificarCorreoUser($usuario));
-        $usuario->permisos()->sync($request->input('permisos', []));
+        // auditSync registra en la auditoría el cambio de permisos (relación N:M).
+        $usuario->auditSync('permisos', $request->input('permisos', []));
 
         $ensayoIDs = $request->input('ensayos_ap', []);
 
@@ -161,7 +162,8 @@ class UserController extends Controller
             $usuario->update(['password' => Hash::make($validated['password'])]);
         }
         $ensayoIDs = $request->input('ensayos_ap', []);
-        $usuario->permisos()->sync($request->input('permisos', []));
+        // auditSync registra en la auditoría el cambio de permisos (relación N:M).
+        $usuario->auditSync('permisos', $request->input('permisos', []));
 
         // $ensayosData = [];
         // $ensayos = EnsayoAptitud::whereIn('id', $ensayoIDs)->get();

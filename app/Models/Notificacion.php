@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Notificacion extends Model
+class Notificacion extends Model implements AuditableContract
 {
+    use Auditable;
+
     protected $table = 'notificacion';
 
     const TIPO_OBSERVACION_INSCRIPCION = 'observacion_inscripcion';

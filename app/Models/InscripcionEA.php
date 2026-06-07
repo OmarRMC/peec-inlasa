@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class InscripcionEA extends Model
+class InscripcionEA extends Model implements AuditableContract
 {
+    use Auditable;
+
     protected $table = 'inscripcion_ea';
 
     protected $fillable = [
