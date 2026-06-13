@@ -1,4 +1,19 @@
 <x-app-layout>
+    @php
+        // Catálogo de validaciones predefinidas: el usuario elige una opción en
+        // lenguaje humano y por detrás se guarda la expresión regular en `pattern`.
+        // 'regex' === '' => "Texto libre" (sin validación). El modo "Personalizado"
+        // se agrega aparte como sentinela '__custom__' para escribir regex a mano.
+        $validacionesPredef = [
+            ['regex' => '',                              'label' => 'Texto libre (sin validación)',      'mensaje' => ''],
+            ['regex' => '^\d+$',                         'label' => 'Solo números enteros',              'mensaje' => 'Ingrese solo números enteros.'],
+            ['regex' => '^\d+([.,]\d+)?$',               'label' => 'Número decimal',                    'mensaje' => 'Ingrese un número (use punto o coma para decimales).'],
+            ['regex' => '^-?\d+([.,]\d+)?$',             'label' => 'Número decimal (permite negativo)', 'mensaje' => 'Ingrese un número, puede ser negativo.'],
+            ['regex' => '^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$',     'label' => 'Solo letras',                       'mensaje' => 'Ingrese solo letras.'],
+            ['regex' => '^[A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ ]+$',  'label' => 'Letras y números',                  'mensaje' => 'Ingrese solo letras y números.'],
+            ['regex' => '^[^@\s]+@[^@\s]+\.[^@\s]+$',     'label' => 'Correo electrónico',                'mensaje' => 'Ingrese un correo electrónico válido.'],
+        ];
+    @endphp
     <div class="max-w-6xl mx-auto p-6 bg-white rounded shadow">
         <div class="mb-2 flex items-center justify-between">
             <x-shared.btn-volver :url="route('admin.formularios.show',$ensayo->id )" />
@@ -216,10 +231,16 @@
                                                                         placeholder="Step"
                                                                         class="w-full text-xs border rounded px-1 py-0.5 mt-1">
                                                                 </td> --}}
-                                                                <td class="px-2 py-1 border">
+                                                                <td class="px-2 py-1 border align-top">
+                                                                    <select class="pattern-preset w-full text-xs border rounded px-1 py-0.5">
+                                                                        @foreach ($validacionesPredef as $v)
+                                                                            <option value="{{ $v['regex'] }}" data-mensaje="{{ $v['mensaje'] }}">{{ $v['label'] }}</option>
+                                                                        @endforeach
+                                                                        <option value="__custom__">Personalizado (avanzado)</option>
+                                                                    </select>
                                                                     <textarea
                                                                         name="secciones[{{ $i }}][parametros][{{ $j }}][campos][{{ $k }}][pattern]"
-                                                                        placeholder="" class="w-full text-xs border rounded px-1 py-0.5 mt-1">{{ $campo->pattern }}</textarea>
+                                                                        placeholder="Expresión regular" class="pattern-input w-full text-xs border rounded px-1 py-0.5 mt-1" hidden>{{ $campo->pattern }}</textarea>
                                                                 </td>
                                                                 <td class="px-2 py-1 border">
                                                                     <textarea
@@ -536,6 +557,39 @@
             const urlGrupos = @json(route('admin.grupos.selectores.json', ['ensayoId' => $ensayo->id]));
             let firstLoad = true;
 
+            // --- Validaciones predefinidas (catálogo compartido con el PHP de arriba) ---
+            const PATTERN_PRESETS = @json($validacionesPredef);
+
+            function escAttr(s) {
+                return String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+            }
+
+            // Genera las <option> del selector "Formato" para las filas creadas por JS.
+            function patternPresetOptionsHtml() {
+                let html = PATTERN_PRESETS.map(v =>
+                    `<option value="${escAttr(v.regex)}" data-mensaje="${escAttr(v.mensaje)}">${v.label}</option>`
+                ).join('');
+                return html + `<option value="__custom__">Personalizado (avanzado)</option>`;
+            }
+
+            // Sincroniza el selector con el regex guardado: elige el preset que coincide,
+            // o "Personalizado" (mostrando el textarea) si el regex no está en el catálogo.
+            function initPatternCell(select) {
+                const td = select.closest('td');
+                const textarea = td.querySelector('.pattern-input');
+                if (!textarea) return;
+                const val = (textarea.value || '').trim();
+                const match = Array.from(select.options)
+                    .find(o => o.value === val && o.value !== '__custom__');
+                if (match) {
+                    select.value = match.value;
+                    textarea.hidden = true;
+                } else {
+                    select.value = '__custom__';
+                    textarea.hidden = false;
+                }
+            }
+
             // --- API: Buscar grupos ---
             async function fetchGrupos(query = "") {
                 const url = "{{ route('admin.grupos-selectores.buscar') }}?q=" + encodeURIComponent(query);
@@ -657,9 +711,12 @@
                     <input type="number" name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][posicion]"
                         placeholder="#" class="w-full text-xs border rounded px-1 py-0.5">
                 </td>
-                <td class="px-2 py-1 border">
+                <td class="px-2 py-1 border align-top">
+                    <select class="pattern-preset w-full text-xs border rounded px-1 py-0.5">
+                        ${patternPresetOptionsHtml()}
+                    </select>
                     <textarea name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][pattern]"
-                      placeholder='Validacion' class="w-full text-xs border rounded px-1 py-0.5 mt-1"></textarea>
+                      placeholder='Expresión regular' class="pattern-input w-full text-xs border rounded px-1 py-0.5 mt-1" hidden></textarea>
                 </td>
                 <td class="px-2 py-1 border">
                     <textarea name="secciones[${seccionIdx}][parametros][${parametroIdx}][campos][${resultadoIdx}][mensaje]"
@@ -701,6 +758,8 @@
                 `;
                 const selectGrupo = tr.querySelector('.grupo-selector-select');
                 asignarFocusGrupo(selectGrupo);
+                const selectPattern = tr.querySelector('.pattern-preset');
+                if (selectPattern) initPatternCell(selectPattern);
                 return tr;
             }
 
@@ -779,6 +838,32 @@
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.grupo-selector-select').forEach(select => {
                     asignarFocusGrupo(select);
+                });
+
+                // Selector de validación: sincroniza las filas ya existentes...
+                document.querySelectorAll('.pattern-preset').forEach(initPatternCell);
+
+                // ...y reacciona al cambio de opción.
+                document.addEventListener('change', (e) => {
+                    if (!e.target.classList.contains('pattern-preset')) return;
+                    const select = e.target;
+                    const td = select.closest('td');
+                    const textarea = td.querySelector('.pattern-input');
+                    if (!textarea) return;
+
+                    if (select.value === '__custom__') {
+                        textarea.hidden = false;
+                        textarea.focus();
+                        return;
+                    }
+                    // Preset normal (o "Texto libre" = ''): guardamos el regex y ocultamos el textarea.
+                    textarea.value = select.value;
+                    textarea.hidden = true;
+
+                    // Autocompleta el mensaje de error si está vacío.
+                    const msg = select.selectedOptions[0]?.dataset.mensaje || '';
+                    const msgField = select.closest('tr')?.querySelector('textarea[name*="[mensaje]"]');
+                    if (msgField && !msgField.value.trim() && msg) msgField.value = msg;
                 });
 
                 document.getElementById('add-seccion').addEventListener('click', () => {

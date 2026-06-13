@@ -1,5 +1,20 @@
+@php
+    // Datos que el navegador recupera tras un error de validación del servidor.
+    $oldCiclo = [
+        'hasErrors' => $errors->any(),
+        'ciclo_id' => old('ciclo_id'),
+        'nombre' => old('nombre'),
+        'fecha_inicio_envio_muestras' => old('fecha_inicio_envio_muestras'),
+        'fecha_fin_envio_muestras' => old('fecha_fin_envio_muestras'),
+        'fecha_inicio_envio_resultados' => old('fecha_inicio_envio_resultados'),
+        'fecha_fin_envio_resultados' => old('fecha_fin_envio_resultados'),
+        'fecha_inicio_envio_reporte' => old('fecha_inicio_envio_reporte'),
+        'fecha_fin_envio_reporte' => old('fecha_fin_envio_reporte'),
+    ];
+@endphp
+
 <x-app-layout>
-    <div class="px-4 max-w-6xl mx-auto" x-data="ciclosApp()" x-init="init()">
+    <div class="px-4 max-w-6xl mx-auto" x-data="ciclosApp(@js($oldCiclo))" x-init="init()">
         <x-shared.btn-volver :url="route('admin.formularios.ea')" />
 
         <div class="flex justify-between items-center mb-4 mt-2">
@@ -176,14 +191,21 @@
                         <input type="hidden" name="_method" value="PUT">
                     </template>
                     <input type="hidden" name="id_ensayo" value="{{ $ensayo->id }}">
+                    {{-- Permite recuperar el modo edición si el servidor devuelve errores --}}
+                    <input type="hidden" name="ciclo_id" :value="ciclo?.id || ''">
 
                     {{-- Nombre --}}
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre del Ciclo</label>
-                        <input type="text" name="nombre"
+                        <input type="text" name="nombre" x-model="form.nombre"
                             class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-blue-400 focus:outline-none"
-                            :value="isEdit ? ciclo.nombre : ''"
                             placeholder="Ej. Ciclo 1 - Química" required>
+                    </div>
+
+                    <div class="mb-4 bg-blue-50 border border-blue-100 text-blue-700 text-xs rounded px-3 py-2 flex items-start gap-2">
+                        <i class="fas fa-magic mt-0.5"></i>
+                        <span>Elige la <strong>primera fecha</strong> y las siguientes se completan solas en orden.
+                            Luego solo ajusta las que necesites: el calendario no te dejará elegir una fecha anterior a la fase previa.</span>
                     </div>
 
                     {{-- Fase 1: Muestras --}}
@@ -196,14 +218,17 @@
                             <div>
                                 <label class="block text-xs text-gray-500 mb-1">Fecha Inicio</label>
                                 <input type="date" name="fecha_inicio_envio_muestras"
+                                    x-model="form.fecha_inicio_envio_muestras" @change="cascade('fecha_inicio_envio_muestras')"
                                     class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-indigo-400 focus:outline-none"
-                                    :value="isEdit ? ciclo.fecha_inicio_envio_muestras : ''" required>
+                                    required>
                             </div>
                             <div>
                                 <label class="block text-xs text-gray-500 mb-1">Fecha Fin</label>
                                 <input type="date" name="fecha_fin_envio_muestras"
+                                    x-model="form.fecha_fin_envio_muestras" @change="cascade('fecha_fin_envio_muestras')"
+                                    :min="form.fecha_inicio_envio_muestras"
                                     class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-indigo-400 focus:outline-none"
-                                    :value="isEdit ? ciclo.fecha_fin_envio_muestras : ''" required>
+                                    required>
                             </div>
                         </div>
                     </div>
@@ -219,14 +244,18 @@
                             <div>
                                 <label class="block text-xs text-gray-500 mb-1">Fecha Inicio</label>
                                 <input type="date" name="fecha_inicio_envio_resultados"
+                                    x-model="form.fecha_inicio_envio_resultados" @change="cascade('fecha_inicio_envio_resultados')"
+                                    :min="form.fecha_fin_envio_muestras"
                                     class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-blue-400 focus:outline-none"
-                                    :value="isEdit ? ciclo.fecha_inicio_envio_resultados : ''" required>
+                                    required>
                             </div>
                             <div>
                                 <label class="block text-xs text-gray-500 mb-1">Fecha Fin</label>
                                 <input type="date" name="fecha_fin_envio_resultados"
+                                    x-model="form.fecha_fin_envio_resultados" @change="cascade('fecha_fin_envio_resultados')"
+                                    :min="form.fecha_inicio_envio_resultados"
                                     class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-blue-400 focus:outline-none"
-                                    :value="isEdit ? ciclo.fecha_fin_envio_resultados : ''" required>
+                                    required>
                             </div>
                         </div>
                     </div>
@@ -241,27 +270,41 @@
                             <div>
                                 <label class="block text-xs text-gray-500 mb-1">Fecha Inicio</label>
                                 <input type="date" name="fecha_inicio_envio_reporte"
+                                    x-model="form.fecha_inicio_envio_reporte" @change="cascade('fecha_inicio_envio_reporte')"
+                                    :min="form.fecha_fin_envio_resultados"
                                     class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-green-400 focus:outline-none"
-                                    :value="isEdit ? ciclo.fecha_inicio_envio_reporte : ''" required>
+                                    required>
                             </div>
                             <div>
                                 <label class="block text-xs text-gray-500 mb-1">Fecha Fin</label>
                                 <input type="date" name="fecha_fin_envio_reporte"
+                                    x-model="form.fecha_fin_envio_reporte" @change="cascade('fecha_fin_envio_reporte')"
+                                    :min="form.fecha_inicio_envio_reporte"
                                     class="w-full border rounded px-2 py-1.5 text-sm focus:ring-1 focus:ring-green-400 focus:outline-none"
-                                    :value="isEdit ? ciclo.fecha_fin_envio_reporte : ''" required>
+                                    required>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-end gap-2 pt-2 border-t">
-                        <button type="button" @click="openModal = false"
-                            class="px-4 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">
-                            Cancelar
-                        </button>
-                        <button type="submit"
-                            class="px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-500 text-sm">
-                            Guardar
-                        </button>
+                    <div class="flex items-center justify-between gap-2 pt-2 border-t">
+                        <p class="text-xs text-amber-600 flex items-center gap-1" x-show="!valid" x-cloak>
+                            <i class="fas fa-info-circle"></i>
+                            Completa el nombre y las 6 fechas en orden cronológico.
+                        </p>
+                        <span x-show="valid" class="text-xs text-green-600 flex items-center gap-1" x-cloak>
+                            <i class="fas fa-check-circle"></i> Listo para guardar
+                        </span>
+                        <div class="flex gap-2 ml-auto">
+                            <button type="button" @click="openModal = false"
+                                class="px-4 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">
+                                Cancelar
+                            </button>
+                            <button type="submit" :disabled="!valid"
+                                :class="valid ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-300 cursor-not-allowed'"
+                                class="px-4 py-1.5 text-white rounded text-sm transition">
+                                Guardar
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -269,25 +312,90 @@
     </div>
 
     <script>
-        function ciclosApp() {
+        function ciclosApp(old) {
+            // Orden cronológico estricto de las 6 fechas
+            const FIELDS = [
+                'fecha_inicio_envio_muestras',
+                'fecha_fin_envio_muestras',
+                'fecha_inicio_envio_resultados',
+                'fecha_fin_envio_resultados',
+                'fecha_inicio_envio_reporte',
+                'fecha_fin_envio_reporte',
+            ];
+            const emptyForm = () => ({
+                nombre: '',
+                fecha_inicio_envio_muestras: '',
+                fecha_fin_envio_muestras: '',
+                fecha_inicio_envio_resultados: '',
+                fecha_fin_envio_resultados: '',
+                fecha_inicio_envio_reporte: '',
+                fecha_fin_envio_reporte: '',
+            });
+
             return {
                 openModal: false,
                 isEdit: false,
                 ciclo: null,
+                form: emptyForm(),
+
                 init() {
-                    @if ($errors->any())
+                    // El servidor devolvió errores: recuperamos lo que el usuario ya había escrito
+                    if (old && old.hasErrors) {
+                        const { hasErrors, ciclo_id, ...values } = old;
+                        this.form = Object.assign(emptyForm(), values);
+                        if (ciclo_id) {
+                            this.isEdit = true;
+                            this.ciclo = { id: ciclo_id };
+                        }
                         this.openModal = true;
-                    @endif
+                    }
                 },
+
                 openCreate() {
                     this.isEdit = false;
                     this.ciclo = null;
+                    this.form = emptyForm();
                     this.openModal = true;
                 },
+
                 openEdit(ciclo) {
                     this.isEdit = true;
                     this.ciclo = ciclo;
+                    this.form = {
+                        nombre: ciclo.nombre ?? '',
+                        fecha_inicio_envio_muestras: ciclo.fecha_inicio_envio_muestras ?? '',
+                        fecha_fin_envio_muestras: ciclo.fecha_fin_envio_muestras ?? '',
+                        fecha_inicio_envio_resultados: ciclo.fecha_inicio_envio_resultados ?? '',
+                        fecha_fin_envio_resultados: ciclo.fecha_fin_envio_resultados ?? '',
+                        fecha_inicio_envio_reporte: ciclo.fecha_inicio_envio_reporte ?? '',
+                        fecha_fin_envio_reporte: ciclo.fecha_fin_envio_reporte ?? '',
+                    };
                     this.openModal = true;
+                },
+
+                // Al cambiar una fecha, completa/empuja las siguientes para mantener el orden cronológico
+                cascade(field) {
+                    const i = FIELDS.indexOf(field);
+                    let prev = this.form[field];
+                    if (i === -1 || !prev) return;
+                    for (let j = i + 1; j < FIELDS.length; j++) {
+                        if (!this.form[FIELDS[j]] || this.form[FIELDS[j]] < prev) {
+                            this.form[FIELDS[j]] = prev;
+                        }
+                        prev = this.form[FIELDS[j]];
+                    }
+                },
+
+                // Validación en vivo: nombre + 6 fechas completas y en orden
+                get valid() {
+                    if (!this.form.nombre || !this.form.nombre.trim()) return false;
+                    for (const f of FIELDS) {
+                        if (!this.form[f]) return false;
+                    }
+                    for (let i = 1; i < FIELDS.length; i++) {
+                        if (this.form[FIELDS[i]] < this.form[FIELDS[i - 1]]) return false;
+                    }
+                    return true;
                 },
             }
         }

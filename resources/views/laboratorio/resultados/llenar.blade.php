@@ -70,33 +70,46 @@
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 document.querySelectorAll(".campo-entrada").forEach(input => {
-                    let errorMsg = document.createElement("small");
-                    errorMsg.classList.add("text-red-600", "text-xs", "hidden");
-                    input.insertAdjacentElement("afterend", errorMsg);
-                    input.addEventListener("input", () => validarCampo(input, errorMsg));
-                    input.addEventListener("change", () => validarCampo(input, errorMsg));
+                    // Envolvemos el input en un contenedor relativo para anclar el globo de
+                    // error de forma absoluta: así flota debajo del campo SIN ocupar espacio
+                    // en la celda (no descuadra la tabla).
+                    const wrap = document.createElement("span");
+                    wrap.className = "relative block w-full";
+                    input.parentNode.insertBefore(wrap, input);
+                    wrap.appendChild(input);
+
+                    const bubble = document.createElement("small");
+                    bubble.className = "absolute left-0 top-full mt-0.5 z-20 bg-red-600 " +
+                        "text-white text-xs rounded px-2 py-0.5 shadow whitespace-nowrap hidden";
+                    wrap.appendChild(bubble);
+
+                    const validar = () => validarCampo(input, bubble);
+                    input.addEventListener("input", validar);
+                    input.addEventListener("change", validar);
                 });
 
-                function validarCampo(input, errorMsg) {
+                function validarCampo(input, bubble) {
                     if (input.checkValidity()) {
-                        errorMsg.textContent = "";
-                        errorMsg.classList.add("hidden");
+                        bubble.classList.add("hidden");
                         input.classList.remove("border-red-500");
                         input.classList.add("border-green-500");
-                    } else {
-                        let mensaje = input.dataset.mensajeError || "Valor inválido";
-                        if (input.validity.valueMissing) mensaje = "Este campo es obligatorio";
-                        if (input.validity.tooShort) mensaje = `Mínimo ${input.minLength} caracteres`;
-                        if (input.validity.tooLong) mensaje = `Máximo ${input.maxLength} caracteres`;
-                        if (input.validity.rangeUnderflow) mensaje = `El valor debe ser >= ${input.min}`;
-                        if (input.validity.rangeOverflow) mensaje = `El valor debe ser <= ${input.max}`;
-                        if (input.validity.patternMismatch) mensaje = "Formato inválido";
-
-                        errorMsg.textContent = mensaje;
-                        errorMsg.classList.remove("hidden");
-                        input.classList.add("border-red-500");
-                        input.classList.remove("border-green-500");
+                        return;
                     }
+
+                    // Mensaje personalizado configurado por el admin (data-mensaje-validacion).
+                    const custom = input.dataset.mensajeValidacion;
+                    let mensaje = custom || "Valor inválido";
+                    if (input.validity.valueMissing) mensaje = "Este campo es obligatorio";
+                    else if (input.validity.tooShort) mensaje = `Mínimo ${input.minLength} caracteres`;
+                    else if (input.validity.tooLong) mensaje = `Máximo ${input.maxLength} caracteres`;
+                    else if (input.validity.rangeUnderflow) mensaje = `El valor debe ser ≥ ${input.min}`;
+                    else if (input.validity.rangeOverflow) mensaje = `El valor debe ser ≤ ${input.max}`;
+                    else if (input.validity.patternMismatch) mensaje = custom || "Formato inválido";
+
+                    bubble.innerHTML = `<i class="fas fa-triangle-exclamation mr-1"></i>${mensaje}`;
+                    bubble.classList.remove("hidden");
+                    input.classList.add("border-red-500");
+                    input.classList.remove("border-green-500");
                 }
             });
         </script>
