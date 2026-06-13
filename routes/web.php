@@ -309,6 +309,7 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(func
     Route::post('/ea/{id}/subir_ponderaciones', [ResponsableLaboratorioController::class, 'uploadCertificadoData'])->name('ea.lab.subir.ponderaciones');
     Route::get('/ea/{id}/en_revision', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoTemporal'])->name('ea.lab.desempeno.temporal');
     Route::get('/ea/{id}/labs-ajax', [ResponsableLaboratorioController::class, 'getData'])->name('ea.lab.inscritos.ajax');
+    Route::get('/ea/{id}/labs/exportar', [ResponsableLaboratorioController::class, 'exportInscripciones'])->name('ea.lab.inscritos.exportar');
     Route::post('/detalle-certificado/{id}', [DetalleCertificadoController::class, 'update'])->name('detalle-certificado.update');
     Route::post('/ea/{id}/certificado/confirmar', [ResponsableLaboratorioController::class, 'confirmarDatosCertificados'])->name('confirmar.datos.certificados');
     Route::get('/ea/{id}/certificado/confirmados', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoConfirmados'])->name('ea.lab.desempeno.confirmado');

@@ -10,6 +10,22 @@
                 <h1 class="text-xl font-bold text-gray-800">Lista de inscripciones a
                     {{ $ensayosAptitud->descripcion }}</h1>
             </div>
+
+            <!-- Botones de exportación -->
+            <div class="flex flex-wrap gap-2 justify-end">
+                <a id="export-excel" href="#"
+                    class="flex items-center gap-2 px-4 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 shadow-sm">
+                    <i class="fas fa-file-excel text-green-600"></i> Exportar Excel
+                </a>
+                <a id="export-pdf" href="#"
+                    class="flex items-center gap-2 px-4 py-2 rounded-md text-sm bg-red-600 hover:bg-red-700 text-white shadow-sm">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </a>
+                <a id="export-json" href="#"
+                    class="flex items-center gap-2 px-4 py-2 border rounded-md text-sm bg-white hover:bg-gray-50 shadow-sm">
+                    <i class="fas fa-file-code text-yellow-600"></i> Exportar JSON
+                </a>
+            </div>
         </div>
 
         <!-- Filtros y Buscador -->
@@ -176,7 +192,22 @@
                 $('#custom-search').on('keypress', e => {
                     if (e.which === 13) table.search($('#custom-search').val()).draw();
                 });
-                $('#filter-gestion').on('change', () => table.draw());
+
+                // Mantener los enlaces de exportación con la gestión seleccionada.
+                const baseExport = "{{ route('ea.lab.inscritos.exportar', $idEa) }}";
+
+                function actualizarEnlacesExport() {
+                    const gestion = $('#filter-gestion').val();
+                    $('#export-excel').attr('href', `${baseExport}?format=xlsx&gestion=${gestion}`);
+                    $('#export-pdf').attr('href', `${baseExport}?format=pdf&gestion=${gestion}`);
+                    $('#export-json').attr('href', `${baseExport}?format=json&gestion=${gestion}`);
+                }
+                actualizarEnlacesExport();
+
+                $('#filter-gestion').on('change', () => {
+                    actualizarEnlacesExport();
+                    table.draw();
+                });
                 $('#filter-pais').on('change', async function() {
                     const pais = this.value;
                     $('#filter-dep').prop('disabled', !pais).html('<option>Cargando...</option>');
