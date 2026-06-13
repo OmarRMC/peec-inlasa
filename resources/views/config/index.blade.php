@@ -15,7 +15,7 @@
                 </div>
             @endif
             {{-- , ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'] --}}
-            @foreach ([['id' => 'registro', 'title' => 'Periodo de registro de nuevos laboratorios'], ['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.aprobacion', 'title' => 'Información personalizada para email de aprobacion'], ['id' => 'email.observacion', 'title' => 'Información personalizada para email de observacion'], ['id' => 'habilitar.docs.inscripcion', 'title' => 'Habilitar la subida de documentos de inscripción'], ['id' => 'habilitar.docs.pagos', 'title' => 'Habilitar la subida de comprobantes de pagos']] as $item)
+            @foreach ([['id' => 'registro', 'title' => 'Periodo de registro de nuevos laboratorios', 'repKey' => Configuracion::FECHA_INICIO_REGISTRO_NUEVO_LAB], ['id' => 'inscripcion', 'title' => 'Periodo de Inscripción', 'repKey' => Configuracion::GESTION_INSCRIPCION], ['id' => 'pago', 'title' => 'Periodo de Pago', 'repKey' => Configuracion::FECHA_INICIO_PAGO], ['id' => 'notificacion', 'title' => 'Notificaciones', 'repKey' => Configuracion::NOTIFICACION_KEY], ['id' => 'email.aprobacion', 'title' => 'Información personalizada para email de aprobacion', 'repKey' => Configuracion::EMAIL_APROBACION], ['id' => 'email.observacion', 'title' => 'Información personalizada para email de observacion', 'repKey' => Configuracion::EMAIL_OBSERVACION], ['id' => 'habilitar.docs.inscripcion', 'title' => 'Habilitar la subida de documentos de inscripción', 'repKey' => Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_INSCRIPCION], ['id' => 'habilitar.docs.pagos', 'title' => 'Habilitar la subida de comprobantes de pagos', 'repKey' => Configuracion::HABILITAR_SUBIDA_DOCUMENTOS_PAGOS]] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -31,6 +31,16 @@
                         class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
                         <div class="px-5 py-4 space-y-4 text-sm text-gray-700">
                             @php $config = 'configuracion.update'; @endphp
+
+                            @php $rep = $ultimasActualizaciones[$item['repKey']] ?? null; @endphp
+                            @if ($rep && $rep->editor)
+                                <p class="text-xs text-gray-500 italic">
+                                    <i class="fas fa-user-clock mr-1"></i>
+                                    Última actualización por
+                                    {{ trim($rep->editor->nombre . ' ' . $rep->editor->ap_paterno) ?: $rep->editor->username }}
+                                    el {{ formatDate($rep->updated_at) }}
+                                </p>
+                            @endif
 
                             @switch($item['id'])
                                 @case('registro')
