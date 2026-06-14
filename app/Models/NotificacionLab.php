@@ -118,4 +118,6 @@ class NotificacionLab extends Model implements AuditableContract
     public function getEsRecurrenteAttribute(): bool    { return (bool) $this->notificacion?->es_recurrente; }
     public function getEstaVigenteAttribute(): bool     { return (bool) $this->notificacion?->esta_vigente; }
     public function getCreadorAttribute()               { return $this->notificacion?->creador; }
+    public function getEsAutomaticaAttribute(): bool    { return (bool) $this->notificacion?->es_automatica; }
+    public function getNombreCreadorAttribute(): string { return $this->notificacion?->nombre_creador ?? '-'; }
 }

@@ -119,9 +119,9 @@
                         <td class="p-2 text-gray-600 text-xs">{{ $n->created_at?->format('d/m/Y H:i') }}</td>
                         <td class="p-2 text-xs">
                             <div class="text-gray-700">
-                                {{ $n->creador ? trim($n->creador->nombre . ' ' . $n->creador->ap_paterno) : '-' }}
+                                {{ $n->nombre_creador }}
                             </div>
-                            <div class="text-gray-400">{{ $n->creador?->email }}</div>
+                            <div class="text-gray-400">{{ $n->es_automatica ? '' : $n->creador?->email }}</div>
                         </td>
                         <td class="p-2">
                             <span class="px-2 py-0.5 rounded text-xs {{ $estadoBadge[1] }}">

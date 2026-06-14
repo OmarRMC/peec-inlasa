@@ -192,6 +192,26 @@ class NotificacionLabService
     }
 
     /**
+     * Resuelve las recepciones pendientes de un SOLO laboratorio para las notificaciones
+     * que matcheen tipo+entidad. Útil cuando una acción del propio lab debe cerrar su
+     * notificación persistente (ej: el lab envía resultados → se resuelve su recordatorio),
+     * sin afectar a los demás destinatarios. Devuelve la cantidad de recepciones resueltas.
+     */
+    public static function resolverParaLab(string $tipo, string $entidadTipo, int $entidadId, int $idLab): int
+    {
+        $ids = Notificacion::deTipo($tipo)
+            ->deEntidad($entidadTipo, $entidadId)
+            ->pluck('id');
+
+        if ($ids->isEmpty()) return 0;
+
+        return NotificacionLab::whereIn('id_notificacion', $ids)
+            ->where('id_lab', $idLab)
+            ->whereNull('resuelta_en')
+            ->update(['resuelta_en' => now()]);
+    }
+
+    /**
      * Resuelve una notificación para TODOS sus destinatarios.
      * Para el botón "Resolver para todos" en la vista edit.
      */
@@ -241,6 +261,15 @@ class NotificacionLabService
         }
 
         return View::make($vista, ['mensaje' => $mensaje, 'notif' => $notif])->render();
+    }
+
+    /**
+     * Sanitiza HTML con la misma lista blanca de tags usada en las notificaciones in-app.
+     * Punto de reutilización para los correos (notificación manual, etc.).
+     */
+    public static function sanitizar(string $html): string
+    {
+        return self::sanitizarHtml($html);
     }
 
     private static function sanitizarHtml(string $html): string

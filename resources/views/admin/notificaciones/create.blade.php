@@ -270,6 +270,20 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+                    <label class="flex items-start gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="enviar_email" value="1" class="mt-0.5 text-indigo-600"
+                            {{ old('enviar_email') ? 'checked' : '' }}>
+                        <span>
+                            <span class="font-semibold">Notificar también por correo electrónico</span>
+                            <span class="block text-xs text-gray-500 mt-0.5">
+                                Se enviará un correo con el mismo título y mensaje al correo principal de
+                                cada laboratorio seleccionado, además de la notificación en el sistema.
+                            </span>
+                        </span>
+                    </label>
+                </div>
             </div>
 
             <div class="lg:col-span-2 flex justify-end gap-2">

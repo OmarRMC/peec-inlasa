@@ -19,6 +19,7 @@ class Notificacion extends Model implements AuditableContract
     const TIPO_OBSERVACION_INSCRIPCION = 'observacion_inscripcion';
     const TIPO_CERTIFICADO_DISPONIBLE = 'certificado_disponible';
     const TIPO_DEUDA_PENDIENTE = 'deuda_pendiente';
+    const TIPO_RECORDATORIO_RESULTADOS = 'recordatorio_resultados';
     const TIPO_GENERAL = 'general';
 
     const MODO_UNA_VEZ = 'una_vez';
@@ -27,25 +28,37 @@ class Notificacion extends Model implements AuditableContract
     const ENTIDAD_INSCRIPCION = 'inscripcion';
     const ENTIDAD_CERTIFICADO = 'certificado';
     const ENTIDAD_PAGO = 'pago';
+    const ENTIDAD_CICLO = 'ciclo';
+
+    /** Nombre a mostrar como remitente de las notificaciones generadas automáticamente. */
+    const REMITENTE_SISTEMA = 'Sistema (automático)';
+
+    /** Tipos que genera el sistema de forma automática (sin un usuario real detrás). */
+    const TIPOS_SISTEMA = [
+        self::TIPO_RECORDATORIO_RESULTADOS,
+    ];
 
     const TITULOS = [
         self::TIPO_OBSERVACION_INSCRIPCION => 'Su inscripción tiene observaciones',
-        // self::TIPO_CERTIFICADO_DISPONIBLE  => 'Certificado disponible',  // no integrado aún ocultar de filtros
+        self::TIPO_CERTIFICADO_DISPONIBLE  => 'Certificado disponible',
         // self::TIPO_DEUDA_PENDIENTE         => 'Tiene una deuda pendiente', // no integrado aún ocultar de filtros
+        self::TIPO_RECORDATORIO_RESULTADOS => 'Recordatorio: envío de resultados',
         self::TIPO_GENERAL                 => 'Notificación',
     ];
 
     const ICONOS = [
         self::TIPO_OBSERVACION_INSCRIPCION => 'fas fa-exclamation-triangle',
-        // self::TIPO_CERTIFICADO_DISPONIBLE  => 'fas fa-award',
+        self::TIPO_CERTIFICADO_DISPONIBLE  => 'fas fa-award',
         // self::TIPO_DEUDA_PENDIENTE         => 'fas fa-money-bill-wave',
+        self::TIPO_RECORDATORIO_RESULTADOS => 'fas fa-flask-vial',
         self::TIPO_GENERAL                 => 'fas fa-bell',
     ];
 
     const COLORES = [
         self::TIPO_OBSERVACION_INSCRIPCION => 'yellow',
-        // self::TIPO_CERTIFICADO_DISPONIBLE  => 'green',
+        self::TIPO_CERTIFICADO_DISPONIBLE  => 'green',
         // self::TIPO_DEUDA_PENDIENTE         => 'red',
+        self::TIPO_RECORDATORIO_RESULTADOS => 'blue',
         self::TIPO_GENERAL                 => 'indigo',
     ];
 
@@ -129,6 +142,10 @@ class Notificacion extends Model implements AuditableContract
         if (!$this->entidad_tipo || !$this->entidad_id) return null;
         return match ($this->entidad_tipo) {
             self::ENTIDAD_INSCRIPCION => route('lab.inscripcion.show', $this->entidad_id),
+            self::ENTIDAD_CICLO => isset($this->mensaje['id_ea'])
+                ? route('lab.inscritos-ensayos.formularios', $this->mensaje['id_ea'])
+                : route('lab.inscritos-ensayos.index'),
+            self::ENTIDAD_CERTIFICADO => route('lab.certificados.disponibles.index'),
             default => null,
         };
     }
@@ -153,5 +170,23 @@ class Notificacion extends Model implements AuditableContract
         if ($this->fecha_inicio && $this->fecha_inicio->toDateString() > $hoy) return false;
         if ($this->fecha_fin && $this->fecha_fin->toDateString() < $hoy) return false;
         return true;
+    }
+
+    /** True si la notificación fue generada automáticamente por el sistema. */
+    public function getEsAutomaticaAttribute(): bool
+    {
+        return in_array($this->tipo, self::TIPOS_SISTEMA, true);
+    }
+
+    /** Nombre del remitente a mostrar: "Sistema" para las automáticas, el usuario real en el resto. */
+    public function getNombreCreadorAttribute(): string
+    {
+        if ($this->es_automatica) {
+            return self::REMITENTE_SISTEMA;
+        }
+
+        return $this->creador
+            ? trim($this->creador->nombre . ' ' . $this->creador->ap_paterno)
+            : '-';
     }
 }

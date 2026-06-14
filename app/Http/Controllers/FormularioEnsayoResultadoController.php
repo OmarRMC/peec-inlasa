@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\EnsayoAptitud;
 use App\Models\FormularioEnsayoResultado;
 use App\Models\InscripcionEA;
+use App\Models\Notificacion;
 use App\Models\Permiso;
 use App\Models\RespuestaCampo;
 use App\Services\MapeadorValorRespuesta;
+use App\Services\NotificacionLabService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -261,6 +263,19 @@ class FormularioEnsayoResultadoController extends Controller
             }
 
             DB::commit();
+
+            // El lab ya envió resultados de este ciclo: resolver su recordatorio persistente
+            // para que deje de mostrarse el modal (no afecta a los demás laboratorios).
+            try {
+                NotificacionLabService::resolverParaLab(
+                    Notificacion::TIPO_RECORDATORIO_RESULTADOS,
+                    Notificacion::ENTIDAD_CICLO,
+                    $ciclo->id,
+                    $laboratorio->id
+                );
+            } catch (\Throwable $e) {
+                Log::error('No se pudo resolver el recordatorio de resultados: ' . $e->getMessage());
+            }
 
             $mensaje = $cantidadProcesados > 1
                 ? "Se guardaron $cantidadProcesados formularios correctamente."

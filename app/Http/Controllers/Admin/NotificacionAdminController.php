@@ -14,8 +14,11 @@ use App\Models\Pais;
 use App\Models\Permiso;
 use App\Models\TipoLaboratorio;
 use App\Models\User;
+use App\Mail\NotificacionGeneralLab;
 use App\Services\NotificacionLabService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class NotificacionAdminController extends Controller
 {
@@ -150,6 +153,7 @@ class NotificacionAdminController extends Controller
             'modo'         => 'required|in:' . NotificacionLab::MODO_UNA_VEZ . ',' . NotificacionLab::MODO_PERSISTENTE,
             'fecha_inicio' => 'nullable|date|required_if:modo,' . NotificacionLab::MODO_PERSISTENTE,
             'fecha_fin'    => 'nullable|date|required_if:modo,' . NotificacionLab::MODO_PERSISTENTE . '|after_or_equal:fecha_inicio',
+            'enviar_email' => 'nullable|boolean',
         ]);
 
         $count = NotificacionLabService::notificarGeneralAVarios(
@@ -162,9 +166,34 @@ class NotificacionAdminController extends Controller
             $data['fecha_fin'] ?? null
         );
 
+        $correos = 0;
+        if ($request->boolean('enviar_email')) {
+            $labs = Laboratorio::whereIn('id', $data['id_labs'])
+                ->get(['id', 'nombre_lab', 'mail_lab']);
+
+            foreach ($labs as $lab) {
+                if (empty($lab->mail_lab)) {
+                    continue;
+                }
+                try {
+                    Mail::to($lab->mail_lab)->send(
+                        new NotificacionGeneralLab($lab->nombre_lab, $data['titulo'], $data['mensaje'])
+                    );
+                    $correos++;
+                } catch (\Throwable $e) {
+                    Log::error('Notificación email lab ' . $lab->id . ': ' . $e->getMessage());
+                }
+            }
+        }
+
+        $mensaje = "Notificación enviada a {$count} laboratorio(s).";
+        if ($request->boolean('enviar_email')) {
+            $mensaje .= " Correos enviados: {$correos}.";
+        }
+
         return redirect()
             ->route('admin.notificaciones.index')
-            ->with('success', "Notificación enviada a {$count} laboratorio(s).");
+            ->with('success', $mensaje);
     }
 
     public function resolver(Request $request, $id)
