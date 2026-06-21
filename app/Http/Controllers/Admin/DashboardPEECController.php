@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Permiso;
 use App\Services\Estadistica\CalculadorClasico;
+use App\Services\Estadistica\ComportamientoCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -41,24 +42,32 @@ class DashboardPEECController extends Controller
             ->where('gestion', $gestion)
             ->count();
 
+        // KPI "% Aptitud global" (z-score). El donut se removio; solo se usa el porcentaje.
         $pctGestion = CalculadorClasico::porcentajeSatisfactoriosGestion($gestion);
         $tasasPorEnsayo = CalculadorClasico::tasasPorEnsayoGestion($gestion);
         $heatmap = CalculadorClasico::heatmapEnsayosCiclos($gestion);
         $labsProblematicos = CalculadorClasico::labsProblematicos($gestion, 6, 2);
 
+        // Comportamiento de ensayos / paquetes (demanda y evolucion, sin z-score)
+        $inscritosPorEnsayo  = ComportamientoCalculator::inscritosPorEnsayo($gestion);
+        $inscritosPorPaquete = ComportamientoCalculator::inscritosPorPaquete($gestion);
+        $evolucion           = ComportamientoCalculator::evolucionInscripciones();
+
         return view('admin.dashboard.peec', [
-            'gestion'           => $gestion,
-            'gestiones'         => $gestiones,
-            'kpis'              => [
+            'gestion'             => $gestion,
+            'gestiones'           => $gestiones,
+            'kpis'                => [
                 'ensayos_activos'  => $ensayosActivos,
                 'labs_activos'     => $labsActivos,
                 'total_resultados' => $totalResultados,
                 'pct_aptitud'      => $pctGestion['pct_satisfactorios'],
             ],
-            'desempeno'         => $pctGestion,
-            'tasasPorEnsayo'    => $tasasPorEnsayo,
-            'heatmap'           => $heatmap,
-            'labsProblematicos' => $labsProblematicos,
+            'tasasPorEnsayo'      => $tasasPorEnsayo,
+            'heatmap'             => $heatmap,
+            'labsProblematicos'   => $labsProblematicos,
+            'inscritosPorEnsayo'  => $inscritosPorEnsayo,
+            'inscritosPorPaquete' => $inscritosPorPaquete,
+            'evolucion'           => $evolucion,
         ]);
     }
 }

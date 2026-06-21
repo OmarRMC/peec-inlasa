@@ -42,48 +42,67 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-            {{-- V5: Donut desempeno global --}}
-            <div class="bg-white border rounded p-4 lg:col-span-1">
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Desempeño global</h3>
-                @if ($desempeno['n'] > 0)
-                    <canvas id="donutGlobal" height="200"></canvas>
-                    <ul class="text-xs mt-3 space-y-1">
-                        <li class="flex items-center gap-2">
-                            <span class="inline-block w-3 h-3 bg-green-500 rounded-full"></span>
-                            Satisfactorios: <strong>{{ $desempeno['satisfactorios'] }}</strong>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="inline-block w-3 h-3 bg-yellow-500 rounded-full"></span>
-                            Cuestionables: <strong>{{ $desempeno['cuestionables'] }}</strong>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span>
-                            No satisfactorios: <strong>{{ $desempeno['no_satisfactorios'] }}</strong>
-                        </li>
-                        <li class="border-t pt-1 mt-2">
-                            Total evaluaciones: <strong>{{ $desempeno['n'] }}</strong>
-                        </li>
-                    </ul>
+        {{-- V6: Bar chart tasa respuesta por ensayo --}}
+        <div class="bg-white border rounded p-4 mb-6">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3">
+                Tasa de respuesta por ensayo
+                <span class="text-xs text-gray-400 font-normal">(ciclo más reciente de cada ensayo)</span>
+            </h3>
+            @if ($tasasPorEnsayo->isNotEmpty())
+                <div style="position:relative; height:{{ max(200, $tasasPorEnsayo->count() * 24) }}px;">
+                    <canvas id="tasasPorEnsayo"></canvas>
+                </div>
+            @else
+                <p class="text-xs text-gray-400 italic">Sin ensayos en esta gestión.</p>
+            @endif
+        </div>
+
+        {{-- Comportamiento: inscritos por ensayo / por paquete --}}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            {{-- Inscritos por ensayo --}}
+            <div class="bg-white border rounded p-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">
+                    Laboratorios inscritos por ensayo
+                    <span class="text-xs text-gray-400 font-normal">(demanda en la gestión)</span>
+                </h3>
+                @if ($inscritosPorEnsayo->isNotEmpty())
+                    <div style="position:relative; height:{{ max(200, $inscritosPorEnsayo->count() * 24) }}px;">
+                        <canvas id="inscritosPorEnsayo"></canvas>
+                    </div>
                 @else
-                    <p class="text-xs text-gray-400 italic">Sin evaluaciones registradas en esta gestión.</p>
+                    <p class="text-xs text-gray-400 italic">Sin inscripciones en esta gestión.</p>
                 @endif
             </div>
 
-            {{-- V6: Bar chart tasa respuesta por ensayo --}}
-            <div class="bg-white border rounded p-4 lg:col-span-2">
+            {{-- Inscritos por paquete --}}
+            <div class="bg-white border rounded p-4">
                 <h3 class="text-sm font-semibold text-gray-700 mb-3">
-                    Tasa de respuesta por ensayo
-                    <span class="text-xs text-gray-400 font-normal">(ciclo más reciente de cada ensayo)</span>
+                    Laboratorios inscritos por paquete
+                    <span class="text-xs text-gray-400 font-normal">(vs cupo máximo)</span>
                 </h3>
-                @if ($tasasPorEnsayo->isNotEmpty())
-                    <div style="position:relative; height:{{ max(200, $tasasPorEnsayo->count() * 24) }}px;">
-                        <canvas id="tasasPorEnsayo"></canvas>
+                @if ($inscritosPorPaquete->isNotEmpty())
+                    <div style="position:relative; height:{{ max(200, $inscritosPorPaquete->count() * 28) }}px;">
+                        <canvas id="inscritosPorPaquete"></canvas>
                     </div>
                 @else
-                    <p class="text-xs text-gray-400 italic">Sin ensayos en esta gestión.</p>
+                    <p class="text-xs text-gray-400 italic">Sin inscripciones en esta gestión.</p>
                 @endif
             </div>
+        </div>
+
+        {{-- Evolución de inscripciones por gestión --}}
+        <div class="bg-white border rounded p-4 mb-6">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3">
+                Evolución de inscripciones por gestión
+                <span class="text-xs text-gray-400 font-normal">(todas las gestiones)</span>
+            </h3>
+            @if ($evolucion->isNotEmpty())
+                <div style="position:relative; height:280px;">
+                    <canvas id="evolucionInscripciones"></canvas>
+                </div>
+            @else
+                <p class="text-xs text-gray-400 italic">Sin inscripciones registradas.</p>
+            @endif
         </div>
 
         {{-- V9: Heatmap ensayos x ciclos --}}
@@ -246,20 +265,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        @if ($desempeno['n'] > 0)
-        new Chart(document.getElementById('donutGlobal'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Satisfactorios', 'Cuestionables', 'No satisfactorios'],
-                datasets: [{
-                    data: [{{ $desempeno['satisfactorios'] }}, {{ $desempeno['cuestionables'] }}, {{ $desempeno['no_satisfactorios'] }}],
-                    backgroundColor: ['rgba(34,197,94,0.85)', 'rgba(234,179,8,0.85)', 'rgba(239,68,68,0.85)'],
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }}}
-        });
-        @endif
-
         @if ($tasasPorEnsayo->isNotEmpty())
         (function () {
             const tasas = @json($tasasPorEnsayo->all());
@@ -304,6 +309,134 @@
                     scales: {
                         x: { beginAtZero: true, max: 100, title: { display: true, text: '%' }},
                         y: { ticks: { font: { size: 9 }, autoSkip: false }}
+                    }
+                }
+            });
+        })();
+        @endif
+
+        @if ($inscritosPorEnsayo->isNotEmpty())
+        (function () {
+            const datos = @json($inscritosPorEnsayo->all());
+            const labels = datos.map(d => {
+                const paq = (d.paquete || 'Sin paquete');
+                const ens = d.descripcion;
+                const paqShort = paq.length > 30 ? paq.slice(0,30)+'...' : paq;
+                const ensShort = ens.length > 35 ? ens.slice(0,35)+'...' : ens;
+                return [paqShort, ensShort];
+            });
+            new Chart(document.getElementById('inscritosPorEnsayo'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Labs inscritos',
+                        data: datos.map(d => d.labs_inscritos),
+                        backgroundColor: 'rgba(79,70,229,0.85)',
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: items => {
+                                    const d = datos[items[0].dataIndex];
+                                    return (d.paquete || 'Sin paquete') + ' - ' + d.descripcion;
+                                },
+                                label: ctx => 'Labs inscritos: ' + datos[ctx.dataIndex].labs_inscritos
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'Laboratorios' }},
+                        y: { ticks: { font: { size: 9 }, autoSkip: false }}
+                    }
+                }
+            });
+        })();
+        @endif
+
+        @if ($inscritosPorPaquete->isNotEmpty())
+        (function () {
+            const datos = @json($inscritosPorPaquete->all());
+            const labels = datos.map(d => {
+                const desc = d.descripcion || 'Sin nombre';
+                return desc.length > 40 ? desc.slice(0,40)+'...' : desc;
+            });
+            new Chart(document.getElementById('inscritosPorPaquete'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Labs inscritos',
+                        data: datos.map(d => d.labs_inscritos),
+                        backgroundColor: datos.map(d => {
+                            if (!d.max_participantes) return 'rgba(79,70,229,0.85)';
+                            const ocup = d.labs_inscritos / d.max_participantes;
+                            if (ocup >= 1)   return 'rgba(239,68,68,0.85)';   // lleno / sobrecupo
+                            if (ocup >= 0.8) return 'rgba(234,179,8,0.85)';   // casi lleno
+                            return 'rgba(34,197,94,0.85)';                    // con cupo
+                        }),
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: items => datos[items[0].dataIndex].descripcion,
+                                label: ctx => {
+                                    const d = datos[ctx.dataIndex];
+                                    const cupo = d.max_participantes ? (' / ' + d.max_participantes + ' cupos') : '';
+                                    return 'Inscritos: ' + d.labs_inscritos + cupo;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'Laboratorios' }},
+                        y: { ticks: { font: { size: 10 }, autoSkip: false }}
+                    }
+                }
+            });
+        })();
+        @endif
+
+        @if ($evolucion->isNotEmpty())
+        (function () {
+            const datos = @json($evolucion->all());
+            new Chart(document.getElementById('evolucionInscripciones'), {
+                type: 'line',
+                data: {
+                    labels: datos.map(d => d.gestion),
+                    datasets: [
+                        {
+                            label: 'Inscripciones',
+                            data: datos.map(d => d.total_inscripciones),
+                            borderColor: 'rgba(79,70,229,1)',
+                            backgroundColor: 'rgba(79,70,229,0.15)',
+                            tension: 0.3, fill: true,
+                        },
+                        {
+                            label: 'Laboratorios',
+                            data: datos.map(d => d.total_labs),
+                            borderColor: 'rgba(16,185,129,1)',
+                            backgroundColor: 'rgba(16,185,129,0.15)',
+                            tension: 0.3, fill: true,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' }},
+                    scales: {
+                        x: { title: { display: true, text: 'Gestión' }},
+                        y: { beginAtZero: true, ticks: { precision: 0 }}
                     }
                 }
             });

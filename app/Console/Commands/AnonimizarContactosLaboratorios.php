@@ -16,7 +16,7 @@ class AnonimizarContactosLaboratorios extends Command
                             {--dry-run : Simula los cambios sin guardarlos}
                             {--force : Omite el guard de producción y la confirmación interactiva}';
 
-    protected $description = 'Reemplaza correos, teléfonos y nombres de laboratorios y sus usuarios por valores falsos deterministas (para entornos de prueba con copia de producción)';
+    protected $description = 'Reemplaza correos, teléfonos, nombres y CI (responsable y representante legal) de laboratorios y sus usuarios por valores falsos deterministas (para entornos de prueba con copia de producción)';
 
     public function handle(): int
     {
@@ -35,7 +35,7 @@ class AnonimizarContactosLaboratorios extends Command
         $this->info("Laboratorios encontrados: {$total}");
 
         // 2) Confirmación interactiva (salvo dry-run o --force).
-        if (!$dryRun && !$force && !$this->confirm("Se reemplazarán correos, teléfonos y nombres de {$total} laboratorios y sus usuarios. ¿Continuar?")) {
+        if (!$dryRun && !$force && !$this->confirm("Se reemplazarán correos, teléfonos, nombres y CI (responsable y representante legal) de {$total} laboratorios y sus usuarios. ¿Continuar?")) {
             $this->warn('Operación cancelada.');
             return self::SUCCESS;
         }
@@ -75,6 +75,8 @@ class AnonimizarContactosLaboratorios extends Command
                     $wapp2 = "6{$sufijo}";
                     $nombre = "Laboratorio de prueba {$lab->id}";
                     $sigla = "LAB{$lab->id}";
+                    $ciRespo = '60' . $sufijo;
+                    $ciRepre = '70' . $sufijo;
 
                     try {
                         // Nombre e identificación del laboratorio: siempre.
@@ -89,6 +91,14 @@ class AnonimizarContactosLaboratorios extends Command
                         }
                         if (!empty($lab->wapp2_lab)) {
                             $lab->wapp2_lab = $wapp2;
+                        }
+
+                        // CI de responsable y representante legal: solo si tenían valor.
+                        if (!empty($lab->ci_respo_lab)) {
+                            $lab->ci_respo_lab = $ciRespo;
+                        }
+                        if (!empty($lab->ci_repreleg_lab)) {
+                            $lab->ci_repreleg_lab = $ciRepre;
                         }
 
                         // Usuario asociado: email/telefono solo si tenían valor.
@@ -109,6 +119,8 @@ class AnonimizarContactosLaboratorios extends Command
 
                         if ($dryRun) {
                             $this->line("DRY RUN - Lab #{$lab->id} ({$lab->cod_lab}): nombre_lab -> {$nombre}, sigla_lab -> {$sigla}, mail_lab -> {$mail}, wapp_lab -> {$wapp}"
+                                . (!empty($lab->ci_respo_lab) ? ", ci_respo_lab -> {$ciRespo}" : '')
+                                . (!empty($lab->ci_repreleg_lab) ? ", ci_repreleg_lab -> {$ciRepre}" : '')
                                 . ($usuario ? " | usuario #{$usuario->id}: email -> {$usuario->email}, telefono -> {$usuario->telefono}" : ' | sin usuario'));
                             $labsActualizados++;
                             if ($tocaUsuario) {

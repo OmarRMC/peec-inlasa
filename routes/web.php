@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/perfil/contrasena', [ProfileController::class, 'editPassword'])->name('password.edit');
 });
 Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function () {
     Route::get('/notificaciones', [\App\Http\Controllers\Admin\NotificacionAdminController::class, 'index'])

@@ -376,10 +376,12 @@ class Laboratorio extends Model implements AuditableContract
             'code' => $codigoCertificado,
             'type' => Certificado::TYPE_PARTICIPACION,
         ]);
+        // SVG (PHP puro, sin Imagick) para evitar el módulo PNG de ImageMagick
+        // que puede estar bloqueado por políticas de control de aplicaciones del servidor.
         $qrBase64 = base64_encode(
-            QrCode::format('png')->size(320)->margin(1)->generate($verifyUrl)
+            QrCode::format('svg')->size(320)->margin(1)->generate($verifyUrl)
         );
-        $qrDataUri = "data:image/png;base64,{$qrBase64}";
+        $qrDataUri = "data:image/svg+xml;base64,{$qrBase64}";
         $plantillaDefault = PlantillaCertificado::query()->oldest()->first();
         if (!$plantilla || ($plantillaDefault && $plantilla->id === $plantillaDefault->id)) {
             $usarPlantilla = $plantilla ?? $plantillaDefault;
@@ -501,10 +503,12 @@ class Laboratorio extends Model implements AuditableContract
             'code' => $codigoCertificado,
             'type' => Certificado::TYPE_DESEMP,
         ]);
+        // SVG (PHP puro, sin Imagick) para evitar el módulo PNG de ImageMagick
+        // que puede estar bloqueado por políticas de control de aplicaciones del servidor.
         $qrBase64 = base64_encode(
-            QrCode::format('png')->size(320)->margin(1)->generate($verifyUrl)
+            QrCode::format('svg')->size(320)->margin(1)->generate($verifyUrl)
         );
-        $qrDataUri = "data:image/png;base64,{$qrBase64}";
+        $qrDataUri = "data:image/svg+xml;base64,{$qrBase64}";
         $plantillaDefault = PlantillaCertificado::query()->oldest()->first();
         if (!$plantilla || ($plantillaDefault && $plantilla->id === $plantillaDefault->id)) {
             $usarPlantilla = $plantilla ?? $plantillaDefault;
