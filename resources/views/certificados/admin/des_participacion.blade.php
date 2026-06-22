@@ -23,7 +23,7 @@
                         <span class="font-semibold">Notificar a los laboratorios por correo electrónico</span>
                         <span class="block text-xs text-gray-500 mt-0.5">
                             Además del aviso en el sistema, se enviará un correo a cada laboratorio cuyo
-                            certificado se publique.
+                            certificado se publico.
                         </span>
                     </span>
                 </label>

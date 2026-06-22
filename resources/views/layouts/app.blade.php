@@ -219,7 +219,7 @@
                         alt="INLASA Logo">
                 </div>
                 ©  {{ now()->year }} | <strong>INLASA</strong> Instituto Nacional de Laboratorios de Salud
-                <span class="float-right mr-4 text-gray-400">SigPEEC v2</span>
+                <span class="float-right mr-4 text-gray-400">SigPEEC</span>
             </footer>
         </div>
     </div>

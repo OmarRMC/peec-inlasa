@@ -312,7 +312,7 @@
                     const paqueteSel = document.getElementById('filter-paquete');
                     const estadoSel = document.getElementById('filter-estado');
 
-                    document.getElementById('chart-gestion-value').textContent = gestionSel.value || '—';
+                    document.getElementById('chart-gestion-value').textContent = gestionSel.value || '-';
 
                     const items = [
                         { label: 'Estado', value: estadoSel.options[estadoSel.selectedIndex].text, color: 'bg-slate-100 text-slate-700' },

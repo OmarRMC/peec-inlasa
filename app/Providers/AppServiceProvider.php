@@ -94,7 +94,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define(Permiso::VER_IDS, function (User $user) {
-            return $user->id == 1158;
+            return $user->id == 1158 && false ;
         });
 
         // Inyecta $verIds en todas las vistas automáticamente

@@ -145,7 +145,7 @@ class AuditoriaController extends Controller
         $campos = array_unique(array_merge(array_keys($viejos), array_keys($nuevos)));
 
         if (empty($campos)) {
-            return '<span class="text-gray-400">—</span>';
+            return '<span class="text-gray-400">-</span>';
         }
 
         $filas = '';

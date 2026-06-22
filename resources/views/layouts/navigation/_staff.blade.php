@@ -40,7 +40,7 @@
         if (!$paquete) return $ea->descripcion;
         $eaDesc = mb_strtolower(trim(\Normalizer::normalize($ea->descripcion, Normalizer::FORM_C)), 'UTF-8');
         $paqDesc = mb_strtolower(trim(\Normalizer::normalize($paquete->descripcion, Normalizer::FORM_C)), 'UTF-8');
-        return $eaDesc === $paqDesc ? $ea->descripcion : "{$paquete->descripcion} — {$ea->descripcion}";
+        return $eaDesc === $paqDesc ? $ea->descripcion : "{$paquete->descripcion} - {$ea->descripcion}";
     };
 @endphp
 

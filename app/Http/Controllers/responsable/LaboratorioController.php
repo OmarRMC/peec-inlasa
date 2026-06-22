@@ -19,6 +19,7 @@ use App\Models\TipoLaboratorio;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
@@ -294,7 +295,25 @@ class LaboratorioController extends Controller
         $gestiones = Inscripcion::rangoGestion([
             'status_inscripcion' => [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO],
         ]);
-        return view('responsable.upload_certificados', compact('ensayosAptitud', 'idEA', 'gestion', 'descripcion', 'gestiones'));
+
+        // Labs inscritos (aprobado/vencido) al EA en la gestión, para la tabla de registro manual.
+        // Incluye el desempeño ya registrado (si existe) para precargarlo en la tabla editable.
+        $labsManual = InscripcionEA::with([
+                'inscripcion.laboratorio',
+                'inscripcion.certificado.detalles' => fn($q) => $q->where('id_ea', $idEA),
+            ])
+            ->where('id_ea', $idEA)
+            ->whereHas('inscripcion', fn($q) => $q->where('gestion', $gestion)->aprobadoOrVencido())
+            ->get()
+            ->map(fn($iea) => [
+                'id_inscripcion' => $iea->inscripcion->id,
+                'cod_lab'        => $iea->inscripcion->laboratorio->cod_lab,
+                'nombre_lab'     => $iea->inscripcion->laboratorio->nombre_lab,
+                'desempeno'      => $iea->inscripcion->certificado?->detalles?->first()?->calificacion_certificado ?? '',
+            ])
+            ->unique('id_inscripcion')->values();
+
+        return view('responsable.upload_certificados', compact('ensayosAptitud', 'idEA', 'gestion', 'descripcion', 'gestiones', 'labsManual'));
     }
     public function uploadCertificadoData(Request $request, $id)
     {
@@ -368,31 +387,63 @@ class LaboratorioController extends Controller
                 continue;
             }
 
-            $certificado = Certificado::firstOrCreate(
-                ['id_inscripcion' => $inscripcion->id],
-                [
-                    'gestion_certificado' => $inscripcion->gestion,
-                    'nombre_laboratorio' => $lab->nombre_lab,
-                    'cod_lab' => $lab->cod_lab,
-                    'status_certificado' => 0,
-                    'plantilla_certificado_id' => $plantillaSeleccionada?->id,
-                ]
-            );
-            DetalleCertificado::updateOrCreate(
-                [
-                    'id_certificado' => $certificado->id,
-                    'id_ea'          => $id,
-                ],
-                [
-                    'detalle_ea' => $inscripcionEA->descripcion_ea,
-                    'detalle_area' => $inscripcionEA->ensayoAptitud->paquete->area->descripcion ?? null,
-                    'calificacion_certificado' => $fila['desempeno'] != 'NULL' ? $fila['desempeno'] : null,
-                    'updated_by' => $responsable->id,
-                    'temporal' => true,
-                ]
+            $this->guardarDesempenoDetalle(
+                $inscripcionEA,
+                $fila['desempeno'] != 'NULL' ? $fila['desempeno'] : null,
+                true, // temporal: el CSV sigue yendo a "En Revisión"
+                $responsable->id,
+                $plantillaSeleccionada
             );
         }
         return back()->with('success', 'Archivo procesado correctamente, Puedes revisar en al sección de Revision');
+    }
+
+    /**
+     * Crea o actualiza el desempeño (DetalleCertificado) de un laboratorio en un ensayo.
+     * Reutilizado por la carga CSV (temporal=true) y el registro manual (temporal=false).
+     * Cuando temporal=false, el certificado pasa a status_certificado=1 (confirmación directa).
+     */
+    private function guardarDesempenoDetalle(
+        InscripcionEA $inscripcionEA,
+        ?string $desempeno,
+        bool $temporal,
+        int $userId,
+        ?PlantillaCertificado $plantilla
+    ): DetalleCertificado {
+        $inscripcion = $inscripcionEA->inscripcion;
+        $lab = $inscripcion->laboratorio;
+
+        $certificado = Certificado::firstOrCreate(
+            ['id_inscripcion' => $inscripcion->id],
+            [
+                'gestion_certificado' => $inscripcion->gestion,
+                'nombre_laboratorio' => $lab->nombre_lab,
+                'cod_lab' => $lab->cod_lab,
+                'status_certificado' => 0,
+                'plantilla_certificado_id' => $plantilla?->id,
+            ]
+        );
+
+        $detalle = DetalleCertificado::updateOrCreate(
+            [
+                'id_certificado' => $certificado->id,
+                'id_ea'          => $inscripcionEA->id_ea,
+            ],
+            [
+                'detalle_ea' => $inscripcionEA->descripcion_ea,
+                'detalle_area' => $inscripcionEA->ensayoAptitud->paquete->area->descripcion ?? null,
+                'calificacion_certificado' => $desempeno,
+                'updated_by' => $userId,
+                'temporal' => $temporal,
+            ]
+        );
+
+        if ($temporal === false && $certificado->status_certificado != 1) {
+            $certificado->status_certificado = 1;
+            $certificado->save();
+        }
+
+        return $detalle;
     }
 
     public function getLaboratoriosDesempenoTemporal(Request $request, $idEa)
@@ -495,6 +546,90 @@ class LaboratorioController extends Controller
             return redirect()->back()->withErrors(['error' => 'Ocurrió un error al confirmar los datos de los certificados. Por favor, inténtalo de nuevo.']);
         }
         return redirect()->back()->with('success', 'Datos de certificados confirmados correctamente.');
+    }
+
+    /**
+     * Registro masivo del desempeño de varios laboratorios en un ensayo.
+     * Recibe un arreglo `registros` (id_inscripcion + calificacion_certificado).
+     * Confirmación directa: cada detalle queda temporal=false y status_certificado=1.
+     * Las filas con desempeño vacío se omiten.
+     */
+    public function registrarDesempenoMasivo(Request $request, $id)
+    {
+        if (!Gate::any([Permiso::JEFE_PEEC]) && !Configuracion::estaHabilitadoCargarCertificado()) {
+            return response()->json([
+                'message' => 'El periodo para la carga de desempeño no está habilitado actualmente.',
+            ], 403);
+        }
+
+        $responsable = Auth::user();
+        $ensayosAptitud = null;
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayosAptitud = EnsayoAptitud::find($id);
+        } else if (Gate::allows(Permiso::RESPONSABLE)) {
+            $ensayosAptitud = $responsable->responsablesEA->find($id);
+        }
+        if (!$ensayosAptitud) {
+            return response()->json(['message' => 'No se tiene el ensayo de aptitud solicitado.'], 404);
+        }
+
+        $request->validate([
+            'registros'                            => 'required|array|min:1',
+            'registros.*.id_inscripcion'           => 'required|integer',
+            'registros.*.calificacion_certificado' => 'nullable|string|max:100',
+        ]);
+
+        $gestion = $request->input('gestion', now()->year);
+
+        // Cargar una sola vez las InscripcionEA válidas del EA+gestión, indexadas por id_inscripcion.
+        // Esto valida pertenencia (lab <-> EA <-> gestión) sin confiar en los ids del cliente.
+        $validas = InscripcionEA::with(['inscripcion.laboratorio', 'ensayoAptitud.paquete.area'])
+            ->where('id_ea', $id)
+            ->whereHas('inscripcion', fn($q) => $q->where('gestion', $gestion)->aprobadoOrVencido())
+            ->get()
+            ->keyBy('id_inscripcion');
+
+        $guardados = 0;
+        $omitidos = 0;
+
+        try {
+            DB::transaction(function () use ($request, $responsable, $validas, &$guardados, &$omitidos) {
+                $plantilla = PlantillaCertificado::where('activo', PlantillaCertificado::SELECCIONADO)->first();
+
+                foreach ($request->input('registros') as $registro) {
+                    $valor = $registro['calificacion_certificado'] ?? null;
+                    // Omitir filas sin desempeño: no se crean certificados confirmados vacíos.
+                    if ($valor === null || trim($valor) === '') {
+                        $omitidos++;
+                        continue;
+                    }
+
+                    $inscripcionEA = $validas->get((int) $registro['id_inscripcion']);
+                    if (!$inscripcionEA) {
+                        $omitidos++;
+                        continue;
+                    }
+
+                    $this->guardarDesempenoDetalle(
+                        $inscripcionEA,
+                        $valor,
+                        false, // confirmación directa
+                        $responsable->id,
+                        $plantilla
+                    );
+                    $guardados++;
+                }
+            });
+        } catch (\Throwable $e) {
+            Log::error('Error al registrar desempeño masivo: ' . $e->getMessage());
+            return response()->json(['message' => 'Ocurrió un error al registrar los desempeños.'], 500);
+        }
+
+        return response()->json([
+            'message'   => "{$guardados} desempeño(s) registrado(s) correctamente." . ($omitidos ? " {$omitidos} omitido(s)." : ''),
+            'guardados' => $guardados,
+            'omitidos'  => $omitidos,
+        ]);
     }
 
     public function getLaboratoriosDesempenoConfirmados(Request $request,  $idEa)

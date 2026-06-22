@@ -12,6 +12,9 @@
             <button id="btn-tab-ponderaciones" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
                 Ver Ponderaciones
             </button>
+            <button id="btn-tab-manual" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                Registro manual
+            </button>
             <button id="btn-tab-download" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
                 onclick="window.location='{{ route('formato.csv.descargar') }}'">
                 <i class="fas fa-file-csv"></i> Descargar Formato
@@ -167,6 +170,95 @@
                 <div id="custom-info-certificado-ok"></div>
                 <div id="custom-pagination-certificado-ok" class="flex justify-center"></div>
             </div>
+        </div>
+
+        <!-- SECCIÓN 4: Registro manual (tabla editable) -->
+        <div id="section-manual" class="bg-white rounded-lg shadow p-6 hidden">
+            <h2 class="text-lg font-bold text-gray-800 mb-1">Registro manual de desempeño - Gestión {{ $gestion }}</h2>
+            <p class="text-xs text-gray-500 mb-4">Escriba el desempeño en cada laboratorio o use "Aplicar" para cargar el mismo valor en bloque. Las filas vacías se omiten.</p>
+
+            <datalist id="desempeno-list">
+                <option value="EXCELENTE"></option>
+                <option value="SATISFACTORIO"></option>
+                <option value="BUENO"></option>
+                <option value="ACEPTABLE"></option>
+                <option value="SUFICIENTE"></option>
+                <option value="REGULAR"></option>
+                <option value="CUESTIONABLE"></option>
+                <option value="NO SATISFACTORIO"></option>
+            </datalist>
+
+            @if ($labsManual->isEmpty())
+                <div class="p-4 bg-yellow-50 text-yellow-800 rounded text-sm">
+                    No hay laboratorios inscritos (aprobados/vencidos) en esta gestión.
+                </div>
+            @else
+                <!-- Barra aplicar masivo -->
+                <div class="flex flex-wrap items-end gap-3 mb-3 bg-gray-50 p-3 rounded">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Valor a aplicar</label>
+                        <input type="text" id="masivo-valor" list="desempeno-list" maxlength="100" autocomplete="off"
+                            placeholder="Ej. SATISFACTORIO"
+                            class="border-gray-300 rounded-md shadow-sm text-sm px-2 py-1 min-w-[200px]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Aplicar a</label>
+                        <select id="masivo-destino" class="border-gray-300 rounded-md shadow-sm text-sm px-2 py-1">
+                            <option value="seleccionados">Seleccionados</option>
+                            <option value="vacios">Vacíos</option>
+                        </select>
+                    </div>
+                    <button type="button" id="btn-aplicar-masivo"
+                        class="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-500 text-sm">
+                        Aplicar
+                    </button>
+                    <div class="relative ml-auto">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="search" id="masivo-buscar" placeholder="Buscar laboratorio..."
+                            class="pl-10 pr-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm w-64">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table id="tabla-desempeno-masivo" class="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-3 py-2 text-left w-10">
+                                    <input type="checkbox" id="check-todos">
+                                </th>
+                                <th class="px-3 py-2 text-left">Código</th>
+                                <th class="px-3 py-2 text-left">Laboratorio</th>
+                                <th class="px-3 py-2 text-left">Desempeño</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($labsManual as $l)
+                                <tr class="fila-lab border-b" data-id="{{ $l['id_inscripcion'] }}">
+                                    <td class="px-3 py-2">
+                                        <input type="checkbox" class="row-check">
+                                    </td>
+                                    <td class="px-3 py-2 cod-lab">{{ $l['cod_lab'] }}</td>
+                                    <td class="px-3 py-2 nombre-lab">{{ $l['nombre_lab'] }}</td>
+                                    <td class="px-3 py-2">
+                                        <input type="text" class="row-desempeno w-full border-gray-300 rounded-md shadow-sm text-sm px-2 py-1"
+                                            list="desempeno-list" maxlength="100" autocomplete="off"
+                                            value="{{ $l['desempeno'] }}" placeholder="Elija o escriba...">
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    <button type="button" id="btn-guardar-masivo"
+                        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
+                        Guardar todo
+                    </button>
+                </div>
+            @endif
         </div>
 
     </div>
@@ -351,52 +443,123 @@
                 $('#custom-length-ok').on('change', function() {
                     table2.page.len(this.value).draw();
                 });
+
+                // --- Registro masivo de desempeño (tabla editable, confirmación directa) ---
+
+                // Aplicar un valor en bloque (a seleccionados o a vacíos). Solo cliente.
+                $('#btn-aplicar-masivo').on('click', function() {
+                    const valor = $('#masivo-valor').val();
+                    const destino = $('#masivo-destino').val();
+                    $('#tabla-desempeno-masivo tbody tr.fila-lab').each(function() {
+                        const $fila = $(this);
+                        if ($fila.is(':hidden')) return; // respeta el filtro de búsqueda
+                        const $input = $fila.find('.row-desempeno');
+                        if (destino === 'seleccionados') {
+                            if ($fila.find('.row-check').is(':checked')) $input.val(valor);
+                        } else { // vacios
+                            if (!$input.val().trim()) $input.val(valor);
+                        }
+                    });
+                });
+
+                // Seleccionar / deseleccionar todos (filas visibles).
+                $('#check-todos').on('change', function() {
+                    const marcado = this.checked;
+                    $('#tabla-desempeno-masivo tbody tr.fila-lab:visible .row-check').prop('checked', marcado);
+                });
+
+                // Filtro por código o nombre.
+                $('#masivo-buscar').on('input', function() {
+                    const q = this.value.toLowerCase();
+                    $('#tabla-desempeno-masivo tbody tr.fila-lab').each(function() {
+                        const txt = ($(this).find('.cod-lab').text() + ' ' + $(this).find('.nombre-lab').text()).toLowerCase();
+                        $(this).toggle(txt.indexOf(q) !== -1);
+                    });
+                });
+
+                // Guardar todo: recolecta filas con desempeño no vacío y envía en un POST.
+                $('#btn-guardar-masivo').on('click', function() {
+                    const registros = [];
+                    $('#tabla-desempeno-masivo tbody tr.fila-lab').each(function() {
+                        const valor = $(this).find('.row-desempeno').val().trim();
+                        if (valor !== '') {
+                            registros.push({
+                                id_inscripcion: $(this).data('id'),
+                                calificacion_certificado: valor
+                            });
+                        }
+                    });
+                    if (registros.length === 0) {
+                        showError('No hay desempeños para guardar. Complete al menos una fila.');
+                        return;
+                    }
+
+                    const $btn = $(this).prop('disabled', true);
+                    $.ajax({
+                        url: "{{ route('ea.lab.desempeno.masivo', ['id' => $idEA]) }}",
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            gestion: '{{ $gestion }}',
+                            registros: registros
+                        },
+                        success: function(r) {
+                            showToast({ title: r.message || 'Desempeños registrados correctamente.' });
+                            if (typeof table2 !== 'undefined') table2.draw();
+                            // Marca visual de filas guardadas (las que tenían valor).
+                            $('#tabla-desempeno-masivo tbody tr.fila-lab').each(function() {
+                                if ($(this).find('.row-desempeno').val().trim() !== '') {
+                                    $(this).addClass('bg-green-50');
+                                }
+                            });
+                        },
+                        error: function(xhr) {
+                            let m = 'Error al registrar los desempeños.';
+                            if (xhr.responseJSON) {
+                                m = xhr.responseJSON.message || xhr.responseJSON.info || m;
+                                if (xhr.responseJSON.errors) {
+                                    m = Object.values(xhr.responseJSON.errors).flat().join(' ');
+                                }
+                            }
+                            showError(m);
+                        },
+                        complete: function() {
+                            $btn.prop('disabled', false);
+                        }
+                    });
+                });
             });
             // Botones
             const btnTabUpload = document.getElementById('btn-tab-upload');
             const btnTabView = document.getElementById('btn-tab-view');
             const btnTabPonderaciones = document.getElementById('btn-tab-ponderaciones');
+            const btnTabManual = document.getElementById('btn-tab-manual');
             // Secciones
             const sectionUpload = document.getElementById('section-upload');
             const sectionView = document.getElementById('section-view');
             const sectionPonderacionesView = document.getElementById('section-ponderaciones-view');
+            const sectionManual = document.getElementById('section-manual');
+
+            const tabs = [
+                { btn: btnTabUpload, section: sectionUpload },
+                { btn: btnTabView, section: sectionView },
+                { btn: btnTabPonderaciones, section: sectionPonderacionesView },
+                { btn: btnTabManual, section: sectionManual },
+            ];
 
             // Cambiar entre secciones
-            btnTabUpload.addEventListener('click', () => {
-                sectionUpload.classList.remove('hidden');
-                sectionView.classList.add('hidden');
-                sectionPonderacionesView.classList.add('hidden');
-                btnTabUpload.classList.add('bg-blue-600', 'text-white');
-                btnTabUpload.classList.remove('bg-gray-200', 'text-gray-800');
-                btnTabView.classList.remove('bg-blue-600', 'text-white');
-                btnTabView.classList.add('bg-gray-200', 'text-gray-800');
-                btnTabPonderaciones.classList.remove('bg-blue-600', 'text-white');
-                btnTabPonderaciones.classList.add('bg-gray-200', 'text-gray-800');
-            });
+            function activarTab(activo) {
+                tabs.forEach(({ btn, section }) => {
+                    const esActivo = btn === activo;
+                    section.classList.toggle('hidden', !esActivo);
+                    btn.classList.toggle('bg-blue-600', esActivo);
+                    btn.classList.toggle('text-white', esActivo);
+                    btn.classList.toggle('bg-gray-200', !esActivo);
+                    btn.classList.toggle('text-gray-800', !esActivo);
+                });
+            }
 
-            btnTabView.addEventListener('click', () => {
-                sectionUpload.classList.add('hidden');
-                sectionView.classList.remove('hidden');
-                sectionPonderacionesView.classList.add('hidden');
-                btnTabView.classList.add('bg-blue-600', 'text-white');
-                btnTabView.classList.remove('bg-gray-200', 'text-gray-800');
-                btnTabUpload.classList.remove('bg-blue-600', 'text-white');
-                btnTabUpload.classList.add('bg-gray-200', 'text-gray-800');
-                btnTabPonderaciones.classList.remove('bg-blue-600', 'text-white');
-                btnTabPonderaciones.classList.add('bg-gray-200', 'text-gray-800');
-            });
-
-            btnTabPonderaciones.addEventListener('click', () => {
-                sectionUpload.classList.add('hidden');
-                sectionView.classList.add('hidden');
-                sectionPonderacionesView.classList.remove('hidden');
-                btnTabPonderaciones.classList.add('bg-blue-600', 'text-white');
-                btnTabPonderaciones.classList.remove('bg-gray-200', 'text-gray-800');
-                btnTabUpload.classList.remove('bg-blue-600', 'text-white');
-                btnTabUpload.classList.add('bg-gray-200', 'text-gray-800');
-                btnTabView.classList.remove('bg-blue-600', 'text-white');
-                btnTabView.classList.add('bg-gray-200', 'text-gray-800');
-            });
+            tabs.forEach(({ btn }) => btn.addEventListener('click', () => activarTab(btn)));
 
             // Drag & Drop
             const dropArea = document.getElementById('drop-area');
