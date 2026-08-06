@@ -46,10 +46,12 @@ class LaboratorioController extends Controller
 
         Log::info('$idEa');
         Log::info($idEa);
-        // Obtener IDs de laboratorios inscritos en el EA
         $query = InscripcionEA::with(['inscripcion', 'inscripcion.laboratorio.departamento', 'inscripcion.laboratorio.usuario'])
-            ->where('id_ea', $idEa);
-
+            ->where('id_ea', $idEa)
+            ->whereHas('inscripcion', function ($q) {
+                $q->whereYear('fecha_inscripcion', now());
+                $q->Aprobado();
+            });
         // Log::info($Inscripciones);
         // Consultar solo los laboratorios filtrados por ID
         // $query = Laboratorio::whereIn('id', $laboratorioIds)

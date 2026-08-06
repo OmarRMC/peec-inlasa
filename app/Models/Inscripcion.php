@@ -187,4 +187,9 @@ class Inscripcion extends Model
         $pagos = $this->pagos->where('status', true)->sum('monto_pagado');
         return $this->costo_total - $pagos;
     }
+
+    public function scopeAprobado($query)
+    {
+        return $query->where('status_inscripcion', Inscripcion::STATUS_APROBADO);
+    }
 }
