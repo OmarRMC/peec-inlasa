@@ -195,6 +195,8 @@ class Permiso extends Model
 
     public const GESTION_CERTIFICADOS = 'gestion.certificados';
     public const GESTION_CERTIFICADOS_NAME = 'Gestión Certificados';
+    public const EDITAR_CERTIFICADOS = 'editar.certificados';
+    public const EDITAR_CERTIFICADOS_NAME = 'Editar / despublicar certificados';
     public const GAME = 'game';
 
     public const IMPERSONAR_USUARIO = 'impersonar.usuario';
@@ -219,6 +221,7 @@ class Permiso extends Model
         self::RESPONSABLE => self::RESPONSABLE_NAME,
         self::LABORATORIO => self::LABORATORIO_NAME,
         self::GESTION_CERTIFICADOS => self::GESTION_CERTIFICADOS_NAME,
+        self::EDITAR_CERTIFICADOS => self::EDITAR_CERTIFICADOS_NAME,
         self::JEFE_PEEC => self::JEFE_PEEC_NAME,
         self::IMPERSONAR_USUARIO => self::IMPERSONAR_USUARIO_NAME,
     ];

@@ -73,6 +73,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define(Permiso::GESTION_CERTIFICADOS, function (User $user) {
             return $user->tienePermiso(Permiso::GESTION_CERTIFICADOS);
         });
+        Gate::define(Permiso::EDITAR_CERTIFICADOS, function (User $user) {
+            return $user->tienePermiso(Permiso::EDITAR_CERTIFICADOS);
+        });
         Gate::define(Permiso::JEFE_PEEC, function (User $user) {
             return $user->tienePermiso(Permiso::JEFE_PEEC);
         });
@@ -80,8 +83,7 @@ class AppServiceProvider extends ServiceProvider
             return $user->id == 1158;
         });
         Gate::define(Permiso::IMPERSONAR_USUARIO, function (User $user) {
-            return $user->id == 1158;
-            // return $user->tienePermiso(Permiso::IMPERSONAR_USUARIO);
+            return $user->id == 1158 || $user->tienePermiso(Permiso::IMPERSONAR_USUARIO);
         });
 
         Gate::define(Permiso::VER_IDS, function (User $user) {

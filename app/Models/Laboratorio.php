@@ -339,11 +339,14 @@ class Laboratorio extends Model
             ->get();
     }
 
-    public function descargarCertificadoParticipacion($gestion)
+    /**
+     * @param bool $incluirNoPublicados true solo para la vista previa del admin; el portal del laboratorio usa false.
+     */
+    public function descargarCertificadoParticipacion($gestion, bool $incluirNoPublicados = false)
     {
         $query = $this->inscripciones()
             ->aprobadoOrVencido()
-            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->whereHas('certificado', fn($query) => $incluirNoPublicados ? $query : $query->Publicado())
             ->where('gestion', $gestion)->with([
                 'certificado.detalles',
                 'certificado.plantilla',
@@ -444,11 +447,14 @@ class Laboratorio extends Model
         return $pdf->stream("certificado-participacion-{$gestion}.pdf");
     }
 
-    public function descargarCertificadoDesemp($gestion)
+    /**
+     * @param bool $incluirNoPublicados true solo para la vista previa del admin; el portal del laboratorio usa false.
+     */
+    public function descargarCertificadoDesemp($gestion, bool $incluirNoPublicados = false)
     {
         $inscripciones = $this->inscripciones()
             ->aprobadoOrVencido()
-            ->whereHas('certificado', fn($query) => $query->Publicado())
+            ->whereHas('certificado', fn($query) => $incluirNoPublicados ? $query : $query->Publicado())
             ->where('gestion', $gestion)
             ->whereHas('certificado.detalles', fn($query) => $query->whereNotNull('calificacion_certificado'))
             ->with([

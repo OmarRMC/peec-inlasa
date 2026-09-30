@@ -9,6 +9,7 @@ use App\Models\Laboratorio;
 use App\Models\Permiso;
 use App\Models\PlantillaCertificado;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -24,7 +25,8 @@ class CertificadoController extends Controller
         ]);
         $plantillas = PlantillaCertificado::orderBy('nombre')
             ->get(['id', 'nombre']);
-        return view('certificados.admin.index', compact('gestiones', 'plantillas'));
+        $puedeEditar = Gate::allows(Permiso::EDITAR_CERTIFICADOS);
+        return view('certificados.admin.index', compact('gestiones', 'plantillas', 'puedeEditar'));
     }
 
     public function getDataCertificado(Request $request)
@@ -33,12 +35,23 @@ class CertificadoController extends Controller
             return redirect('/')->with('error', 'No tiene autorización para acceder a esta sección.');
         }
 
+        // publicado: '1' = publicados (por defecto), '0' = no publicados, 'todos' = ambos
+        $filtroPublicado = $request->input('publicado', '1');
+        $publicados = fn($q) => $q->Publicado()->conDetalles();
+        $noPublicados = fn($q) => $q->noPublicado()->whereHas('detalles', fn($d) => $d->where('temporal', false));
         $query = Inscripcion::with(['laboratorio', 'certificado.detalles', 'certificado.plantilla'])
-            ->whereHas('certificado', function ($q2) {
-                $q2->Publicado()->conDetalles();
+            ->whereHas('certificado', function ($q2) use ($filtroPublicado, $publicados, $noPublicados) {
+                if ($filtroPublicado === 'todos') {
+                    $q2->where(fn($q) => $q->where($publicados)->orWhere($noPublicados));
+                } elseif ($filtroPublicado === '0') {
+                    $noPublicados($q2);
+                } else {
+                    $publicados($q2);
+                }
             })
             ->aprobadoOrVencido()
-            ->orderByDesc('gestion');
+            ->orderByDesc('gestion')
+            ->orderBy('id');
 
         if ($request->filled('gestion')) {
             $query->where('gestion', $request->gestion);
@@ -70,7 +83,9 @@ class CertificadoController extends Controller
             } else {
                 $data[$inscripcion->gestion][$codLab] = (object) [
                     'gestion' => $inscripcion->gestion,
-                    'laboratorio' => $lab->nombre_lab,
+                    'laboratorio' => $inscripcion->certificado->nombre_laboratorio ?: $lab->nombre_lab,
+                    'nombre_lab_actual' => $lab->nombre_lab,
+                    'publicado' => (bool) $inscripcion->certificado->publicado,
                     'idLab' => $lab->id,
                     'cod_lab' => $codLab,
                     'tiene_certificado_desempeno' => $tieneDes,
@@ -87,6 +102,11 @@ class CertificadoController extends Controller
                 $rows->push($info);
             }
         }
+        $rows = $rows->sortBy([
+            ['gestion', 'desc'],
+            ['laboratorio', 'asc'],
+            ['cod_lab', 'asc'],
+        ])->values();
         if ($request->filled('estado')) {
             if ($request->estado == Certificado::STATUS_HABILITADO) {
                 $rows = $rows->where('inhabilitado', false);
@@ -95,6 +115,7 @@ class CertificadoController extends Controller
                 $rows = $rows->where('inhabilitado', true);
             }
         }
+        $puedeEditar = Gate::allows(Permiso::EDITAR_CERTIFICADOS);
         return datatables()
             ->of($rows)
             ->addColumn('laboratorio', fn($row) => $row->laboratorio)
@@ -105,7 +126,10 @@ class CertificadoController extends Controller
             ->addColumn('estado', fn($row) => Certificado::estado($row->inhabilitado))
             ->addColumn('plantilla_id', fn($row) => $row->plantilla_id)
             ->addColumn('plantilla_nombre', fn($row) => $row->plantilla_nombre)
-            ->rawColumns(['desempeño', 'participacion', 'estado'])
+            ->addColumn('nombre_lab_actual', fn($row) => $row->nombre_lab_actual)
+            ->addColumn('publicado', fn($row) => $row->publicado)
+            ->addColumn('acciones', fn($row) => $puedeEditar ? Certificado::botonEditarRaw($row) : '')
+            ->rawColumns(['desempeño', 'participacion', 'estado', 'acciones'])
             ->toJson();
     }
 
@@ -125,12 +149,7 @@ class CertificadoController extends Controller
         $gestion = $request->gestion;
         $plantillaId = $request->plantilla_id;
 
-        // Obtener todos los certificados del laboratorio para esa gestión
-        $certificados = Certificado::whereHas('inscripcion', function ($q) use ($idLab, $gestion) {
-            $q->where('id_lab', $idLab)
-              ->where('gestion', $gestion)
-              ->aprobadoOrVencido();
-        })->get();
+        $certificados = $this->certificadosDeLab($idLab, $gestion);
 
         if ($certificados->isEmpty()) {
             return response()->json(['error' => 'No se encontraron certificados'], 404);
@@ -156,6 +175,133 @@ class CertificadoController extends Controller
         ]);
     }
 
+    public function despublicar(Request $request)
+    {
+        if (!Gate::allows(Permiso::EDITAR_CERTIFICADOS)) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+        $data = $this->validarLabGestion($request);
+        $todos = $this->certificadosDeLab($data['id_laboratorio'], $data['gestion']);
+        if ($todos->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron certificados'], 404);
+        }
+        $certificados = $todos->where('publicado', true);
+        if ($certificados->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'El certificado ya estaba despublicado',
+                'publicado' => false,
+                'updated_count' => 0,
+            ]);
+        }
+
+        Certificado::whereIn('id', $certificados->pluck('id'))->update(['publicado' => 0]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Certificado despublicado correctamente',
+            'publicado' => false,
+            'updated_count' => $certificados->count(),
+        ]);
+    }
+
+    public function publicarLaboratorio(Request $request)
+    {
+        if (!Gate::allows(Permiso::EDITAR_CERTIFICADOS)) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+        $data = $this->validarLabGestion($request);
+        $todos = $this->certificadosDeLab($data['id_laboratorio'], $data['gestion']);
+        if ($todos->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron certificados'], 404);
+        }
+        if ($todos->where('publicado', false)->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'El certificado ya estaba publicado',
+                'publicado' => true,
+                'updated_count' => 0,
+            ]);
+        }
+        $ids = Certificado::whereIn('id', $todos->pluck('id'))
+            ->noPublicado()
+            ->whereHas('detalles', fn($q) => $q->where('temporal', false))
+            ->pluck('id');
+
+        if ($ids->isEmpty()) {
+            return response()->json(['error' => 'El certificado tiene desempeños en revisión; confírmelos antes de publicar'], 422);
+        }
+
+        Certificado::whereIn('id', $ids)->update(['publicado' => 1]);
+        Log::info('certificado.publicar_laboratorio', [
+            'user_id' => Auth::id(),
+            'id_laboratorio' => $data['id_laboratorio'],
+            'gestion' => $data['gestion'],
+            'certificados' => $ids->all(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Certificado publicado correctamente',
+            'publicado' => true,
+            'updated_count' => $ids->count(),
+        ]);
+    }
+
+    public function updateNombre(Request $request)
+    {
+        if (!Gate::allows(Permiso::EDITAR_CERTIFICADOS)) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+        $data = $this->validarLabGestion($request, [
+            'nombre_laboratorio' => 'required|string|max:400',
+        ]);
+        $certificados = $this->certificadosDeLab($data['id_laboratorio'], $data['gestion']);
+
+        if ($certificados->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron certificados'], 404);
+        }
+        if ($certificados->contains('publicado', true)) {
+            return response()->json(['error' => 'Despublique el certificado antes de editarlo'], 422);
+        }
+
+        $nombre = trim($data['nombre_laboratorio']);
+        Log::info('certificado.update_nombre', [
+            'user_id' => Auth::id(),
+            'id_laboratorio' => $data['id_laboratorio'],
+            'gestion' => $data['gestion'],
+            'antes' => $certificados->pluck('nombre_laboratorio', 'id')->all(),
+            'despues' => $nombre,
+        ]);
+        Certificado::whereIn('id', $certificados->pluck('id'))->update(['nombre_laboratorio' => $nombre]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Nombre del certificado actualizado correctamente',
+            'nombre_laboratorio' => $nombre,
+        ]);
+    }
+
+    private function validarLabGestion(Request $request, array $extra = []): array
+    {
+        return $request->validate(array_merge([
+            'id_laboratorio' => 'required|integer|exists:laboratorio,id',
+            'gestion' => 'required|string',
+        ], $extra));
+    }
+
+    /**
+     * Certificados de un laboratorio en una gestión (puede haber varias inscripciones).
+     */
+    private function certificadosDeLab($idLab, $gestion)
+    {
+        return Certificado::whereHas('inscripcion', function ($q) use ($idLab, $gestion) {
+            $q->where('id_lab', $idLab)
+                ->where('gestion', $gestion)
+                ->aprobadoOrVencido();
+        })->get();
+    }
+
     public function descargarCertificado($idLaboratorio, $gestion, $type)
     {
         if (!Gate::any([Permiso::GESTION_CERTIFICADOS, Permiso::ADMIN])) {
@@ -167,11 +313,11 @@ class CertificadoController extends Controller
         }
         switch ($type) {
             case Certificado::TYPE_DESEMP:
-                $data = $lab->descargarCertificadoDesemp($gestion);
+                $data = $lab->descargarCertificadoDesemp($gestion, true);
                 break;
 
             case Certificado::TYPE_PARTICIPACION:
-                $data = $lab->descargarCertificadoParticipacion($gestion);
+                $data = $lab->descargarCertificadoParticipacion($gestion, true);
                 break;
 
             default:

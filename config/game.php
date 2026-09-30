@@ -128,7 +128,7 @@ return [
     'seeder_permiso' => [
         'cmd' => ['php', 'artisan', 'db:seed', '--class=PermisoSeed'],
         'type' => 'artisan',
-        'description' => 'Sincroniza los permisos del sistema en la base de datos (incluye nuevos permisos como impersonar.usuario).',
+        'description' => 'Sincroniza los permisos del sistema en la base de datos (incluye nuevos permisos como impersonar.usuario y editar.certificados).',
     ],
 
     'seeder_recurso_laboratorio' => [

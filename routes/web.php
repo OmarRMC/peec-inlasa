@@ -106,6 +106,9 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/certificados', [CertificadoController::class, 'index'])->name('admin.certificado.index');
     Route::get('/certificados/ajax', [CertificadoController::class, 'getDataCertificado'])->name('admin.certificado.ajax.index');
     Route::post('/certificados/update-plantilla', [CertificadoController::class, 'updatePlantilla'])->name('admin.certificado.update-plantilla');
+    Route::post('/certificados/despublicar', [CertificadoController::class, 'despublicar'])->name('admin.certificado.despublicar');
+    Route::post('/certificados/publicar-laboratorio', [CertificadoController::class, 'publicarLaboratorio'])->name('admin.certificado.publicar-laboratorio');
+    Route::post('/certificados/update-nombre', [CertificadoController::class, 'updateNombre'])->name('admin.certificado.update-nombre');
     Route::get('/certificados/{idLaboratorio}/descargar/{gestion}/{type}', [CertificadoController::class, 'descargarCertificado'])->name('admin.certificado.descargar');
 
     Route::prefix('inscripcion')->group(function () {

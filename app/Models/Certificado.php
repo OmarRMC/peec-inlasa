@@ -91,6 +91,21 @@ class Certificado extends Model
                 </span>';
     }
 
+    public static function botonEditarRaw(object $row)
+    {
+        return '<button type="button"
+                    class="btn-editar-cert inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-indigo-500 text-indigo-600 hover:bg-indigo-50 transition text-xs font-medium"
+                    data-id-lab="' . e($row->idLab) . '"
+                    data-gestion="' . e($row->gestion) . '"
+                    data-cod-lab="' . e($row->cod_lab) . '"
+                    data-nombre="' . e($row->laboratorio) . '"
+                    data-nombre-actual="' . e($row->nombre_lab_actual) . '"
+                    data-publicado="' . ($row->publicado ? '1' : '0') . '"
+                    data-tippy-content="Editar certificado">
+                    <i class="fas fa-pen"></i> Editar
+                </button>';
+    }
+
     public static function estado($inhabilitado)
     {
 
