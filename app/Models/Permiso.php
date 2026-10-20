@@ -6,10 +6,13 @@ use App\Traits\General;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Permiso extends Model
+class Permiso extends Model implements AuditableContract
 {
     use General;
+    use Auditable;
 
     // ------------------------------
     // Claves
@@ -201,9 +204,17 @@ class Permiso extends Model
 
     public const IMPERSONAR_USUARIO = 'impersonar.usuario';
     public const IMPERSONAR_USUARIO_NAME = 'Impersonar usuario';
+    public const GESTION_FORMULARIOS = 'gestion.formularios';
+    public const GESTION_FORMULARIOS_NAME = 'Gestión Formularios';
+
+    public const GESTION_NOTIFICACIONES = 'gestion.notificaciones';
+    public const GESTION_NOTIFICACIONES_NAME = 'Gestión de notificaciones';
 
     public const VER_IDS = 'ver.ids';
     public const VER_IDS_NAME = 'Ver IDs en tablas';
+
+    public const VER_AUDITORIA = 'ver.auditoria';
+    public const VER_AUDITORIA_NAME = 'Ver auditoría';
 
     // ------------------------------
     // PERMISOS_HABILITADOS
@@ -223,7 +234,9 @@ class Permiso extends Model
         self::GESTION_CERTIFICADOS => self::GESTION_CERTIFICADOS_NAME,
         self::EDITAR_CERTIFICADOS => self::EDITAR_CERTIFICADOS_NAME,
         self::JEFE_PEEC => self::JEFE_PEEC_NAME,
-        self::IMPERSONAR_USUARIO => self::IMPERSONAR_USUARIO_NAME,
+        self::GESTION_FORMULARIOS => self::GESTION_FORMULARIOS_NAME,
+        self::GESTION_NOTIFICACIONES => self::GESTION_NOTIFICACIONES_NAME,
+        self::VER_AUDITORIA => self::VER_AUDITORIA_NAME,
     ];
 
     protected $table = 'permiso';

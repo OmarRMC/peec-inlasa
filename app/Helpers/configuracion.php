@@ -2,6 +2,7 @@
 
 use App\Models\Configuracion;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 if (!function_exists('configuracion')) {
     function configuracion(string $key, $valor = null)
@@ -9,7 +10,10 @@ if (!function_exists('configuracion')) {
         if (isset($valor)) {
             Configuracion::updateOrCreate(
                 ['key' => $key],
-                ['valor' => is_array($valor) ? json_encode($valor, JSON_UNESCAPED_UNICODE) : $valor]
+                [
+                    'valor'      => is_array($valor) ? json_encode($valor, JSON_UNESCAPED_UNICODE) : $valor,
+                    'updated_by' => Auth::id(),
+                ]
             );
         } else {
             $config = Configuracion::find($key)?->valor;

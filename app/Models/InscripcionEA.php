@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class InscripcionEA extends Model
+class InscripcionEA extends Model implements AuditableContract
 {
+    use Auditable;
+
     protected $table = 'inscripcion_ea';
 
     protected $fillable = [
@@ -28,5 +32,12 @@ class InscripcionEA extends Model
     {
         return $this->hasOne(DetalleCertificado::class, 'id_ea', 'id_ea')
             ->whereColumn('id_certificado', 'id_certificado');
+    }
+
+    public function formularios()
+    {
+        return $this->belongsToMany(InscripcionEAFormulario::class, 'inscripcion_ea_formulario', 'inscripcion_ea_id', 'formulario_id')
+            ->withPivot('cantidad')
+            ->withTimestamps();
     }
 }

@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CertificadoDisponibleLab;
 use App\Models\Certificado;
 use App\Models\Configuracion;
 use App\Models\Inscripcion;
 use App\Models\Laboratorio;
+use App\Models\Notificacion;
 use App\Models\Permiso;
 use App\Models\PlantillaCertificado;
+use App\Services\NotificacionLabService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class CertificadoController extends Controller
 {
@@ -378,12 +382,70 @@ class CertificadoController extends Controller
         if (!Gate::any([Permiso::ADMIN, Permiso::GESTION_CERTIFICADOS])) {
             return redirect('/')->with('error', 'No tienes permisos para realizar esta acción.');
         }
-        $total = Certificado::where('gestion_certificado', $gestion)
+        $request->validate(['enviar_email' => 'nullable|boolean']);
+        $enviarEmail = $request->boolean('enviar_email');
+
+        // Traer los certificados a publicar junto con su laboratorio antes de actualizar,
+        // para saber a qué laboratorios notificar.
+        $certs = Certificado::where('gestion_certificado', $gestion)
             ->noPublicado()
             ->whereHas('inscripcion', fn($q) => $q->aprobadoOrVencido())
             ->whereHas('detalles', fn($q) => $q->where('temporal', false))
-            ->update(['publicado' => 1]);
+            ->with('inscripcion.laboratorio:id,nombre_lab,mail_lab')
+            ->get();
 
-        return back()->with('success', "Se publicaron {$total} certificados de la gestión {$gestion}.");
+        $total = $certs->count();
+
+        if ($total === 0) {
+            return back()->with('success', "Se publicaron 0 certificados de la gestión {$gestion}.");
+        }
+
+        Certificado::whereIn('id', $certs->pluck('id'))->update(['publicado' => 1]);
+
+        // Un aviso por laboratorio (no por certificado).
+        $porLab = $certs->groupBy(fn($c) => $c->inscripcion?->laboratorio?->id);
+        $urlCertificados = route('lab.certificados.disponibles.index');
+        $correos = 0;
+
+        foreach ($porLab as $idLab => $grupo) {
+            if (empty($idLab)) {
+                continue;
+            }
+            $lab = $grupo->first()->inscripcion->laboratorio;
+
+            // In-app (siempre).
+            NotificacionLabService::crear([
+                'id_lab'  => $idLab,
+                'tipo'    => Notificacion::TIPO_CERTIFICADO_DISPONIBLE,
+                'mensaje' => [
+                    'gestion'      => $gestion,
+                    'url_descarga' => $urlCertificados,
+                ],
+                'entidad' => [
+                    'tipo' => Notificacion::ENTIDAD_CERTIFICADO,
+                    'id'   => $grupo->first()->id,
+                ],
+                'modo'    => Notificacion::MODO_UNA_VEZ,
+            ]);
+
+            // Email (opcional).
+            if ($enviarEmail && !empty($lab->mail_lab)) {
+                try {
+                    Mail::to($lab->mail_lab)->send(
+                        new CertificadoDisponibleLab($lab->nombre_lab, $gestion, $urlCertificados)
+                    );
+                    $correos++;
+                } catch (\Throwable $e) {
+                    Log::error('Certificado disponible email lab ' . $idLab . ': ' . $e->getMessage());
+                }
+            }
+        }
+
+        $mensaje = "Se publicaron {$total} certificados de la gestión {$gestion}.";
+        if ($enviarEmail) {
+            $mensaje .= " Correos enviados: {$correos}.";
+        }
+
+        return back()->with('success', $mensaje);
     }
 }

@@ -34,7 +34,7 @@ class UserController extends Controller
         $permisos = Permiso::active()->listar()
             ->get();
         $areas = Area::listarConDescripcionUnica(true);
-        $ensayoA = EnsayoAptitud::active()->orderBy('descripcion')->get();
+        $ensayoA = EnsayoAptitud::with('paquete')->active()->orderBy('descripcion')->get();
         return view('usuario.create', compact('cargos', 'permisos', 'ensayoA', 'areas'));
     }
 
@@ -73,7 +73,8 @@ class UserController extends Controller
         ]);
 
         // $usuario->notify(new VerificarCorreoUser($usuario));
-        $usuario->permisos()->sync($request->input('permisos', []));
+        // auditSync registra en la auditoría el cambio de permisos (relación N:M).
+        $usuario->auditSync('permisos', $request->input('permisos', []));
 
         $ensayoIDs = $request->input('ensayos_ap', []);
 
@@ -111,7 +112,7 @@ class UserController extends Controller
         ]);
         $cargos = Cargo::active()->get();
         $permisos = Permiso::active()->listar()->get();
-        $ensayoA = EnsayoAptitud::active()->get();
+        $ensayoA = EnsayoAptitud::with('paquete')->active()->get();
         $areas = Area::listarConDescripcionUnica(true);
         $responsablesEA = $usuario->responsablesEA->mapWithKeys(function ($ensayo) {
             $paquete = $ensayo->paquete;
@@ -161,7 +162,8 @@ class UserController extends Controller
             $usuario->update(['password' => Hash::make($validated['password'])]);
         }
         $ensayoIDs = $request->input('ensayos_ap', []);
-        $usuario->permisos()->sync($request->input('permisos', []));
+        // auditSync registra en la auditoría el cambio de permisos (relación N:M).
+        $usuario->auditSync('permisos', $request->input('permisos', []));
 
         // $ensayosData = [];
         // $ensayos = EnsayoAptitud::whereIn('id', $ensayoIDs)->get();

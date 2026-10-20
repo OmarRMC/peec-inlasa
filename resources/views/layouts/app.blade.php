@@ -184,6 +184,10 @@
                             @endif
                             <div class="text-gray-400 text-xs mt-1">PEEC - INLASA</div>
                         </div>
+                        <a href="{{ route('password.edit') }}"
+                            class="w-full text-left px-4 py-2 hover:bg-indigo-50 flex items-center gap-2 text-sm">
+                            <i class="fas fa-key text-gray-500"></i> Cambiar contraseña
+                        </a>
                         <form method="POST" action="{{ route('logout') }}" class="text-sm"
                             onsubmit="sessionStorage.clear()">
                             @csrf

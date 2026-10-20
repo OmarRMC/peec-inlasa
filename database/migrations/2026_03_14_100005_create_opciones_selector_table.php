@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('opciones_selector', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('id_grupo_selector');
+            $table->unsignedBigInteger('id_subgrupo')->nullable();
+            $table->string('valor', 255);
+            $table->foreign('id_grupo_selector')
+                ->references('id')
+                ->on('grupos_selectores')
+                ->onDelete('cascade');
+
+            $table->foreign('id_subgrupo')
+                ->references('id')
+                ->on('grupos_selectores')
+                ->nullOnDelete();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('opciones_selector');
+    }
+};

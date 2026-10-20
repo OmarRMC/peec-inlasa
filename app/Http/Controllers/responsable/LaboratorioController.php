@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\responsable;
 
+use App\Exports\InscripcionesEaLabExport;
 use App\Http\Controllers\Controller;
 use App\Models\CategoriaLaboratorio;
 use App\Models\Certificado;
@@ -15,10 +16,12 @@ use App\Models\Pais;
 use App\Models\Permiso;
 use App\Models\PlantillaCertificado;
 use App\Models\TipoLaboratorio;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Normalizer;
 
 class LaboratorioController extends Controller
@@ -27,6 +30,49 @@ class LaboratorioController extends Controller
     public function __construct()
     {
         $this->middleware('can:' . Permiso::RESPONSABLE)->only(['create', 'update', 'destroy', 'show', 'edit']);
+    }
+
+    public function misEnsayos(Request $request)
+    {
+        $responsable = Auth::user();
+        $gestion = (int) $request->query('gestion', now()->year);
+
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayos = EnsayoAptitud::with('paquete.area')->orderBy('descripcion')->get();
+        } else {
+            $ensayos = $responsable->load('responsablesEA.paquete.area')->responsablesEA->sortBy('descripcion')->values();
+        }
+
+        $idsEa = $ensayos->pluck('id')->all();
+        $estadosActivos = [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO];
+
+        $conteoPorEa = InscripcionEA::whereIn('id_ea', $idsEa)
+            ->whereHas('inscripcion', fn($q) => $q->where('gestion', $gestion)->whereIn('status_inscripcion', $estadosActivos))
+            ->join('inscripcion', 'inscripcion.id', '=', 'inscripcion_ea.id_inscripcion')
+            ->selectRaw('inscripcion_ea.id_ea, COUNT(DISTINCT inscripcion.id_lab) as inscritos')
+            ->groupBy('inscripcion_ea.id_ea')
+            ->pluck('inscritos', 'id_ea');
+
+        $totalLabsUnicos = InscripcionEA::whereIn('id_ea', $idsEa)
+            ->whereHas('inscripcion', fn($q) => $q->where('gestion', $gestion)->whereIn('status_inscripcion', $estadosActivos))
+            ->join('inscripcion', 'inscripcion.id', '=', 'inscripcion_ea.id_inscripcion')
+            ->distinct('inscripcion.id_lab')
+            ->count('inscripcion.id_lab');
+
+        $totalInscritos = $conteoPorEa->sum();
+
+        $gestiones = Inscripcion::rangoGestion([
+            'status_inscripcion' => $estadosActivos,
+        ]);
+
+        return view('responsable.lab.mis-ensayos', [
+            'ensayos' => $ensayos,
+            'conteoPorEa' => $conteoPorEa,
+            'totalLabsUnicos' => $totalLabsUnicos,
+            'totalInscritos' => $totalInscritos,
+            'gestion' => $gestion,
+            'gestiones' => $gestiones,
+        ]);
     }
 
     public function index(Request $request, $idEa)
@@ -126,6 +172,90 @@ class LaboratorioController extends Controller
             })
             ->rawColumns(['status_label', 'actions', 'status_inscripcion'])
             ->toJson();
+    }
+
+    /**
+     * Exporta la lista de laboratorios inscritos a un EA en Excel, CSV, PDF o JSON.
+     * Reutiliza el mismo control de acceso y filtro (gestión + aprobadoOrVencido) que getData().
+     */
+    public function exportInscripciones(Request $request, $idEa)
+    {
+        $responsable = Auth::user();
+        $ensayosAptitud = null;
+        if (Gate::any([Permiso::JEFE_PEEC])) {
+            $ensayosAptitud = EnsayoAptitud::find($idEa);
+        }
+        if (Gate::any([Permiso::RESPONSABLE])) {
+            $ensayosAptitud = $responsable->responsablesEA->find($idEa);
+        }
+        if (!$ensayosAptitud) {
+            return redirect('/')->with('error', 'No se tiene el ensayo de aptitud solicitado.');
+        }
+        $ensayosAptitud->loadMissing('paquete');
+
+        $gestion = $request->query('gestion', now()->year);
+
+        $inscripciones = InscripcionEA::with(['inscripcion', 'inscripcion.laboratorio.departamento'])
+            ->where('id_ea', $idEa)
+            ->whereHas('inscripcion', function ($q) use ($gestion) {
+                $q->where('gestion', $gestion)->aprobadoOrVencido();
+            })
+            ->get();
+
+        // Filas en el mismo orden que las columnas visibles de la tabla.
+        $laboratorios = $inscripciones->map(function ($ins) {
+            $lab = $ins->inscripcion->laboratorio;
+            return [
+                $ins->inscripcion->fecha_inscripcion,
+                $lab->cod_lab,
+                $lab->nombre_lab,
+                $lab->mail_lab,
+                $lab->wapp_lab,
+                $lab->departamento->nombre_dep ?? '-',
+                $ins->inscripcion->status_inscripcion_label,
+            ];
+        })->values();
+
+        $format = $request->query('format', 'xlsx');
+        $fileName = 'InscripcionesEA_' . now()->format('Y-m-d_H-i-s') . '.' . $format;
+
+        if ($format === 'json') {
+            $jsonContent = $laboratorios->map(fn($fila) => [
+                'fecha_hora' => $fila[0],
+                'codigo' => $fila[1],
+                'nombre' => $fila[2],
+                'correo' => $fila[3],
+                'whatsapp' => $fila[4],
+                'departamento' => $fila[5],
+                'estado' => $fila[6],
+            ])->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            return response()->streamDownload(function () use ($jsonContent) {
+                echo $jsonContent;
+            }, $fileName, [
+                'Content-Type' => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            ]);
+        }
+
+        if ($format === 'pdf') {
+            $generadoPor = trim("{$responsable->nombre} {$responsable->ap_paterno} {$responsable->ap_materno}");
+            return Pdf::loadView('responsable.lab.exports.inscripciones-pdf', [
+                'laboratorios' => $laboratorios,
+                'ensayosAptitud' => $ensayosAptitud,
+                'gestion' => $gestion,
+                'generado_en' => now(),
+                'generado_por' => $generadoPor !== '' ? $generadoPor : ($responsable->username ?? 'Usuario'),
+            ])->setPaper('a4', 'landscape')->download($fileName);
+        }
+
+        $export = new InscripcionesEaLabExport($laboratorios);
+        switch ($format) {
+            case 'csv':
+                return Excel::download($export, $fileName, \Maatwebsite\Excel\Excel::CSV);
+            case 'xlsx':
+            default:
+                return Excel::download($export, $fileName);
+        }
     }
 
     public function showUploadCertificado(Request $request, $id)

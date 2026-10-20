@@ -238,3 +238,21 @@ extension=php_imagick.dll
 ```
 3. Guarda el archivo.
 > Nota: Reinicia Apache
+
+# Integración de Excel
+- Habilitar extensión ZIP en PHP
+```bash
+C:\xampp\php\php.ini
+```
+- Busca esta línea (usualmente está comentada con ; al inicio):
+```bash
+;extension=zip
+```
+# 🔧 Instalación
+```bash
+composer require maatwebsite/excel
+```
+Publica la configuración (opcional):
+```bash
+php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider"
+```

@@ -249,7 +249,9 @@
                         disabled>
                         <option value="">Selecciona Ensayo de A.</option>
                         @foreach ($ensayoA as $ensayo)
-                            <option value="{{ $ensayo->id }}">{{ $ensayo->descripcion }}</option>
+                            <option value="{{ $ensayo->id }}">
+                                {{ $ensayo->paquete ? $ensayo->paquete->descripcion . ' - ' : '' }}{{ $ensayo->descripcion }}
+                            </option>
                         @endforeach
                     </select>
                 </div>

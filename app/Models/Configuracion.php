@@ -18,7 +18,16 @@ class Configuracion extends Model
     protected $fillable = [
         'key',
         'valor',
+        'updated_by',
     ];
+
+    /**
+     * Usuario que realizó la última actualización de esta configuración.
+     */
+    public function editor()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
 
     const KEY_GESTION_FILTER = 'key_gestion_filter';
     // Claves centralizadas como constantes

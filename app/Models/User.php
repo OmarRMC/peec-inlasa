@@ -15,12 +15,24 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Gate;
 use Lab404\Impersonate\Models\Impersonate;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, AuditableContract
 {
     use General, Impersonate;
+    use Auditable;
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Atributos sensibles que NO deben registrarse en la auditoría.
+     */
+    protected $auditExclude = [
+        'password',
+        'remember_token',
+        'email_verified_at',
+    ];
 
     /**
      * The attributes that are mass assignable.

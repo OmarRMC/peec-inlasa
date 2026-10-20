@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\ResultadosEvaluacionLabExport;
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\GaleriaController;
 use App\Http\Controllers\Admin\RecursoLaboratorioController;
@@ -21,22 +22,39 @@ use App\Http\Controllers\Admin\PaqueteController;
 use App\Http\Controllers\Admin\PlantillaCertificadoController;
 use App\Http\Controllers\Admin\ProgramaController;
 use App\Http\Controllers\Admin\ProvinciaController;
+use App\Http\Controllers\Admin\ReporteCertificadosController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\TipoLaboratorioController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CargoController;
+use App\Http\Controllers\FormularioEnsayoResultadoController;
 use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\VerificacionCorreoLaboratorioController;
 use App\Http\Controllers\CertificadoController;
+use App\Http\Controllers\CicloController;
 use App\Http\Controllers\DocumentosController;
 use App\Http\Controllers\GestionContratoController;
+use App\Http\Controllers\FormularioEnsayoController;
+use App\Http\Controllers\GrupoSelectorController;
 use App\Http\Controllers\Lab\LabController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\PdfInscripcionController;
+use App\Http\Controllers\Lab\RegistroResultadosController;
+use App\Http\Controllers\OpcionSelectorController;
+use App\Http\Controllers\ReporteResultadosEvaluacioneController;
+use App\Http\Controllers\responsable\GestionFormulariosController;
+use App\Http\Controllers\responsable\InformeTecnicoController;
 use App\Http\Controllers\responsable\LaboratorioController as ResponsableLaboratorioController;
+use App\Http\Controllers\admin\DashboardPEECController;
+use App\Http\Controllers\Estadistica\ExploradorRespuestasController;
+use App\Http\Controllers\responsable\DashboardEnsayoController;
+use App\Http\Controllers\responsable\ReporteResultadosController;
+use App\Http\Controllers\responsable\ResultadosEnviadosLabController;
+use App\Http\Controllers\ResultadoController;
 use App\Http\Controllers\VerificarController;
 use App\Http\Controllers\DashboardController;
+use App\Models\FormularioEnsayo;
 use App\Models\Permiso;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +67,10 @@ Route::get('/vistas/validar_cert.php', [VerificarController::class, 'validarAnti
 Route::get('/formato/csv/descargar', function () {
     return response()->download(public_path('formatos/subida_desemp.csv'));
 })->name('formato.csv.descargar');
+Route::get('/formato/zip/descargar', function () {
+    return response()->download(public_path('formatos/subida_informe.zip'));
+})->name('formato.zip.descargar');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/game', [DebugController::class, 'descargar']);
     Route::get('/admin/game/descargar-ruta', [DebugController::class, 'descargarRuta'])->name('game.descargar.ruta');
@@ -68,8 +90,29 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/perfil/contrasena', [ProfileController::class, 'editPassword'])->name('password.edit');
 });
 Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function () {
+    Route::get('/notificaciones', [\App\Http\Controllers\Admin\NotificacionAdminController::class, 'index'])
+        ->name('admin.notificaciones.index');
+    Route::get('/notificaciones/create', [\App\Http\Controllers\Admin\NotificacionAdminController::class, 'create'])
+        ->name('admin.notificaciones.create');
+    Route::post('/notificaciones', [\App\Http\Controllers\Admin\NotificacionAdminController::class, 'store'])
+        ->name('admin.notificaciones.store');
+    Route::post('/notificaciones/{id}/resolver', [\App\Http\Controllers\Admin\NotificacionAdminController::class, 'resolver'])
+        ->name('admin.notificaciones.resolver');
+    Route::get('/notificaciones/{id}/edit', [\App\Http\Controllers\Admin\NotificacionAdminController::class, 'edit'])
+        ->name('admin.notificaciones.edit');
+    Route::put('/notificaciones/{id}', [\App\Http\Controllers\Admin\NotificacionAdminController::class, 'update'])
+        ->name('admin.notificaciones.update');
+    Route::post('/notificaciones/{id}/resolver-todos', [\App\Http\Controllers\Admin\NotificacionAdminController::class, 'resolverTodos'])
+        ->name('admin.notificaciones.resolverTodos');
+    Route::get('/dashboard-peec', [DashboardPEECController::class, 'index'])
+        ->name('admin.dashboard-peec');
+    Route::get('/auditoria/data', [\App\Http\Controllers\Admin\AuditoriaController::class, 'getData'])
+        ->name('admin.auditoria.data');
+    Route::get('/auditoria', [\App\Http\Controllers\Admin\AuditoriaController::class, 'index'])
+        ->name('admin.auditoria.index');
     Route::get('/plantillas-certificados/{plantilla}/preview', [PlantillaCertificadoController::class, 'preview'])
         ->name('plantillas-certificados.preview');
     Route::resource('plantillas-certificados', PlantillaCertificadoController::class)
@@ -111,6 +154,53 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::post('/certificados/update-nombre', [CertificadoController::class, 'updateNombre'])->name('admin.certificado.update-nombre');
     Route::get('/certificados/{idLaboratorio}/descargar/{gestion}/{type}', [CertificadoController::class, 'descargarCertificado'])->name('admin.certificado.descargar');
 
+    Route::get('/formularios-ea', [FormularioEnsayoController::class, 'formulariosIndex'])->name('admin.formularios.ea');
+    Route::get('/formularios-ea/{idEA}/show', [FormularioEnsayoController::class, 'formulariosByEa'])->name('admin.formularios.show');
+    Route::put('/formularios-ea/update/{id}', [FormularioEnsayoController::class, 'update'])->name('admin.formularios.update');
+    Route::delete('/formularios-ea/{formulario}', [FormularioEnsayoController::class, 'destroy'])->name('admin.formularios.destroy');
+    Route::get('/formularios-ea/{id}/{idEa}/edit', [FormularioEnsayoController::class, 'edit'])->name('admin.formularios.edit');
+    Route::get('/formularios-ea/{id}/preview', [FormularioEnsayoController::class, 'preview'])->name('admin.formularios.preview');
+    Route::get('/formularios-ea/guia', [FormularioEnsayoController::class, 'guia'])->name('admin.formularios.guia');
+    Route::post('/formularios-ea', [FormularioEnsayoController::class, 'store'])->name('admin.formularios.store');
+    Route::put('/formularios-ea/{id}', [FormularioEnsayoController::class, 'updateEstructura'])->name('admin.formularios.updateEstructura');
+    Route::post('/formularios/usar/{id}', [FormularioEnsayoController::class, 'usar'])
+        ->name('admin.formularios.usar');
+    Route::delete('/formularios-ea/{formulario}/desvincular/{ensayo}', [FormularioEnsayoController::class, 'desvincular'])
+        ->name('admin.formularios.desvincular');
+
+
+
+    Route::get('/ciclos/{idEa}', [CicloController::class, 'index'])->name('admin.ciclos.index');
+    Route::post('/ciclos', [CicloController::class, 'store'])->name('admin.ciclos.store');
+    Route::put('/ciclos/{id}', [CicloController::class, 'update'])->name('admin.ciclos.update');
+    Route::put('/ciclos/{id}/toggle', [CicloController::class, 'toggle'])->name('admin.ciclos.toggle');
+    Route::delete('/ciclos/{id}', [CicloController::class, 'destroy'])->name('admin.ciclos.destroy');
+
+    Route::prefix('/formularios')->name('admin.formularios.')->group(function () {
+        // Route::get('/{id}/edit', [FormularioEnsayoController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [FormularioEnsayoController::class, 'update'])->name('update');
+        Route::post('/resultados/test', [FormularioEnsayoResultadoController::class, 'testAdmin'])->name('store.test');
+    });
+    Route::prefix('/grupos-selectores')->name('admin.grupos-selectores.')->group(function () {
+        Route::get('/buscar', [GrupoSelectorController::class, 'buscar'])->name('buscar');
+        Route::post('/guardar', [GrupoSelectorController::class, 'guardar'])->name('guardar');
+        Route::delete('/eliminar/{id}', [GrupoSelectorController::class, 'eliminar'])->name('eliminar');
+        Route::get('/opciones/{id}', [GrupoSelectorController::class, 'getOpciones'])->name('opciones');
+    });
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('ensayos/{ensayo}/grupos', [GrupoSelectorController::class, 'index'])
+            ->name('grupos.index');
+        Route::post('ensayos/{ensayo}/grupos', [GrupoSelectorController::class, 'store'])->name('grupos.store');
+        Route::get('/json/ensayos/{ensayoId}/grupos', [GrupoSelectorController::class, 'gruposSelectoresJson'])->name('grupos.selectores.json');
+        Route::put('grupos/{grupo}', [GrupoSelectorController::class, 'update'])->name('grupos.update');
+        Route::delete('grupos/{grupo}', [GrupoSelectorController::class, 'destroy'])->name('grupos.destroy');
+
+        Route::post('grupos/{grupo}/opciones', [OpcionSelectorController::class, 'store'])->name('opciones.store');
+        Route::put('opciones/{opcion}', [OpcionSelectorController::class, 'update'])->name('opciones.update');
+        Route::delete('opciones/{opcion}', [OpcionSelectorController::class, 'destroy'])->name('opciones.destroy');
+    });
+
     Route::prefix('inscripcion')->group(function () {
         Route::get('/', [InscripcionPaqueteController::class, 'index'])->name('inscripcion_paquete.index');
         Route::get('/{lab}', [InscripcionPaqueteController::class, 'show'])
@@ -149,6 +239,13 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::get('/certificados/desempeno-participacion', [CertificadoController::class,  'certificadoDesempenoParticionListLabs'])->name('list.cert.participacion.desemp');
 
     Route::post('/certificados/publicar/{gestion}', [CertificadoController::class,  'publicarCertificado'])->name('certificados.publicar');
+
+    Route::prefix('reportes')->name('admin.reportes.')->group(function () {
+        Route::get('distribucion-ensayos', [ReporteCertificadosController::class, 'distribucionEnsayos'])->name('distribucion');
+        Route::get('distribucion-ensayos/data', [ReporteCertificadosController::class, 'distribucionEnsayosData'])->name('distribucion.data');
+        Route::get('distribucion-ensayos/drill', [ReporteCertificadosController::class, 'distribucionEnsayosDrill'])->name('distribucion.drill');
+        Route::get('distribucion-ensayos/export', [ReporteCertificadosController::class, 'distribucionEnsayosExport'])->name('distribucion.export');
+    });
     Route::prefix('inscripcion')->group(function () {
         Route::get('reportes/inscripciones', [ReporteController::class, 'inscripciones'])
             ->name('reportes.inscripciones.index');
@@ -180,8 +277,9 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
     Route::get('/inscripciones/ajax/data', [LabController::class, 'getInscripcionData'])->name('lab_inscripcion.ajax.data');
     Route::get('/inscripciones/new', [LabController::class, 'labInscripcion'])->name('lab.inscripcion.create');
     Route::get('/inscripcion/{id}', [LabController::class, 'labShowInscripcion'])->name('lab.inscripcion.show');
-    Route::get('/notificacion/verify', [NotificacionController::class, 'getNotificacion']);
-    Route::post('/notificacion/read', [NotificacionController::class, 'marcarLeido']);
+    Route::get('/notificaciones/pendientes', [NotificacionController::class, 'getNotificacionesPendientes'])->name('lab.notificaciones.pendientes');
+    Route::post('/notificaciones/{id}/read', [NotificacionController::class, 'marcarLeida'])->name('lab.notificaciones.marcarLeida');
+    Route::get('/notificaciones', [NotificacionController::class, 'bandeja'])->name('lab.notificaciones.bandeja');
     Route::get('/contrato', [LabController::class, 'generarContrato'])->name('formulario_contrato');
     Route::get('/formulario-ins/{id}', [LabController::class, 'generarFormularioIns'])->name('formulario_inscripcion');
     Route::put('/inscripcion/{id}/anular', [LabController::class, 'anularInscripcion'])->name('inscripciones.anular');
@@ -198,24 +296,84 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('lab')->group(function () 
         ->name('pago.lab.subirComprobante');
     Route::get('/inscripciones/{id}/comprobantes', [DocumentosController::class, 'indexDocPagos'])
         ->name('documentos.pagos.index');
+
+    Route::get('/inscripcion-ensayos', [RegistroResultadosController::class, 'listaEnsayosInscritos'])->name('lab.inscritos-ensayos.index');
+    Route::get('/inscripcion-ensayos/{id}/formularios', [RegistroResultadosController::class, 'getFormulariosByEa'])->name('lab.inscritos-ensayos.formularios');
+    Route::get('/inscripcion-ensayos/formulario/{id}/llenar/{idEA}', [RegistroResultadosController::class, 'formularioLlenar'])->name('lab.inscritos-ensayos.formularios.llenar');
+    Route::post('/inscripcion-ensayos/formulario/{id}/llenar', [RegistroResultadosController::class, 'guardarResultados'])->name('laboratorio.formularios.guardar');
+
+    Route::post('/formularios/resultados', [FormularioEnsayoResultadoController::class, 'store'])->name('lab.resultados.store');
+    Route::get('/informes', [\App\Http\Controllers\lab\InformeTecnicoController::class, 'labInformes'])->name('lab.ensayos-informes.index');
 });
 
 Route::middleware(['auth', 'usuario.activo'])->prefix('responsable')->group(function () {
+    Route::get('/mis-ensayos', [ResponsableLaboratorioController::class, 'misEnsayos'])->name('responsable.mis-ensayos');
     Route::get('/ea/{id}/labs', [ResponsableLaboratorioController::class, 'index'])->name('ea.lab.inscritos');
     Route::get('/ea/{id}/certificados', [ResponsableLaboratorioController::class, 'showUploadCertificado'])->name('ea.lab.certificados');
     Route::post('/ea/{id}/subir_ponderaciones', [ResponsableLaboratorioController::class, 'uploadCertificadoData'])->name('ea.lab.subir.ponderaciones');
     Route::get('/ea/{id}/en_revision', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoTemporal'])->name('ea.lab.desempeno.temporal');
     Route::get('/ea/{id}/labs-ajax', [ResponsableLaboratorioController::class, 'getData'])->name('ea.lab.inscritos.ajax');
+    Route::get('/ea/{id}/labs/exportar', [ResponsableLaboratorioController::class, 'exportInscripciones'])->name('ea.lab.inscritos.exportar');
     Route::post('/detalle-certificado/{id}', [DetalleCertificadoController::class, 'update'])->name('detalle-certificado.update');
     Route::post('/ea/{id}/certificado/confirmar', [ResponsableLaboratorioController::class, 'confirmarDatosCertificados'])->name('confirmar.datos.certificados');
     Route::get('/ea/{id}/certificado/confirmados', [ResponsableLaboratorioController::class, 'getLaboratoriosDesempenoConfirmados'])->name('ea.lab.desempeno.confirmado');
+    Route::get('/ea/gestion-formularios', [GestionFormulariosController::class, 'index'])->name('ea.formulario.index');
+    Route::get('/ea/{id}/gestion-formularios/labs', [GestionFormulariosController::class, 'labs'])->name('ea.formulario.lab.inscritos');
+    Route::get('/ea/{id}/gestion-formularios/labs/data', [GestionFormulariosController::class, 'getData'])->name('ea.formulario.lab.inscritos.getData');
+    Route::post('/ea/formulario/actualizar-cantidad', [GestionFormulariosController::class, 'actualizarCantidad'])
+        ->name('ea.formulario.actualizarCantidad');
+    Route::get('reportes/ensayos', [ReporteResultadosController::class, 'reporteEnsayos'])
+        ->name('reportes.resultados.ensayos');
+    Route::get('ensayos/{idEA}/dashboard', [DashboardEnsayoController::class, 'index'])
+        ->name('responsable.ensayo.dashboard');
+    Route::get('reportes/resultados/{idEA}/registrados', [ReporteResultadosController::class, 'resultadosRegistradosPorLab'])
+        ->name('reportes.resultados.registrados');
+    Route::get('reportes/ensayo/{idEA}/export/{ciclo}', [ReporteResultadosEvaluacioneController::class, 'exportEnsayoResultados'])
+        ->name('reportes.resultados.ensayos.export');
+    Route::get('reportes/ensayo/{idEA}/ciclo/{idCiclo}/lab/{idLab}', [ResultadosEnviadosLabController::class, 'listadoRespuestasEnviados'])
+        ->name('resultados.enviados.index');
+    Route::get('resultado/preview/{id}', [ResultadosEnviadosLabController::class, 'previewResultado'])
+        ->name('responsable.resultados.preview');
+    Route::get('informes/ensayos', [InformeTecnicoController::class, 'informeTecnicoEnsayos'])
+        ->name('informe.tecnico.ensayos');
+    Route::get('informes/ensayo/{id}', [InformeTecnicoController::class, 'informeTecnicoEnsayo'])
+        ->name('informe.tecnico.ensayo');
+    Route::post('informes/ensayo/{id}', [InformeTecnicoController::class, 'cargarInformeTecnico'])
+        ->name('informe.tecnico.subir');
+    Route::get('informes/ciclo/{idCiclo}', [InformeTecnicoController::class, 'listadoInformes'])
+        ->name('informe.tecnico.listados');
+    Route::delete('informes/{id}', [InformeTecnicoController::class, 'eliminarInforme'])
+        ->name('informe.tecnico.eliminar');
 });
+Route::get('/exportar-resultados/{id}', [ResultadoController::class, 'export'])->name('formularios.resultados.export');
 
-// Iniciar impersonación — solo usuarios con permiso
+// Explorador descriptivo de respuestas (autorizacion interna por Gate: RESPONSABLE / JEFE_PEEC / ADMIN)
+Route::middleware(['auth', 'usuario.activo'])
+    ->prefix('explorador-respuestas')
+    ->name('explorador-respuestas.')
+    ->group(function () {
+        Route::get('ensayos/{idEA}',
+            [ExploradorRespuestasController::class, 'ensayo'])->name('ensayo');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/formularios/{idFormulario}',
+            [ExploradorRespuestasController::class, 'formulario'])->name('formulario');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/parametros/{idParametro}',
+            [ExploradorRespuestasController::class, 'parametro'])->name('parametro');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/campos/{idCampo}',
+            [ExploradorRespuestasController::class, 'campo'])->name('campo');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/formularios/{idFormulario}/export/excel',
+            [ExploradorRespuestasController::class, 'exportarFormulario'])->name('formulario.export');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/parametros/{idParametro}/export/pdf',
+            [ExploradorRespuestasController::class, 'exportarParametro'])->name('parametro.export');
+        Route::get('ensayos/{idEA}/ciclos/{idCiclo}/campos/{idCampo}/export/pdf',
+            [ExploradorRespuestasController::class, 'exportarCampo'])->name('campo.export');
+    });
+
+
+// Iniciar impersonación - solo usuarios con permiso
 Route::middleware(['auth', 'canany:' . Permiso::IMPERSONAR_USUARIO])->group(function () {
     Route::get('impersonate/take/{id}/{guardName?}', '\Lab404\Impersonate\Controllers\ImpersonateController@take')->name('impersonate');
 });
-// Salir de impersonación — cualquier usuario autenticado (puede ser el impersonado)
+// Salir de impersonación - cualquier usuario autenticado (puede ser el impersonado)
 Route::middleware(['auth'])->group(function () {
     Route::get('impersonate/leave', '\Lab404\Impersonate\Controllers\ImpersonateController@leave')->name('impersonate.leave');
 });

@@ -6,9 +6,13 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Inscripcion extends Model
+class Inscripcion extends Model implements AuditableContract
 {
+    use Auditable;
+
     protected $table = 'inscripcion';
 
     const STATUS_EN_REVISION = 1;

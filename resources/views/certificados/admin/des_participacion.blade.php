@@ -16,6 +16,19 @@
                 </select>
             </div>
 
+            <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded max-w-md">
+                <label class="flex items-start gap-2 text-sm text-gray-700">
+                    <input type="checkbox" name="enviar_email" value="1" class="mt-0.5 text-indigo-600">
+                    <span>
+                        <span class="font-semibold">Notificar a los laboratorios por correo electrónico</span>
+                        <span class="block text-xs text-gray-500 mt-0.5">
+                            Además del aviso en el sistema, se enviará un correo a cada laboratorio cuyo
+                            certificado se publique.
+                        </span>
+                    </span>
+                </label>
+            </div>
+
             <div class="my-2 pt-5">
                 <button type="submit" class="btn-primary"><i class="fas fa-save mr-1"></i>Publicar
                     certificados</button>

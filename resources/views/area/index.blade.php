@@ -65,7 +65,8 @@
                                 <div class="flex space-x-1">
                                     <a href="{{ route('area.edit', $area->id) }}"
                                         class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm"
-                                        data-tippy-content="Editar">
+                                        data-tippy-content="Editar"
+                                        >
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     @if (Gate::any(Permiso::DELETE_GESTION_PROGRAMAS))

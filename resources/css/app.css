@@ -227,7 +227,7 @@
 
 /* Tamaño compacto del cuadro Confirmar - Incripciones*/
 .swal2-mini-popup {
-    padding: 1rem ;
+    padding: 1rem;
     width: 450px !important;
     font-size: 0.85rem;
     border-radius: 0.75rem;
@@ -236,19 +236,19 @@
 /* Título pequeño */
 .swal2-mini-title {
     font-size: 1rem;
-    font-weight: 600 ;
+    font-weight: 600;
 }
 
 /* Contenido reducido */
 .swal2-mini-html {
-    font-size: 0.8rem ;
+    font-size: 0.8rem;
 }
 
 /* Botones más pequeños y minimalistas */
 .swal2-mini-btn {
     padding: 8px 12px;
-    font-size: 0.8rem ;
-    border-radius: 6px ;
+    font-size: 0.8rem;
+    border-radius: 6px;
     margin: 0 4px;
 }
 
@@ -262,4 +262,27 @@
 .swal2-cancel {
     background-color: #6c757d;
     color: white;
+}
+
+/* Es para los campos de preview de formulario*/
+.campo-entrada {
+    width: auto;
+}
+
+
+.tippy-box[data-theme~='validacion'] {
+    background-color: #111827;
+    /* gris oscuro elegante */
+    color: #f9fafb;
+    /* texto claro */
+    font-size: 0.85rem;
+    font-weight: 400;
+    border-radius: 4px;
+    padding: 4px 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+}
+
+.tippy-box[data-theme~='validacion'][data-placement^='top']>.tippy-arrow::before {
+    color: #111827;
 }

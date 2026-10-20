@@ -22,8 +22,9 @@ class ConfiguracionController extends Controller
     public function index()
     {
         $configuraciones = Configuracion::all()->pluck('valor', 'clave');
+        $ultimasActualizaciones = Configuracion::with('editor')->get()->keyBy('key');
 
-        return view('config.index', compact('configuraciones'));
+        return view('config.index', compact('configuraciones', 'ultimasActualizaciones'));
     }
 
     public function update(Request $request, $seccion)

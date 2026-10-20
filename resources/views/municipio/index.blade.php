@@ -43,7 +43,7 @@
                                         class="delete-form inline" data-nombre="{{ $mun->nombre_municipio }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" data-tippy-content="Eliminar"s
+                                        <button type="submit" data-tippy-content="Eliminar"
                                             class="delete-button bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded shadow-sm">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>

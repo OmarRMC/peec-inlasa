@@ -9,10 +9,13 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Laboratorio extends Model
+class Laboratorio extends Model implements AuditableContract
 {
     use HasFactory;
+    use Auditable;
     const ACTIVE_STATUS = 1;
     const INACTIVE_STATUS = 0;
 
@@ -376,10 +379,12 @@ class Laboratorio extends Model
             'code' => $codigoCertificado,
             'type' => Certificado::TYPE_PARTICIPACION,
         ]);
+        // SVG (PHP puro, sin Imagick) para evitar el módulo PNG de ImageMagick
+        // que puede estar bloqueado por políticas de control de aplicaciones del servidor.
         $qrBase64 = base64_encode(
-            QrCode::format('png')->size(320)->margin(1)->generate($verifyUrl)
+            QrCode::format('svg')->size(320)->margin(1)->generate($verifyUrl)
         );
-        $qrDataUri = "data:image/png;base64,{$qrBase64}";
+        $qrDataUri = "data:image/svg+xml;base64,{$qrBase64}";
         $plantillaDefault = PlantillaCertificado::query()->oldest()->first();
         if (!$plantilla || ($plantillaDefault && $plantilla->id === $plantillaDefault->id)) {
             $usarPlantilla = $plantilla ?? $plantillaDefault;
@@ -504,10 +509,12 @@ class Laboratorio extends Model
             'code' => $codigoCertificado,
             'type' => Certificado::TYPE_DESEMP,
         ]);
+        // SVG (PHP puro, sin Imagick) para evitar el módulo PNG de ImageMagick
+        // que puede estar bloqueado por políticas de control de aplicaciones del servidor.
         $qrBase64 = base64_encode(
-            QrCode::format('png')->size(320)->margin(1)->generate($verifyUrl)
+            QrCode::format('svg')->size(320)->margin(1)->generate($verifyUrl)
         );
-        $qrDataUri = "data:image/png;base64,{$qrBase64}";
+        $qrDataUri = "data:image/svg+xml;base64,{$qrBase64}";
         $plantillaDefault = PlantillaCertificado::query()->oldest()->first();
         if (!$plantilla || ($plantillaDefault && $plantilla->id === $plantillaDefault->id)) {
             $usarPlantilla = $plantilla ?? $plantillaDefault;
@@ -642,5 +649,15 @@ class Laboratorio extends Model
             ->orderByDesc('gestion')
             ->pluck('gestion')
             ->toArray();
+    }
+
+    public function respuestas()
+    {
+        return $this->hasMany(FormularioEnsayoResultado::class, 'id_laboratorio');
+    }
+
+    public function informesTecnicos()
+    {
+        return $this->hasMany(InformeTecnico::class, 'id_laboratorio');
     }
 }

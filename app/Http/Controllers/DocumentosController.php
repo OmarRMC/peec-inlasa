@@ -6,8 +6,10 @@ use App\Models\Configuracion;
 use App\Models\DetallePagoDocumento;
 use App\Models\DocumentoInscripcion;
 use App\Models\Inscripcion;
+use App\Models\NotificacionLab;
 use App\Models\Pago;
 use App\Models\Permiso;
+use App\Services\NotificacionLabService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -49,7 +51,7 @@ class DocumentosController extends Controller
                 $docExistente = $inscripcion->documentosInscripcion()
                     ->where('nombre_doc', $titulo)
                     ->first();
-                if ($docExistente->ruta_doc && Storage::disk('public')->exists(str_replace('/storage/', '', $docExistente->ruta_doc))) {
+                if ($docExistente && $docExistente->ruta_doc && Storage::disk('public')->exists(str_replace('/storage/', '', $docExistente->ruta_doc))) {
                     Storage::disk('public')->delete(str_replace('/storage/', '', $docExistente->ruta_doc));
                 }
                 $archivo = $archivos[$index];
@@ -78,6 +80,12 @@ class DocumentosController extends Controller
                 }
             }
         }
+
+        NotificacionLabService::resolver(
+            NotificacionLab::TIPO_OBSERVACION_INSCRIPCION,
+            NotificacionLab::ENTIDAD_INSCRIPCION,
+            $inscripcion->id
+        );
 
         return redirect()->back()->with('success', 'Documentos subidos correctamente.');
     }
