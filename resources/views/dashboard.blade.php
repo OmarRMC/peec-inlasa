@@ -49,35 +49,51 @@ use App\Models\Permiso;
                 <h3 class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
                     <i class="fas fa-file-signature text-indigo-500"></i> Inscripción {{ $gestion }}
                 </h3>
-                @if ($inscripcionActual)
-                    @php
-                        $si = $inscripcionActual->status_inscripcion;
-                        $colorInsc = match($si) {
-                            \App\Models\Inscripcion::STATUS_APROBADO => 'bg-green-100 text-green-800',
-                            \App\Models\Inscripcion::STATUS_EN_REVISION  => 'bg-yellow-100 text-yellow-800',
-                            \App\Models\Inscripcion::STATUS_EN_OBSERVACION => 'bg-red-100 text-red-800',
-                            \App\Models\Inscripcion::STATUS_VENCIDO => 'bg-orange-100 text-orange-800',
-                            \App\Models\Inscripcion::STATUS_ANULADO => 'bg-gray-200 text-gray-600',
-                            default => 'bg-gray-100 text-gray-600',
-                        };
-                    @endphp
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorInsc }}">
-                            {{ \App\Models\Inscripcion::STATUS_INSCRIPCION[$si] ?? '—' }}
-                        </span>
+                @if ($resumenInscripcion)
+                    <div class="flex items-center gap-2 mb-3 flex-wrap">
+                        @foreach ($resumenInscripcion->estados as $si)
+                            @php
+                                $colorInsc = match($si) {
+                                    \App\Models\Inscripcion::STATUS_APROBADO => 'bg-green-100 text-green-800',
+                                    \App\Models\Inscripcion::STATUS_EN_REVISION  => 'bg-yellow-100 text-yellow-800',
+                                    \App\Models\Inscripcion::STATUS_EN_OBSERVACION => 'bg-red-100 text-red-800',
+                                    \App\Models\Inscripcion::STATUS_VENCIDO => 'bg-orange-100 text-orange-800',
+                                    default => 'bg-gray-100 text-gray-600',
+                                };
+                            @endphp
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $colorInsc }}">
+                                {{ \App\Models\Inscripcion::STATUS_INSCRIPCION[$si] ?? '—' }}
+                            </span>
+                        @endforeach
                     </div>
-                    @if ($inscripcionActual->detalleInscripciones->isNotEmpty())
+                    @unless ($resumenInscripcion->valida)
+                        <p class="text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded p-2 mb-3">
+                            <i class="fas fa-hourglass-half mr-1"></i>
+                            @if ($resumenInscripcion->estados->contains(\App\Models\Inscripcion::STATUS_EN_OBSERVACION))
+                                Tu inscripción tiene observaciones. Revísalas en <a href="{{ route('lab.ins.index') }}" class="underline font-medium">Mis inscripciones</a>.
+                            @else
+                                Tu inscripción está en revisión. Se mostrará como aprobada cuando sea validada.
+                            @endif
+                        </p>
+                    @endunless
+                    @if ($resumenInscripcion->paquetes->isNotEmpty())
                         <p class="text-xs text-gray-500 mb-1 uppercase tracking-wide">Paquetes inscritos</p>
                         <ul class="space-y-1 mb-3">
-                            @foreach ($inscripcionActual->detalleInscripciones as $detalle)
+                            @foreach ($resumenInscripcion->paquetes as $paquete)
                                 <li class="text-sm text-gray-700 flex items-start gap-2">
                                     <i class="fas fa-box-open text-indigo-400 mt-0.5 text-xs"></i>
-                                    {{ $detalle->descripcion_paquete }}
+                                    {{ $paquete }}
                                 </li>
                             @endforeach
                         </ul>
                     @endif
-                    <p class="text-xs text-gray-400">Fecha: {{ $inscripcionActual->fecha_inscripcion }}</p>
+                    @if ($resumenInscripcion->en_tramite > 0)
+                        <p class="text-xs text-yellow-700 mb-2">
+                            <i class="fas fa-hourglass-half mr-1"></i>
+                            Tienes {{ $resumenInscripcion->en_tramite }} inscripción(es) adicional(es) en revisión.
+                        </p>
+                    @endif
+                    <p class="text-xs text-gray-400">Fecha: {{ $resumenInscripcion->fecha }}</p>
                 @else
                     <div class="flex flex-col items-center py-4 text-center text-gray-400">
                         <i class="fas fa-inbox text-3xl mb-2"></i>
@@ -97,9 +113,10 @@ use App\Models\Permiso;
                 <h3 class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
                     <i class="fas fa-wallet text-indigo-500"></i> Estado de cuenta
                 </h3>
-                @if ($inscripcionActual)
+                {{-- Solo con inscripción aprobada (o vencida) --}}
+                @if ($resumenInscripcion?->valida)
                     @php
-                        $pagado = $inscripcionActual->status_cuenta === \App\Models\Inscripcion::STATUS_PAGADO;
+                        $pagado = $resumenInscripcion->pagado;
                     @endphp
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center {{ $pagado ? 'bg-green-100' : 'bg-red-100' }}">
@@ -114,7 +131,7 @@ use App\Models\Permiso;
                     </div>
                     <p class="text-sm text-gray-700">
                         Costo total:
-                        <span class="font-bold text-gray-900">Bs. {{ number_format($inscripcionActual->costo_total, 2) }}</span>
+                        <span class="font-bold text-gray-900">Bs. {{ number_format($resumenInscripcion->costo_total, 2) }}</span>
                     </p>
                     @if (!$pagado)
                         <p class="text-xs text-red-500 mt-2">
@@ -125,7 +142,11 @@ use App\Models\Permiso;
                 @else
                     <div class="flex flex-col items-center py-4 text-center text-gray-400">
                         <i class="fas fa-receipt text-3xl mb-2"></i>
-                        <p class="text-sm">No hay cuenta activa para {{ $gestion }}</p>
+                        @if ($resumenInscripcion)
+                            <p class="text-sm">El estado de cuenta se mostrará cuando tu inscripción sea aprobada.</p>
+                        @else
+                            <p class="text-sm">No hay cuenta activa para {{ $gestion }}</p>
+                        @endif
                     </div>
                 @endif
             </div>

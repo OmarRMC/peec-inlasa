@@ -183,7 +183,10 @@ class Laboratorio extends Model
 
     public function tieneIscripcionGestionActual()
     {
-        return $this->inscripciones()->where('gestion', configuracion(Configuracion::GESTION_INSCRIPCION))->exists();
+        return $this->inscripciones()
+            ->where('gestion', configuracion(Configuracion::GESTION_INSCRIPCION))
+            ->where('status_inscripcion', '!=', Inscripcion::STATUS_ANULADO)
+            ->exists();
     }
 
     /**

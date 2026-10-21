@@ -16,18 +16,39 @@ class DashboardController extends Controller
         // ── LABORATORIO ──────────────────────────────────────────────
         if ($user->isLaboratorio()) {
             $lab = $user->laboratorio;
-            $inscripcionActual = $lab->inscripciones()
-                ->with('detalleInscripciones')
-                ->latest('id')
-                ->first();
+            $gestion = configuracion(Configuracion::GESTION_INSCRIPCION);
 
-            $gestion = $inscripcionActual?->gestion ?? configuracion(Configuracion::GESTION_INSCRIPCION);
+            // Inscripciones de la gestión configurada, sin anuladas (un lab puede tener varias)
+            $inscripciones = $lab->inscripciones()
+                ->with('detalleInscripciones')
+                ->where('gestion', $gestion)
+                ->where('status_inscripcion', '!=', Inscripcion::STATUS_ANULADO)
+                ->orderBy('id')
+                ->get();
+
+            // Válidas = aprobadas o vencidas; si no hay, se muestran las que están en revisión/observación
+            $estadosValidos = [Inscripcion::STATUS_APROBADO, Inscripcion::STATUS_VENCIDO];
+            $validas = $inscripciones->whereIn('status_inscripcion', $estadosValidos);
+            $enTramite = $inscripciones->whereNotIn('status_inscripcion', $estadosValidos);
+            $mostradas = $validas->isNotEmpty() ? $validas : $enTramite;
 
             return view('dashboard', [
                 'tipo'                    => 'laboratorio',
                 'lab'                     => $lab,
                 'gestion'                 => $gestion,
-                'inscripcionActual'       => $inscripcionActual,
+                'resumenInscripcion'      => $mostradas->isEmpty() ? null : (object) [
+                    'valida'        => $validas->isNotEmpty(),
+                    'estados'       => $mostradas->pluck('status_inscripcion')->unique()->values(),
+                    'paquetes'      => $mostradas->flatMap->detalleInscripciones
+                        ->unique('id_paquete')
+                        ->pluck('descripcion_paquete')
+                        ->values(),
+                    'costo_total'   => $mostradas->sum('costo_total'),
+                    'pagado'        => $mostradas->every(fn($i) => $i->status_cuenta === Inscripcion::STATUS_PAGADO),
+                    'fecha'         => $mostradas->last()->fecha_inscripcion,
+                    // Inscripciones adicionales aún en trámite cuando ya hay una aprobada
+                    'en_tramite'    => $validas->isNotEmpty() ? $enTramite->count() : 0,
+                ],
                 'periodoInscripcion'      => Configuracion::esPeriodoInscripcion(),
                 'certificadosHabilitados' => Configuracion::estaHabilitadoCargarCertificado(),
             ]);
