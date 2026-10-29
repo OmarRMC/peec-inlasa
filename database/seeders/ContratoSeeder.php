@@ -66,7 +66,7 @@ c) Enviar los resultados obtenidos al enlace proporcionado según el área que c
 d) Participar de las reuniones de retroalimentación y responder a encuestas de satisfacción realizadas por el PEEC - INLASA para mejorar el Programa.
 e) Apelar los resultados de su evaluación, cuando lo considere necesario.
 f) Mantener actualizados sus registros de métodos, reactivos y equipos el en reporte de resultados al PEEC - INLASA.
-g) Brindar información sobre el PEEC – INLASA a organismos evaluadores cuando se requiera en el marco de procesos oficiales.
+g) Brindar información sobre el PEEC - INLASA a organismos evaluadores cuando se requiera en el marco de procesos oficiales.
 h) Cumplir la política de divulgación de informes establecida en los protocolos de cada ensayo de aptitud.
 i) Pagar la tasa de inscripción por la participación en el Programa, de conformidad a los plazos establecidos en la  {{ convocatoria }}',
                 'posicion' => 5,

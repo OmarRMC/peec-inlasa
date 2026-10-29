@@ -162,7 +162,7 @@
             </div>
 
             <div class="footer">
-                <p class="small">Programa de Evaluación Externa de la Calidad – INLASA</p>
+                <p class="small">Programa de Evaluación Externa de la Calidad - INLASA</p>
             </div>
         </div>
     </div>

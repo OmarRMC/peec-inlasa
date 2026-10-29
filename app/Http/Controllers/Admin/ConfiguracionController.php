@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AprobarInscripcion;
+use App\Mail\EnvioObsLab;
 use App\Models\Configuracion;
+use App\Models\Laboratorio;
 use App\Models\Permiso;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,22 +128,24 @@ class ConfiguracionController extends Controller
                 configuracion(Configuracion::NOTIFICACION_FECHA_FIN, $request->notificacion_fecha_fin);
                 break;
 
-            case 'email.aprobacion':
+            case Configuracion::EMAIL_APROBACION_INFORMACION:
+            case Configuracion::EMAIL_OBSERVACION_INFORMACION:
+                $campo = str_replace('.', '_', $seccion);
                 $request->validate([
-                    'email_aprobacion' => 'required|string',
+                    $campo => 'required|string|max:100000',
                 ], [
-                    'email_aprobacion.string' => 'El mensaje debe ser una cadena de texto.',
+                    "$campo.required" => 'El contenido de la sección INFORMACIÓN es obligatorio.',
+                    "$campo.string" => 'El contenido debe ser una cadena de texto.',
+                    "$campo.max" => 'El contenido es demasiado grande (máximo 100.000 caracteres).',
                 ]);
-                configuracion(Configuracion::EMAIL_APROBACION, $request->email_aprobacion);
-                break;
 
-            case 'email.observacion':
-                $request->validate([
-                    'email_observacion' => 'required|string',
-                ], [
-                    'email_observacion.string' => 'El mensaje debe ser una cadena de texto.',
-                ]);
-                configuracion(Configuracion::EMAIL_OBSERVACION, $request->email_observacion);
+                $html = $request->input($campo);
+                if ($error = $this->errorEstructuraHtml($html)) {
+                    return back()->withInput()->with('error', $error);
+                }
+
+                configuracion($seccion, $this->limpiarHtmlEmail($html));
+                Log::info('config.' . $seccion, ['user_id' => Auth::id()]);
                 break;
 
             case 'certificados':
@@ -282,5 +287,140 @@ class ConfiguracionController extends Controller
             })
             ->values();
         return view('certificados.config', compact('configuraciones'));
+    }
+
+    /**
+     * Vista previa del correo completo (aprobación u observación) en una pestaña nueva.
+     * Muestra el contenido actual del editor (no se guarda).
+     */
+    public function previewEmail(Request $request, string $tipo)
+    {
+        if (!Gate::any([Permiso::ADMIN, Permiso::CONFIGURACION])) {
+            abort(403);
+        }
+
+        $html = $this->limpiarHtmlEmail((string) $request->input('html', ''));
+        $aviso = $this->errorEstructuraHtml((string) $request->input('html', ''));
+
+        $lab = Laboratorio::with('usuario')->whereHas('usuario')->find($request->input('laboratorio_id'))
+            ?? Laboratorio::with('usuario')->whereHas('usuario')->active()->orderBy('cod_lab')->first();
+        if (!$lab) {
+            abort(404, 'No hay laboratorios para la vista previa.');
+        }
+        $gestion = $lab->inscripciones()->latest('id')->value('gestion')
+            ?? configuracion(Configuracion::GESTION_INSCRIPCION);
+
+        $mail = $tipo === 'aprobacion'
+            ? new AprobarInscripcion($lab->usuario, $lab, $gestion, $html)
+            : new EnvioObsLab($lab->usuario, $lab, [
+                'Formulario de inscripción' => 'Ejemplo: falta la firma del responsable.',
+                'Comprobante de pago' => 'Ejemplo: el documento no es legible.',
+            ], $gestion, $html);
+
+        $banner = view('config.partials.email_preview_banner', [
+            'asunto' => $mail->envelope()->subject,
+            'lab' => $lab,
+            'gestion' => $gestion,
+            'aviso' => $aviso,
+        ])->render();
+
+        $contenido = preg_replace('/<body[^>]*>/i', '$0' . $banner, $mail->render(), 1);
+
+        return response($contenido);
+    }
+
+    /** Buscador de laboratorios por código (o nombre) para la vista previa. */
+    public function buscarLaboratorioEmail(Request $request)
+    {
+        if (!Gate::any([Permiso::ADMIN, Permiso::CONFIGURACION])) {
+            abort(403);
+        }
+        $q = trim((string) $request->input('q', ''));
+
+        return Laboratorio::whereHas('usuario')
+            ->when($q !== '', fn($query) => $query->where(
+                fn($w) => $w->where('cod_lab', 'like', "%$q%")->orWhere('nombre_lab', 'like', "%$q%")
+            ))
+            ->orderBy('cod_lab')
+            ->limit(15)
+            ->get(['id', 'cod_lab', 'nombre_lab']);
+    }
+
+    /** Subida de imágenes desde el editor visual (formato de respuesta de Jodit). */
+    public function subirImagenEmail(Request $request)
+    {
+        if (!Gate::any([Permiso::ADMIN, Permiso::CONFIGURACION])) {
+            return response()->json(['success' => false, 'data' => ['messages' => ['No tiene permiso.']]], 403);
+        }
+
+        $validator = validator($request->all(), [
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ], [
+            'imagen.required' => 'Seleccione una imagen.',
+            'imagen.image' => 'El archivo debe ser una imagen.',
+            'imagen.mimes' => 'Formatos permitidos: jpg, png, gif, webp.',
+            'imagen.max' => 'La imagen no debe superar los 2 MB.',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'data' => ['messages' => $validator->errors()->all()]]);
+        }
+
+        $path = $request->file('imagen')->store('emails', 'public');
+        Log::info('config.email.imagen', ['user_id' => Auth::id(), 'path' => $path]);
+
+        // URL absoluta: el correo se abre fuera del sistema
+        return response()->json(['success' => true, 'data' => [
+            'baseurl' => url('storage') . '/',
+            'files' => [$path],
+            'isImages' => [true],
+            'messages' => [],
+        ]]);
+    }
+
+    /** Devuelve un mensaje si las etiquetas de tabla/lista no están balanceadas (rompería el diseño del correo). */
+    private function errorEstructuraHtml(string $html): ?string
+    {
+        $html = preg_replace('/<!--.*?-->/s', '', $html);
+        foreach (['table', 'tr', 'td', 'th', 'ul', 'ol', 'div', 'a'] as $tag) {
+            $abiertas = preg_match_all('/<' . $tag . '(\s[^>]*)?>/i', $html);
+            $cerradas = preg_match_all('/<\/' . $tag . '\s*>/i', $html);
+            if ($abiertas !== $cerradas) {
+                return "El HTML tiene etiquetas <$tag> sin cerrar o de más ($abiertas abiertas, $cerradas cerradas). Revise el código fuente.";
+            }
+        }
+        return null;
+    }
+
+    /** Quita scripts, iframes, formularios y atributos peligrosos; conserva estilos en línea y <style>. */
+    private function limpiarHtmlEmail(string $html): string
+    {
+        $doc = new \DOMDocument();
+        $prev = libxml_use_internal_errors(true);
+        $doc->loadHTML('<?xml encoding="utf-8"?><div id="__raiz">' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
+
+        $xpath = new \DOMXPath($doc);
+        foreach ($xpath->query('//script|//iframe|//form|//object|//embed|//input|//button|//textarea|//select|//meta|//link|//base') as $nodo) {
+            $nodo->parentNode->removeChild($nodo);
+        }
+        foreach ($xpath->query('//@*') as $attr) {
+            $nombre = strtolower($attr->nodeName);
+            $valor = strtolower(preg_replace('/\s+/', '', $attr->nodeValue));
+            if (str_starts_with($nombre, 'on')
+                || (in_array($nombre, ['href', 'src', 'action', 'formaction', 'xlink:href'])
+                    && (str_starts_with($valor, 'javascript:') || str_starts_with($valor, 'vbscript:') || str_starts_with($valor, 'data:text')))
+            ) {
+                $attr->ownerElement->removeAttributeNode($attr);
+            }
+        }
+
+        $raiz = $doc->getElementById('__raiz') ?? $xpath->query('//div[@id="__raiz"]')->item(0);
+        $salida = '';
+        foreach ($raiz->childNodes as $hijo) {
+            $salida .= $doc->saveHTML($hijo);
+        }
+        // libxml codifica las llaves en href/src: restaurar los comodines ({codigo} → %7Bcodigo%7D → {codigo})
+        return trim(preg_replace('/%7B(\w+)%7D/i', '{$1}', $salida));
     }
 }

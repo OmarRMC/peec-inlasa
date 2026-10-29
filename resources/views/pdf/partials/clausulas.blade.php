@@ -73,7 +73,7 @@
           e) Apelar los resultados de su evaluación, cuando lo considere necesario.</br>
           f) Mantener actualizados sus registros de métodos, reactivos y equipos el en reporte de resultados al
           PEEC - INLASA. </br>
-          g) Brindar información sobre el PEEC – INLASA a organismos evaluadores cuando se requiera en el marco de
+          g) Brindar información sobre el PEEC - INLASA a organismos evaluadores cuando se requiera en el marco de
           procesos oficiales. </br>
           h) Cumplir la política de divulgación de informes establecida en los protocolos de cada ensayo de
           aptitud. </br>

@@ -138,6 +138,10 @@ Route::middleware(['auth', 'usuario.activo'])->prefix('admin')->group(function (
     Route::post('/contrato-detalles/save-all', [GestionContratoController::class, 'saveAll'])
         ->name('contrato_detalles.saveAll');
     Route::put('/configuracion/update/{seccion}', [ConfiguracionController::class, 'update'])->name('configuracion.update');
+    Route::post('/configuracion/email/preview/{tipo}', [ConfiguracionController::class, 'previewEmail'])
+        ->whereIn('tipo', ['aprobacion', 'observacion'])->name('configuracion.email.preview');
+    Route::get('/configuracion/email/laboratorios', [ConfiguracionController::class, 'buscarLaboratorioEmail'])->name('configuracion.email.laboratorios');
+    Route::post('/configuracion/email/imagen', [ConfiguracionController::class, 'subirImagenEmail'])->name('configuracion.email.imagen');
     Route::get('/configuracion/certificado', [ConfiguracionController::class, 'certificados'])->name('configuracion.cerfificado');
 
     Route::resource('formularios', FormularioController::class);

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Configuracion;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -17,15 +18,20 @@ class EnvioObsLab extends Mailable
     protected $laboratorio;
 
     protected $observaciones;
+    protected $gestion;
+    protected $informacionHtml;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($usuario, $laboratorio, $observaciones)
+    public function __construct($usuario, $laboratorio, $observaciones, $gestion, ?string $informacionHtml = null)
     {
         $this->usuario = $usuario;
         $this->laboratorio = $laboratorio;
         $this->observaciones = $observaciones;
+        $this->gestion = $gestion;
+        // $informacionHtml solo se pasa en la vista previa (contenido aún no guardado)
+        $this->informacionHtml = Configuracion::informacionEmail('observacion', $usuario, $laboratorio, $gestion, $informacionHtml);
     }
     /**
      * Get the message envelope.
@@ -47,7 +53,9 @@ class EnvioObsLab extends Mailable
             with: [
                 'usuario' => $this->usuario,
                 'laboratorio' => $this->laboratorio,
-                'observaciones' => $this->observaciones
+                'observaciones' => $this->observaciones,
+                'gestion' => $this->gestion,
+                'informacionHtml' => $this->informacionHtml,
             ],
         );
     }

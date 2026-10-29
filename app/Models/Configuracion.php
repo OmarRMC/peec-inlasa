@@ -70,6 +70,78 @@ class Configuracion extends Model
         return $fechaInicio <= $hoy && $hoy <= $fechaFin;
     }
 
+    public const EMAIL_COMODINES = [
+        '{codigo}'      => 'Código del laboratorio',
+        '{laboratorio}' => 'Nombre del laboratorio',
+        '{gestion}'     => 'Gestión de la inscripción',
+        '{fecha}'       => 'Fecha de envío',
+    ];
+
+    public const EMAIL_APROBACION_INFORMACION = 'email.aprobacion.informacion';
+    public const EMAIL_OBSERVACION_INFORMACION = 'email.observacion.informacion';
+
+    public const EMAIL_TIPOS = [
+        'aprobacion'  => self::EMAIL_APROBACION_INFORMACION,
+        'observacion' => self::EMAIL_OBSERVACION_INFORMACION,
+    ];
+
+    // Claves anteriores: solo un bloque libre al final de la sección (ya no se editan)
+    private const EMAIL_BLOQUE_LIBRE = [
+        'aprobacion'  => self::EMAIL_APROBACION,
+        'observacion' => self::EMAIL_OBSERVACION,
+    ];
+
+    /** HTML original de la sección "INFORMACIÓN" según la plantilla. */
+    public static function informacionEmailPorDefecto(string $tipo): string
+    {
+        return view('emails.partials.informacion_' . $tipo)->render();
+    }
+
+    /**
+     * Contenido de la sección cuando aún no se editó: el original con el bloque libre anterior
+     * (email.aprobacion / email.observacion) en el mismo lugar donde aparecía.
+     */
+    public static function informacionEmailInicial(string $tipo): string
+    {
+        $html = self::informacionEmailPorDefecto($tipo);
+        $bloque = trim((string) self::find(self::EMAIL_BLOQUE_LIBRE[$tipo])?->valor);
+
+        if ($bloque === '' || str_contains($bloque, 'Modificable desde la configuración')) {
+            return $html;
+        }
+        if (str_contains($bloque, 'pégalo en un navegador')) {
+            return $bloque;
+        }
+
+        if (preg_match('/<body[^>]*>(.*)<\/body>/is', $bloque, $m)) {
+            preg_match_all('/<style[^>]*>.*?<\/style>/is', $bloque, $estilos);
+            $bloque = implode("\n", $estilos[0]) . "\n" . trim($m[1]);
+        }
+
+        $pos = strpos($html, '</table>', strpos($html, 'pégalo en un navegador.'));
+        $fila = "<tr>\n<td align=\"left\" style=\"padding:0;Margin:0\">\n" . $bloque . "\n</td>\n</tr>\n";
+        return substr_replace($html, $fila, $pos, 0);
+    }
+
+    /**
+     * HTML de la sección "INFORMACIÓN" del correo con los comodines reemplazados.
+     * El HTML guardado NO se compila con Blade; solo se reemplazan comodines.
+     */
+    public static function informacionEmail(string $tipo, $usuario, $laboratorio, $gestion, ?string $html = null): string
+    {
+        $html ??= self::find(self::EMAIL_TIPOS[$tipo])?->valor;
+        if (!is_string($html) || trim($html) === '') {
+            $html = self::informacionEmailInicial($tipo);
+        }
+
+        return strtr($html, array_map(fn($v) => e((string) $v), [
+            '{codigo}'      => $usuario?->username,
+            '{laboratorio}' => $laboratorio?->nombre_lab,
+            '{gestion}'     => $gestion,
+            '{fecha}'       => now()->format('d/m/Y'),
+        ]));
+    }
+
     public static function estaHabilitadoCargarCertificado()
     {
         $fechaInicio = Configuracion::where('key', Configuracion::FECHA_INICIO_REGISTRO_CERTIFICADOS)->value('valor');

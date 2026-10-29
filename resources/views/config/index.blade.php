@@ -15,7 +15,7 @@
                 </div>
             @endif
             {{-- , ['id' => 'vigencia', 'title' => 'Periodo de Vigencia'] --}}
-            @foreach ([['id' => 'registro', 'title' => 'Periodo de registro de nuevos laboratorios'], ['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.aprobacion', 'title' => 'Información personalizada para email de aprobacion'], ['id' => 'email.observacion', 'title' => 'Información personalizada para email de observacion'], ['id' => 'habilitar.docs.inscripcion', 'title' => 'Habilitar la subida de documentos de inscripción'], ['id' => 'habilitar.docs.pagos', 'title' => 'Habilitar la subida de comprobantes de pagos']] as $item)
+            @foreach ([['id' => 'registro', 'title' => 'Periodo de registro de nuevos laboratorios'], ['id' => 'inscripcion', 'title' => 'Periodo de Inscripción'], ['id' => 'pago', 'title' => 'Periodo de Pago'], ['id' => 'notificacion', 'title' => 'Notificaciones'], ['id' => 'email.aprobacion', 'title' => 'Correo de aprobación: sección INFORMACIÓN'], ['id' => 'email.observacion', 'title' => 'Correo de observación: sección INFORMACIÓN'], ['id' => 'habilitar.docs.inscripcion', 'title' => 'Habilitar la subida de documentos de inscripción'], ['id' => 'habilitar.docs.pagos', 'title' => 'Habilitar la subida de comprobantes de pagos']] as $item)
                 <div class="border border-gray-200 rounded-xl overflow-hidden">
                     <button type="button"
                         class="w-full flex justify-between items-center px-5 py-4 bg-indigo-50 hover:bg-indigo-100 font-semibold transition duration-300"
@@ -343,37 +343,11 @@
                                 @break
 
                                 @case('email.aprobacion')
-                                    <form action="{{ route($config, 'email.aprobacion') }}" method="POST">
-                                        @csrf @method('PUT')
-                                        <div>
-                                            <label for="{{ Configuracion::EMAIL_APROBACION }}"
-                                                class="block text-sm font-medium">Informacion (HTML permitido)</label>
-                                            <textarea name="{{ Configuracion::EMAIL_APROBACION }}" id="{{ Configuracion::EMAIL_APROBACION }}" rows="5"
-                                                class="input-standard" required>{{ old(Configuracion::EMAIL_APROBACION, configuracion(Configuracion::EMAIL_APROBACION) ?? '') }}</textarea>
-                                        </div>
-
-                                        <div class="text-right mt-4">
-                                            <button type="submit" class="btn-primary"><i
-                                                    class="fas fa-save mr-1"></i>Guardar</button>
-                                        </div>
-                                    </form>
+                                    @include('config.partials.email_informacion', ['tipo' => 'aprobacion'])
                                 @break
 
                                 @case('email.observacion')
-                                    <form action="{{ route($config, 'email.observacion') }}" method="POST">
-                                        @csrf @method('PUT')
-                                        <div>
-                                            <label for="{{ Configuracion::EMAIL_OBSERVACION }}"
-                                                class="block text-sm font-medium">Informacion (HTML permitido)</label>
-                                            <textarea name="{{ Configuracion::EMAIL_OBSERVACION }}" id="{{ Configuracion::EMAIL_OBSERVACION }}" rows="5"
-                                                class="input-standard" required>{{ old(Configuracion::EMAIL_OBSERVACION, configuracion(Configuracion::EMAIL_OBSERVACION) ?? '') }}</textarea>
-                                        </div>
-
-                                        <div class="text-right mt-4">
-                                            <button type="submit" class="btn-primary"><i
-                                                    class="fas fa-save mr-1"></i>Guardar</button>
-                                        </div>
-                                    </form>
+                                    @include('config.partials.email_informacion', ['tipo' => 'observacion'])
                                 @break
 
                                 @case('habilitar.docs.inscripcion')
@@ -432,6 +406,10 @@
             @endforeach
         </div>
     </div>
+
+    @push('scripts')
+        @vite('resources/js/editor-email.js')
+    @endpush
 
     <script>
         function toggleCollapse(id) {

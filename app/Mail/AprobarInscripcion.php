@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Configuracion;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -16,14 +17,16 @@ class AprobarInscripcion extends Mailable
     protected $usuario;
     protected $laboratorio;
     protected $gestion;
+    protected $informacionHtml;
     /**
      * Create a new message instance.
      */
-    public function __construct($usuario, $laboratorio, $gestion)
+    public function __construct($usuario, $laboratorio, $gestion, ?string $informacionHtml = null)
     {
         $this->usuario = $usuario;
         $this->laboratorio = $laboratorio;
         $this->gestion = $gestion;
+        $this->informacionHtml = Configuracion::informacionEmail('aprobacion', $usuario, $laboratorio, $gestion, $informacionHtml);
     }
 
     /**
@@ -47,6 +50,7 @@ class AprobarInscripcion extends Mailable
                 'usuario' => $this->usuario,
                 'laboratorio' => $this->laboratorio,
                 'gestion' => $this->gestion,
+                'informacionHtml' => $this->informacionHtml,
             ],
         );
     }
